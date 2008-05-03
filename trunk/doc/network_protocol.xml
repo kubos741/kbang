@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<article xmlns="http://do   cbook.org/ns/docbook" version="5.0" xml:lang="en">
+  <articleinfo>
+    <title>KBang Protocol Specification</title>
+    <author>
+        <firstname>MacJariel</firstname>
+        <affiliation>
+          <address><email>macjariel@users.sourceforge.net</email></address>
+        </affiliation>
+    </author>
+  </articleinfo>
+
+  <abstract>
+    <para>This article defines the KBang Protocol, a protocol used in the KBang game.</para>
+  </abstract>
+
+
+  <section>
+    <title>Introduction</title>
+    <para>
+    The KBang protocol is an open XML based protocol used in the KBang game. This protocol is still
+    in development and may change.
+    </para>
+  </section>
+    
+  <section>
+    <title>Architecture</title>
+    <section>
+        <title>Overview</title>
+        <para>The KBang architecture is quite simple. There is a KBang server that is listening for
+        incomming TCP connections. Clients can connect to that server and communicate with it. Clients
+        only communicate to server, they never communicate directly to another clients.</para>
+        <para>The following diagram provides an overview of this architecture.</para>
+        <programlisting>
+            C1
+            |
+        C2--S--C3
+            |
+            C4
+        </programlisting>
+        <para>The symbols are as follows:
+        <itemizedlist>
+            <listitem>C1, C2, C3, C4 = KBang clients</listitem>
+            <listitem>S = KBang server</listitem>
+        </itemizedlist>
+        </para>
+    </section>
+    <section>
+        <title>Server</title>
+        <para>A server acts as an arbitor that serves and judges several Bang games. 
+        All the intelligence in KBang is concentrated to the server.
+        </para>
+    </section>
+    <section>
+        <title>Client</title>
+        <para>A client connects directly to the server over a TCP connection. Then it can
+        create a new bang game or join games either as a player or as an observer.</para>
+    </section>
+   </section>
+  <section>
+    <title>XML Streams</title>
+    <section>
+        <title>Overview</title>
+        <para>An XML stream is a container for the exchange of XML elements between the client and server.
+        The start of an XML stream is denoted unambiguously by an opening XML &lt;stream&gt; tag (with appropriate
+        attributes and namespace declarations), while the end of the XML stream is denoted unambiguously by a closing
+        XML &lt;/stream&gt; tag. During the life of the stream, the entity that initiated it can send an unbounded
+        number of XML elements over the stream. The "initial stream" is negotiated from the initiating entity (usually
+        a client) to the receiving entity (usually a server), and can be seen as corresponding to the initiating
+        entity's "session" with the receiving entity. The initial stream enables unidirectional communication from the
+        initiating entity to the receiving entity; in order to enable information exchange from the receiving entity
+        to the initiating entity, the receiving entity MUST negotiate a stream in the opposite direction
+        (the "response stream").</para>
+        <para>Consider the example of a client's session with a server. In order to connect to a server, a client
+        initiates an XML stream by sending an opening &lt;stream&rt; tag to the server.
+    </section>
+  </section>
+
+  <section>
+    <title>Handshaking and creating/joining game</title>
+    <para>The KBang communications starts after client (C) initializes a TCP connection
+    to specified port on the KBang server (S). C sends the following XML:
+
+
+    </para>
+  </section>
+
+</article>
+<!--
+  <title>Sample article</title>
+  <para>This is really very short article.</para>
+
+Part 1: Handshaking and creating/joining the game
+
+The KBang communication is based on the client-server model. Clients could be
+players or observers and they connect to a KBang server. After some "handshaking"
+clients can query server for some server parameters like the name and description
+of the server or the list of created games. Clients can then create a new game or
+join to existing game. Any of these action can be disabled by server (ie. games can
+be created only by admins).
+
+Let's see this process in details. Client (C) initializes the tcp connection to
+specified port on the server (S). C sends the following XML:
+<stream>
+    [TODO]
+
+S responds with:
+<stream>
+    [TODO]
+
+In this state the communication is established and client is ready to query server for
+basic parameters:
+
+C:  
+    <serverquery id=123>
+        <get name="serverName" />
+    </serverquery>
+S:
+    <serverquery id=123>
+        <result name="serverName" value="Example server" />
+    </serverquery>
+
+C:
+    <serverquery id="124">
+        <get name="gameList" />
+    </serverquery>
+S:
+    <serverquery id=123>
+        <result name="serverName">
+            [TODO] // hry jsou identifikovane pomoci id:32bit unsigned integer
+        </result>
+    </serverquery>
+
+Client can query for these parameters anytime while connected to the server.
+
+After listing games, client can decide to join one of them or create a new one:
+C:
+    <serverquery id
+        join
+
+[EXAMPLE CREATE GAME]
+
+Client can create/join a game only if he is not in a game already (either as a player or as
+a observer).
+
+The player that creates the game gets some special rights. He sets the parameters
+of the games (minimal and maximal player count, used rulesets (expansion sets, etc.),
+some passwords (player password, observer password, see for password policy for details),
+[maybe something more ?] - what about a flag "Shuffle players" that will schuffle the players order
+after starting the game - without this, players will be ordered according to the time of joining the game,
+or maybe the game creator could reshufle them)
+and then the game is created. This game is listed in the
+ gameList result and is in the waitingForPlayers (maybe rename the state) state. Clients
+ can join this game by the join command (what is the syntax) as a player (can be observer as well).
+
+After joining the game players can chat with each other in the game [see chatting], but must wait for start of the game.
+During this time they can set some parameters like password (this is necessary for reconnecting) but they cannot pick
+roles, etc. This is possible after the game is started. (There is a reason for this: imagine if a client could pick characters
+imediatelly after he join the game. If he got "bad" characters to choose from, he could leave the game and join again and a new
+pair of characters would be generated for him. This is obviously kind of cheat. )
+The game in the waitingForPlayers can be either started or canceled. The game creator has the right to do that.
+(this can be done by administrator as well) One client can be joined to only one game so after joining the game
+he must leave to join another one.
+
+If the game is cancelled, client is informed by:
+    [TODO]
+
+Client can also join games that has already started, either as a observer (client can do this anytime, depending on the
+game configuration) or as a player (there must be a unattached player (i.e. player without a client) with a set password
+and client must know that password).
+
+
+Password policy:
+    Protecting games
+    games can be protected by two types of passwords - player password and observer password. If client wants to join the game
+    as a player, he needs to know the player password. If client wants to join the game as an observer, he needs to know either
+    the player password or the observer password. The game could be either fully unprotected or it can have only player password set
+    or both password could be set. It's impossible to set only observer password.
+
+
+    Protecting players
+    When a client becomes a player, he can set a password. Later, in case he disconnects for any reason, he can reconnect
+    to that game only if he knows that player password. This behavior can be altered by server settings. For instance server
+    can do some countdown after player disconnects and if the client does not reconnect in time, server would use AI.
+
+
+
+
+Getting information in game
+
+The commands in this section can be used by observers and players, so any client connected to a game can use this queries.
+Clients can query for global state of the game:
+    TODO: parameters - game name, game description, count of players, list of players, the number of current turn, the current player,
+    the player with the token
+    (players should be counted by id), number of cards on the pile, number of cards on the graveyard, top card on the graveyard
+    temporary card lists (after playing General Store) - they should be more of them and some should be private (the situation of
+    playing panic to some players hand should be modeled)
+
+    there should be an example for getting any of these stuff..
+    list of players (what would be the order - obviously the player id (int) would not represent the (usporadani) of the players
+
+
+    this construction should be sufficent to get any necessary information about game state that is not related to a concrete player.
+    (there should be a space for some extensions, like using expansion sets with extra decks)
+
+Clients can also query for some players related information. In this case a client must specify the target player by his id.
+    Querying for: player name, character card, number of lifes, max number of lifes, the number of cards in his hands, the list of cards on the
+    table in front of him, ... )
+
+
+Commands for players only:
+    querying own state:
+    Every player can query for his own state. He can query for the common public things using the query syntax described above and for
+    getting private things he need to use this syntax: ..todo..
+    He can query for: the role, list of cards in hands
+
+
+Recieving events in game:
+
+Although clients could be satisfied with just quering for state, there could emerge some problems with that. For this reason there are events.
+When something happens, server broadcasts the events about this and clients should update their own state of game. They should use quering for
+state from time to time or if they connect to an already started game. There are ? types of events:
+* public events
+These events are sent to any client connected to the game and represent any public action that is seen during the game. It contains:
+  
+  * player draws cards (the beginning of the turn)
+  * player draws card(s) for other reason  (prison/dynamite, effect of character,...)
+  * player plays any card (either by discarding it or by putting it on the table)
+  * player discard cards (from hand or from table - it could be either by his decision or for example after playing cat balow))
+  * player gives some cards to another player (mostly after playing panic)
+  * player gets the token (the player that has the token is the one that should do some action - it does not always mean, that
+    it is that players turn)
+
+
+* private events
+This kind of events apply only to players and it consists of the actions that only concrete player knows about. In the Bang
+game everybody knows that some action happens (someone take a card and put it somewhere else), but not always everyone know
+the details (only two players know what card has been taken from someone's hand by panic). When the events are broadcasted,
+some clients get only the public part (eg. count of cards drawn from the deck) and some of them get the private part as well
+(what cards they were).
+
+
+Commiting actions:
+There is a set of commands that are used to actualy play the game. The necessary thing to say is that these action commands can
+be used only by players that has the token. So in any state of the game there is just one player that is expected to send an action command.
+
+These commands are:
+    * drawing cards
+    * playing cards
+    * choosing cards from a list
+
+
+
+
+
+
+
+
+Pretending actions:
+    every action can be pretended in sense that the game tells you if that is or is not possible.. for example you can say:
+        player 1 plays bang on player 2
+        and the server will respond if that would be possible
+
+-->
+
+
+
+
+
+
+
+
+
+
