@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<article xmlns="http://do   cbook.org/ns/docbook" version="5.0" xml:lang="en">
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
   <articleinfo>
     <title>KBang Protocol Specification</title>
     <author>
-        <firstname>MacJariel</firstname>
-        <affiliation>
-          <address><email>macjariel@users.sourceforge.net</email></address>
-        </affiliation>
+      <firstname>MacJariel</firstname>
+      <affiliation>
+        <address>
+          <email>macjariel@users.sourceforge.net</email>
+        </address>
+      </affiliation>
     </author>
   </articleinfo>
-
   <abstract>
     <para>This article defines the KBang Protocol, a protocol used in the KBang game.</para>
   </abstract>
-
-
   <section>
     <title>Introduction</title>
     <para>
@@ -22,46 +22,46 @@
     in development and may change.
     </para>
   </section>
-    
   <section>
     <title>Architecture</title>
     <section>
-        <title>Overview</title>
-        <para>The KBang architecture is quite simple. There is a KBang server that is listening for
+      <title>Overview</title>
+      <para>The KBang architecture is quite simple. There is a KBang server that is listening for
         incomming TCP connections. Clients can connect to that server and communicate with it. Clients
         only communicate to server, they never communicate directly to another clients.</para>
-        <para>The following diagram provides an overview of this architecture.</para>
-        <programlisting>
+      <para>The following diagram provides an overview of this architecture.</para>
+      <programlisting>
             C1
             |
         C2--S--C3
             |
             C4
         </programlisting>
-        <para>The symbols are as follows:
-        <itemizedlist>
-            <listitem>C1, C2, C3, C4 = KBang clients</listitem>
-            <listitem>S = KBang server</listitem>
-        </itemizedlist>
-        </para>
+      <para>The symbols are as follows:</para>
+      <itemizedlist>
+        <listitem>
+          <para>C1, C2, C3, C4 = KBang clients</para>
+        </listitem>
+        <listitem>
+          <para>S = KBang server</para>
+        </listitem>
+      </itemizedlist>
     </section>
     <section>
-        <title>Server</title>
-        <para>A server acts as an arbitor that serves and judges several Bang games. 
+      <title>Server</title>
+      <para>A server acts as an arbitor that serves and judges several Bang games. 
         All the intelligence in KBang is concentrated to the server.
         </para>
     </section>
     <section>
-        <title>Client</title>
-        <para>A client connects directly to the server over a TCP connection. Then it can
+      <title>Client</title>
+      <para>A client connects directly to the server over a TCP connection. Then it can
         create a new bang game or join games either as a player or as an observer.</para>
     </section>
-   </section>
+  </section>
   <section>
     <title>XML Streams</title>
-    <section>
-        <title>Overview</title>
-        <para>An XML stream is a container for the exchange of XML elements between the client and server.
+    <para>An XML stream is a container for the exchange of XML elements between the client and server.
         The start of an XML stream is denoted unambiguously by an opening XML &lt;stream&gt; tag (with appropriate
         attributes and namespace declarations), while the end of the XML stream is denoted unambiguously by a closing
         XML &lt;/stream&gt; tag. During the life of the stream, the entity that initiated it can send an unbounded
@@ -71,25 +71,235 @@
         initiating entity to the receiving entity; in order to enable information exchange from the receiving entity
         to the initiating entity, the receiving entity MUST negotiate a stream in the opposite direction
         (the "response stream").</para>
-        <para>Consider the example of a client's session with a server. In order to connect to a server, a client
-        initiates an XML stream by sending an opening &lt;stream&rt; tag to the server.
+    <para>Consider the example of a client's session with a server. In order to connect to a server, a client
+        initiates an XML stream by sending an opening &lt;stream&gt; tag to the server. Server then responds by
+	sending an opening &lt;stream&gt; tag and opens the response stream.</para>
+    <para>As soon as both streams are opened, both sides can send "XML commands" to each other. 
+	Some commands are availible for the entire life of the session and others can be used only in specified situations.</para>
+  </section>
+  <section>
+    <title>Client states</title>
+    <para>As soon as the session between client and server is established, client is associated with a state. This
+    information is stored on server and it is server responsibility to change it. The state of a client represents
+    the place on server where client currently is and it determines which commands can client use. The client states
+    are:</para>
+    <itemizedlist>
+      <listitem>
+        <para>uninitialized - the client hasn't send the identification yet</para>
+      </listitem>
+      <listitem>
+        <para>unassociated - the client is not associated with a game</para>
+      </listitem>
+      <listitem>
+        <para>observing - the client is connected to a game as an observer</para>
+      </listitem>
+      <listitem>
+        <para>playing - the client is connected to a game as a player</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+	<section>
+		<title>Global client commands</title>
+		<para>
+			There are some commands that can be executed by client anytime during the session.
+		</para>
+		<section>
+			<title>Server details quering</title>
+			<para>
+				A client can query server for details such as the server name, etc.
+				Client can send this query:
+			</para>
+      <programlisting><![CDATA[ 
+<iq type='get' id='1'>
+  <query xmlns='kbang:iq:server:desc' />
+</iq>
+]]></programlisting>
+      <para>
+				Server then responds:
+			</para>
+			<programlisting><![CDATA[ 
+<iq type='result' id='1'>
+  <query xmlns='kbang:iq:server:desc'>
+    <serverdesc name='Example server' description='Example description' />
+  </query>
+</iq>
+]]></programlisting>
+		</section>			
+	</section>
+	<section>
+    <title>Uninitialized state</title>
+    <para>After client establishes the connection with server and both streams are open, client must
+    identify itself to become active.</para>
+    <section>
+      <title>Setting identity</title>
+      <para>Right after a client establishes the stream connection with a server, it MUST 
+	    set its identity. This can be done by sending this XML command:</para>
+      <programlisting><![CDATA[ 
+<iq type='set' id='2'>
+  <query xmlns='kbang:iq:identity'>
+    <alias>somealias</alias>
+  </query>
+</iq>
+]]></programlisting>
+      <para>Alias MUST be unique within a server. If a client sends non-unique alias, error is returned:</para>
+      <programlisting><![CDATA[ 
+<iq type='error' id='2' />
+]]></programlisting>
+       <para>If the identity is successfully set, the server MUST send a result:</para>
+      <programlisting><![CDATA[ 
+<iq type='result' id='2' />
+]]></programlisting>
+      <para>Client can change its identity later, but this command MUST be used only when client is not connected to a game.</para>
     </section>
   </section>
-
   <section>
-    <title>Handshaking and creating/joining game</title>
-    <para>The KBang communications starts after client (C) initializes a TCP connection
-    to specified port on the KBang server (S). C sends the following XML:
-
-
-    </para>
+		<title>Unassociated state</title>
+		<para>A client is in the unassociated state if it is already identified (by setting identity) and is not
+			connected to a game. A client can get into this state from the <command>uninitialized</command> state or
+			from <command>observing</command> or <command>playing</command> state when leaving the game.</para>
+		<para>
+      Clients in this state can query server for list of games and/or create new games.
+		</para>
+    <section>
+      <title>Quering for games</title>
+      <para>To get the list of games client must send following command:</para>
+      <programlisting><![CDATA[ 
+<iq type='get' id='gamelisting_1'>
+  <query xmlns='kbang:iq:server:games' />
+</iq>
+]]></programlisting>
+      <para>
+        Server then responds with the list of games or with error (if the client is not in the right state).
+        The list of games may look like this:
+      </para>
+      <programlisting><![CDATA[ 
+<iq type='result' id='gamelisting_1'>
+  <query xmlns='kbang:iq:server:games'>
+    <game gid='1'
+          name='The Example Bang Game'
+          desc='The game description'
+          minplayers='5'
+          maxplayers='7'
+          maxobservers='10'
+          currentplayers='2'
+          currentobservers='0'
+          state='awaiting'
+          ruleset='bang'
+          playerpassword='0'
+          observerpassword='0'
+          />
+    <game gid='2'
+          name='The Example Bang Game #2'
+          desc='Another description'
+          minplayers='4'
+          maxplayers='7'
+          maxobservers='0'
+          currentplayers='5'
+          currentobservers='0'
+          state='running'
+          ruleset='bangexp1'
+          playerpassword='1'
+          observerpassword='0'
+          />
+  </query>
+</iq>
+]]></programlisting>
+    </section>
+    <section>
+      <title>Creating games</title>
+      <para>
+        A client that is in the unassociated state can create a new bang game. It can be done
+        with the following command.
+      </para>
+      <programlisting><![CDATA[ 
+<iq type='set' id='creategame_1'>
+  <query xmlns='kbang:iq:server:games'>
+    <game name='The Example Bang Game'
+          desc='The game description'
+          minplayers='5'
+          maxplayers='7'
+          maxobservers='10'
+          ruleset='bang'
+          playerpassword='SomePassword'
+          observerpassword=''
+          shuffleplayers='1'
+          />
+  </query>
+</iq>
+]]></programlisting>
+      <para>
+        The player that creates the game must sets these atributes:
+      </para>
+      <itemizedlist>
+        <listitem><para>
+            <code>name</code> - The name of the game. Should be short (&lt; 16 characters) string.
+        </para></listitem>
+        <listitem><para>
+            <code>desc</code> - The description of the game. Should be less than 128 characters.
+        </para></listitem>
+        <listitem><para>
+            <code>minplayers</code> - The minimum number of players, must be less or equal to <code>maxplayers</code>.
+        </para></listitem>
+        <listitem><para>
+            <code>maxplayers</code> - The maximum number of players, must be greater or equal to <code>minplayers</code>.
+        </para></listitem>
+        <listitem><para>
+            <code>maxobservers</code> - The maximum number of observers. If set to 0, observers are disabled.
+        </para></listitem>
+        <listitem><para>
+            <code>ruleset</code> - The ruleset for the game. See rulesets. [TODO - link]
+        </para></listitem>
+        <listitem><para>
+            <code>playerpassword</code> - The password for players. If empty string is set, the game is not protected by player password.
+        </para></listitem>
+        <listitem><para>
+            <code>observerpassword</code> - The password for observers. If empty string is set, the game is not protected by observer password.
+              Can be used only when player password is set.
+        </para></listitem>
+        <listitem><para>
+            <code>shuffleplayers</code> - If this flag is set to 1, the order of players is shuffled after starting the game. Otherwise the 
+            time of connecting to game is used for player order. (hint: server can implement a feature for the game creator to reorder players if
+            shuffleplayers is not set.
+        </para></listitem>
+        <listitem><para>
+            <code>joinas</code> - This parameter should be either <code>player</code> or <code>observer</code>.
+        </para></listitem>
+      </itemizedlist>
+      <para>
+        After the game is created, it gets into the game listing and clients can connect to the game. The creating player is automatically connected
+        to the game as a player or observer (depends on the joinas parameter). The game is in the <code>waitingForPlayers</code> state.
+      </para>
+      <para>
+        If everything goes well, the server responds with the result iq stanza (similar to that in game listing). Else an error stanza is send to client.
+      </para>
+    </section>
+    <section>
+      <title>Joining games</title>
+      <para>
+        A client that is in the unassociated state can join a new bang game. If joining the game as an observer, the only
+        need is that the game has less observers than <code>maxobservers</code> and client knows either the player or observer password
+        (if needed). If joining as a player, the game must have less players than <code>maxplayers</code>, client must know the player password
+        and the game must be in the <code>waitingForPlayers</code> state. There is one exception thouugh. Player can join a game not in the
+        <code>waitingForPlayers</code> state, but only to substitute an unattached player (i.e player without a client).
+      </para>
+      <programlisting><![CDATA[ 
+<iq type='set' id='joingame_1'>
+  <query xmlns='kbang:iq:server:joingame'>
+    <gid>123</gid>
+    <password>password</password>
+    <role>player</role>
+  </query>
+</iq>
+]]></programlisting>
+      <para>
+        The player that creates the game must sets these atributes:
+      </para>
+ 
   </section>
+
 
 </article>
 <!--
-  <title>Sample article</title>
-  <para>This is really very short article.</para>
-
 Part 1: Handshaking and creating/joining the game
 
 The KBang communication is based on the client-server model. Clients could be
@@ -262,13 +472,3 @@ Pretending actions:
         and the server will respond if that would be possible
 
 -->
-
-
-
-
-
-
-
-
-
-
