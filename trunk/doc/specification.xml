@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+  <articleinfo>
+    <title>KBang General Specification</title>
+    <author>
+      <firstname>MacJariel</firstname>
+      <affiliation>
+        <address>
+          <email>macjariel@gmail.com</email>
+        </address>
+      </affiliation>
+    </author>
+  </articleinfo>
+  <abstract>
+    <para>
+      This is the KBang General Specification, the text that describes basic principes in the KBang implementation.
+    </para>
+  </abstract>
+  <section>
+    <title>Introduction</title>
+    <para>
+      The KBang is a computer multiplayer card game. It's based on the card Bang! game. 
+    </para>
+  </section>
+  <section>
+    <title>Game Entity</title>
+    <section>
+      <title>Introduction</title>
+      <para>
+        In the KBang core, the <code>Game</code> entity represents one Bang! game. There can be any number of <code>Game</code> entities
+        (identified by integer identificator <code>gid</code>) and their state is maintained on the server. The <code>Game</code> life cycle
+        can be represented by several states and transitions between them.
+      </para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="diagrams/game_states.png" format="PNG" />
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="diagrams/game_states.eps" format="EPS" />
+          </imageobject>
+        </mediaobject>
+    </section>
+    <section>
+      <title>Game States</title>
+      <section>
+        <title>WaitingForPlayers</title>
+        <para>
+          This is the initial state. Right after the game is created, clients can enter this game, either as players or as observers. Only the
+          initiating client has the right to start the game. Therefore, if the initiating client leaves the game, the game is cancelled and all
+          connected clients are &quot;kicked&quot;.
+        </para>
+        <para>
+          When the initiating client decides that the game is ready to start, he can start the game. Nevertheless he cannot start the game if there are
+          less players in the game than the minplayers parameter. After the game is started, the state of the <code>Game</code> changes to
+          <code>GameInitialization</code>. No players can connect from now on.
+        </para>
+        <para>
+          <emphasis>Proposal:</emphasis>
+          The initiating player has the right to change the order of players (who sits next to whom).
+        </para>
+      </section>
+      <section>
+        <title>GameInitialization</title>
+        <para>
+          Yet the only decided things are who is playing (the list of players) and where are they &quot;sitting&quot; (the order of players).
+          In this phase every player is given a role (sheriff, deputy, etc.) and two character cards. These three cards are given to the players privately,
+          so players can see only their cards. Every player has to choose on of those two character cards. After a player chooses a card, other clients get
+          the information that this player is ready. After all players chose their character cards, their chosen cards are revealed to the
+          public. The other character cards (not chosen ones) are not revealed to public and only role card that is revealed is the sherif card.
+        </para>
+        <para>
+          The player that is the sherif starts the game. The state of the <code>Game</code> changes to <code>GameTurn</code>.
+        </para>
+      </section>
+      <section>
+        <title>GameTurn</title>
+        <para>
+          This state represents the time of player's turn. It starts when player draws cards and lasts to the end of his turn, although it
+          can be interupted by transiting into <code>PlayerReaction</code> state and back. When the <code>Game</code> is in the <code>GameTurn</code>
+          state, it is always associated with a player who is expected to trigger an action. Consider the following example of a Bang! game.
+        </para>
+        <para>
+          The previous player ends his turn and our player starts his turn. The <code>Game</code> state &quot;changes&quot; from <code>GameTurn</code> (associated
+          with previous player) to <code>GameTurn</code> (associated with our player). He (and only he) is now expected to do actions. He draws
+          two cards and plays Bang! card to some player. Right after he played that card, there must be a space for reactions (by target of the Bang! card) so the 
+          state of the <code>Game</code> changes to <code>PlayerReaction</code> and the target player now has the space to do some actions (defend himself, get hurt, etc.).
+          After his reaction, the <code>GameTurn</code> state is restored and our player can continue with other actions. Afterwards he can end his turn and another player
+          is playing.
+        </para>
+      </section>
+      <section>
+        <title>PlayerReaction</title>
+        <para>
+          This state occurs when a current player plays a card that needs other player interaction. It can be for instance Bang, General Store or Duel. In
+          case of Bang card only the interaction of one player is required. But in case of General Store, every player has to pick a card. Let's have
+          an example:
+        </para>
+        <para>
+          A player plays the General Store. Some cards are put on the table and the initiating player has the right to choose first. It's necessary to realize
+          that right after the player played the General Store card, the state changed to <code>PlayerReaction</code>. Player chose a card and another player
+          chooses from the rest of cards. The <code>PlayerReaction</code> state &quot;changed&quot; to <code>PlayerReaction</code> again, but now it's associated
+          with the other player. After the last player takes the last card, the <code>GameTurn</code> state is restored and the game continues as before.
+        </para>
+      </section>
+      <section>
+        <title>GameOver</title>
+        <para>
+          This is the final state. After any objective of the game is met, the <code>Game</code> state goes into the <code>GameOver</code> state and the
+          game is frozen from now on.
+        </para>
+        <para>
+          The game should persist until the last player leaves the game and joining the game as an observer should be forbidden now.
+        </para>
+      </section>
+    </section>
+    <section>
+      <title>Player Token</title>
+      <para>
+
+      </para>
+    </section>
+  </section>
+  <section>
+    <title>Client UI</title>
+    <para>
+      The Client UI should look like this:
+    </para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="ui/ingame.png" format="PNG" />
+      </imageobject>
+    </mediaobject>
+    <para>
+      When connected as a observer, there will be no player part (the bigger area in the middle bottom).
+    </para>
+  </section>
+</article>

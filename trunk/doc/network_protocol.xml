@@ -212,19 +212,17 @@
         with the following command.
       </para>
       <programlisting><![CDATA[ 
-<iq type='set' id='creategame_1'>
-  <query xmlns='kbang:iq:server:games'>
-    <game name='The Example Bang Game'
-          desc='The game description'
-          minplayers='5'
-          maxplayers='7'
-          maxobservers='10'
-          ruleset='bang'
-          playerpassword='SomePassword'
-          observerpassword=''
-          shuffleplayers='1'
-          />
-  </query>
+<iq type='action' id='creategame_1'>
+  <creategame name='The Example Bang Game'
+              desc='The game description'
+              minplayers='5'
+              maxplayers='7'
+              maxobservers='10'
+              ruleset='bang'
+              playerpassword='SomePassword'
+              observerpassword=''
+              shuffleplayers='1'
+             />
 </iq>
 ]]></programlisting>
       <para>
@@ -282,19 +280,66 @@
         and the game must be in the <code>waitingForPlayers</code> state. There is one exception thouugh. Player can join a game not in the
         <code>waitingForPlayers</code> state, but only to substitute an unattached player (i.e player without a client).
       </para>
+      <para>
+        Suppose a client wants to join a game with <code>gid=123</code> as a player:
+      </para>
       <programlisting><![CDATA[ 
-<iq type='set' id='joingame_1'>
-  <query xmlns='kbang:iq:server:joingame'>
-    <gid>123</gid>
-    <password>password</password>
-    <role>player</role>
-  </query>
+<iq type="action" id='joingame_1'>
+  <joingame gid="123"
+            role="player" />
 </iq>
 ]]></programlisting>
       <para>
-        The player that creates the game must sets these atributes:
+        If this game is protected by password the server responds with an error:
       </para>
- 
+      <programlisting><![CDATA[ 
+<iq type='error' id='joingame_1'>
+  <not-authorized />
+</iq>
+]]></programlisting>
+      <para>
+        In this case the client needs to send password to connect to this server. The client should know that the game was password-protected (from
+        the game listing) and should have used the following command in the first place:
+      </para>
+<programlisting><![CDATA[ 
+<iq type='action' id='joingame_2'>
+  <joingame gid="123"
+            role="player"
+            password="a_password" />
+</iq>
+]]></programlisting>
+      <para>
+        If the password is wrong, the same error as above is returned. If the game is not password-protected or the password is right, the server responds
+        with the following:
+      </para>
+<programlisting><![CDATA[ 
+<iq type='result' id='joingame_2'>
+  <joingame gid="123"
+            role="player"
+            playername="PlayerName" />
+</iq>
+]]></programlisting>
+      <para>
+        Note that there is no password in the result. The <code>password</code> field SHOULD be cut from the result. There is also an extra <code>playername</code> field.
+        Players can have different names than their clients (it's because client can disconnect and another client can connect instead of him, but the playername must
+        persist). Client SHOULD send the <code>playername</code> attribute in the <code>joingame</code>, but if he doesn't send the name, it's automatically set from the
+        client name.
+      </para>
+    </section>
+  </section>
+
+	<section>
+    <title>Playing state</title>
+    <para>
+      After the client creates/joins the game, he gets into the <code>playing state</code>. The client rights and obligations depend on the 
+      state of the game.
+    </para>
+    <section>
+      <title>Game states</title>
+      <para>
+        There are several game states.
+      </para>
+    </section>
   </section>
 
 
