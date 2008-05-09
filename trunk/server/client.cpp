@@ -27,28 +27,13 @@
 
 
 Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
- : QObject(parent), mp_tcpSocket(socket), m_clientId(clientId),
-   m_xml(socket), m_parsingState(START)
+ : QObject(parent), m_clientId(clientId), m_xmlParser(this, socket),
+   m_clientState(CLIENT_STATE_START)
 {
-    std::cerr << "Client id " << clientId << " connected." << std::endl;    
-//    connect(socket, SIGNAL(destroyed()),
-//            this, SLOT(deleteLater()));
-/*            
-    connect(this, SIGNAL(destroyed()),
-            socket, SLOT(deleteLater()));
-*/
-    connect(socket, SIGNAL(readyRead()),
-            this, SLOT(readData()));
-            
-//    connect(socket, SIGNAL(disconnected()),
-//            socket, SLOT(deleteLater()));
-    
+    std::cerr << "Client id " << clientId << " connected." << std::endl;
     connect(socket, SIGNAL(disconnected()),
             this, SLOT(disconnectFromHost()));
-            
 }
-
-
 
 
 Client::~Client()
@@ -56,55 +41,64 @@ Client::~Client()
     std::cerr << "Client id " << m_clientId << " dies!" << std::endl;
 }
 
-void Client::readData()
-{
-    qDebug("Client::readData()");
-    bool disconnect = 0;
-    while(!m_xml.atEnd())
-    {
-        QXmlStreamReader::TokenType tokenType = m_xml.readNext();
-        std::cout << tokenType << std::endl;
-        if (tokenType <= 3 || tokenType >= 7) continue;
-        switch(m_parsingState)
-        {
-            case START:
-                disconnect = parseStart();
-                break;
-        }
-    }
-    QXmlStreamReader::Error error = m_xml.error();
-    if (error && error != 4)
-    {
-        std::cout << error << std::endl;
-        qDebug("Invalid client. XmlStreamReader::Error.");
-        disconnect = 1;
-    }
-    if (disconnect)
-    {
-        disconnectFromHost();
-    }
-}
 
 void Client::disconnectFromHost()
 {
-    m_xml.clear();
-    mp_tcpSocket->disconnectFromHost();
+    m_xmlParser.disconnectFromHost();
     emit clientDisconnected(m_clientId);
 }
 
+/*
 bool Client::parseStart()
 {
     if (!m_xml.isStartElement() || m_xml.name() != "stream")
     {
         qDebug("Invalid client. Opening stream tag expected.");
+        disconnectFromHost();
         return 1;
     }
     QXmlStreamAttributes attrs = m_xml.attributes();
     QStringList version = attrs.value("", "version").toString().split(".");
     if (version.size() >= 1) m_protocolVersion.first = version[0].toInt();
     if (version.size() >= 2) m_protocolVersion.second = version[1].toInt();
-    std::cout << "Version: " << m_protocolVersion.first << "." << m_protocolVersion.second << std::endl;
+    m_clientState = CLIENT_STATE_INIT_RECIEVED;
+    m_parseLevel = 0;
+    sendStart();
     return 0;
 }
 
+void Client::parseEnd()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << "</stream>\n";
+    mp_tcpSocket->write(block);    
+    disconnectFromHost();
+}
 
+void Client::sendStart()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << "<stream version=\"1.0\">\n";
+    mp_tcpSocket->write(block);
+
+}
+
+void Client::parseIq()
+{
+    QXmlStreamAttributes attrs = m_xml.attributes();
+    QString id = attrs.value("", "id");
+    QString type = attrs.value("", "type");
+    if (id.isEmpty() || type.isEmpty()) return sendIqError();
+    
+}
+
+void Client::sendIqError()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << "<iq type=\"error\" id="" />\n";
+    mp_tcpSocket->write(block);
+}
+*/

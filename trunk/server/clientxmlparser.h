@@ -17,62 +17,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
-
-#include "clientxmlparser.h"
+#ifndef CLIENTXMLPARSER_H
+#define CLIENTXMLPARSER_H
 
 #include <QObject>
-#include <QPair>
+#include <QXmlStreamReader>
 
-
-class GameServer;
 class QTcpSocket;
+class Client;
 
 
-enum ClientState
-{
-    CLIENT_STATE_START,
-    CLIENT_STATE_INIT_RECIEVED,
-    CLIENT_STATE_INIT_SENT
-};
 
 
 /**
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
+class ClientXmlParser : public QObject
 {
 Q_OBJECT
 public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-
-private slots:
+    ClientXmlParser(Client* parent, QTcpSocket*  socket);
+    virtual ~ClientXmlParser();
     void disconnectFromHost();
     
-signals:
-    void clientDisconnected(int clientId);
-
-/*
-private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
-
-private:
+public slots:
+    void readData();
     
-    const int m_clientId;    
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientState m_clientState;
-    int m_parseLevel;
+
+private:
+    void parseStream();
+    void parseStanza();
+    void sendData(const QString& data);
+
+private:
+    QXmlStreamReader m_xml;
+    QTcpSocket* mp_socket;
+    Client* mp_client;
+
+    int m_depth;
+    bool m_inStreamInitialized;
+    bool m_outStreamInitialized;
+    struct { quint16 major, minor; } m_protocolVersion;
+    
 };
 
 #endif
