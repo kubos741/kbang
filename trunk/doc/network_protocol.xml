@@ -72,8 +72,17 @@
         to the initiating entity, the receiving entity MUST negotiate a stream in the opposite direction
         (the "response stream").</para>
     <para>Consider the example of a client's session with a server. In order to connect to a server, a client
-        initiates an XML stream by sending an opening &lt;stream&gt; tag to the server. Server then responds by
-	sending an opening &lt;stream&gt; tag and opens the response stream.</para>
+      initiates an XML stream by sending an opening &lt;stream&gt; tag to the server.</para>
+			<programlisting><![CDATA[ 
+<?xml version='1.0'?>        
+<stream xmlns='kbang' version='1.0'>
+]]></programlisting>
+    <para>Server then responds by
+      sending an opening &lt;stream&gt; tag and opens the response stream.</para>
+<programlisting><![CDATA[ 
+<?xml version='1.0'?>        
+<stream xmlns='kbang' version='1.0'>
+]]></programlisting>
     <para>As soon as both streams are opened, both sides can send "XML commands" to each other. 
 	Some commands are availible for the entire life of the session and others can be used only in specified situations.</para>
   </section>

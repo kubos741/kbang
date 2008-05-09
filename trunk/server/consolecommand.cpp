@@ -20,9 +20,51 @@
 
 #include <QTextStream>
 #include "consolecommand.h"
+#include "console.h"
 #include "gameserver.h"
 
 
+#define CMDDEF(name) bool name(const QStringList& args, Console& console)
+#define CMDREG(name, function) cmdHash.insert(name, function)
+#define CMDALIAS(name, alias) cmdHash.insert(name, cmdHash[alias])
+
+QHash<QString, ConsoleCmd*> cmdHash;
+
+
+ConsoleCmd* console_get_command(const QString& cmdName)
+{
+    if (cmdHash.contains(cmdName))
+    {
+        return cmdHash.value(cmdName);
+    }
+    return 0;
+}
+
+CMDDEF(console_help)
+{
+    (void) args;
+    console.Cout() << "Help" << endl;
+    return 1;
+}
+
+CMDDEF(console_quit)
+{
+    (void) args;
+    (void) console;
+    GameServer::instance().exit();
+    return 1;
+}
+
+
+void console_register_commands()
+{
+    CMDREG("help", &console_help);
+    CMDREG("quit", &console_quit);
+    CMDALIAS("exit", "quit");
+}
+
+
+/*
 QMap<QString, ConsoleCmd*> ConsoleCmd::mp_commands;
 ConsoleCmd* ConsoleCmd::mp_cmdNotFound = 0;
 
@@ -31,6 +73,7 @@ void ConsoleCmd::initialize()
     ConsoleCmdGet::initialize();
     ConsoleCmdNotFound::initialize();
     ConsoleCmdHelp::initialize();
+    ConsoleCmdQuit::initialize();
 }
 
 QPair<QString, QStringList> ConsoleCmd::parse(QString command)
@@ -76,8 +119,6 @@ QString ConsoleCmdHelp::execute(const QString&, const QStringList& attributes, c
 
 }
 
-
-
 void ConsoleCmdHelp::initialize()
 {
     ConsoleCmd::appendCommand("help", new ConsoleCmdHelp());
@@ -88,9 +129,14 @@ QString ConsoleCmdGet::execute(const QString&, const QStringList& params, const 
     if (params.count() == 0) return QString("use: get [VAR]");
     if (params[0] == "name") return gs->name();
 
-        return QString("This is the get command.");
-        }
+    return QString("This is the get command.");
+}
 
+void ConsoleCmdHelp::quit()
+{
+    ConsoleCmd::appendCommand("quit", new ConsoleCmdQuit());
+}
+*/
 
 
 

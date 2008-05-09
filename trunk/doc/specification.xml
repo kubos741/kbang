@@ -24,6 +24,29 @@
     </para>
   </section>
   <section>
+    <title>Server Entity</title>
+    <section>
+      <title>Introduction</title>
+      <para>
+        The <code>Server</code> entity represents a KBang server. This entity takes care of creating games, let clients join games and
+        provides the administration console. After the KBang server is started, the administration console appears and admin can use commands
+        to get the state of game or do some actions (e.g create a game).
+      </para>
+    </section>
+    <section>
+      <title>Implementation</title>
+      <para>
+        This entity is called <code>GameServer</code> in source codes and is responsible for storing <code>Client</code> and <code>Game</code> entities.
+        It also holds the global server attributes, such as server name, etc.
+
+      </para>
+    </section>
+
+  </section>
+  
+  
+  
+  <section>
     <title>Game Entity</title>
     <section>
       <title>Introduction</title>

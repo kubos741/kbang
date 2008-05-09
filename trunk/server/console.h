@@ -20,11 +20,13 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include "consolecommand.h"
 #include "gameserver.h"
 #include <QtCore>
 
 
-class GameServer;
+
+
 
 /**
  * @author MacJariel <macjariel@users.sourceforge.net>
@@ -34,21 +36,19 @@ class Console: public QThread
     Q_OBJECT
 protected:
     void run();
-
 public:
     Console(GameServer* gameServer, FILE* in, FILE* out);
-
     ~Console();
+    QTextStream& Cout() { return m_cout; }
 private:
-    QPointer<GameServer> mp_gameServer;
     QTextStream m_cin;
     QTextStream m_cout;
 
 
 private:
     void initConsole();
-    QString readCommand();
-    void execCommand(const QString& cmd);
+    QString readLine();
+    void execLine(QString& cmd);
 };
 
 #endif

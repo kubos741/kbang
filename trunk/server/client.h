@@ -17,29 +17,52 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CLIENT_H
+#define CLIENT_H
 
-#include "gameserver.h"
-#include "charactercard.h"
-#include "console.h"
-#include <QCoreApplication>
+#include <QObject>
+#include <QXmlStreamReader>
+#include <QPair>
 
+class GameServer;
+class QTcpSocket;
 
-int main(int argc, char* argv[])
+enum ParsingState
 {
-    QCoreApplication app(argc, argv);
-    GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
-    server.setName("Testing server");
-    server.listen();
-    Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
+    START,
+    STREAMIN,
+    ANOTHER
+};
+
+
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class Client : public QObject
+{
+Q_OBJECT
+public:
+    Client(GameServer* parent, int clientId, QTcpSocket* socket);
+    virtual ~Client();
+
+
+private slots:
+    void readData();
+    void disconnectFromHost();
     
-    console->start();
-//    CharacterCard::loadCharacterBank();
+signals:
+    void clientDisconnected(int clientId);
 
-//    Arbiter a;
-    return app.exec();
-}
+private:
+    bool parseStart();
 
+private:
+    QTcpSocket* mp_tcpSocket;
+    const int m_clientId;    
+    QXmlStreamReader m_xml;
+    QString m_clientName;
+    QPair<int,int> m_protocolVersion;
+    ParsingState m_parsingState;
+};
+
+#endif

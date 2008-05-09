@@ -17,29 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
+#include "tcpserver.h"
 #include "gameserver.h"
-#include "charactercard.h"
-#include "console.h"
-#include <QCoreApplication>
+#include <iostream>
 
-
-int main(int argc, char* argv[])
+/**
+ * The only TcpServer constructor.
+ * @param parent
+ */
+TcpServer::TcpServer(GameServer* parent)
+ : QTcpServer(parent),
+   m_hostAddress(QHostAddress::Any),
+   m_port(8123)
 {
-    QCoreApplication app(argc, argv);
-    GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
-    server.setName("Testing server");
-    server.listen();
-    Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
-    
-    console->start();
-//    CharacterCard::loadCharacterBank();
-
-//    Arbiter a;
-    return app.exec();
+    connect(this, SIGNAL(newConnection()),
+            parent, SLOT(createClient()));
 }
+
+
+TcpServer::~TcpServer()
+{
+}
+
+bool TcpServer::listen()
+{
+    return QTcpServer::listen(m_hostAddress, m_port);
+}
+
+
+
 

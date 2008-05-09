@@ -17,29 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
 
-#include "gameserver.h"
-#include "charactercard.h"
-#include "console.h"
-#include <QCoreApplication>
+#include <QTcpServer>
 
+class GameServer;
 
-int main(int argc, char* argv[])
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class TcpServer : public QTcpServer
 {
-    QCoreApplication app(argc, argv);
-    GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
-    server.setName("Testing server");
-    server.listen();
-    Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
-    
-    console->start();
-//    CharacterCard::loadCharacterBank();
+Q_OBJECT
+public:
+    TcpServer(GameServer* parent);
+    virtual bool listen();
+    virtual ~TcpServer();
 
-//    Arbiter a;
-    return app.exec();
-}
+private:
+    QHostAddress m_hostAddress;
+    quint16 m_port;
+    GameServer* mp_gameServer;
+};
 
+#endif

@@ -20,38 +20,40 @@
 #include "console.h"
 #include "consolecommand.h"
 #include "gameserver.h"
-#include <stdio.h>
 #include <QIODevice>
 
 Console::Console(GameServer* gameServer, FILE* in, FILE* out):
-QThread(gameServer), mp_gameServer(gameServer), m_cin(in, QIODevice::ReadOnly), m_cout(out, QIODevice::WriteOnly)
+QThread(gameServer), m_cin(in, QIODevice::ReadOnly), m_cout(out, QIODevice::WriteOnly)
 {
+    qDebug("Creating Console.");
 }
 
 
 Console::~Console()
 {
+    qDebug("Destroying Console.");
 }
 
 void Console::run()
 {
     initConsole();
-    QString cmd;
+    QString line;
     while(1)
     {
-        cmd = readCommand();
-        execCommand(cmd);
+        line = readLine();
+        execLine(line);
     }
 }
 
 void Console::initConsole()
 {
-    ConsoleCmd::initialize();
+    console_register_commands();
     m_cout << "Welcome to KBang Server version 12345\n" << endl;
 }
 
-QString Console::readCommand()
+QString Console::readLine()
 {
+    
     m_cout << "> " << flush;
     return m_cin.readLine();
 }
@@ -60,10 +62,27 @@ QString Console::readCommand()
  *
  * @param cmdString
  */
-void Console::execCommand(const QString& cmdString)
+void Console::execLine(QString& cmdString)
 {
-    QPair<QString, QStringList> pair = ConsoleCmd::parse(cmdString);
-    const ConsoleCmd& cmd = ConsoleCmd::instance(pair.first);
+    QString cmdName;
+    QStringList cmdArgs;
+    QTextStream ss(&cmdString, QIODevice::ReadOnly);
+    QString buffer;
+    ss >> cmdName;
+    while (ss.status() == QTextStream::Ok)
+    {
+        ss >> buffer;
+        if (buffer.size()) cmdArgs.push_back(buffer);
+    }
+    ConsoleCmd* cmd = console_get_command(cmdName);
+    if (!cmd)
+    {
+        m_cout << cmdName << ": bad command" << endl;
+        return;
+    }
+    (*cmd)(cmdArgs, *this); 
+/*    
+//    const ConsoleCmd& cmd = ConsoleCmd::instance(pair.first);
     QString result = cmd.execute(pair.first, pair.second, mp_gameServer);
     //QString result(cmd.exec(mp_gameServer));
     if (result.size())
@@ -76,5 +95,5 @@ void Console::execCommand(const QString& cmdString)
     } else {
         m_cout << flush;
     }
-
+*/
 }

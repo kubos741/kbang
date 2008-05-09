@@ -19,12 +19,16 @@
  ***************************************************************************/
 #include "gameserver.h"
 #include "gamestate.h"
+#include "tcpserver.h"
+#include "client.h"
+
+#include <QTcpSocket>
 
 GameServer* GameServer::sm_instance = 0;
 
-GameServer::GameServer(): QObject(0)
+GameServer::GameServer(): QObject(0),  m_nextClientId(0)
 {
-
+    mp_tcpServer = new TcpServer(this);
 }
 
 QPointer< GameState > GameServer::createGame(const Client & creator, int maxPlayers, int AIPlayers)
@@ -32,6 +36,41 @@ QPointer< GameState > GameServer::createGame(const Client & creator, int maxPlay
     QPointer<GameState> gameState = new GameState(this, creator, maxPlayers, AIPlayers);
     m_games.append(gameState);
     return gameState;
+}
+
+/**
+ * Tells the TcpServer to listen for incoming connections.
+ * @return 
+ */
+bool GameServer::listen()
+{
+    if (!mp_tcpServer->isListening()) return mp_tcpServer->listen();
+    return 1;
+}
+
+void GameServer::exit()
+{
+    emit aboutToQuit();
+}
+
+void GameServer::createClient()
+{
+    if (!mp_tcpServer->hasPendingConnections()) return;
+    /* TODO: Max Clients Limit */
+    while (m_clients.contains(m_nextClientId)) m_nextClientId++;
+    int clientId = m_nextClientId++;
+    m_clients.insert(clientId, 0);
+    QTcpSocket* socket = mp_tcpServer->nextPendingConnection();
+    m_clients[clientId] = new Client(this, clientId, socket);
+    connect(m_clients[clientId], SIGNAL(clientDisconnected(int)),
+            this, SLOT(deleteClient(int)));
+}
+
+void GameServer::deleteClient(int clientId)
+{
+    if (m_clients.contains(clientId) && m_clients[clientId]) m_clients[clientId]->deleteLater();
+    //if (m_clients.contains(clientId) && m_clients[clientId]) delete m_clients[clientId];
+    m_clients.remove(clientId);
 }
 
 

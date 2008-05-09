@@ -22,6 +22,16 @@
 
 #include <QtCore>
 
+class Console;
+
+typedef bool (ConsoleCmd)(const QStringList&, Console&);
+
+void console_register_commands();
+ConsoleCmd* console_get_command(const QString&);
+
+
+
+/*
 
 class GameServer;
 class ConsoleCmd
@@ -110,6 +120,16 @@ public:
     static void initialize();
 };
 
+class ConsoleCmdQuit: public ConsoleCmd
+{
+protected:
+    ConsoleCmdQuit();
+public:
+    virtual QString execute(const QString&, const QStringList&, const GameServer*) const;
+    static void initialize();
+};
+
+*/
 
 
 

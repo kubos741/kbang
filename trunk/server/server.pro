@@ -9,7 +9,9 @@ weaponcard.h \
  gamestate.h \
  gamestarter.h \
  console.h \
- consolecommand.h
+ consolecommand.h \
+ client.h \
+ tcpserver.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -20,10 +22,14 @@ playingcard.cpp \
  gamestate.cpp \
  gamestarter.cpp \
  console.cpp \
- consolecommand.cpp
+ consolecommand.cpp \
+ client.cpp \
+ tcpserver.cpp
 TEMPLATE = app
 
 CONFIG -= release
 
 CONFIG += debug
 
+QT += xml \
+network

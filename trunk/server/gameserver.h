@@ -24,14 +24,13 @@
 
 class GameState;
 class Client;
+class TcpServer;
 
 /**
  * The GameServer class is a singleton class that represent the state of the whole
  * server. It holds all the clients and games created on the server.
  * It represents the state of the server and holds some attributes such as
  * server name, description, etc.
- * This and only this class has right to create a new bang game by creating new
- * GameArbiter.
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
 
@@ -82,15 +81,25 @@ public:
         return m_description;
     }
 
+    bool listen();
 
-
-
+    void exit();
+    
+signals:
+    void aboutToQuit();
+    
+public slots:
+    void createClient();
+    void deleteClient(int clientId);
 
 private:
     static GameServer* sm_instance;
     QList<QPointer<GameState> > m_games;
+    QHash<int, QPointer<Client> > m_clients;
+    int m_nextClientId;
     QString m_name;
     QString m_description;
+    TcpServer* mp_tcpServer;
 
 };
 
