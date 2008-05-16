@@ -146,16 +146,93 @@
   </section>
   <section>
     <title>Client UI</title>
-    <para>
-      The Client UI should look like this:
-    </para>
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="ui/ingame.png" format="PNG" />
-      </imageobject>
-    </mediaobject>
-    <para>
-      When connected as a observer, there will be no player part (the bigger area in the middle bottom).
-    </para>
+    <section>
+      <title>Introduction</title>
+      <para>
+        The client GUI is (will be) written in QT4 and requires graphic environment (running XServer on linux).
+        When the client application is executed in the common way, that is without any parameters, the main
+        window appears. User can connect to a KBang server and query for games or create one. This can be done
+        through the menu or icons on toolbar.
+      </para>
+    </section>
+    <section>
+      <title>Main Window</title>
+      <para>
+        The main window appears after the client application is executed. This window can be split into several parts:
+      </para>
+      <itemizedlist>
+        <listitem><para>
+          <emphasis>Menu</emphasis>. The standard menu in the top of the window. This is provided by the standard Qt widget,
+          thus its look depends on the environment.
+        </para></listitem>
+        <listitem><para>
+          <emphasis>Table</emphasis>. This is the most important part of the main window, because it shows all necesary things
+          (like cards on the table, your cards) to play the Bang! game. This part also provides interaction with the Bang! game
+          by clicking on cards, players and other active elements. This part is described in details in the next section.
+        </para></listitem>
+        <listitem><para>
+          <emphasis>Status bar</emphasis>. This is the common status bar in the bottom of the window. I put it there probably because
+          I think people are used to have one in their applications. It will display some information about the status of
+          the client, server, game, whatever.
+        </para></listitem>
+      </itemizedlist>
+    </section>
+    <section>
+      <title>Menu</title>
+      <para>
+        PUT SOME INTERESTING TEXT HERE!
+      </para>
+    </section>
+    <section>
+      <title>Table</title>
+      <para>
+        The Table part of the main window is the big green area between the top menu and the bottom status bar. This area is
+        empty after the client application starts and when the user joins a game (or creates one) the cards are displayed
+        here. The table part during the Bang! is shown in the following figure. Note that this is the view for a player.
+        If connected as an observer, there won't be any revealed cards in someone's hands.
+      </para>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="ui/ingame.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+      <para>
+        In the bottom left part of the Table there is the chat area. This area is only shown when the user is connected to a game.
+        The chat window with the chat posts is scrollable and the nicknames can be colored. The players are colored white and
+        the observers grey. Note that observers chat is only visible to other observers (to disallow them disturb or spoil the game).
+        There is no wispering allowed. Using another way to communicate with other players (VoIP, IM, etc.) is considered as a cheat.
+      </para>
+      <para>
+        In the bottom right part of the Table there is the system area. It's used to show some useful information about client state
+        and/or Bang! game state. There are several tabs in this area.
+      </para>
+      <itemizedlist>
+        <listitem><para>
+          <emphasis>Log.</emphasis> The log of recent actions is shown there. The actions are distinguished by colors according to
+          their origin. There can be client log entries and game log entries.
+        </para></listitem>
+        <listitem><para>
+          <emphasis>Debug.</emphasis> The debug console is handy tool to debug some parts of the client.
+        </para></listitem>
+        <listitem><para>
+          <emphasis>XML.</emphasis> Similar to debug, this console shows all the communication between server and client.
+        </para></listitem>
+      </itemizedlist>
+
+      <para>
+        When the client application starts this area contains only the small window in the left bottom with the log console and
+        the KBang logo with credits in the middle. The table changes as soon as the user joins a game. Note that connecting to servers
+        and joining games is handled by specific windows that are described later.
+      </para>
+      <para>
+        After joining a game the table looks like the image above. If the game just started the character cards of players are not shown,
+        because they didn't choose them yet. In this stage two character cards are offered to the user and as soon as one of them is selected
+        by clicking on it and pressing the ready button the client says to the server that this player is ready. When all players are ready,
+        characters are revealed and the Sheriff can start the game.
+      </para>
+      <para>
+        
+      </para>
+    </section>
   </section>
 </article>
