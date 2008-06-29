@@ -26,21 +26,32 @@
 
 GameServer* GameServer::sm_instance = 0;
 
-GameServer::GameServer(): QObject(0),  m_nextClientId(0)
+GameServer::GameServer():
+    QObject(0),
+    m_nextClientId(0),
+    m_nextGameId(0),
+    m_maxClientCount(1)
 {
     mp_tcpServer = new TcpServer(this);
 }
 
-QPointer< GameState > GameServer::createGame(const Client & creator, int maxPlayers, int AIPlayers)
+GameState* GameServer::createGame(const QString & name, const QString & description, int creatorId,
+                                  int minPlayers, int maxPlayers, int maxObservers,
+                                  const QString & playerPassword, const QString & observerPassword,
+                                  bool shufflePlayers)
 {
-    QPointer<GameState> gameState = new GameState(this, creator, maxPlayers, AIPlayers);
-    m_games.append(gameState);
-    return gameState;
+    while (!m_nextGameId || m_games.contains(m_nextGameId)) m_nextGameId++;
+    int gameId = m_nextGameId++;
+    GameState* newGame = new GameState(this, gameId, name, description, creatorId, minPlayers, maxPlayers,
+                                       maxObservers, playerPassword, observerPassword, shufflePlayers);
+    m_games[gameId] = newGame;
+    return newGame;
 }
+
 
 /**
  * Tells the TcpServer to listen for incoming connections.
- * @return 
+ * @return
  */
 bool GameServer::listen()
 {
@@ -56,8 +67,16 @@ void GameServer::exit()
 void GameServer::createClient()
 {
     if (!mp_tcpServer->hasPendingConnections()) return;
-    /* TODO: Max Clients Limit */
-    while (m_clients.contains(m_nextClientId)) m_nextClientId++;
+    if (m_clients.size() >= m_maxClientCount)
+    {
+        // The aplication of the client count limit should be
+        // done in a more polite way
+        QTcpSocket* socket = mp_tcpServer->nextPendingConnection();
+        socket->disconnectFromHost();
+        return;
+    }
+
+    while (!m_nextClientId || m_clients.contains(m_nextClientId)) m_nextClientId++;
     int clientId = m_nextClientId++;
     m_clients.insert(clientId, 0);
     QTcpSocket* socket = mp_tcpServer->nextPendingConnection();
@@ -72,6 +91,8 @@ void GameServer::deleteClient(int clientId)
     //if (m_clients.contains(clientId) && m_clients[clientId]) delete m_clients[clientId];
     m_clients.remove(clientId);
 }
+
+
 
 
 

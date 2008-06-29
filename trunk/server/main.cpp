@@ -32,10 +32,11 @@ int main(int argc, char* argv[])
                      &app, SLOT(quit()));
     server.setName("Testing server");
     server.listen();
+    server.createGame("Testovaci hra", "Popis testovaci hry", 0, 5, 7, 99, QString(), QString(), 0);
     Console* console = new Console(&server, stdin, stdout);
     QObject::connect(&server, SIGNAL(aboutToQuit()),
                      console, SLOT(terminate()));
-    
+
     console->start();
 //    CharacterCard::loadCharacterBank();
 

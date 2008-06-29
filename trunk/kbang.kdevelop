@@ -42,7 +42,10 @@
       <root>/usr/lib/qt4</root>
       <designerpluginpaths/>
     </qt>
-    <references/>
+    <references>
+      <pcs>Gcc</pcs>
+      <pcs>Qt4</pcs>
+    </references>
     <codecompletion>
       <automaticCodeCompletion>true</automaticCodeCompletion>
       <automaticArgumentsHint>true</automaticArgumentsHint>
@@ -154,7 +157,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>server</activedir>
+      <activedir>client</activedir>
     </general>
     <make>
       <abortonerror>true</abortonerror>

@@ -31,7 +31,7 @@ class TcpServer;
  * server. It holds all the clients and games created on the server.
  * It represents the state of the server and holds some attributes such as
  * server name, description, etc.
- * @author MacJariel <macjariel@users.sourceforge.net>
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 
 class GameServer: public QObject
@@ -53,9 +53,18 @@ public:
 
     /**
      * Creates a new game.
-     * @returns a pointer to GameArbiter.
+     * @returns pointer to newly created GameState
+     * @see GameState constructor
      */
-    QPointer<GameState> createGame(const Client& creator, int maxPlayers, int AIPlayers);
+    GameState* createGame(const QString& name,
+                          const QString& description,
+                          int creatorId,
+                          int minPlayers,
+                          int maxPlayers,
+                          int maxObservers,
+                          const QString& playerPassword,
+                          const QString& observerPassword,
+                          bool shufflePlayers);
 
 
 /* SETTERS AND GETTERS */
@@ -64,6 +73,10 @@ public:
         m_name = theValue;
     }
 
+    QList<GameState*> getGames()
+    {
+        return m_games.values();
+    }
 
     QString name() const
     {
@@ -84,19 +97,22 @@ public:
     bool listen();
 
     void exit();
-    
+
 signals:
     void aboutToQuit();
-    
+
 public slots:
     void createClient();
     void deleteClient(int clientId);
 
 private:
-    static GameServer* sm_instance;
-    QList<QPointer<GameState> > m_games;
-    QHash<int, QPointer<Client> > m_clients;
+    static GameServer*       sm_instance;
+    QHash<int, GameState*>   m_games;
+    QHash<int, Client*>      m_clients;
+
     int m_nextClientId;
+    int m_nextGameId;
+    int m_maxClientCount; // is this necessary?
     QString m_name;
     QString m_description;
     TcpServer* mp_tcpServer;

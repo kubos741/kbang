@@ -39,6 +39,8 @@ enum ClientState
 
 
 /**
+ * NOTE: There cannot be a client with id = 0.
+ *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Client : public QObject
@@ -49,9 +51,10 @@ public:
     virtual ~Client();
     friend class ClientXmlParser;
 
+
 private slots:
     void disconnectFromHost();
-    
+
 signals:
     void clientDisconnected(int clientId);
 
@@ -65,8 +68,8 @@ private:
 */
 
 private:
-    
-    const int m_clientId;    
+
+    const int m_clientId;
     //QXmlStreamReader m_xml;
     ClientXmlParser m_xmlParser;
     QString m_clientName;

@@ -12,7 +12,8 @@ weaponcard.h \
  consolecommand.h \
  client.h \
  tcpserver.h \
- clientxmlparser.h
+ clientxmlparser.h \
+ command.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -26,7 +27,8 @@ playingcard.cpp \
  consolecommand.cpp \
  client.cpp \
  tcpserver.cpp \
- clientxmlparser.cpp
+ clientxmlparser.cpp \
+ command.cpp
 TEMPLATE = app
 
 CONFIG -= release

@@ -7,13 +7,13 @@
       <firstname>MacJariel</firstname>
       <affiliation>
         <address>
-          <email>macjariel@users.sourceforge.net</email>
+          <email>echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"</email>
         </address>
       </affiliation>
     </author>
   </articleinfo>
   <abstract>
-    <para>This article defines the KBang Protocol, a protocol used in the KBang game.</para>
+    <para>This article is the specification of the KBang protocol, a network protocol used in the KBang game.</para>
   </abstract>
   <section>
     <title>Introduction</title>
@@ -26,9 +26,9 @@
     <title>Architecture</title>
     <section>
       <title>Overview</title>
-      <para>The KBang architecture is quite simple. There is a KBang server that is listening for
+      <para>The KBang architecture is quite simple. There is a KBang server that listens for
         incomming TCP connections. Clients can connect to that server and communicate with it. Clients
-        only communicate to server, they never communicate directly to another clients.</para>
+        only communicate with the server, they never communicate directly with another clients.</para>
       <para>The following diagram provides an overview of this architecture.</para>
       <programlisting>
             C1
@@ -49,9 +49,9 @@
     </section>
     <section>
       <title>Server</title>
-      <para>A server acts as an arbitor that serves and judges several Bang games. 
+      <para>A server acts as an arbitor that serves and judges several KBang games. 
         All the intelligence in KBang is concentrated to the server.
-        </para>
+      </para>
     </section>
     <section>
       <title>Client</title>
@@ -77,14 +77,22 @@
 <?xml version='1.0'?>        
 <stream xmlns='kbang' version='1.0'>
 ]]></programlisting>
-    <para>Server then responds by
-      sending an opening &lt;stream&gt; tag and opens the response stream.</para>
+    <para>Server then responds by sending an opening &lt;stream&gt; tag and opens the response stream.</para>
 <programlisting><![CDATA[ 
 <?xml version='1.0'?>        
 <stream xmlns='kbang' version='1.0'>
 ]]></programlisting>
-    <para>As soon as both streams are opened, both sides can send "XML commands" to each other. 
-	Some commands are availible for the entire life of the session and others can be used only in specified situations.</para>
+    <para>As soon as both streams are opened, both sides can send stanzas to each other.</para>
+  </section>
+  <section>
+    <title>Stanzas</title>
+    <para>Stanza is a group of XML elements that represents a command. In the XML structure it is formed by a subtree
+          that has its root element on level 2 (right under the root &lt;stream&gt; element).</para>
+    <para>Every stanza should have a unique id. This id is used to match more stanzas, ie. when client requests
+          some information the resulting stanza will have the same id as the client used in the request stanza.
+          The id is a string of at most 16 alphanumeric characters and is passed as the id attribute in the root
+          stanza element.</para>
+    <para>There are several types of stanzas:</para>
   </section>
   <section>
     <title>Client states</title>
@@ -351,6 +359,53 @@
     </section>
   </section>
 
+  <appendix>
+    <title>Use cases</title>
+    <para>These are some use cases to describe common situations in game.</para>
+    <section>
+      <title>Establishing connection</title>
+<programlisting><![CDATA[ 
+C:   <?xml version='1.0'?>        
+     <stream xmlns='kbang' version='1.0'>
+
+S:   <?xml version='1.0'?>        
+     <stream xmlns='kbang' version='1.0'>
+
+<!-- There is some communication here. If any side closes
+     the <stream/> tag, the other one should do it too.  -->
+
+S:   </stream>
+C:   </stream>
+]]></programlisting>
+    </section>
+    <section>
+      <title>Quering games</title>
+<programlisting><![CDATA[ 
+C:   <query type='get' id='abcd1234'> 
+       <gamelist/>
+     </query>
+     
+S:   <query type='result' id='abcd1234'> 
+       <gamelist>
+         <game gid='1'
+               name='The Example Bang Game'
+               desc='The game description'
+               minplayers='5'
+               maxplayers='7'
+               maxobservers='10'
+               currentplayers='2'
+               currentobservers='0'
+               state='awaiting'
+               ruleset='bang'
+               playerpassword='0'
+               observerpassword='0'
+          />
+       </gamelist>
+     </query>
+]]></programlisting>
+     </section>
+    
+  </appendix>
 
 </article>
 <!--

@@ -22,10 +22,11 @@
 
 #include <QObject>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 class QTcpSocket;
 class Client;
-
+class Command;
 
 
 
@@ -39,10 +40,10 @@ public:
     ClientXmlParser(Client* parent, QTcpSocket*  socket);
     virtual ~ClientXmlParser();
     void disconnectFromHost();
-    
+
 public slots:
     void readData();
-    
+
 
 private:
     void parseStream();
@@ -50,15 +51,17 @@ private:
     void sendData(const QString& data);
 
 private:
-    QXmlStreamReader m_xml;
+    QXmlStreamReader m_xmlIn;
+    QXmlStreamWriter m_xmlOut;
     QTcpSocket* mp_socket;
     Client* mp_client;
 
     int m_depth;
     bool m_inStreamInitialized;
     bool m_outStreamInitialized;
+    Command* mp_command;
     struct { quint16 major, minor; } m_protocolVersion;
-    
+
 };
 
 #endif

@@ -20,14 +20,18 @@
 
 #include "clientxmlparser.h"
 #include "client.h"
+#include "command.h"
 #include <QTcpSocket>
 #include <QStringList>
+#include <QtDebug>
 
 #include <iostream>
 
-ClientXmlParser::ClientXmlParser(Client* parent, QTcpSocket* socket)
- : QObject(parent), m_xml(socket), mp_socket(socket), mp_client(parent),
-   m_depth(0), m_inStreamInitialized(0), m_outStreamInitialized(0)
+
+ClientXmlParser::ClientXmlParser(Client* parent, QTcpSocket* socket):
+QObject(parent), m_xmlIn(socket), m_xmlOut(socket), mp_socket(socket),
+mp_client(parent), m_depth(0), m_inStreamInitialized(0),
+m_outStreamInitialized(0), mp_command(0)
 {
     connect(socket, SIGNAL(readyRead()),
             this,   SLOT(readData()));
@@ -42,24 +46,42 @@ ClientXmlParser::~ClientXmlParser()
 
 void ClientXmlParser::readData()
 {
-while(!m_xml.atEnd())
+while(!m_xmlIn.atEnd())
     {
-        QXmlStreamReader::TokenType tokenType = m_xml.readNext();
-        if (tokenType <= 3 || tokenType >= 7) continue;
-        if (tokenType == 6 && m_xml.isWhitespace()) continue;
-        std::cerr << "Type: " << tokenType << ", Name: " << m_xml.name().toString().toStdString() << ", Text: " << m_xml.text().toString().toStdString() << std::endl;        
-        if (tokenType == 5) m_depth--;
+        m_xmlIn.readNext();
+        if (!(m_xmlIn.isStartElement() || m_xmlIn.isEndElement() ||
+             (m_xmlIn.isCharacters() && !m_xmlIn.isWhitespace()))) continue;
+        qDebug() << "T:" << m_xmlIn.tokenType() << "N:" << m_xmlIn.name().toString() << "Text:" << m_xmlIn.text().toString();
+        if (m_xmlIn.isEndElement()) m_depth--;
         switch(m_depth)
         {
-            case 0: parseStream();
-                    break;
-            case 1: parseStanza();
-                    break;
+        case 0:
+            parseStream();
+            break;
+        case 1:
+            if (m_xmlIn.isStartElement()) // The start of a new stanza recieved
+            {
+                Q_ASSERT(!mp_command);
+                mp_command = Command::create(m_xmlIn);
+            }
+            if (m_xmlIn.isEndElement()) // The end of stanza - completing command and sending for another processing
+            {
+                Q_ASSERT(mp_command);
+                mp_command->execute(m_xmlOut);
+                //sendData(mp_command->execute());
+                delete mp_command;
+                mp_command = 0;
+            }
+            break;
+        default:
+            // Depth > 1 - we are in the middle of a stanza - let command handle it
+            mp_command->processToken(m_xmlIn);
+            break;
         }
-        if (tokenType == 4) m_depth++;
+        if (m_xmlIn.isStartElement()) m_depth++;
     }
 
-    QXmlStreamReader::Error error = m_xml.error();
+    QXmlStreamReader::Error error = m_xmlIn.error();
     if (error && error != 4)
     {
         qDebug("Invalid client. XmlStreamReader::Error.");
@@ -71,7 +93,7 @@ while(!m_xml.atEnd())
 void ClientXmlParser::disconnectFromHost()
 {
     mp_socket->flush();
-    m_xml.clear();
+    m_xmlIn.clear();
     mp_socket->disconnectFromHost();
     mp_socket->deleteLater();
 }
@@ -81,28 +103,32 @@ void ClientXmlParser::parseStream()
     if (!m_inStreamInitialized)
     {
         // Parsing incoming <stream>
-        if (!m_xml.isStartElement() || m_xml.name() != "stream")
+        if (!m_xmlIn.isStartElement() || m_xmlIn.name() != "stream")
         {
             qDebug("Invalid client: expected <stream> as first element.");
             mp_client->disconnectFromHost();
             return;
         }
-        QXmlStreamAttributes attrs = m_xml.attributes();
+        QXmlStreamAttributes attrs = m_xmlIn.attributes();
         QStringList version = attrs.value("", "version").toString().split(".");
         if (version.size() >= 1) m_protocolVersion.major = version[0].toInt();
         if (version.size() >= 2) m_protocolVersion.minor = version[1].toInt();
         m_inStreamInitialized = 1;
-        
-        // Initiating outgoing <stream>
-        sendData("<stream version=\"1.0\">\n");
+
+        m_xmlOut.setAutoFormatting(1);
+        m_xmlOut.writeStartDocument();
+        m_xmlOut.writeStartElement("stream");
+        m_xmlOut.writeAttribute("version", "1.0");
+        m_xmlOut.writeCharacters("");
+
         m_outStreamInitialized = 1;
         return;
     }
-    
-    if (m_xml.isEndElement() && m_xml.name() == "stream")
+
+    if (m_xmlIn.isEndElement() && m_xmlIn.name() == "stream")
     {
         // Finishing stream & disconnecting
-        sendData("</stream>\n");
+        m_xmlOut.writeEndDocument();
         mp_client->disconnectFromHost();
         return;
     }
@@ -110,17 +136,15 @@ void ClientXmlParser::parseStream()
     mp_client->disconnectFromHost();
 }
 
-void ClientXmlParser::sendData(const QString & data)
+void ClientXmlParser::sendData(const QString& data)
 {
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out << data;
-        mp_socket->write(block);
+    mp_socket->write(data.toUtf8());
 }
 
 void ClientXmlParser::parseStanza()
 {
-    // TODO: I need to figure out how to parse stanzas
+
+
 
 }
 

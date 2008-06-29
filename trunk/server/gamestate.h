@@ -25,6 +25,7 @@
 #include <QtCore>
 
 class Client;
+class GameServer;
 
 enum {  STATE_AWAITING = 1, // Players are connecting
         STATE_PREGAME  = 2, // The number of players is fixed - time for choosing roles
@@ -36,23 +37,169 @@ enum {  STATE_AWAITING = 1, // Players are connecting
 /**
  * The GameState class is the major class that control a bang game. Every bang game running
  * on the server has just one instance of this class. This class stores all global information
- * about the game and thus must not be accessible to player controllers, because they could be
- * cheating.
- * The bang game is created.
+ * about the game and thus must not be accessible to player controllers, because they could
+ * cheat.
+ * The bang game is created by a client (creator) by sending the specified stanza. The only
+ * place in code, where new GameState objects should be created is in the GameServer class.
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
 class GameState : public QObject
 {
 Q_OBJECT
 public:
-    GameState(QObject *parent, const Client& client, int maxPlayers, int AIPlayers);
+
+    /**
+     * Creates an instance of GameState. The GameServer class is responsible
+     * for creating instances of GameState.
+     * @param parent parent of the GameState is a GameServer
+     * @param gameId id of the game - the GameServer class is responsible to set it unique
+     * @param name name of the game
+     * @param description description of the game
+     * @param creatorId id of client that creates the game (if the game is created by server, use special value 0)
+     * @param minPlayers minimal count of players
+     * @param maxPlayers maximal count of players
+     * @param maxObservers maximal count of observers
+     * @param playerPassword playerPassword (null string means no password)
+     * @param observerPassword observerPassword (null string means no password)
+     * @param shufflePlayers shuffle-players feature
+     * @see GameServer::createGame()
+     */
+    GameState(GameServer* parent,
+              int gameId,
+              const QString& name,
+              const QString& description,
+              int creatorId,
+              int minPlayers,
+              int maxPlayers,
+              int maxObservers,
+              // TODO: implement rulesets
+              const QString& playerPassword,
+              const QString& observerPassword,
+              bool shufflePlayers);
+
+
+
+    //    GameState(QObject *parent, const Client& client, int maxPlayers, int AIPlayers);
     ~GameState();
+
+
+
+    /**
+     * Returns id of the game.
+     */
+    inline int gameId() const
+    {
+        return m_gameId;
+    }
+
+    /**
+     * Returns name of the game.
+     */
+    inline QString name() const
+    {
+        return m_name;
+    }
+
+    /**
+     * Returns description of the game.
+     */
+    inline QString description() const
+    {
+        return m_description;
+    }
+
+    /**
+     * Returns minimal count of players.
+     */
+    inline int minPlayers() const
+    {
+        return m_minPlayers;
+    }
+
+    /**
+     * Returns maximal count of players.
+     */
+    inline int maxPlayers() const
+    {
+        return m_maxPlayers;
+    }
+
+    /**
+     * Returns maximal count of observers.
+     */
+    inline int maxObservers() const
+    {
+        return m_maxObservers;
+    }
+
+    /**
+     * Returns count of players.
+     */
+    inline int playersCount() const
+    {
+        return m_players.size();
+    }
+
+    /**
+     * Returns count of observers.
+     */
+    inline int observersCount() const
+    {
+        return 0; // TODO: implement this
+    }
+
+    /**
+     * Returns 1 if player password is set,
+     * otherwise returns 0.
+     */
+    inline bool hasPlayerPassword() const
+    {
+        return !m_playerPassword.isNull();
+    }
+
+    /**
+     * Returns 1 if observer password is set,
+     * otherwise returns 0.
+     */
+    inline bool hasObserverPassword() const
+    {
+        return !m_observerPassword.isNull();
+    }
+
+    /**
+     * Returns the id of the client that created this game.
+     */
+    inline int creatorId() const
+    {
+        return m_creatorId;
+    }
+
+    /**
+     * Returns true if shuffle-players feature is set, otherwise
+     * returns false. This feature shuffles players after the
+     * game starts.
+     */
+    inline bool hasShufflePlayers() const
+    {
+        return m_shufflePlayers;
+    }
+
 
 private:
     QList<Player*> m_players;
     GameArbiter m_arbiter;
     int m_state;
 
+    const int   m_gameId;
+    QString     m_name;
+    QString     m_description;
+    const int   m_creatorId;
+    int         m_minPlayers;
+    int         m_maxPlayers;
+    int         m_maxObservers;
+    QString     m_playerPassword;
+    QString     m_observerPassword;
+    bool        m_shufflePlayers;
 };
 
 #endif

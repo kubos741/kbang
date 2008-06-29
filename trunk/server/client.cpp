@@ -30,6 +30,7 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
  : QObject(parent), m_clientId(clientId), m_xmlParser(this, socket),
    m_clientState(CLIENT_STATE_START)
 {
+    Q_ASSERT(clientId != 0);
     std::cerr << "Client id " << clientId << " connected." << std::endl;
     connect(socket, SIGNAL(disconnected()),
             this, SLOT(disconnectFromHost()));
@@ -72,7 +73,7 @@ void Client::parseEnd()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << "</stream>\n";
-    mp_tcpSocket->write(block);    
+    mp_tcpSocket->write(block);
     disconnectFromHost();
 }
 
@@ -91,7 +92,7 @@ void Client::parseIq()
     QString id = attrs.value("", "id");
     QString type = attrs.value("", "type");
     if (id.isEmpty() || type.isEmpty()) return sendIqError();
-    
+
 }
 
 void Client::sendIqError()
