@@ -26,7 +26,7 @@
 
 class QTcpSocket;
 class Client;
-class Command;
+class Stanza;
 
 
 
@@ -59,7 +59,7 @@ private:
     int m_depth;
     bool m_inStreamInitialized;
     bool m_outStreamInitialized;
-    Command* mp_command;
+    Stanza* mp_stanza;
     struct { quint16 major, minor; } m_protocolVersion;
 
 };

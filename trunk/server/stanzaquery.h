@@ -17,35 +17,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef STANZAQUERY_H
+#define STANZAQUERY_H
 
-#include "gameserver.h"
-#include "charactercard.h"
-#include "console.h"
-#include "settings.h"
-#include <QCoreApplication>
+#include <QHash>
+#include <stanza.h>
 
-
-
-int main(int argc, char* argv[])
+/**
+ *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class StanzaQuery : public Stanza
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("McJ Games");
-    QCoreApplication::setApplicationName("KBang Server");
-    defaultSettings();
-    GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
-    server.setName("Testing server");
-    server.listen();
-    server.createGame("Testovaci hra", "Popis testovaci hry", 0, 5, 7, 99, QString(), QString(), 0);
-    Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
+friend class Stanza;
+private:
+    typedef void (StanzaQuery::*ExecuteMethod)(QXmlStreamWriter&);
 
-    console->start();
-//    CharacterCard::loadCharacterBank();
 
-//    Arbiter a;
-    return app.exec();
-}
+protected:
+    StanzaQuery(const QXmlStreamReader& xmlIn);
 
+public:
+    virtual void processToken(const QXmlStreamReader& xmlIn);
+    virtual void execute(QXmlStreamWriter& xmlOut);
+    virtual ~StanzaQuery();
+
+private:
+    static void initializeMethods();
+    void writeStanzaStartElement(QXmlStreamWriter& xmlOut);
+    void writeStanzaEndElement(QXmlStreamWriter& xmlOut);
+
+private:
+    void getGameList(QXmlStreamWriter& xmlOut);
+    void getGame(QXmlStreamWriter& xmlOut);
+
+private:
+    static QHash<QString, ExecuteMethod> sm_methods;
+    static bool sm_initialized;
+
+    QString              m_elementName;
+    QXmlStreamAttributes m_attributes;
+
+};
+
+#endif

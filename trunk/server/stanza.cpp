@@ -18,34 +18,70 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "common.h"
+#include "stanza.h"
+#include "stanzaquery.h"
+#include "gamestate.h"
 #include "gameserver.h"
-#include "charactercard.h"
-#include "console.h"
-#include "settings.h"
-#include <QCoreApplication>
+#include <QXmlAttributes>
 
 
 
-int main(int argc, char* argv[])
+Stanza::Stanza(const QXmlStreamReader& xmlIn):
+    m_state(STATE_OK),
+    m_xmlDepth(0),
+    m_complete(0)
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("McJ Games");
-    QCoreApplication::setApplicationName("KBang Server");
-    defaultSettings();
-    GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
-    server.setName("Testing server");
-    server.listen();
-    server.createGame("Testovaci hra", "Popis testovaci hry", 0, 5, 7, 99, QString(), QString(), 0);
-    Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
-
-    console->start();
-//    CharacterCard::loadCharacterBank();
-
-//    Arbiter a;
-    return app.exec();
+    Q_ASSERT(xmlIn.isStartElement());
+    m_id = xmlIn.attributes().value("id").toString();
 }
+
+void Stanza::processToken(const QXmlStreamReader& xmlIn)
+{
+    Q_ASSERT(!m_complete);
+    if (xmlIn.isStartElement()) m_xmlDepth++;
+    if (xmlIn.isEndElement()) m_xmlDepth--;
+    if (xmlIn.isEndElement() && m_xmlDepth == -1)
+    {
+        m_complete = 1;
+    }
+}
+
+void Stanza::execute(QXmlStreamWriter&)
+{
+    Q_ASSERT(m_complete);
+}
+
+void Stanza::writeErrorElement(QXmlStreamWriter& xmlOut)
+{
+    switch(m_state)
+    {
+        case STATE_INVALID_TYPE:   xmlOut.writeEmptyElement("invalid-type"); break;
+        case STATE_BAD_QUERY:      xmlOut.writeEmptyElement("bad-query");    break;
+        case STATE_NOT_EXIST:      xmlOut.writeEmptyElement("not-exist");    break;
+        default:                   NOT_REACHED();                            break;
+    }
+}
+
+
+
+Stanza *Stanza::construct(const QXmlStreamReader& xmlIn)
+{
+    Q_ASSERT(xmlIn.isStartElement());
+    if (xmlIn.name() == "query")
+    {
+        return new StanzaQuery(xmlIn);
+    }
+    else if (xmlIn.name() == "action")
+    {
+        //return new StanzaAction(xmlIn);
+    }
+    return new Stanza(xmlIn);
+}
+
+
+
+
+
+
 

@@ -28,7 +28,7 @@
 TcpServer::TcpServer(GameServer* parent)
  : QTcpServer(parent),
    m_hostAddress(QHostAddress::Any),
-   m_port(8123)
+   m_port(QSettings().value("network/port").toInt())
 {
     connect(this, SIGNAL(newConnection()),
             parent, SLOT(createClient()));

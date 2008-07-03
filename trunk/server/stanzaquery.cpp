@@ -1,0 +1,131 @@
+/***************************************************************************
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "common.h"
+#include "gameserver.h"
+#include "gamestate.h"
+#include "stanzaquery.h"
+
+QHash<QString, StanzaQuerys::ExecuteMethod> StanzaQuery::sm_methods;
+bool StanzaQuery::sm_initialized = 0;
+
+
+StanzaQuery::StanzaQuery(const QXmlStreamReader& xmlIn)
+ : Stanza(xmlIn)
+{
+    if (!sm_initialized) StanzaQuery::initializeMethods();
+
+    if (m_id.isEmpty())                            m_state = STATE_MISSING_ID;
+    if (xmlIn.attributes().value("type") != "get") m_state = STATE_INVALID_TYPE;
+}
+
+void StanzaQuery::processToken(const QXmlStreamReader& xmlIn)
+{
+    Stanza::processToken(xmlIn);
+    if (m_state != STATE_OK) return;
+    if ((m_xmlDepth == 1) && xmlIn.isStartElement())
+    {
+        if (!m_elementName.isNull() || !sm_methods.contains(xmlIn.name().toString()))
+        {
+            m_state = STATE_BAD_QUERY;
+            return;
+        }
+        m_elementName = xmlIn.name().toString();
+        m_attributes  = xmlIn.attributes();
+    }
+    else
+    {
+        m_state = STATE_BAD_QUERY;
+        return;
+    }
+}
+
+void StanzaQuery::execute(QXmlStreamWriter& xmlOut)
+{
+    Stanza::execute(xmlOut);
+    if (m_state != STATE_OK)
+    {
+        writeStanzaStartElement(xmlOut);
+        writeErrorElement(xmlOut);
+        writeStanzaEndElement(xmlOut);
+    }
+    else
+    {
+        CALL_MEMBER_FN(*this,sm_methods[m_elementName])(xmlOut);
+    }
+}
+
+
+void StanzaQuery::writeStanzaStartElement(QXmlStreamWriter& xmlOut)
+{
+    xmlOut.writeStartElement("query");
+    xmlOut.writeAttribute("type", (m_state == STATE_OK) ? "result" : "error");
+    if (!m_id.isEmpty()) xmlOut.writeAttribute("id", m_id);
+}
+
+
+void StanzaQuery::writeStanzaEndElement(QXmlStreamWriter& xmlOut)
+{
+    xmlOut.writeEndElement();
+}
+
+void StanzaQuery::initializeMethods()
+{
+    sm_methods["gamelist"] = &StanzaQuery::getGameList;
+    sm_methods["game"]     = &StanzaQuery::getGame;
+    sm_initialized = 1;
+}
+
+
+
+void StanzaQuery::getGameList(QXmlStreamWriter& xmlOut)
+{
+    writeStanzaStartElement(xmlOut);
+    xmlOut.writeStartElement("gamelist");
+    foreach(GameState* game, GameServer::instance().gameStateList())
+    {
+        game->writeXml(xmlOut);
+    }
+    xmlOut.writeEndElement();
+    writeStanzaEndElement(xmlOut);
+}
+
+void StanzaQuery::getGame(QXmlStreamWriter& xmlOut)
+{
+    int gameId = m_attributes.value("id").toString().toInt();
+    GameState* game = 0;
+    qDebug()     << "GameId: " << gameId;
+    if (gameId)
+    {
+        game = GameServer::instance().gameState(gameId);
+    }
+    if (!game) m_state = STATE_NOT_EXIST;
+    writeStanzaStartElement(xmlOut);
+    if (game) game->writeXml(xmlOut);
+    else writeErrorElement(xmlOut);
+    writeStanzaEndElement(xmlOut);
+}
+
+StanzaQuery::~StanzaQuery()
+{
+}
+
+
+
+

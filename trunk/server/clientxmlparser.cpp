@@ -20,7 +20,7 @@
 
 #include "clientxmlparser.h"
 #include "client.h"
-#include "command.h"
+#include "stanza.h"
 #include <QTcpSocket>
 #include <QStringList>
 #include <QtDebug>
@@ -31,7 +31,7 @@
 ClientXmlParser::ClientXmlParser(Client* parent, QTcpSocket* socket):
 QObject(parent), m_xmlIn(socket), m_xmlOut(socket), mp_socket(socket),
 mp_client(parent), m_depth(0), m_inStreamInitialized(0),
-m_outStreamInitialized(0), mp_command(0)
+m_outStreamInitialized(0), mp_stanza(0)
 {
     connect(socket, SIGNAL(readyRead()),
             this,   SLOT(readData()));
@@ -61,21 +61,20 @@ while(!m_xmlIn.atEnd())
         case 1:
             if (m_xmlIn.isStartElement()) // The start of a new stanza recieved
             {
-                Q_ASSERT(!mp_command);
-                mp_command = Command::create(m_xmlIn);
+                Q_ASSERT(!mp_stanza);
+                mp_stanza = Stanza::construct(m_xmlIn);
             }
-            if (m_xmlIn.isEndElement()) // The end of stanza - completing command and sending for another processing
+            if (m_xmlIn.isEndElement()) // The end of stanza - completing stanza and sending for another processing
             {
-                Q_ASSERT(mp_command);
-                mp_command->execute(m_xmlOut);
-                //sendData(mp_command->execute());
-                delete mp_command;
-                mp_command = 0;
+                Q_ASSERT(mp_stanza);
+                mp_stanza->execute(m_xmlOut);
+                delete mp_stanza;
+                mp_stanza = 0;
             }
             break;
         default:
             // Depth > 1 - we are in the middle of a stanza - let command handle it
-            mp_command->processToken(m_xmlIn);
+            mp_stanza->processToken(m_xmlIn);
             break;
         }
         if (m_xmlIn.isStartElement()) m_depth++;

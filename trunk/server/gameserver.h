@@ -73,9 +73,39 @@ public:
         m_name = theValue;
     }
 
-    QList<GameState*> getGames()
+    /**
+     * Returns a list of games (GameState instances).
+     */
+    inline QList<GameState*> gameStateList()
     {
         return m_games.values();
+    }
+
+    /**
+     * Returns a pointer to the GameState with
+     * given id.
+     */
+    inline GameState* gameState(int id)
+    {
+        if (m_games.contains(id)) return m_games[id];
+        return 0;
+    }
+
+    /**
+     * Returns a list of clients.
+     */
+    inline QList<Client*> clientList()
+    {
+        return m_clients.values();
+    }
+
+    /**
+     * Returns a pointer to the Client with given id.
+     */
+    inline Client* client(int id)
+    {
+        if (m_clients.contains(id)) return m_clients[id];
+        return 0;
     }
 
     QString name() const

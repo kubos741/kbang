@@ -18,8 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+
 #include "gamestate.h"
 #include "gameserver.h"
+
+#include <QXmlStreamWriter>
 
 GameState::GameState(GameServer* parent, int gameId, const QString& name, const QString& description,
                      int creatorId, int minPlayers, int maxPlayers, int maxObservers,
@@ -45,6 +48,21 @@ m_shufflePlayers(shufflePlayers)
 
 }
 
+void GameState::writeXml(QXmlStreamWriter& xmlOut)
+{
+    xmlOut.writeStartElement("game");
+    xmlOut.writeAttribute("id", QString::number(m_gameId));
+    xmlOut.writeAttribute("name", m_name);
+    xmlOut.writeAttribute("description", m_description);
+    xmlOut.writeAttribute("creatorId", QString::number(m_creatorId));
+    xmlOut.writeAttribute("minPlayers", QString::number(m_minPlayers));
+    xmlOut.writeAttribute("maxPlayers", QString::number(m_maxPlayers));
+    xmlOut.writeAttribute("maxObservers", QString::number(m_maxObservers));
+    xmlOut.writeAttribute("playerPassword", QString::number(hasPlayerPassword()));
+    xmlOut.writeAttribute("observerPassword", QString::number(hasObserverPassword()));
+    xmlOut.writeAttribute("shufflePlayers", QString::number(hasShufflePlayers()));
+    xmlOut.writeEndElement();
+}
 
 
 GameState::~GameState()

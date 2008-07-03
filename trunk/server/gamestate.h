@@ -26,6 +26,7 @@
 
 class Client;
 class GameServer;
+class QXmlStreamWriter;
 
 enum {  STATE_AWAITING = 1, // Players are connecting
         STATE_PREGAME  = 2, // The number of players is fixed - time for choosing roles
@@ -183,6 +184,13 @@ public:
     {
         return m_shufflePlayers;
     }
+
+    /**
+     * Writes information about this game (the game tag) to
+     * XmlStreamWriter.
+     * @param xmlOut QXmlStreamWriter to write into
+     */
+    void writeXml(QXmlStreamWriter& xmlOut);
 
 
 private:
