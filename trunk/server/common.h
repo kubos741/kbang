@@ -23,6 +23,7 @@
 
 #include <QtDebug>
 
+#include "config.h"
 
 
 #define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)

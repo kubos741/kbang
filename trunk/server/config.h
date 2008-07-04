@@ -17,16 +17,39 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CONFIG_H
+#define CONFIG_H
 
-#include "settings.h"
+#include <QtCore>
 
-#define LISTENPORT 6543
+/**
+ * The config class provides a way to handle configuration files and commandline
+ * arguments. This class is a singleton.
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+*/
+class Config{
+private:
+    Config();
+    Config(const Config&);
+    Config& operator=(Config&);
 
-void defaultSettings()
-{
+    static Config* smp_instance;
 
-    QSettings settings;
-    if (!settings.contains("network/port")) settings.setValue("network/port", LISTENPORT);
-    settings.sync();
+    bool loadCfg(const QString& filePath);
 
-}
+    QHash<QPair<QString, QString>, QString> m_values;
+
+public:
+    static inline Config& instance()
+    {
+        if (!smp_instance) smp_instance = new Config();
+        return *smp_instance;
+    }
+
+    int getInt(const QString& group, const QString& key);
+    QString getString(const QString& group, const QString& key);
+
+    ~Config();
+};
+
+#endif

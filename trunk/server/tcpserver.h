@@ -35,8 +35,21 @@ public:
     virtual bool listen();
     virtual ~TcpServer();
 
+    inline QString hostAddressString()
+    {
+        return m_hostAddressString;
+    }
+
+    inline quint16 port()
+    {
+        return m_port;
+    }
+
+
+
 private:
     QHostAddress m_hostAddress;
+    QString m_hostAddressString;
     quint16 m_port;
     GameServer* mp_gameServer;
 };

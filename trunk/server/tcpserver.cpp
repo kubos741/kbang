@@ -17,9 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "common.h"
 #include "tcpserver.h"
 #include "gameserver.h"
-#include <iostream>
+
 
 /**
  * The only TcpServer constructor.
@@ -27,8 +28,9 @@
  */
 TcpServer::TcpServer(GameServer* parent)
  : QTcpServer(parent),
-   m_hostAddress(QHostAddress::Any),
-   m_port(QSettings().value("network/port").toInt())
+   m_hostAddress(QHostAddress(Config::instance().getString("network","server_bind_ip"))),
+   m_hostAddressString(Config::instance().getString("network","server_bind_ip")),
+   m_port(Config::instance().getInt("network", "server_port"))
 {
     connect(this, SIGNAL(newConnection()),
             parent, SLOT(createClient()));

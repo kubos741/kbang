@@ -21,7 +21,7 @@
 #include "gameserver.h"
 #include "charactercard.h"
 #include "console.h"
-#include "settings.h"
+#include "common.h"
 #include <QCoreApplication>
 
 
@@ -29,13 +29,9 @@
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("McJ Games");
-    QCoreApplication::setApplicationName("KBang Server");
-    defaultSettings();
     GameServer& server = GameServer::instance();
     QObject::connect(&server, SIGNAL(aboutToQuit()),
                      &app, SLOT(quit()));
-    server.setName("Testing server");
     server.listen();
     server.createGame("Testovaci hra", "Popis testovaci hry", 0, 5, 7, 99, QString(), QString(), 0);
     Console* console = new Console(&server, stdin, stdout);

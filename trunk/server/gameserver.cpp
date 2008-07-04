@@ -21,6 +21,7 @@
 #include "gamestate.h"
 #include "tcpserver.h"
 #include "client.h"
+#include "common.h"
 
 #include <QTcpSocket>
 
@@ -33,7 +34,10 @@ GameServer::GameServer():
     m_maxClientCount(1)
 {
     mp_tcpServer = new TcpServer(this);
+    m_name = Config::instance().getString("network", "server_name");
+    m_description = Config::instance().getString("network", "server_description");
 }
+
 
 GameState* GameServer::createGame(const QString & name, const QString & description, int creatorId,
                                   int minPlayers, int maxPlayers, int maxObservers,
@@ -55,7 +59,17 @@ GameState* GameServer::createGame(const QString & name, const QString & descript
  */
 bool GameServer::listen()
 {
-    if (!mp_tcpServer->isListening()) return mp_tcpServer->listen();
+    if (!mp_tcpServer->isListening() && !mp_tcpServer->listen())
+    {
+        qCritical("ERROR: Unable to listen on %s:%d", mp_tcpServer->hostAddressString().toAscii().data(),
+                  mp_tcpServer->port());
+        return 0;
+    }
+    else
+    {
+        QString a("ahoj");
+        qDebug("Listening on %s:%d", mp_tcpServer->hostAddressString().toAscii().data(), mp_tcpServer->port());
+    }
     return 1;
 }
 

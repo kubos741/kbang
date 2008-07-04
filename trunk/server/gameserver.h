@@ -36,23 +36,24 @@ class TcpServer;
 
 class GameServer: public QObject
 {
-    Q_OBJECT
-
+    Q_OBJECT;
+private:
     GameServer();
+    GameServer(GameServer&);
+    GameServer& operator=(const GameServer&);
 
 public:
     /**
-     * The singleton object accessor.
+     * This method returns reference to the GameServer (singleton) instance.
      */
     static inline GameServer& instance()
     {
         if (!sm_instance) sm_instance = new GameServer();
-
         return *sm_instance;
     }
 
     /**
-     * Creates a new game.
+     * This method creates a new game.
      * @returns pointer to newly created GameState
      * @see GameState constructor
      */
@@ -66,12 +67,6 @@ public:
                           const QString& observerPassword,
                           bool shufflePlayers);
 
-
-/* SETTERS AND GETTERS */
-    void setName(const QString& theValue)
-    {
-        m_name = theValue;
-    }
 
     /**
      * Returns a list of games (GameState instances).
@@ -112,12 +107,6 @@ public:
     {
         return m_name;
     }
-
-    void setDescription(const QString& theValue)
-    {
-        m_description = theValue;
-    }
-
 
     QString description() const
     {
