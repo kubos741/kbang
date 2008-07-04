@@ -67,6 +67,7 @@ while(!m_xmlIn.atEnd())
             if (m_xmlIn.isEndElement()) // The end of stanza - completing stanza and sending for another processing
             {
                 Q_ASSERT(mp_stanza);
+                mp_stanza->processToken(m_xmlIn);
                 mp_stanza->execute(m_xmlOut);
                 delete mp_stanza;
                 mp_stanza = 0;
@@ -74,6 +75,7 @@ while(!m_xmlIn.atEnd())
             break;
         default:
             // Depth > 1 - we are in the middle of a stanza - let command handle it
+            Q_ASSERT(mp_stanza);
             mp_stanza->processToken(m_xmlIn);
             break;
         }

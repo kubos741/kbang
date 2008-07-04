@@ -14,7 +14,6 @@ weaponcard.h \
  tcpserver.h \
  clientxmlparser.h \
  stanza.h \
- config.h \
  settings.h \
  common.h \
  stanzaquery.h
@@ -33,7 +32,6 @@ playingcard.cpp \
  tcpserver.cpp \
  clientxmlparser.cpp \
  stanza.cpp \
- config.cpp \
  settings.cpp \
  stanzaquery.cpp
 TEMPLATE = app

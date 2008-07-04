@@ -28,7 +28,7 @@
 
 
 Stanza::Stanza(const QXmlStreamReader& xmlIn):
-    m_state(STATE_OK),
+    m_state(STATE_VOID),
     m_xmlDepth(0),
     m_complete(0)
 {

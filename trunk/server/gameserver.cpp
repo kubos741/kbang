@@ -67,6 +67,8 @@ void GameServer::exit()
 void GameServer::createClient()
 {
     if (!mp_tcpServer->hasPendingConnections()) return;
+    /* NOTE: This is bad - client should be ALWAYS allowed
+       to connect to server (consider only querying for games
     if (m_clients.size() >= m_maxClientCount)
     {
         // The aplication of the client count limit should be
@@ -75,6 +77,7 @@ void GameServer::createClient()
         socket->disconnectFromHost();
         return;
     }
+    */
 
     while (!m_nextClientId || m_clients.contains(m_nextClientId)) m_nextClientId++;
     int clientId = m_nextClientId++;

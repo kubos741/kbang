@@ -379,7 +379,8 @@ C:   </stream>
 ]]></programlisting>
     </section>
     <section>
-      <title>Quering games</title>
+      <title>Querying for games</title>
+      <para>Client needs to obtain the list of games on the server. The following stanza is used.</para>
 <programlisting><![CDATA[ 
 C:   <query type='get' id='abcd1234'> 
        <gamelist/>
@@ -387,7 +388,7 @@ C:   <query type='get' id='abcd1234'>
      
 S:   <query type='result' id='abcd1234'> 
        <gamelist>
-         <game gid='1'
+         <game id='1'
                name='The Example Bang Game'
                desc='The game description'
                minplayers='5'
@@ -404,7 +405,59 @@ S:   <query type='result' id='abcd1234'>
      </query>
 ]]></programlisting>
      </section>
-    
+     <section>
+       <title>Querying for game details</title>
+       <para>Users can demand detailed info about a game. It can be obtained with following stanza.</para>
+<programlisting><![CDATA[ 
+C:   <query type='get' id='abcd1234'> 
+       <game id='1' />
+     </query>
+     
+S:   <query type='result' id='abcd1234'> 
+       <gamelist>
+         <game id='1'
+               name='The Example Bang Game'
+               desc='The game description'
+               minplayers='5'
+               maxplayers='7'
+               maxobservers='10'
+               currentplayers='2'
+               currentobservers='0'
+               state='awaiting'
+               ruleset='bang'
+               playerpassword='0'
+               observerpassword='0'>
+         <players>
+           <player pid='1' name='Alice' cid='11'  />
+           <player pid='2' name='Bob' cid='3' />
+           <player pid='3' name="Charlie' cid='4' />
+         </players>
+         <observers>
+         </observers>
+       </gamelist>
+     </query>
+]]></programlisting>
+      <para>Values pid and cid represent player id and client id.</para>
+    </section>
+     <section>
+       <title>Querying for clients</title>
+       <para>Someone may become interested where all the folks are. The following
+             stanza is an example for getting a list of all clients and their locations
+             on server.</para>
+<programlisting><![CDATA[ 
+C:   <query type='get' id='abcd1234'> 
+       <clientlist />
+     </query>
+     
+S:   <query type='result' id='abcd1234'> 
+       <clientlist>
+         <client id='1' name='Alice' playing_game='3' />
+         <client id='2' name='Bob' observing_game='2' />
+         <client id='3' name='Charlie' />
+       </clientlist>
+     </query>
+]]></programlisting>
+    </section>
   </appendix>
 
 </article>

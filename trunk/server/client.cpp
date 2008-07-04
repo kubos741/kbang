@@ -22,7 +22,7 @@
 #include "gameserver.h"
 
 #include <QTcpSocket>
-#include <iostream>
+#include <QXmlStreamWriter>
 
 
 
@@ -31,7 +31,7 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
    m_clientState(CLIENT_STATE_START)
 {
     Q_ASSERT(clientId != 0);
-    std::cerr << "Client id " << clientId << " connected." << std::endl;
+    qDebug() << "Client #" << clientId << " connected.";
     connect(socket, SIGNAL(disconnected()),
             this, SLOT(disconnectFromHost()));
 }
@@ -39,7 +39,7 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
 
 Client::~Client()
 {
-    std::cerr << "Client id " << m_clientId << " dies!" << std::endl;
+    qDebug() << "Client #" << m_clientId << " disconnected.";
 }
 
 
@@ -103,3 +103,11 @@ void Client::sendIqError()
     mp_tcpSocket->write(block);
 }
 */
+
+void Client::writeXml(QXmlStreamWriter& xmlOut)
+{
+    xmlOut.writeStartElement("client");
+    xmlOut.writeAttribute("id", QString::number(m_clientId));
+    xmlOut.writeAttribute("name", m_clientName);
+    xmlOut.writeEndElement();
+}

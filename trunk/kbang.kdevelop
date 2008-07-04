@@ -157,7 +157,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>client</activedir>
+      <activedir>server</activedir>
     </general>
     <make>
       <abortonerror>true</abortonerror>

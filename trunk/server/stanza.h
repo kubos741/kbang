@@ -28,28 +28,32 @@ class QXmlStreamWriter;
 /**
  * The Stanza class represents a recieved stanza from a client. Since
  * xml stanzas are recieved as a sequence of xml tokens, it's not possible
- * to construct whole Stanza instance at once. Instead a &quot;void&quot; stanza
+ * to construct whole Stanza instance at once. Instead a "void" stanza
  * is constructed and then it is fed with xml tokens. When the stanza is complete,
  * it is executed.
  * Generally when a root element of a stanza is recieved, it is send to the factory
- * method that constructs an incomplete Stanza instance depending on the type
- * of the stanza. The processToken method is then called for every xml token inside of
- * that stanza. After all the tokens from stanza are send to the instance, the stanza
+ * method that constructs a void Stanza instance depending on the type of the stanza.
+ * The processToken method is then called for every xml token inside that stanza.
+ * After all the tokens from stanza are send to the instance, the stanza
  * is complete and the execute method is called. Because every recieved stanza should
- * respond somehow, the reference to XmlStreamWriter is passed in the execute method call.
+ * respond somehow, the reference to XmlStreamWriter is passed when calling the execute method.
+ * This class is subclassed for concrete stanza types. The factory method creates
+ * the instance of these subclases according to the stanza type. If the type is unknown,
+ * instance of this class is created. Such instance does nothing.
  *
+ * @note This class handles only stanzas recieved from client. The outgoing stanzas are
+ * typically generated in execute method.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Stanza {
-public:
-    enum State { STATE_OK, STATE_NOT_EXIST,
+protected:
+    enum State { STATE_VOID, STATE_OK, STATE_NOT_EXIST,
                  STATE_INVALID_TYPE, STATE_MISSING_ID,
                  STATE_BAD_QUERY, STATE_BAD_ACTION };
 
-protected:
     /**
-     * Constructs the (incomplete) stanza instance according to the root xml element
-     * of the stanza. The constructor should not be used
+     * Constructs the void stanza instance. This is used for unknown
+     * stanzas, otherwise a constructor of a subclass is used.
      * @param xmlIn The root xml element of the stanza is gotten from the QXmlStreamReader object.
      */
     Stanza(const QXmlStreamReader& xmlIn);
@@ -73,10 +77,24 @@ public:
      *               produce output to the client - through the QXmlStreamWriter
      */
     virtual void execute(QXmlStreamWriter& xmlOut);
+
     virtual ~Stanza() {}
+
+    /**
+     * This method constructs the stanzas according to their types. This
+     * is the only way that should be used for creating stanzas.
+     */
     static Stanza* construct(const QXmlStreamReader& xmlIn);
 
 protected:
+    /**
+     * This method will read the state of the stanza and
+     * writes error element according its state. This method
+     * should be used in subclasses, since the list of possible
+     * error elements is defined in this class. Nevertheless
+     * this method is virtual and could be overwrittten in subclasses.
+     * @param xmlOut xml stream for output
+     */
     virtual void writeErrorElement(QXmlStreamWriter& xmlOut);
 
 protected:
@@ -84,7 +102,6 @@ protected:
     QString              m_id;
     int                  m_xmlDepth;
     bool                 m_complete;
-
 };
 
 #endif

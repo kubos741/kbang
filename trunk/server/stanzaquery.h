@@ -24,14 +24,21 @@
 #include <stanza.h>
 
 /**
- *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The StanzaQuery class is a subclass of the Stanza class and represents the
+ * query stanzas recieved from client. The type attribute of these stanzas must
+ * be always get, otherwise an error is returned to the client. The query stanza
+ * will have the following structure:
+ * <query type="get" id="1">
+ *   <somequery attr1="val1" ... />
+ * </query>
+ *
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class StanzaQuery : public Stanza
 {
 friend class Stanza;
 private:
     typedef void (StanzaQuery::*ExecuteMethod)(QXmlStreamWriter&);
-
 
 protected:
     StanzaQuery(const QXmlStreamReader& xmlIn);
@@ -49,6 +56,7 @@ private:
 private:
     void getGameList(QXmlStreamWriter& xmlOut);
     void getGame(QXmlStreamWriter& xmlOut);
+    void getClientList(QXmlStreamWriter& xmlOut);
 
 private:
     static QHash<QString, ExecuteMethod> sm_methods;

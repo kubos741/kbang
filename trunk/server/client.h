@@ -28,6 +28,7 @@
 
 class GameServer;
 class QTcpSocket;
+class QXmlStreamWriter;
 
 
 enum ClientState
@@ -76,6 +77,13 @@ private:
     QPair<int,int> m_protocolVersion;
     ClientState m_clientState;
     int m_parseLevel;
+
+
+public:
+    /**
+     * Writes the xml output about this client.
+     */
+    void writeXml(QXmlStreamWriter&);
 };
 
 #endif

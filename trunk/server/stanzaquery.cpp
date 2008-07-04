@@ -20,9 +20,11 @@
 #include "common.h"
 #include "gameserver.h"
 #include "gamestate.h"
+#include "client.h"
 #include "stanzaquery.h"
 
-QHash<QString, StanzaQuerys::ExecuteMethod> StanzaQuery::sm_methods;
+
+QHash<QString, StanzaQuery::ExecuteMethod> StanzaQuery::sm_methods;
 bool StanzaQuery::sm_initialized = 0;
 
 
@@ -38,9 +40,11 @@ StanzaQuery::StanzaQuery(const QXmlStreamReader& xmlIn)
 void StanzaQuery::processToken(const QXmlStreamReader& xmlIn)
 {
     Stanza::processToken(xmlIn);
-    if (m_state != STATE_OK) return;
+    if (m_state != STATE_OK && m_state != STATE_VOID) return;
+    if (xmlIn.isEndElement()) return;
     if ((m_xmlDepth == 1) && xmlIn.isStartElement())
     {
+        qDebug() << "Here: " << xmlIn.name().toString();
         if (!m_elementName.isNull() || !sm_methods.contains(xmlIn.name().toString()))
         {
             m_state = STATE_BAD_QUERY;
@@ -48,6 +52,7 @@ void StanzaQuery::processToken(const QXmlStreamReader& xmlIn)
         }
         m_elementName = xmlIn.name().toString();
         m_attributes  = xmlIn.attributes();
+        m_state       = STATE_OK;
     }
     else
     {
@@ -59,6 +64,7 @@ void StanzaQuery::processToken(const QXmlStreamReader& xmlIn)
 void StanzaQuery::execute(QXmlStreamWriter& xmlOut)
 {
     Stanza::execute(xmlOut);
+    if (m_state == STATE_VOID) m_state = STATE_BAD_QUERY;
     if (m_state != STATE_OK)
     {
         writeStanzaStartElement(xmlOut);
@@ -67,6 +73,7 @@ void StanzaQuery::execute(QXmlStreamWriter& xmlOut)
     }
     else
     {
+        Q_ASSERT(sm_methods.contains(m_elementName));
         CALL_MEMBER_FN(*this,sm_methods[m_elementName])(xmlOut);
     }
 }
@@ -87,8 +94,9 @@ void StanzaQuery::writeStanzaEndElement(QXmlStreamWriter& xmlOut)
 
 void StanzaQuery::initializeMethods()
 {
-    sm_methods["gamelist"] = &StanzaQuery::getGameList;
-    sm_methods["game"]     = &StanzaQuery::getGame;
+    sm_methods["gamelist"]   = &StanzaQuery::getGameList;
+    sm_methods["game"]       = &StanzaQuery::getGame;
+    sm_methods["clientlist"] = &StanzaQuery::getClientList;
     sm_initialized = 1;
 }
 
@@ -119,6 +127,18 @@ void StanzaQuery::getGame(QXmlStreamWriter& xmlOut)
     writeStanzaStartElement(xmlOut);
     if (game) game->writeXml(xmlOut);
     else writeErrorElement(xmlOut);
+    writeStanzaEndElement(xmlOut);
+}
+
+void StanzaQuery::getClientList(QXmlStreamWriter& xmlOut)
+{
+    writeStanzaStartElement(xmlOut);
+    xmlOut.writeStartElement("clientlist");
+    foreach(Client* client, GameServer::instance().clientList())
+    {
+        client->writeXml(xmlOut);
+    }
+    xmlOut.writeEndElement();
     writeStanzaEndElement(xmlOut);
 }
 
