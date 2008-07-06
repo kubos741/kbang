@@ -127,36 +127,33 @@
 				Client can send this query:
 			</para>
       <programlisting><![CDATA[ 
-<iq type='get' id='1'>
-  <query xmlns='kbang:iq:server:desc' />
-</iq>
+<query type='get' id='1'>
+  <serverinfo />
+</query>
 ]]></programlisting>
       <para>
 				Server then responds:
 			</para>
 			<programlisting><![CDATA[ 
-<iq type='result' id='1'>
-  <query xmlns='kbang:iq:server:desc'>
-    <serverdesc name='Example server' description='Example description' />
-  </query>
-</iq>
+<query type='result' id='1'>
+  <serverinfo name='Example server' description='Example description' />
+</query>
 ]]></programlisting>
 		</section>			
 	</section>
 	<section>
     <title>Uninitialized state</title>
-    <para>After client establishes the connection with server and both streams are open, client must
-    identify itself to become active.</para>
+    <para>After client establishes the connection with server and both streams are open, client can
+          identify itself. This must be done before joining games, but can be useless if the client only
+          wants to query for games and then disconnect.</para>
     <section>
       <title>Setting identity</title>
       <para>Right after a client establishes the stream connection with a server, it MUST 
-	    set its identity. This can be done by sending this XML command:</para>
+	    set its identity. This can be done by sending the following stanza:</para>
       <programlisting><![CDATA[ 
-<iq type='set' id='2'>
-  <query xmlns='kbang:iq:identity'>
-    <alias>somealias</alias>
-  </query>
-</iq>
+<action>
+  <set-identity alias="somealias" />
+</action>
 ]]></programlisting>
       <para>Alias MUST be unique within a server. If a client sends non-unique alias, error is returned:</para>
       <programlisting><![CDATA[ 

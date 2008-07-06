@@ -24,6 +24,7 @@
 #include "common.h"
 
 #include <QTcpSocket>
+#include <QXmlStreamWriter>
 
 GameServer* GameServer::sm_instance = 0;
 
@@ -107,6 +108,14 @@ void GameServer::deleteClient(int clientId)
     if (m_clients.contains(clientId) && m_clients[clientId]) m_clients[clientId]->deleteLater();
     //if (m_clients.contains(clientId) && m_clients[clientId]) delete m_clients[clientId];
     m_clients.remove(clientId);
+}
+
+void GameServer::writeXml(QXmlStreamWriter & xmlOut)
+{
+    xmlOut.writeStartElement("serverinfo");
+    xmlOut.writeAttribute("name", m_name);
+    xmlOut.writeAttribute("description", m_description);
+    xmlOut.writeEndElement();
 }
 
 

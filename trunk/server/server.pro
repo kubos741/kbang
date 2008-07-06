@@ -16,7 +16,8 @@ weaponcard.h \
  stanza.h \
  common.h \
  stanzaquery.h \
- config.h
+ config.h \
+ stanzaaction.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -33,7 +34,8 @@ playingcard.cpp \
  clientxmlparser.cpp \
  stanza.cpp \
  stanzaquery.cpp \
- config.cpp
+ config.cpp \
+ stanzaaction.cpp
 TEMPLATE = app
 
 CONFIG -= release

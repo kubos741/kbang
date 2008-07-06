@@ -97,6 +97,7 @@ void StanzaQuery::initializeMethods()
     sm_methods["gamelist"]   = &StanzaQuery::getGameList;
     sm_methods["game"]       = &StanzaQuery::getGame;
     sm_methods["clientlist"] = &StanzaQuery::getClientList;
+    sm_methods["serverinfo"] = &StanzaQuery::getServerInfo;
     sm_initialized = 1;
 }
 
@@ -141,6 +142,14 @@ void StanzaQuery::getClientList(QXmlStreamWriter& xmlOut)
     xmlOut.writeEndElement();
     writeStanzaEndElement(xmlOut);
 }
+
+void StanzaQuery::getServerInfo(QXmlStreamWriter& xmlOut)
+{
+    writeStanzaStartElement(xmlOut);
+    GameServer::instance().writeXml(xmlOut);
+    writeStanzaEndElement(xmlOut);
+}
+
 
 StanzaQuery::~StanzaQuery()
 {

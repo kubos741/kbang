@@ -25,6 +25,7 @@
 class GameState;
 class Client;
 class TcpServer;
+class QXmlStreamWriter;
 
 /**
  * The GameServer class is a singleton class that represent the state of the whole
@@ -112,6 +113,8 @@ public:
     {
         return m_description;
     }
+
+    void writeXml(QXmlStreamWriter& xmlOut);
 
     bool listen();
 
