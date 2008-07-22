@@ -23,6 +23,7 @@
 #include <QString>
 
 /**
+ * NEED TO BE REVISED
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
 class AbstractCard

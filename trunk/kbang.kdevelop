@@ -155,6 +155,15 @@
       <autoinstall>false</autoinstall>
       <autokdesu>false</autokdesu>
       <envvars/>
+      <runarguments>
+        <client/>
+      </runarguments>
+      <cwd>
+        <client>/home/macjariel/devel/kbang</client>
+      </cwd>
+      <debugarguments>
+        <client/>
+      </debugarguments>
     </run>
     <general>
       <activedir>server</activedir>

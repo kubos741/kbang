@@ -20,32 +20,45 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QObject>
+#include <QtCore>
+
 #include "playingcard.h"
+#include "playercontrollerrunner.h"
+#include "publicplayerview.h"
+#include "privateplayerview.h"
+#include "playeractions.h"
 
-
+class AbstractPlayerCtrl;
 class CharacterCard;
 class WeaponCard;
-class AbstractPlayerCtrl;
+class Client;
+class Game;
 
 /**
- * @author MacJariel <macjariel@users.sourceforge.net>
+ * The Player class represents a kbang player. The instance of this object
+ * is created when a client joins a game as a player and it lives as long
+ * as the game exists.
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Player : public QObject
 {
-    Q_OBJECT
-
-friend class GameArbiter;
-
-    Player(QObject *parent);
-
+    Q_OBJECT;
+public:
+    /**
+     * Creates a new instance of Player class. You should always create instances
+     * of this class on heap (with the ''new'' operator) because the lifetime of
+     * this objects is managed inside. After creation of the object, the given client
+     * and game are modified.
+     */
+    Player(int id, const QString& name, const QString& password, Game* game);
     ~Player();
+
 public:
 
     /**
      * Returns number of life-points.
      */
-    inline int getLifePoints() const
+    inline int lifePoints() const
     {
         return m_lifePoints;
     }
@@ -67,29 +80,56 @@ public:
         return m_cardsInHand.size();
     }
 
+    inline QString name() const
+    {
+        return m_name;
+    }
+
+    const PublicPlayerView* publicPlayerView() const
+    {
+        return &m_publicPlayerView;
+    }
+
+    const PrivatePlayerView* privatePlayerView() const
+    {
+        return &m_privatePlayerView;
+    }
+
+    const PlayerActions* playerActions() const
+    {
+        return &m_playerActions;
+    }
+
+    const Game* game() const
+    {
+        return mp_game;
+    }
+
     /**
      * This method attaches the PlayerController to the Player.
      * Player has to have his controller detached at the moment
      * of calling this method.
      */
-    void attachPlayerController(const AbstractPlayerCtrl* controller);
+     void attachPlayerController(AbstractPlayerCtrl* controller);
 
     /**
      * This method detaches the PlayerController of the Player.
      */
-    void detachPlayerController();
+     void detachPlayerController();
 
 private:
+    int                       m_id;
     int                       m_lifePoints;
     CharacterCard*            m_characterCard;
     PlayingCardList           m_cardsInHand;
     WeaponCard*               m_weaponCard;
-    const AbstractPlayerCtrl* m_controller;
-
-
-
-
-
+    QString                   m_name;
+    QString                   m_password;
+    Game const*               mp_game;
+    PlayerControllerRunner    m_runner;
+    const PublicPlayerView    m_publicPlayerView;
+    const PrivatePlayerView   m_privatePlayerView;
+    const PlayerActions       m_playerActions;
 };
 
 #endif

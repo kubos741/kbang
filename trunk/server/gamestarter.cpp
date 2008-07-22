@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "gamestarter.h"
-#include "gamestate.h"
+#include "game.h"
 
-GameStarter::GameStarter(GameState *gameState)
-: QObject(gameState), m_gameState(gameState)
+GameStarter::GameStarter(Game *game)
+: QObject(game), m_game(game)
 {
 }
 

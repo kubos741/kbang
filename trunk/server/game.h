@@ -17,42 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#ifndef GAME_H
+#define GAME_H
 
-#include "player.h"
-#include "gamearbiter.h"
 #include <QtCore>
+#include "gamearbiter.h"
+#include "publicgameview.h"
+
 
 class Client;
+class Player;
 class GameServer;
+class Game;
 class QXmlStreamWriter;
 
-enum {  STATE_AWAITING = 1, // Players are connecting
-        STATE_PREGAME  = 2, // The number of players is fixed - time for choosing roles
-        STATE_GAME     = 3  // Game is ready
-};
-
-
-
 /**
- * The GameState class is the major class that control a bang game. Every bang game running
+ * The Game class is the major class that control a bang game. Every bang game running
  * on the server has just one instance of this class. This class stores all global information
  * about the game and thus must not be accessible to player controllers, because they could
  * cheat.
  * The bang game is created by a client (creator) by sending the specified stanza. The only
- * place in code, where new GameState objects should be created is in the GameServer class.
+ * place in code, where new Game objects should be created is in the GameServer class.
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
-class GameState : public QObject
+class Game: public QObject
 {
-Q_OBJECT
+    Q_OBJECT;
 public:
+    enum GameState {
+        Invalid = 0,
+        WaitingForPlayers,
+        WaitingForCharacters,
+        Playing,
+        Finished
+    };
 
     /**
-     * Creates an instance of GameState. The GameServer class is responsible
-     * for creating instances of GameState.
-     * @param parent parent of the GameState is a GameServer
+     * Creates an instance of Game. The GameServer class is responsible
+     * for creating instances of Game.
+     * @param parent parent of the Game is a GameServer
      * @param gameId id of the game - the GameServer class is responsible to set it unique
      * @param name name of the game
      * @param description description of the game
@@ -65,7 +68,7 @@ public:
      * @param shufflePlayers shuffle-players feature
      * @see GameServer::createGame()
      */
-    GameState(GameServer* parent,
+    Game(GameServer* parent,
               int gameId,
               const QString& name,
               const QString& description,
@@ -78,15 +81,15 @@ public:
               const QString& observerPassword,
               bool shufflePlayers);
 
-
-
-    //    GameState(QObject *parent, const Client& client, int maxPlayers, int AIPlayers);
-    ~GameState();
+    /**
+     * Destroys the Game instance.
+     */
+    ~Game();
 
 
 
     /**
-     * Returns id of the game.
+     * Returns the id of the game.
      */
     inline int gameId() const
     {
@@ -185,29 +188,56 @@ public:
         return m_shufflePlayers;
     }
 
+    inline bool comparePlayerPassword(const QString& password) const
+    {
+        return password == m_playerPassword;
+    }
+
+    inline bool compareObserverPassword(const QString& password) const
+    {
+        return (password == m_playerPassword || password == m_observerPassword);
+    }
+
     /**
      * Writes information about this game (the game tag) to
-     * XmlStreamWriter.
+     * XmlStreamWriter. A verbosity can be specified. The default
+     * value is 0.
      * @param xmlOut QXmlStreamWriter to write into
      */
-    void writeXml(QXmlStreamWriter& xmlOut);
+    void writeXml(QXmlStreamWriter& xmlOut, int level = 0);
 
+
+    /**
+     * Creates a new player, enters it into the list of players and
+     * returns a pointer to it.
+     */
+    Player* createNewPlayer(const QString& name, const QString& password);
+
+
+
+    const PublicGameView* publicGameView() const
+    {
+        return &m_publicGameView;
+    }
 
 private:
-    QList<Player*> m_players;
+    QMap<int, Player*> m_players;
     GameArbiter m_arbiter;
     int m_state;
 
-    const int   m_gameId;
-    QString     m_name;
-    QString     m_description;
-    const int   m_creatorId;
-    int         m_minPlayers;
-    int         m_maxPlayers;
-    int         m_maxObservers;
-    QString     m_playerPassword;
-    QString     m_observerPassword;
-    bool        m_shufflePlayers;
+    const int            m_gameId;
+    QString              m_name;
+    QString              m_description;
+    const int            m_creatorId;
+    int                  m_minPlayers;
+    int                  m_maxPlayers;
+    int                  m_maxObservers;
+    QString              m_playerPassword;
+    QString              m_observerPassword;
+    bool                 m_shufflePlayers;
+    int                  m_nextPlayerId;
+    GameState            m_gameState;
+    const PublicGameView m_publicGameView;
 };
 
 #endif

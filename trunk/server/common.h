@@ -30,5 +30,6 @@
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
+QString randomToken(int minLength, int maxLength);
 
 #endif

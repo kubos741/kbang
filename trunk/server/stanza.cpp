@@ -21,7 +21,8 @@
 #include "common.h"
 #include "stanza.h"
 #include "stanzaquery.h"
-#include "gamestate.h"
+#include "stanzaaction.h"
+#include "game.h"
 #include "gameserver.h"
 #include <QXmlAttributes>
 
@@ -56,32 +57,39 @@ void Stanza::writeErrorElement(QXmlStreamWriter& xmlOut)
 {
     switch(m_state)
     {
-        case STATE_INVALID_TYPE:   xmlOut.writeEmptyElement("invalid-type"); break;
-        case STATE_BAD_QUERY:      xmlOut.writeEmptyElement("bad-query");    break;
-        case STATE_NOT_EXIST:      xmlOut.writeEmptyElement("not-exist");    break;
-        default:                   NOT_REACHED();                            break;
+        case STATE_INVALID_TYPE:   xmlOut.writeEmptyElement("invalid-type");   break;
+        case STATE_BAD_QUERY:      xmlOut.writeEmptyElement("bad-query");      break;
+        case STATE_NOT_EXIST:      xmlOut.writeEmptyElement("not-exist");      break;
+        case STATE_NOT_AVAILABLE:  xmlOut.writeEmptyElement("not-available");  break;
+        case STATE_NOT_COMPLETE:   xmlOut.writeEmptyElement("not-complete");   break;
+        case STATE_ACCESS_DENIED:  xmlOut.writeEmptyElement("access-denied");  break;
+        default:                   NOT_REACHED();                              break;
     }
 }
 
 
+inline void Stanza::setClient(Client* client)
+{
+    mp_client = client;
+}
 
-Stanza *Stanza::construct(const QXmlStreamReader& xmlIn)
+Stanza* Stanza::construct(Client* client, const QXmlStreamReader& xmlIn)
 {
     Q_ASSERT(xmlIn.isStartElement());
+    Stanza* stanza = 0;
     if (xmlIn.name() == "query")
     {
-        return new StanzaQuery(xmlIn);
+        stanza = new StanzaQuery(xmlIn);
     }
     else if (xmlIn.name() == "action")
     {
-        //return new StanzaAction(xmlIn);
+        stanza = new StanzaAction(xmlIn);
     }
-    return new Stanza(xmlIn);
+    else
+    {
+        stanza = new Stanza(xmlIn);
+    }
+    Q_ASSERT(stanza);
+    stanza->setClient(client);
+    return stanza;
 }
-
-
-
-
-
-
-

@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "common.h"
 #include "gameserver.h"
-#include "gamestate.h"
+#include "game.h"
 #include "client.h"
 #include "stanzaquery.h"
 
@@ -81,9 +81,9 @@ void StanzaQuery::execute(QXmlStreamWriter& xmlOut)
 
 void StanzaQuery::writeStanzaStartElement(QXmlStreamWriter& xmlOut)
 {
-    xmlOut.writeStartElement("query");
-    xmlOut.writeAttribute("type", (m_state == STATE_OK) ? "result" : "error");
-    if (!m_id.isEmpty()) xmlOut.writeAttribute("id", m_id);
+        xmlOut.writeStartElement("query");
+        xmlOut.writeAttribute("type", (m_state == STATE_OK) ? "result" : "error");
+        if (!m_id.isEmpty()) xmlOut.writeAttribute("id", m_id);
 }
 
 
@@ -107,7 +107,7 @@ void StanzaQuery::getGameList(QXmlStreamWriter& xmlOut)
 {
     writeStanzaStartElement(xmlOut);
     xmlOut.writeStartElement("gamelist");
-    foreach(GameState* game, GameServer::instance().gameStateList())
+    foreach(Game* game, GameServer::instance().gameList())
     {
         game->writeXml(xmlOut);
     }
@@ -118,15 +118,14 @@ void StanzaQuery::getGameList(QXmlStreamWriter& xmlOut)
 void StanzaQuery::getGame(QXmlStreamWriter& xmlOut)
 {
     int gameId = m_attributes.value("id").toString().toInt();
-    GameState* game = 0;
-    qDebug()     << "GameId: " << gameId;
+    Game* game = 0;
     if (gameId)
     {
-        game = GameServer::instance().gameState(gameId);
+        game = GameServer::instance().game(gameId);
     }
     if (!game) m_state = STATE_NOT_EXIST;
     writeStanzaStartElement(xmlOut);
-    if (game) game->writeXml(xmlOut);
+    if (game) game->writeXml(xmlOut, 1);
     else writeErrorElement(xmlOut);
     writeStanzaEndElement(xmlOut);
 }

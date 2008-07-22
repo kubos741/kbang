@@ -17,89 +17,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
 
-#include "clientxmlparser.h"
+#ifndef SERVERTESTER_H
+#define SERVERTESTER_H
 
-#include "player.h"
+#include <QtGui>
+#include <QtNetwork>
 
-#include <QObject>
-#include <QPair>
-
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
-
-/**
- * NOTE: There cannot be a client with id = 0.
- *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class Client : public QObject
-{
-Q_OBJECT
+class ShortcutButton: public QPushButton {
+    Q_OBJECT;
 public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-    friend class Player;
-
-    inline int id() const
-    {
-        return m_clientId;
-    }
-
-    Player* player();
-    AbstractPlayerCtrl* playerController();
-
-    void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
-private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
+    ShortcutButton(QString title, QString content);
+    static void init(QLayout*, QTextEdit*, QPushButton*);
 
 private:
-
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
-
-public:
-    /**
-     * Writes the xml output about this client.
-     */
-    void writeXml(QXmlStreamWriter&);
+    QString m_title;
+    QString m_content;
+    static QLayout* smp_layout;
+    static QTextEdit* smp_textEdit;
+    static QPushButton* smp_sendButton;
+public slots:
+    void updateTextEdit();
 };
+
+
+class ServerTester: public QWidget {
+    Q_OBJECT
+public:
+    ServerTester(QWidget *parent = 0);
+
+private:
+    void initButtons();
+
+private:
+    bool         m_connected;
+    QTcpSocket   m_tcpSocket;
+    QLineEdit   *mp_lineEditAddress;
+    QLineEdit   *mp_lineEditPort;
+    QPushButton *mp_pushButtonConnect;
+    QPushButton *mp_pushButtonSendXml;
+
+    QHBoxLayout *mp_layoutConnect;
+    QHBoxLayout *mp_layoutXmlInput;
+    QGridLayout *mp_layoutButtons;
+    QVBoxLayout *mp_layoutLeftSide;
+    QVBoxLayout *mp_layoutRightSide;
+    QHBoxLayout *mp_layoutMain;
+
+    QTextEdit   *mp_textEditViewXml;
+    QTextEdit   *mp_textEditInputXml;
+
+public slots:
+    void connectClicked();
+    void tcpSocketError();
+    void connected();
+    void disconnected();
+    void sendClicked();
+    void incomingData();
+};
+
+
+
 
 #endif

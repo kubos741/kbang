@@ -17,89 +17,69 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef PUBLICPLAYERVIEW_H
+#define PUBLICPLAYERVIEW_H
 
-#include "clientxmlparser.h"
+#include "common.h"
 
-#include "player.h"
-
-#include <QObject>
-#include <QPair>
-
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
+class Player;
 
 /**
- * NOTE: There cannot be a client with id = 0.
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class Client : public QObject
-{
-Q_OBJECT
-public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-    friend class Player;
+*/
+class PublicPlayerView {
+friend class Player;
+protected:
+    PublicPlayerView(Player* player);
+    virtual ~PublicPlayerView();
+private:
+    PublicPlayerView(const PublicPlayerView&);
+    PublicPlayerView& operator=(const PublicPlayerView&);
 
-    inline int id() const
+
+public:
+    inline QString name() const;
+
+    inline bool isAlive() const
     {
-        return m_clientId;
+        // TODO
+        return 0;
     }
 
-    Player* player();
-    AbstractPlayerCtrl* playerController();
+    inline bool isSheriff() const
+    {
+        // TODO
+        return 0;
+    }
 
-    void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
-private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
-
-private:
-
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
-
-public:
     /**
-     * Writes the xml output about this client.
+     * Returns the role of the player. In case
+     * the player is still alive and is not sheriff,
+     * the unknown role is returned.
      */
-    void writeXml(QXmlStreamWriter&);
+    virtual int role() const
+    {
+        // TODO
+        return 0;
+    }
+
+    inline int lifePoints() const
+    {
+        // TODO
+        return 0;
+    }
+
+    inline int numCardsInHand() const
+    {
+        // TODO
+        return 0;
+    }
+
+    // write method cardsOnTable
+
+private:
+    Player* mp_player;
 };
 
 #endif

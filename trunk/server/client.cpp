@@ -20,6 +20,8 @@
 
 #include "client.h"
 #include "gameserver.h"
+#include "player.h"
+#include "clientplayerctrl.h"
 
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
@@ -28,8 +30,9 @@
 
 Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
  : QObject(parent), m_clientId(clientId), m_xmlParser(this, socket),
-   m_clientState(CLIENT_STATE_START)
+mp_player(0)
 {
+    mp_clientPlayerCtrl = new ClientPlayerCtrl(this);
     Q_ASSERT(clientId != 0);
     qDebug() << "Client #" << clientId << " connected.";
     connect(socket, SIGNAL(disconnected()),
@@ -39,6 +42,7 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
 
 Client::~Client()
 {
+    delete mp_clientPlayerCtrl;
     qDebug() << "Client #" << m_clientId << " disconnected.";
 }
 
@@ -110,4 +114,24 @@ void Client::writeXml(QXmlStreamWriter& xmlOut)
     xmlOut.writeAttribute("id", QString::number(m_clientId));
     xmlOut.writeAttribute("name", m_clientName);
     xmlOut.writeEndElement();
+}
+
+AbstractPlayerCtrl* Client::playerController()
+{
+    return mp_clientPlayerCtrl;
+}
+
+bool Client::isInGame() const
+{
+    return mp_clientPlayerCtrl->isAttached();
+}
+
+void Client::setPlayer(Player* player)
+{
+    mp_player = player;
+}
+
+Player* Client::player()
+{
+    return mp_player;
 }

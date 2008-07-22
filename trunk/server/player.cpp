@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *   Copyright (C) 2008 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
@@ -18,30 +18,52 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "player.h"
-#include "abstractplayerctrl.h"
+#include "game.h"
+#include "client.h"
 
 
-Player::Player(QObject *parent)
- : QObject(parent),
-   m_controller(NULL)
+Player::Player(int id, const QString& name, const QString& password, Game* game):
+QObject(game),
+m_id(id),
+//m_controller(0),
+m_name(name),
+m_password(password),
+mp_game(game),
+m_runner(this),
+m_publicPlayerView(this),
+m_privatePlayerView(this),
+m_playerActions(this)
 {
+    //    mp_client->mp_player = this;
+    //    m_id = mp_game->appendNewPlayer(this);
 }
 
 
 Player::~Player()
 {
+
 }
 
-void Player::attachPlayerController(const AbstractPlayerCtrl * controller)
+
+void Player::attachPlayerController(AbstractPlayerCtrl* controller)
 {
-    Q_ASSERT(m_controller == NULL);
-    m_controller = controller;
+    m_runner.attachPlayerController(controller);
 }
 
 void Player::detachPlayerController()
 {
-    Q_ASSERT(m_controller != NULL);
-    m_controller = NULL;
+    m_runner.detachPlayerController();
 }
 
 
+/*
+Player* Player::construct(const QString&      name,
+                          const QString&      password,
+                          Client*             client,
+                          Game*          game)
+{
+    player = new Player(game, name, password, client);
+    Q_ASSERT(player);
+
+}
+*/

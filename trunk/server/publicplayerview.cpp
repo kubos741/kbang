@@ -17,50 +17,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef STANZAACTION_H
-#define STANZAACTION_H
+#include "publicplayerview.h"
+#include "player.h"
 
-#include <QHash>
-#include <QMap>
-#include <stanza.h>
-
-/**
- * The StanzaAction class represents the action stanzas recieved from client.
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class StanzaAction : public Stanza
+PublicPlayerView::PublicPlayerView(Player* player): mp_player(player)
 {
-friend class Stanza;
-private:
-    typedef void (StanzaAction::*ExecuteMethod)(QXmlStreamWriter&);
+}
 
-protected:
-    StanzaAction(const QXmlStreamReader& xmlIn);
+QString PublicPlayerView::name() const
+{
+    return mp_player->name();
+}
 
-public:
-    virtual void processToken(const QXmlStreamReader& xmlIn);
-    virtual void execute(QXmlStreamWriter& xmlOut);
-    virtual ~StanzaAction();
-
-private:
-    static void initializeMethods();
-    void writeErrorElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaStartElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaEndElement(QXmlStreamWriter& xmlOut);
-
-private:
-    void createGame(QXmlStreamWriter& xmlOut);
-    void joinGame(QXmlStreamWriter& xmlOut);
-    void leaveGame(QXmlStreamWriter& xmlOut);
-
-
-private:
-    static QHash<QString, ExecuteMethod> sm_methods;
-    static bool sm_initialized;
-
-    QString              m_elementName;
-    QXmlStreamAttributes m_attributes;
-    QMap<QString, QXmlStreamAttributes> m_optElements;
-};
-
-#endif
+PublicPlayerView::~ PublicPlayerView()
+{
+}

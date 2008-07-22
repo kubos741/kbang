@@ -17,62 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ABSTRACTPLAYERCTRL_H
-#define ABSTRACTPLAYERCTRL_H
+#ifndef CLIENTPLAYERCTRL_H
+#define CLIENTPLAYERCTRL_H
 
-#include <QThread>
+#include <abstractplayerctrl.h>
 
-#include "playingcard.h"
-
-class PublicPlayerView;
-class PrivatePlayerView;
-class PublicGameView;
-class PlayerActions;
-
-class CharacterCard;
-class CharacterCardList;
-
+class Client;
+class Player;
 
 /**
- * The AbstractPlayerCtrl class provides the base functionality common
- * to all player controllers. The role of a player controller is to
- * control player actions. These actions can be controlled either by an
- * AI or by humans. By subclassing this class you can write your own AIs.
- *
- * PlayerController communicates with the game with Events (see playerctrlevents.h)
- * and PlayerController can also query information from the PrivatePlayerView,
- * PublicPlayerView and PublicGameView instances. These instances are provided
- * by PlayerControllerRunner when a PlayerController is attached.
- *
+ * The ClientPlayerCtrl class provides a wrapper to the...
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class AbstractPlayerCtrl: public QObject
+class ClientPlayerCtrl: public AbstractPlayerCtrl
 {
+    friend class Client;
     Q_OBJECT;
-public:
-    AbstractPlayerCtrl();
-    virtual ~AbstractPlayerCtrl();
-    void attachPlayer(const PrivatePlayerView*,
-                      const PublicGameView*,
-                      const PlayerActions*);
-    void detachPlayer();
+private:
+    ClientPlayerCtrl(Client* client);
+    ~ClientPlayerCtrl();
 
-    inline bool isAttached() const
-    {
-        return m_attached;
-    }
-    /**
-     * This method is called in the beginning of the player's turn and
-     * as soon as this method returns, the player's turn is over.
-     */
-    virtual void playTurn() = 0;
+    virtual void playTurn();
 
     /**
      * This method is called if the player is under attack.
      * @param attacker the attacking player
      * @param card the card used for attack
      */
-    virtual void underAttack(const PublicPlayerView& attacker, const PlayingCard& card) = 0;
+    virtual void underAttack(const PublicPlayerView& attacker, const PlayingCard& card);
 
     /**
      * This method is called if the player is asked to choose a
@@ -80,7 +52,7 @@ public:
      * @param cardList a list of cards to choose from
      * @return reference to one of the cards from cardList
      */
-    virtual const PlayingCard& pickACard(const PlayingCardList& cardList) = 0;
+    virtual const PlayingCard& pickACard(const PlayingCardList& cardList);
 
 
     /**
@@ -90,7 +62,7 @@ public:
      * @param characterList a list of characters to choose from
      * @return reference to one of the cards from characterList
      */
-    virtual const CharacterCard& pickACharacter(const CharacterCardList& characterList) = 0;
+    virtual const CharacterCard& pickACharacter(const CharacterCardList& characterList);
 
 public slots:
     /**
@@ -102,7 +74,7 @@ public slots:
      *
      */
     virtual void playerRecievesCards(const PublicPlayerView& player,
-                                     const PlayingCardList& cardList) = 0;
+                                     const PlayingCardList& cardList);
 
 
     /**
@@ -116,7 +88,7 @@ public slots:
     virtual void playerPlaysCard(const PublicPlayerView&  player,
                                  const PlayingCard&     card,
                                  const PublicPlayerView*  targetPlayer = NULL,
-                                 const PlayingCard*     targetCard   = NULL) = 0;
+                                 const PlayingCard*     targetCard   = NULL);
 
 
     /**
@@ -125,15 +97,10 @@ public slots:
      * @param cardList list of cards that were discarded
      */
     virtual void playerDiscardsCard(const PublicPlayerView& player,
-                                    const PlayingCardList& cardList) = 0;
-
-
+                                    const PlayingCardList& cardList);
 
 private:
-    const PrivatePlayerView* mp_privatePlayerView;
-    const PublicGameView*    mp_publicGameView;
-    const PlayerActions*     mp_playerActions;
-    bool                     m_attached;
+    Client* mp_client;
 };
 
 #endif

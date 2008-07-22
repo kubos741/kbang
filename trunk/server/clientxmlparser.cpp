@@ -62,7 +62,7 @@ while(!m_xmlIn.atEnd())
             if (m_xmlIn.isStartElement()) // The start of a new stanza recieved
             {
                 Q_ASSERT(!mp_stanza);
-                mp_stanza = Stanza::construct(m_xmlIn);
+                mp_stanza = Stanza::construct(mp_client, m_xmlIn);
             }
             if (m_xmlIn.isEndElement()) // The end of stanza - completing stanza and sending for another processing
             {

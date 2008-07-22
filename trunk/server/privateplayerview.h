@@ -17,89 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef PRIVATEPLAYERVIEW_H
+#define PRIVATEPLAYERVIEW_H
 
-#include "clientxmlparser.h"
-
-#include "player.h"
-
-#include <QObject>
-#include <QPair>
-
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
+#include <publicplayerview.h>
 
 /**
- * NOTE: There cannot be a client with id = 0.
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
+class PrivatePlayerView: public PublicPlayerView
 {
-Q_OBJECT
-public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-    friend class Player;
-
-    inline int id() const
-    {
-        return m_clientId;
-    }
-
-    Player* player();
-    AbstractPlayerCtrl* playerController();
-
-    void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
+friend class Player;
 private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
-
-private:
-
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
+    PrivatePlayerView(Player* player);
+    virtual ~PrivatePlayerView();
 
 public:
     /**
-     * Writes the xml output about this client.
+     * Returns the role of the player. The valid role
+     * is returned even if the player is still alive
+     * and is not sheriff.
      */
-    void writeXml(QXmlStreamWriter&);
+    virtual int role() const
+    {
+        // TODO
+        return 0;
+    }
+
+    // implement method cardsInHand
 };
 
 #endif

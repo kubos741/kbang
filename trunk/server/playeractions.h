@@ -17,89 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
-
-#include "clientxmlparser.h"
-
-#include "player.h"
+#ifndef PLAYERACTIONS_H
+#define PLAYERACTIONS_H
 
 #include <QObject>
-#include <QPair>
 
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
+class Player;
 
 /**
- * NOTE: There cannot be a client with id = 0.
- *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
-{
-Q_OBJECT
-public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
+class PlayerActions: public QObject {
+    Q_OBJECT;
     friend class Player;
-
-    inline int id() const
-    {
-        return m_clientId;
-    }
-
-    Player* player();
-    AbstractPlayerCtrl* playerController();
-
-    void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
+protected:
+    PlayerActions(Player* player);
+    ~PlayerActions();
 private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
+    PlayerActions(const PlayerActions&);
+    PlayerActions& operator=(const PlayerActions&);
+
+public:
+    void leaveGame();
+
 
 private:
-
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
     Player* mp_player;
 
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
-
-public:
-    /**
-     * Writes the xml output about this client.
-     */
-    void writeXml(QXmlStreamWriter&);
 };
 
 #endif

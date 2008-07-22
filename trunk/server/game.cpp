@@ -18,13 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
-#include "gamestate.h"
-#include "gameserver.h"
-
 #include <QXmlStreamWriter>
 
-GameState::GameState(GameServer* parent, int gameId, const QString& name, const QString& description,
+#include "game.h"
+#include "gameserver.h"
+#include "client.h"
+#include "player.h"
+#include "common.h"
+
+
+
+Game::Game(GameServer* parent, int gameId, const QString& name, const QString& description,
                      int creatorId, int minPlayers, int maxPlayers, int maxObservers,
                      const QString& playerPassword, const QString& observerPassword,
                      bool shufflePlayers):
@@ -38,17 +42,21 @@ m_maxPlayers(maxPlayers),
 m_maxObservers(maxObservers),
 m_playerPassword(playerPassword),
 m_observerPassword(observerPassword),
-m_shufflePlayers(shufflePlayers)
+m_shufflePlayers(shufflePlayers),
+m_nextPlayerId(0),
+m_gameState(WaitingForPlayers),
+m_publicGameView(this)
 {
     Q_ASSERT(!m_name.isEmpty());
     Q_ASSERT(minPlayers <= maxPlayers);
     Q_ASSERT(m_observerPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
+    //    m_adminPassword = randomToken(10, 16);
 
 
 
 }
 
-void GameState::writeXml(QXmlStreamWriter& xmlOut)
+void Game::writeXml(QXmlStreamWriter& xmlOut, int level)
 {
     xmlOut.writeStartElement("game");
     xmlOut.writeAttribute("id", QString::number(m_gameId));
@@ -61,19 +69,36 @@ void GameState::writeXml(QXmlStreamWriter& xmlOut)
     xmlOut.writeAttribute("playerPassword", QString::number(hasPlayerPassword()));
     xmlOut.writeAttribute("observerPassword", QString::number(hasObserverPassword()));
     xmlOut.writeAttribute("shufflePlayers", QString::number(hasShufflePlayers()));
+    if (level > 0)
+    {
+        xmlOut.writeStartElement("players");
+        foreach(Player* player, m_players.values())
+        {
+            xmlOut.writeStartElement("player");
+            xmlOut.writeAttribute("name", player->name());
+            // TODO: write about client
+            xmlOut.writeEndElement();
+        }
+        xmlOut.writeEndElement();
+    }
     xmlOut.writeEndElement();
 }
 
 
-GameState::~GameState()
+Game::~Game()
 {
 }
-/*
-GameState::GameState(QObject * parent, const Client & client, int maxPlayers, int AIPlayers)
- :QObject(parent),
-  m_state(STATE_AWAITING)
+
+
+Player* Game::createNewPlayer(const QString& name, const QString& password)
 {
+    while (!m_nextPlayerId || m_players.contains(m_nextPlayerId))
+    {
+        m_nextPlayerId++;
+    }
+    Player* newPlayer = new Player(m_nextPlayerId, name, password, this);
+    m_players[m_nextPlayerId] = newPlayer;
+    return newPlayer;
 }
-*/
 
 

@@ -17,89 +17,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef PUBLICGAMEVIEW_H
+#define PUBLICGAMEVIEW_H
 
-#include "clientxmlparser.h"
+#include "common.h"
 
-#include "player.h"
-
-#include <QObject>
-#include <QPair>
-
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
+class Game;
 
 /**
- * NOTE: There cannot be a client with id = 0.
- *
+ * The PublicGameView class provides an interface for quering public information
+ * from games. The instances of this class are used by player controllers to get
+ * the information about the "world around". Every game has exactly one PublicGameView
+ * instance and is responsible for its lifetime.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
-{
-Q_OBJECT
-public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-    friend class Player;
-
-    inline int id() const
-    {
-        return m_clientId;
-    }
-
-    Player* player();
-    AbstractPlayerCtrl* playerController();
-
-    void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
+class PublicGameView {
+    friend class Game;
 private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
+    /**
+     * Constructs the PublicGameView instance. Instances can be constructed only
+     * from the Game class, which is declared as friend class.
+     */
+    PublicGameView(Game* game);
+    /**
+     * Copying PublicGameView objects is not allowed.
+     */
+    PublicGameView(const PublicGameView&);
 
-private:
+    /**
+     * Assignment into PublicGameView instances is not allowed.
+     */
+    const PublicGameView& operator=(const PublicGameView&);
 
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
+    ~PublicGameView();
 
 public:
     /**
-     * Writes the xml output about this client.
+     * Returns the id of the game.
      */
-    void writeXml(QXmlStreamWriter&);
+    int gameId() const;
+
+    /**
+     * Returns name of the game.
+     */
+    QString name() const;
+
+    /**
+     * Returns description of the game.
+     */
+    inline QString description() const;
+
+    /**
+     * Returns count of players.
+     */
+    inline int playersCount() const;
+
+private:
+    Game* mp_game;
 };
 
 #endif

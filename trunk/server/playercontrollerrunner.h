@@ -17,89 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef PLAYERCONTROLLERRUNNER_H
+#define PLAYERCONTROLLERRUNNER_H
 
-#include "clientxmlparser.h"
+#include <QThread>
 
-#include "player.h"
-
-#include <QObject>
-#include <QPair>
-
-
-class GameServer;
-class QTcpSocket;
-class QXmlStreamWriter;
+class Player;
 class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-
 
 /**
- * NOTE: There cannot be a client with id = 0.
- *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
+class PlayerControllerRunner: public QThread
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
-    friend class ClientXmlParser;
-    friend class Player;
+    PlayerControllerRunner(Player* player);
+    ~PlayerControllerRunner();
 
-    inline int id() const
-    {
-        return m_clientId;
-    }
+    void attachPlayerController(AbstractPlayerCtrl* playerController);
+    void detachPlayerController();
 
-    Player* player();
-    AbstractPlayerCtrl* playerController();
 
-    void setPlayer(Player* player);
+    virtual bool event(QEvent*);
 
-private slots:
-    void disconnectFromHost();
-
-signals:
-    void clientDisconnected(int clientId);
-
-/*
-private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
+    virtual void run();
+    virtual void stop();
 
 private:
-
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-
-
-
-
-public:
-    /**
-     * Writes the xml output about this client.
-     */
-    void writeXml(QXmlStreamWriter&);
+    const Player* mp_player;
+    AbstractPlayerCtrl* mp_playerController;
 };
 
 #endif

@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 class QXmlStreamWriter;
+class Client;
 
 /**
  * The Stanza class represents a recieved stanza from a client. Since
@@ -49,7 +50,9 @@ class Stanza {
 protected:
     enum State { STATE_VOID, STATE_OK, STATE_NOT_EXIST,
                  STATE_INVALID_TYPE, STATE_MISSING_ID,
-                 STATE_BAD_QUERY, STATE_BAD_ACTION };
+                 STATE_BAD_QUERY, STATE_BAD_ACTION,
+                 STATE_NOT_AVAILABLE, STATE_NOT_COMPLETE,
+                 STATE_ACCESS_DENIED };
 
     /**
      * Constructs the void stanza instance. This is used for unknown
@@ -60,6 +63,13 @@ protected:
 
 private:
     Stanza(const Stanza&) {}
+    void setClient(Client* client);
+
+protected:
+    inline Client* client()
+    {
+        return mp_client;
+    }
 
 public:
     /**
@@ -84,7 +94,7 @@ public:
      * This method constructs the stanzas according to their types. This
      * is the only way that should be used for creating stanzas.
      */
-    static Stanza* construct(const QXmlStreamReader& xmlIn);
+    static Stanza* construct(Client* client, const QXmlStreamReader& xmlIn);
 
 protected:
     /**
@@ -102,6 +112,7 @@ protected:
     QString              m_id;
     int                  m_xmlDepth;
     bool                 m_complete;
+    Client*              mp_client;
 };
 
 #endif

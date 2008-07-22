@@ -22,7 +22,7 @@
 
 #include <QObject>
 
-class GameState;
+class Game;
 
 /**
  * @author MacJariel <macjariel@users.sourceforge.net>
@@ -31,10 +31,10 @@ class GameStarter : public QObject
 {
 Q_OBJECT
 public:
-    GameStarter(GameState *gameState);
+    GameStarter(Game *game);
     void startGame();
 private:
-    GameState* m_gameState;
+    Game* m_game;
 };
 
 #endif

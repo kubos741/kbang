@@ -22,7 +22,7 @@
 
 #include <QtCore>
 
-class GameState;
+class Game;
 class Client;
 class TcpServer;
 class QXmlStreamWriter;
@@ -55,10 +55,10 @@ public:
 
     /**
      * This method creates a new game.
-     * @returns pointer to newly created GameState
-     * @see GameState constructor
+     * @returns pointer to newly created Game
+     * @see Game constructor
      */
-    GameState* createGame(const QString& name,
+    Game* createGame(const QString& name,
                           const QString& description,
                           int creatorId,
                           int minPlayers,
@@ -70,18 +70,18 @@ public:
 
 
     /**
-     * Returns a list of games (GameState instances).
+     * Returns a list of games (Game instances).
      */
-    inline QList<GameState*> gameStateList()
+    inline QList<Game*> gameList()
     {
         return m_games.values();
     }
 
     /**
-     * Returns a pointer to the GameState with
+     * Returns a pointer to the Game with
      * given id.
      */
-    inline GameState* gameState(int id)
+    inline Game* game(int id)
     {
         if (m_games.contains(id)) return m_games[id];
         return 0;
@@ -129,7 +129,7 @@ public slots:
 
 private:
     static GameServer*       sm_instance;
-    QHash<int, GameState*>   m_games;
+    QHash<int, Game*>   m_games;
     QHash<int, Client*>      m_clients;
 
     int m_nextClientId;

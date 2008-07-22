@@ -6,7 +6,7 @@ player.h \
 playingcard.h \
 weaponcard.h \
  gameserver.h \
- gamestate.h \
+ game.h \
  gamestarter.h \
  console.h \
  consolecommand.h \
@@ -17,7 +17,14 @@ weaponcard.h \
  common.h \
  stanzaquery.h \
  config.h \
- stanzaaction.h
+ stanzaaction.h \
+ publicgameview.h \
+ clientplayerctrl.h \
+ playerctrlevents.h \
+ publicplayerview.h \
+ privateplayerview.h \
+ playercontrollerrunner.h \
+ playeractions.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -25,7 +32,7 @@ player.cpp \
 weaponcard.cpp \
 playingcard.cpp \
  gameserver.cpp \
- gamestate.cpp \
+ game.cpp \
  gamestarter.cpp \
  console.cpp \
  consolecommand.cpp \
@@ -35,7 +42,16 @@ playingcard.cpp \
  stanza.cpp \
  stanzaquery.cpp \
  config.cpp \
- stanzaaction.cpp
+ stanzaaction.cpp \
+ common.cpp \
+ publicgameview.cpp \
+ clientplayerctrl.cpp \
+ abstractplayerctrl.cpp \
+ playerctrlevents.cpp \
+ publicplayerview.cpp \
+ privateplayerview.cpp \
+ playercontrollerrunner.cpp \
+ playeractions.cpp
 TEMPLATE = app
 
 CONFIG -= release

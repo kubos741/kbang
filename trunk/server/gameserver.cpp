@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "gameserver.h"
-#include "gamestate.h"
+#include "game.h"
 #include "tcpserver.h"
 #include "client.h"
 #include "common.h"
@@ -40,14 +40,14 @@ GameServer::GameServer():
 }
 
 
-GameState* GameServer::createGame(const QString & name, const QString & description, int creatorId,
+Game* GameServer::createGame(const QString & name, const QString & description, int creatorId,
                                   int minPlayers, int maxPlayers, int maxObservers,
                                   const QString & playerPassword, const QString & observerPassword,
                                   bool shufflePlayers)
 {
     while (!m_nextGameId || m_games.contains(m_nextGameId)) m_nextGameId++;
     int gameId = m_nextGameId++;
-    GameState* newGame = new GameState(this, gameId, name, description, creatorId, minPlayers, maxPlayers,
+    Game* newGame = new Game(this, gameId, name, description, creatorId, minPlayers, maxPlayers,
                                        maxObservers, playerPassword, observerPassword, shufflePlayers);
     m_games[gameId] = newGame;
     return newGame;

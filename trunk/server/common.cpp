@@ -17,50 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef STANZAACTION_H
-#define STANZAACTION_H
 
-#include <QHash>
-#include <QMap>
-#include <stanza.h>
+#include <QString>
+#include "common.h"
 
-/**
- * The StanzaAction class represents the action stanzas recieved from client.
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class StanzaAction : public Stanza
+QString randomToken(int minLength, int maxLength)
 {
-friend class Stanza;
-private:
-    typedef void (StanzaAction::*ExecuteMethod)(QXmlStreamWriter&);
-
-protected:
-    StanzaAction(const QXmlStreamReader& xmlIn);
-
-public:
-    virtual void processToken(const QXmlStreamReader& xmlIn);
-    virtual void execute(QXmlStreamWriter& xmlOut);
-    virtual ~StanzaAction();
-
-private:
-    static void initializeMethods();
-    void writeErrorElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaStartElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaEndElement(QXmlStreamWriter& xmlOut);
-
-private:
-    void createGame(QXmlStreamWriter& xmlOut);
-    void joinGame(QXmlStreamWriter& xmlOut);
-    void leaveGame(QXmlStreamWriter& xmlOut);
-
-
-private:
-    static QHash<QString, ExecuteMethod> sm_methods;
-    static bool sm_initialized;
-
-    QString              m_elementName;
-    QXmlStreamAttributes m_attributes;
-    QMap<QString, QXmlStreamAttributes> m_optElements;
-};
-
-#endif
+    Q_ASSERT(minLength <= maxLength);
+    const static char* chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    const static int charl = strlen(chars);
+    int length = minLength + ((int)qrand() % (maxLength - minLength + 1));
+    char token[length+1];
+    for (int i = 0; i < length; ++i)
+    {
+        token[i] = chars[qrand() % charl];
+    }
+    token[length - 1] = '\0';
+    return QString(token);
+}
