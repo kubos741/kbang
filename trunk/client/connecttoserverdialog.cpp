@@ -17,66 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "connecttoserverdialog.h"
 
-#ifndef SERVERTESTER_H
-#define SERVERTESTER_H
+ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
+ : QDialog(parent)
+{
+    setupUi(this);
+    connect(mp_cancelButton, SIGNAL(clicked()),
+            this, SLOT(close()));
+    
 
-#include <QtGui>
-#include <QtNetwork>
-
-class ShortcutButton: public QPushButton {
-    Q_OBJECT;
-public:
-    ShortcutButton(QString title, QString content);
-    static void init(QLayout*, QTextEdit*, QPushButton*);
-
-private:
-    QString m_title;
-    QString m_content;
-    static QLayout* smp_layout;
-    static QTextEdit* smp_textEdit;
-    static QPushButton* smp_sendButton;
-public slots:
-    void updateTextEdit();
-};
+}
 
 
-class ServerTester: public QWidget {
-    Q_OBJECT
-public:
-    ServerTester(QWidget *parent = 0);
+ConnectToServerDialog::~ConnectToServerDialog()
+{
+}
 
-private:
-    void initButtons();
+void ConnectToServerDialog::on_mp_buttonSaveFavorite_clicked()
+{
+    QString profileName = mp_lineEditProfileName->text();
+    QString hostName = mp_lineEditHostName->text();
+    QString nickName = mp_lineEditNickName->text();
+    int port = mp_spinBoxPort->value();
+    QList<QTreeWidgetItem *> results = mp_favoriteList->findItems(profileName, Qt::MatchExactly);
+    if (results.size() == 0)
+    {
+        QStringList strings;
+        strings << profileName << hostName << QString(port) << nickName;
+        mp_favoriteList->addTopLevelItem(new QTreeWidgetItem(mp_favoriteList, strings));
+    }
+    else
+    {
+        foreach (QTreeWidgetItem* result , results)
+        {
+            result->setText(1, hostName);
+            result->setText(2, QString::number(port));
+            result->setText(3, nickName);
+        }
+    }
 
-private:
-    bool         m_connected;
-    QTcpSocket   m_tcpSocket;
-    QLineEdit   *mp_lineEditAddress;
-    QLineEdit   *mp_lineEditPort;
-    QPushButton *mp_pushButtonConnect;
-    QPushButton *mp_pushButtonSendXml;
+}
 
-    QHBoxLayout *mp_layoutConnect;
-    QHBoxLayout *mp_layoutXmlInput;
-    QGridLayout *mp_layoutButtons;
-    QVBoxLayout *mp_layoutLeftSide;
-    QVBoxLayout *mp_layoutRightSide;
-    QHBoxLayout *mp_layoutMain;
+void ConnectToServerDialog::on_mp_favoriteList_itemClicked(QTreeWidgetItem * item, int)
+{
+    mp_lineEditProfileName->setText(item->text(0));
+    mp_lineEditHostName->setText(item->text(1));
+    mp_spinBoxPort->setValue(item->text(2).toInt());
+    mp_lineEditNickName->setText(item->text(3));
 
-    QTextEdit   *mp_textEditViewXml;
-    QTextEdit   *mp_textEditInputXml;
-
-public slots:
-    void connectClicked();
-    void tcpSocketError();
-    void connected();
-    void disconnected();
-    void sendClicked();
-    void incomingData();
-};
+}
 
 
 
 
-#endif
