@@ -23,6 +23,7 @@
 #include <abstractplayerctrl.h>
 
 class Client;
+class ClientXmlParser;
 class Player;
 
 /**
@@ -34,8 +35,36 @@ class ClientPlayerCtrl: public AbstractPlayerCtrl
     friend class Client;
     Q_OBJECT;
 private:
-    ClientPlayerCtrl(Client* client);
+    ClientPlayerCtrl(Client* client, ClientXmlParser* parser);
     ~ClientPlayerCtrl();
+
+
+public:
+    virtual void detachPlayer();
+
+    
+
+// API FOR Client class;
+public slots:
+    /**
+     * Tells the client to leave the game.
+     */
+    void actionLeaveGame();
+    
+
+    
+    
+
+public slots:
+
+    //void leaveGame();
+    
+    
+    
+    virtual void start();    
+
+
+//    virtual bool event(QEvent* e);
 
     virtual void playTurn();
 
@@ -101,6 +130,7 @@ public slots:
 
 private:
     Client* mp_client;
+    ClientXmlParser* mp_parser;
 };
 
 #endif

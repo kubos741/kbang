@@ -17,47 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "clientcontroller.h"
+#include "clientplayerctrl.h"
+#include "client.h"
 
-#ifndef PLAYERCTRLEVENTS_H
-#define PLAYERCTRLEVENTS_H
-
-#include <QEvent>
-
-namespace KBangEvent
+ClientController::ClientController(Client* client, ClientPlayerCtrl* clientPlayerController):
+        QObject(client), mp_client(client), mp_clientPlayerController(clientPlayerController)
 {
-    enum Type {
-        PickACharacter = QEvent::User + 1
-    };
+//    connect(this, SIGNAL(actionLeaveGame()), clientPlayerController, SLOT(actionLeaveGame()),Qt::QueuedConnection);
+}
+
+void ClientController::leaveGame()
+{
+    qDebug() << "ClientController::leaveGame()"  << QThread::currentThread();
+//    mp_clientPlayerController->actionLeaveGame();
+    emit actionLeaveGame();
+}
+
+ClientController::~ ClientController()
+{
+}
+
+void ClientController::test()
+{
+    qDebug() << "Number: " << (int)receivers(SIGNAL(actionLeaveGame()));
 }
 
 
-class PickACharacterEvent: public QEvent
-{
-public:
-    PickACharacterEvent();
-
-};
-
-/*
-class ClientPlayerCtrlEvent: public QEvent
-{
-    Q_OBJECT;
-public:
-
-    enum Subtype {
-        LeaveGame = 1
-    };
-
-    ClientPlayerCtrlEvent(Subtype subtype);
-
-    inline Subtype subtype() const
-    {
-        return m_subtype;
-    }
-
-private:
-    Subtype m_subtype;
-};
-*/
-
-#endif

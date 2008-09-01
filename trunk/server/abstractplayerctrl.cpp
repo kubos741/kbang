@@ -25,7 +25,7 @@ AbstractPlayerCtrl::AbstractPlayerCtrl():
 QObject(0), mp_privatePlayerView(0), mp_publicGameView(0), mp_playerActions(0),
 m_attached(0)
 {
-
+    qDebug() << "Creating AbstractPlayerCtrl" << this;
 }
 
 void AbstractPlayerCtrl::attachPlayer(const PrivatePlayerView* privatePlayerView,
@@ -49,5 +49,6 @@ void AbstractPlayerCtrl::detachPlayer()
 
 AbstractPlayerCtrl::~ AbstractPlayerCtrl()
 {
+    qDebug() << "Destroying AbstractPlayerCtrl" << this;
 }
 

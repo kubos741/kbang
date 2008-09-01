@@ -26,6 +26,9 @@ class Player;
 class AbstractPlayerCtrl;
 
 /**
+ * The PlayerControllerRunner class provides a thread for running player controllers
+ * (usually AIs). Every instance of Player class has just one PlayerControllerRunner.
+ 
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class PlayerControllerRunner: public QThread
@@ -39,9 +42,13 @@ public:
     void detachPlayerController();
 
 
-    virtual bool event(QEvent*);
+    /**
+     * Events sent to the PlayerControllerRunner are forwarded to PlayerController.
+     */
+    virtual bool postEventToController(QEvent*);
 
     virtual void run();
+    virtual void start();
     virtual void stop();
 
 private:

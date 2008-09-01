@@ -42,10 +42,7 @@
       <root>/usr/lib/qt4</root>
       <designerpluginpaths/>
     </qt>
-    <references>
-      <pcs>Gcc</pcs>
-      <pcs>Qt4</pcs>
-    </references>
+    <references/>
     <codecompletion>
       <automaticCodeCompletion>true</automaticCodeCompletion>
       <automaticArgumentsHint>true</automaticArgumentsHint>
@@ -156,17 +153,20 @@
       <autokdesu>false</autokdesu>
       <envvars/>
       <runarguments>
-        <client/>
+        <server/>
+        <servertester></servertester>
       </runarguments>
       <cwd>
-        <client>/home/macjariel/devel/kbang</client>
+        <server>/home/macjariel/devel/kbang</server>
+        <servertester>/home/macjariel/devel/kbang</servertester>
       </cwd>
       <debugarguments>
-        <client/>
+        <server/>
+        <servertester></servertester>
       </debugarguments>
     </run>
     <general>
-      <activedir>server</activedir>
+      <activedir>servertester</activedir>
     </general>
     <make>
       <abortonerror>true</abortonerror>

@@ -31,17 +31,49 @@ class Stanza;
 
 
 /**
+ * The ClientXmlParser class takes care of the TcpSocket, parses incoming
+ * data and forms xml data for sending back to TcpSocket. This class
+ * is a part of the Client class, thus each Client and only each Client
+ * has just one instance of the ClientXmlParser class.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class ClientXmlParser : public QObject
 {
 Q_OBJECT
 public:
-    ClientXmlParser(Client* parent, QTcpSocket*  socket);
+    /**
+     * Constructs an instance of ClientXmlParser class.
+     * @param client becomes parent of the instance
+     * @param socket is the TCP socket of the connection
+     */
+    ClientXmlParser(Client* client, QTcpSocket* socket);
+    
+    /**
+     * Destroys instance.
+     */
     virtual ~ClientXmlParser();
-    void disconnectFromHost();
+    
 
-public slots:
+signals:
+    /**
+     * This signal is emitted when the other party disconnects
+     * from the server.
+     */
+    void disconnected();
+  
+  
+private slots:
+    /**
+     * This method is called either manually to force disconnection from
+     * the other party or it is called as slot when the other party disconnects
+     * from server. 
+     */
+    void disconnectFromHost();
+    
+    
+    /**
+     * Reads and parses data from the input stream.
+     */
     void readData();
 
 
@@ -61,6 +93,11 @@ private:
     bool m_outStreamInitialized;
     Stanza* mp_stanza;
     struct { quint16 major, minor; } m_protocolVersion;
+
+
+public slots:
+    void sendJoinGame(int gameId, int type);
+    void sendLeaveGame();
 
 };
 

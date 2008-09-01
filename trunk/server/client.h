@@ -24,6 +24,7 @@
 
 #include "player.h"
 
+
 #include <QObject>
 #include <QPair>
 
@@ -33,6 +34,7 @@ class QTcpSocket;
 class QXmlStreamWriter;
 class AbstractPlayerCtrl;
 class ClientPlayerCtrl;
+class ClientController;
 
 
 /**
@@ -46,43 +48,31 @@ Q_OBJECT
 public:
     Client(GameServer* parent, int clientId, QTcpSocket* socket);
     virtual ~Client();
-    friend class ClientXmlParser;
+
     friend class Player;
 
     inline int id() const
     {
         return m_clientId;
     }
-
     Player* player();
-    AbstractPlayerCtrl* playerController();
-
+    ClientController* clientController() const;
+    AbstractPlayerCtrl* playerController() const;
     void setPlayer(Player* player);
-
-private slots:
-    void disconnectFromHost();
+    void postEventToController(QEvent* event);
 
 signals:
-    void clientDisconnected(int clientId);
-
-/*
-private:
-    bool parseStart();
-    void parseEnd();
-    void parseIq();
-    void sendIqError();
-    void sendStart();
-*/
+    void disconnected(int clientId);
 
 private:
 
-    const int m_clientId;
-    //QXmlStreamReader m_xml;
-    ClientXmlParser m_xmlParser;
-    QString m_clientName;
-    QPair<int,int> m_protocolVersion;
-    ClientPlayerCtrl* mp_clientPlayerCtrl;
-    Player* mp_player;
+    const int           m_clientId;
+    ClientXmlParser     m_xmlParser;
+    ClientController*   mp_clientController;
+    QString             m_clientName;
+    QPair<int,int>      m_protocolVersion;
+    ClientPlayerCtrl*   mp_clientPlayerCtrl;
+    Player*             mp_player;
 
     // STATE REPRESENTATION:
     // m_gameId =  0 => client is not connected to a game

@@ -20,19 +20,33 @@
 #include "playeractions.h"
 #include "player.h"
 
+#define QUEUEDCALL(signal) if (QThread::currentThread() != thread()) { emit signal; return; }
+
 PlayerActions::PlayerActions(Player* player):
 mp_player(player)
 {
+    connect(this, SIGNAL(leaveGameSignal()), this, SLOT(leaveGame()));
+
 }
 
 PlayerActions::~ PlayerActions()
 {
 }
 
-
-
-
-void PlayerActions::leaveGame()
+void PlayerActions::leaveGame() const
 {
-    mp_player->stop();
+    if (QThread::currentThread() != thread())
+    {
+        // This code is executed in the playerController thread
+        //mp_player->playerControllerRunner()->quit();
+    }
+    
+    QUEUEDCALL(leaveGameSignal());
+    
+    /// If the player is not already playing (before the game is active),
+    /// the whole player is deleted. Else only playerController is detached,
+    /// but player doesn't die.
+    /// TODO: implement this idea
+    
+    mp_player->detachPlayerController();
 }

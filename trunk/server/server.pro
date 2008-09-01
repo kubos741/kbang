@@ -24,7 +24,8 @@ weaponcard.h \
  publicplayerview.h \
  privateplayerview.h \
  playercontrollerrunner.h \
- playeractions.h
+ playeractions.h \
+ clientcontroller.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -51,7 +52,8 @@ playingcard.cpp \
  publicplayerview.cpp \
  privateplayerview.cpp \
  playercontrollerrunner.cpp \
- playeractions.cpp
+ playeractions.cpp \
+ clientcontroller.cpp
 TEMPLATE = app
 
 CONFIG -= release

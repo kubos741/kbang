@@ -18,46 +18,65 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef PLAYERCTRLEVENTS_H
-#define PLAYERCTRLEVENTS_H
+#ifndef SERVERTESTER_H
+#define SERVERTESTER_H
 
-#include <QEvent>
+#include <QtGui>
+#include <QtNetwork>
 
-namespace KBangEvent
-{
-    enum Type {
-        PickACharacter = QEvent::User + 1
-    };
-}
-
-
-class PickACharacterEvent: public QEvent
-{
-public:
-    PickACharacterEvent();
-
-};
-
-/*
-class ClientPlayerCtrlEvent: public QEvent
-{
+class ShortcutButton: public QPushButton {
     Q_OBJECT;
 public:
-
-    enum Subtype {
-        LeaveGame = 1
-    };
-
-    ClientPlayerCtrlEvent(Subtype subtype);
-
-    inline Subtype subtype() const
-    {
-        return m_subtype;
-    }
+    ShortcutButton(QString title, QString content);
+    static void init(QLayout*, QTextEdit*, QPushButton*);
 
 private:
-    Subtype m_subtype;
+    QString m_title;
+    QString m_content;
+    static QLayout* smp_layout;
+    static QTextEdit* smp_textEdit;
+    static QPushButton* smp_sendButton;
+public slots:
+    void updateTextEdit();
 };
-*/
+
+
+class ServerTester: public QWidget {
+    Q_OBJECT
+public:
+    ServerTester(QWidget *parent = 0);
+
+private:
+    void initButtons();
+
+private:
+    bool         m_connected;
+    QTcpSocket   m_tcpSocket;
+    QLineEdit   *mp_lineEditAddress;
+    QLineEdit   *mp_lineEditPort;
+    QPushButton *mp_pushButtonConnect;
+    QPushButton *mp_pushButtonSendXml;
+
+    QHBoxLayout *mp_layoutConnect;
+    QHBoxLayout *mp_layoutXmlInput;
+    QGridLayout *mp_layoutButtons;
+    QVBoxLayout *mp_layoutLeftSide;
+    QVBoxLayout *mp_layoutRightSide;
+    QHBoxLayout *mp_layoutMain;
+
+    QTextEdit   *mp_textEditViewXml;
+    QTextEdit   *mp_textEditInputXml;
+
+public slots:
+    void connectClicked();
+    void tcpSocketError();
+    void connected();
+    void disconnected();
+    void sendClicked();
+    void incomingData();
+};
+
+
+
 
 #endif

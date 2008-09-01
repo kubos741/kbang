@@ -1,4 +1,4 @@
-PDFCSLATEX=pdfcslate
+PDFCSLATEX=pdfcslatex
 XSLTPROC=xsltproc
 DOCBOOK_HTML=/usr/share/sgml/docbook/xsl-stylesheets/xhtml/docbook.xsl
 

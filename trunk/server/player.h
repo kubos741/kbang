@@ -99,6 +99,11 @@ public:
     {
         return &m_playerActions;
     }
+    
+    const PlayerControllerRunner* playerControllerRunner()
+    {
+        return &m_runner;
+    }
 
     const Game* game() const
     {
@@ -109,6 +114,7 @@ public:
      * This method attaches the PlayerController to the Player.
      * Player has to have his controller detached at the moment
      * of calling this method.
+     * The controller is then started automatically.
      */
      void attachPlayerController(AbstractPlayerCtrl* controller);
 
@@ -116,6 +122,9 @@ public:
      * This method detaches the PlayerController of the Player.
      */
      void detachPlayerController();
+     
+     
+     void postEventToController(QEvent* event);
 
 private:
     int                       m_id;

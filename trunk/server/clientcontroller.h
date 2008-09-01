@@ -17,47 +17,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CLIENTCONTROLLER_H
+#define CLIENTCONTROLLER_H
 
-#ifndef PLAYERCTRLEVENTS_H
-#define PLAYERCTRLEVENTS_H
+class ClientPlayerCtrl;
 
-#include <QEvent>
+#include <QObject>
 
-namespace KBangEvent
+
+class Client;
+
+/**
+ *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ClientController : public QObject
 {
-    enum Type {
-        PickACharacter = QEvent::User + 1
-    };
-}
-
-
-class PickACharacterEvent: public QEvent
-{
+Q_OBJECT
 public:
-    PickACharacterEvent();
-
-};
-
-/*
-class ClientPlayerCtrlEvent: public QEvent
-{
-    Q_OBJECT;
-public:
-
-    enum Subtype {
-        LeaveGame = 1
-    };
-
-    ClientPlayerCtrlEvent(Subtype subtype);
-
-    inline Subtype subtype() const
-    {
-        return m_subtype;
-    }
-
+    ClientController(Client *client, ClientPlayerCtrl *clientPlayerController);
+    ~ClientController();
+    
+    
+    void leaveGame();
+    
+    void test();
+    
 private:
-    Subtype m_subtype;
+    Client             *mp_client;
+    ClientPlayerCtrl   *mp_clientPlayerController;
+    
+signals:
+    void actionLeaveGame();
+
 };
-*/
 
 #endif

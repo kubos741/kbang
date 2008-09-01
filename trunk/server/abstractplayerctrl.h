@@ -52,11 +52,16 @@ class AbstractPlayerCtrl: public QObject
 public:
     AbstractPlayerCtrl();
     virtual ~AbstractPlayerCtrl();
-    void attachPlayer(const PrivatePlayerView*,
+    virtual void attachPlayer(const PrivatePlayerView*,
                       const PublicGameView*,
                       const PlayerActions*);
-    void detachPlayer();
+    virtual void detachPlayer();
 
+    
+
+    
+    virtual void start() = 0;
+    
     inline bool isAttached() const
     {
         return m_attached;
@@ -129,7 +134,7 @@ public slots:
 
 
 
-private:
+protected:
     const PrivatePlayerView* mp_privatePlayerView;
     const PublicGameView*    mp_publicGameView;
     const PlayerActions*     mp_playerActions;

@@ -52,6 +52,7 @@ private:
     void createGame(QXmlStreamWriter& xmlOut);
     void joinGame(QXmlStreamWriter& xmlOut);
     void leaveGame(QXmlStreamWriter& xmlOut);
+    void say(QXmlStreamWriter& xmlOut);
 
 
 private:

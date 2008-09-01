@@ -222,8 +222,7 @@ public:
 
 private:
     QMap<int, Player*> m_players;
-    GameArbiter m_arbiter;
-    int m_state;
+//    int m_state;
 
     const int            m_gameId;
     QString              m_name;

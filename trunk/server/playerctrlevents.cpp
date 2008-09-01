@@ -26,3 +26,11 @@ PickACharacterEvent::PickACharacterEvent(): QEvent((QEvent::Type)KBangEvent::Pic
 
 }
 
+
+/*
+ ClientPlayerCtrlEvent::ClientPlayerCtrlEvent(Subtype subtype):
+QEvent(QEvent::User), m_subtype(subtype)
+{
+
+}
+*/

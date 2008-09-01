@@ -2,4 +2,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += server \
-client
+client \
+ servertester

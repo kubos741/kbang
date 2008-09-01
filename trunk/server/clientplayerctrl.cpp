@@ -19,9 +19,13 @@
  ***************************************************************************/
 #include "clientplayerctrl.h"
 #include "client.h"
+#include "playerctrlevents.h"
+#include "clientcontroller.h"
 
-ClientPlayerCtrl::ClientPlayerCtrl(Client* owner):
-mp_client(owner)
+#include <QObject>
+
+ClientPlayerCtrl::ClientPlayerCtrl(Client* owner, ClientXmlParser* parser):
+mp_client(owner), mp_parser(parser)
 {
 
 }
@@ -58,6 +62,48 @@ void ClientPlayerCtrl::playerPlaysCard(const PublicPlayerView & player, const Pl
 void ClientPlayerCtrl::playerDiscardsCard(const PublicPlayerView & player, const PlayingCardList & cardList)
 {
 }
+
+/*
+bool ClientPlayerCtrl::event(QEvent* e)
+{
+    if (e->spontaneous()) return QObject::event(e);
+    ClientPlayerCtrlEvent* event = qobject_cast<ClientPlayerCtrlEvent*>((QObject*)e);
+    if (!event) return QObject::event(e);
+    switch(event->subtype())
+    {
+        case ClientPlayerCtrlEvent::LeaveGame:
+        {
+            mp_playerActions->leaveGame();
+            break;
+        }
+    }
+    return true;
+}
+*/
+
+void ClientPlayerCtrl::actionLeaveGame()
+{
+    mp_playerActions->leaveGame();
+    
+}
+
+void ClientPlayerCtrl::start()
+{
+    qDebug() << "ClientPlayerCtrl::start()" << QThread::currentThread();
+    connect((QObject*)mp_client->clientController(), SIGNAL(actionLeaveGame()), (QObject*)this, SLOT(actionLeaveGame()),Qt::QueuedConnection);
+    mp_client->clientController()->test();
+    
+    //connect(mp_client->clientController(), SIGNAL(actionLeaveGame()),
+    //        this, SLOT(actionLeaveGame()));
+    
+}
+
+void ClientPlayerCtrl::detachPlayer()
+{
+    QMetaObject::invokeMethod(mp_parser, "sendLeaveGame");
+    AbstractPlayerCtrl::detachPlayer();
+}
+
 
 
 

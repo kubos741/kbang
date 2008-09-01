@@ -1,0 +1,76 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>658</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <widget class="QGroupBox" name="groupBox" >
+    <property name="geometry" >
+     <rect>
+      <x>280</x>
+      <y>160</y>
+      <width>261</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="title" >
+     <string/>
+    </property>
+    <layout class="QGridLayout" name="gridLayout" >
+     <item row="0" column="0" >
+      <widget class="QTextBrowser" name="textBrowser" />
+     </item>
+     <item row="1" column="0" >
+      <widget class="QLineEdit" name="lineEdit" />
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuGame" >
+    <property name="title" >
+     <string>Game</string>
+    </property>
+    <addaction name="actionJoin_Server" />
+    <addaction name="actionJoin_Game" />
+    <addaction name="actionQuit" />
+   </widget>
+   <addaction name="menuGame" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <action name="actionJoin_Server" >
+   <property name="text" >
+    <string>Join Server</string>
+   </property>
+  </action>
+  <action name="actionJoin_Game" >
+   <property name="text" >
+    <string>Join Game</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

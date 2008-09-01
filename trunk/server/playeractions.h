@@ -37,12 +37,15 @@ private:
     PlayerActions(const PlayerActions&);
     PlayerActions& operator=(const PlayerActions&);
 
-public:
-    void leaveGame();
+public slots:
+    void leaveGame() const;
 
+    
+signals:
+    void leaveGameSignal() const;
 
 private:
-    Player* mp_player;
+    mutable Player* mp_player;
 
 };
 

@@ -22,6 +22,7 @@
 #include "gameserver.h"
 #include "player.h"
 #include "clientplayerctrl.h"
+#include "clientcontroller.h"
 
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
@@ -30,28 +31,25 @@
 
 Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
  : QObject(parent), m_clientId(clientId), m_xmlParser(this, socket),
-mp_player(0)
+   mp_player(0)
 {
-    mp_clientPlayerCtrl = new ClientPlayerCtrl(this);
+    mp_clientPlayerCtrl = new ClientPlayerCtrl(this, &m_xmlParser);
+    mp_clientController = new ClientController(this, mp_clientPlayerCtrl);
     Q_ASSERT(clientId != 0);
-    qDebug() << "Client #" << clientId << " connected.";
-    connect(socket, SIGNAL(disconnected()),
-            this, SLOT(disconnectFromHost()));
+    qDebug("%s:%d: Client #%d connected.", __FILE__, __LINE__, m_clientId);
+    connect(&m_xmlParser, SIGNAL(disconnected()),
+            this, SLOT(deleteLater()));
 }
 
 
 Client::~Client()
 {
+    emit disconnected(m_clientId);
     delete mp_clientPlayerCtrl;
-    qDebug() << "Client #" << m_clientId << " disconnected.";
+    qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_clientId);
 }
 
 
-void Client::disconnectFromHost()
-{
-    m_xmlParser.disconnectFromHost();
-    emit clientDisconnected(m_clientId);
-}
 
 /*
 bool Client::parseStart()
@@ -116,7 +114,12 @@ void Client::writeXml(QXmlStreamWriter& xmlOut)
     xmlOut.writeEndElement();
 }
 
-AbstractPlayerCtrl* Client::playerController()
+ClientController* Client::clientController() const
+{
+    return mp_clientController;
+}
+
+AbstractPlayerCtrl* Client::playerController() const
 {
     return mp_clientPlayerCtrl;
 }
@@ -135,3 +138,9 @@ Player* Client::player()
 {
     return mp_player;
 }
+
+void Client::postEventToController(QEvent* event)
+{
+    QCoreApplication::postEvent(mp_clientPlayerCtrl, event);
+}
+

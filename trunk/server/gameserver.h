@@ -29,12 +29,10 @@ class QXmlStreamWriter;
 
 /**
  * The GameServer class is a singleton class that represent the state of the whole
- * server. It holds all the clients and games created on the server.
- * It represents the state of the server and holds some attributes such as
- * server name, description, etc.
+ * server. It holds all the clients and games created on the server, as well as some
+ * attributes of the server such as the server name, description, etc.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-
 class GameServer: public QObject
 {
     Q_OBJECT;
@@ -104,20 +102,37 @@ public:
         return 0;
     }
 
-    QString name() const
+    /**
+     * Returns name of the server.
+     */
+    inline QString name() const
     {
         return m_name;
     }
 
-    QString description() const
+    /**
+     * Returns descriptive text of the server.
+     */
+    inline QString description() const
     {
         return m_description;
     }
 
+    /**
+     * Writes the information about the server to
+     * given QXmlStreamWriter.
+     */
     void writeXml(QXmlStreamWriter& xmlOut);
 
+    /**
+     * Tells the GameServer to listen for incoming connections.
+     * @returns false in case of error, otherwise true
+     */
     bool listen();
 
+    /**
+     * Prepares GameServer for exiting.
+     */
     void exit();
 
 signals:

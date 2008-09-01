@@ -48,6 +48,7 @@ Player::~Player()
 void Player::attachPlayerController(AbstractPlayerCtrl* controller)
 {
     m_runner.attachPlayerController(controller);
+    m_runner.start();
 }
 
 void Player::detachPlayerController()
@@ -67,3 +68,11 @@ Player* Player::construct(const QString&      name,
 
 }
 */
+
+void Player::postEventToController(QEvent* event)
+{
+    qDebug() << "Trying to post event to m_runner";
+    m_runner.postEventToController(event);
+    qDebug() << "Done here";
+
+}

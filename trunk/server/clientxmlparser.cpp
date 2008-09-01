@@ -35,6 +35,8 @@ m_outStreamInitialized(0), mp_stanza(0)
 {
     connect(socket, SIGNAL(readyRead()),
             this,   SLOT(readData()));
+    connect(socket, SIGNAL(disconnected()),
+            this, SLOT(disconnectFromHost()));
     m_protocolVersion.major = 0;
     m_protocolVersion.minor = 0;
 }
@@ -86,7 +88,7 @@ while(!m_xmlIn.atEnd())
     if (error && error != 4)
     {
         qDebug("Invalid client. XmlStreamReader::Error.");
-        mp_client->disconnectFromHost();
+        disconnectFromHost();
     }
 }
 
@@ -97,7 +99,9 @@ void ClientXmlParser::disconnectFromHost()
     m_xmlIn.clear();
     mp_socket->disconnectFromHost();
     mp_socket->deleteLater();
+    emit disconnected();
 }
+
 
 void ClientXmlParser::parseStream()
 {
@@ -107,7 +111,7 @@ void ClientXmlParser::parseStream()
         if (!m_xmlIn.isStartElement() || m_xmlIn.name() != "stream")
         {
             qDebug("Invalid client: expected <stream> as first element.");
-            mp_client->disconnectFromHost();
+            disconnectFromHost();
             return;
         }
         QXmlStreamAttributes attrs = m_xmlIn.attributes();
@@ -130,16 +134,16 @@ void ClientXmlParser::parseStream()
     {
         // Finishing stream & disconnecting
         m_xmlOut.writeEndDocument();
-        mp_client->disconnectFromHost();
+        disconnectFromHost();
         return;
     }
     // Unknown element, disconnecting
-    mp_client->disconnectFromHost();
+    disconnectFromHost();
 }
 
 void ClientXmlParser::sendData(const QString& data)
 {
-    mp_socket->write(data.toUtf8());
+        mp_socket->write(data.toUtf8());
 }
 
 void ClientXmlParser::parseStanza()
@@ -147,6 +151,25 @@ void ClientXmlParser::parseStanza()
 
 
 
+}
+
+
+void ClientXmlParser::sendJoinGame(int gameId, int type)
+{
+    m_xmlOut.writeStartElement("event");
+    m_xmlOut.writeStartElement("join-game");
+    m_xmlOut.writeAttribute("id", QString::number(gameId));
+    m_xmlOut.writeAttribute("type", type == 1 ? "player" : "observer");
+    m_xmlOut.writeEndElement();
+    m_xmlOut.writeEndElement();
+}
+
+
+void ClientXmlParser::sendLeaveGame()
+{
+    m_xmlOut.writeStartElement("event");
+    m_xmlOut.writeEmptyElement("leave-game");
+    m_xmlOut.writeEndElement();
 }
 
 

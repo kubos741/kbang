@@ -54,10 +54,7 @@ Game* GameServer::createGame(const QString & name, const QString & description, 
 }
 
 
-/**
- * Tells the TcpServer to listen for incoming connections.
- * @return
- */
+
 bool GameServer::listen()
 {
     if (!mp_tcpServer->isListening() && !mp_tcpServer->listen())
@@ -68,7 +65,6 @@ bool GameServer::listen()
     }
     else
     {
-        QString a("ahoj");
         qDebug("Listening on %s:%d", mp_tcpServer->hostAddressString().toAscii().data(), mp_tcpServer->port());
     }
     return 1;
@@ -99,14 +95,12 @@ void GameServer::createClient()
     m_clients.insert(clientId, 0);
     QTcpSocket* socket = mp_tcpServer->nextPendingConnection();
     m_clients[clientId] = new Client(this, clientId, socket);
-    connect(m_clients[clientId], SIGNAL(clientDisconnected(int)),
+    connect(m_clients[clientId], SIGNAL(disconnected(int)),
             this, SLOT(deleteClient(int)));
 }
 
 void GameServer::deleteClient(int clientId)
 {
-    if (m_clients.contains(clientId) && m_clients[clientId]) m_clients[clientId]->deleteLater();
-    //if (m_clients.contains(clientId) && m_clients[clientId]) delete m_clients[clientId];
     m_clients.remove(clientId);
 }
 

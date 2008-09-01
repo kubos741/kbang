@@ -23,6 +23,8 @@
 #include "common.h"
 #include "game.h"
 #include "gameserver.h"
+#include "playerctrlevents.h"
+#include "clientcontroller.h"
 
 
 
@@ -101,6 +103,7 @@ void StanzaAction::initializeMethods()
     sm_methods["create-game"]   = &StanzaAction::createGame;
     sm_methods["join-game"]     = &StanzaAction::joinGame;
     sm_methods["leave-game"]    = &StanzaAction::leaveGame;
+    sm_methods["say"]           = &StanzaAction::say;
     sm_initialized = 1;
 }
 
@@ -164,7 +167,7 @@ void StanzaAction::joinGame(QXmlStreamWriter& xmlOut)
 
     ASSERT_AVAILABLE(!client()->isInGame());
 
-    enum type_t { NONE = 0, PLAYER, OBSERVER };
+    enum type_t { NONE = 0, PLAYER = 1, OBSERVER = 2 };
     type_t type = NONE;
     if (m_optElements.contains("player"))
     {
@@ -208,6 +211,7 @@ void StanzaAction::joinGame(QXmlStreamWriter& xmlOut)
 
     Player* newPlayer = game->createNewPlayer(playerName, playerPass);
     newPlayer->attachPlayerController(client()->playerController());
+    //
     xmlOut.writeStartElement("event");
     xmlOut.writeStartElement("join-game");
     xmlOut.writeAttribute("id", QString::number(game->gameId()));
@@ -220,7 +224,15 @@ void StanzaAction::joinGame(QXmlStreamWriter& xmlOut)
 void StanzaAction::leaveGame(QXmlStreamWriter& xmlOut)
 {
     ASSERT_AVAILABLE(client()->isInGame());
-    client()->player()->detachPlayerController();
+    client()->clientController()->leaveGame();
+}
+
+void StanzaAction::say(QXmlStreamWriter & xmlOut)
+{
+    ASSERT_AVAILABLE(client()->isInGame());
+    QString message = m_attributes.value("message").toString();
+    qDebug("%s:%d: Client #%d says: %s", __FILE__, __LINE__, client()->id(), qPrintable(message));
+
 }
 
 
@@ -229,4 +241,5 @@ void StanzaAction::leaveGame(QXmlStreamWriter& xmlOut)
 StanzaAction::~StanzaAction()
 {
 }
+
 
