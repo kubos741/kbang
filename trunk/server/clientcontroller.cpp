@@ -44,3 +44,14 @@ void ClientController::test()
 }
 
 
+
+
+int ClientController::gameId() const
+{
+    return mp_clientPlayerController->gameId();
+}
+
+void ClientController::sendMessage(const QString& message)
+{
+    emit actionSendMessage(message);
+}

@@ -34,6 +34,14 @@ public:
 
     ~ChatWidget();
 
+
+public slots:
+    void incomingMessage(int senderId, const QString& senderName, const QString& message);
+    void sendMessage();
+
+signals:
+    void outgoingMessage(const QString& message);
+
 };
 
 #endif

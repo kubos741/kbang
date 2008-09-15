@@ -144,3 +144,8 @@ void Client::postEventToController(QEvent* event)
     QCoreApplication::postEvent(mp_clientPlayerCtrl, event);
 }
 
+int Client::gameId() const
+{
+    return mp_clientController->gameId();
+}
+

@@ -134,6 +134,11 @@ public slots:
 
 
 
+    int gameId() const;
+
+public slots:
+    virtual void incomingChatMessage(int senderId, const QString& senderName, const QString& message) {}
+
 protected:
     const PrivatePlayerView* mp_privatePlayerView;
     const PublicGameView*    mp_publicGameView;

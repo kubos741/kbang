@@ -128,6 +128,11 @@ public slots:
     virtual void playerDiscardsCard(const PublicPlayerView& player,
                                     const PlayingCardList& cardList);
 
+
+public slots:
+    virtual void incomingChatMessage(int senderId, const QString& senderName, const QString& message);
+
+
 private:
     Client* mp_client;
     ClientXmlParser* mp_parser;

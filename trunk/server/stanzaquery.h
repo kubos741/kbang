@@ -56,6 +56,7 @@ private:
     void getGameList(QXmlStreamWriter& xmlOut);
     void getGame(QXmlStreamWriter& xmlOut);
     void getClientList(QXmlStreamWriter& xmlOut);
+    void getPlayerList(QXmlStreamWriter& xmlOut);    
     void getServerInfo(QXmlStreamWriter& xmlOut);
 
 private:

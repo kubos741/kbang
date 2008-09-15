@@ -51,6 +51,8 @@ public:
     virtual void start();
     virtual void stop();
 
+
+
 private:
     const Player* mp_player;
     AbstractPlayerCtrl* mp_playerController;

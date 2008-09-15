@@ -23,11 +23,25 @@ ChatWidget::ChatWidget(QWidget *parent)
  : QWidget(parent)
 {
     setupUi(this);
+    connect(mp_messageBox, SIGNAL(returnPressed()),
+            this, SLOT(sendMessage()));
 }
 
 
 ChatWidget::~ChatWidget()
 {
+}
+
+void ChatWidget::incomingMessage(int senderId, const QString& senderName, const QString& message)
+{
+    mp_chatView->append(QString("<b>%1:</b> %2").arg(senderName).arg(message));
+}
+
+void ChatWidget::sendMessage()
+{
+    const QString& message = mp_messageBox->text();
+    mp_messageBox->clear();
+    emit outgoingMessage(message);
 }
 
 

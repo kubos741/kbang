@@ -103,7 +103,7 @@ void StanzaAction::initializeMethods()
     sm_methods["create-game"]   = &StanzaAction::createGame;
     sm_methods["join-game"]     = &StanzaAction::joinGame;
     sm_methods["leave-game"]    = &StanzaAction::leaveGame;
-    sm_methods["say"]           = &StanzaAction::say;
+    sm_methods["chat-message"]  = &StanzaAction::chatMessage;
     sm_initialized = 1;
 }
 
@@ -227,12 +227,20 @@ void StanzaAction::leaveGame(QXmlStreamWriter& xmlOut)
     client()->clientController()->leaveGame();
 }
 
-void StanzaAction::say(QXmlStreamWriter & xmlOut)
+void StanzaAction::chatMessage(QXmlStreamWriter& xmlOut)
 {
     ASSERT_AVAILABLE(client()->isInGame());
     QString message = m_attributes.value("message").toString();
     qDebug("%s:%d: Client #%d says: %s", __FILE__, __LINE__, client()->id(), qPrintable(message));
-
+    client()->clientController()->sendMessage(message);
+    
+/*    
+    int gameId = client()->gameId();
+    Q_ASSERT(gameId != 0);
+    Game* game = GameServer::instance().game(gameId);
+    Q_ASSERT(game != 0);
+    game->postMessage(client()->player(), message);
+*/
 }
 
 

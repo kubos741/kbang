@@ -110,6 +110,11 @@ public:
         return mp_game;
     }
 
+    const int id() const
+    {
+        return m_id;
+    }
+
     /**
      * This method attaches the PlayerController to the Player.
      * Player has to have his controller detached at the moment
@@ -125,6 +130,12 @@ public:
      
      
      void postEventToController(QEvent* event);
+     
+     void writeXml(QXmlStreamWriter&);
+
+signals:
+    void incomingChatMessage(int senderId, const QString& senderName, const QString& message);
+
 
 private:
     int                       m_id;

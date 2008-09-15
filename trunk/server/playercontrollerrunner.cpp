@@ -86,7 +86,9 @@ void PlayerControllerRunner::attachPlayerController(AbstractPlayerCtrl* playerCo
                                       mp_player->game()->publicGameView(),
                                       mp_player->playerActions()
                                      );
-    qDebug() << __LINE__ << mp_playerController;
+    connect(mp_player, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
+            mp_playerController, SLOT(incomingChatMessage(int, const QString&, const QString&)));
+    
 }
 
 void PlayerControllerRunner::detachPlayerController()
@@ -106,6 +108,8 @@ void PlayerControllerRunner::detachPlayerController()
     mp_playerController = 0;
     qDebug() << "Detaching mp_playerController()";
     qDebug() << __LINE__ << mp_playerController;
+    disconnect(mp_player, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
+               mp_playerController, SLOT(incomingChatMessage(int, const QString&, const QString&)));
 }
 
 bool PlayerControllerRunner::postEventToController(QEvent* e)
@@ -125,5 +129,6 @@ bool PlayerControllerRunner::postEventToController(QEvent* e)
     return true;
 */
 }
+
 
 

@@ -39,7 +39,8 @@ public:
     
     
     void leaveGame();
-    
+    void sendMessage(const QString& message);
+    int gameId() const;
     void test();
     
 private:
@@ -48,6 +49,7 @@ private:
     
 signals:
     void actionLeaveGame();
+    void actionSendMessage();
 
 };
 

@@ -28,6 +28,9 @@
          <property name="styleSheet" >
           <string notr="true" >color: rgb(255, 255, 0);</string>
          </property>
+         <property name="horizontalScrollBarPolicy" >
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
         </widget>
        </item>
       </layout>
@@ -39,9 +42,24 @@
       <layout class="QGridLayout" name="gridLayout_2" >
        <item row="0" column="0" >
         <widget class="QTextBrowser" name="mp_xmlView" >
-         <property name="styleSheet" >
-          <string notr="true" >background-color: rgb(0, 0, 0);
-color: rgb(255, 255, 0);</string>
+         <property name="autoFillBackground" >
+          <bool>false</bool>
+         </property>
+         <property name="verticalScrollBarPolicy" >
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy" >
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="html" >
+          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;">
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+         <property name="openLinks" >
+          <bool>false</bool>
          </property>
         </widget>
        </item>

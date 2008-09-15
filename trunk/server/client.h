@@ -81,7 +81,7 @@ private:
 
 public:
     bool isInGame() const;
-
+    int  gameId() const;
 
 
 

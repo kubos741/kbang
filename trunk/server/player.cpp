@@ -76,3 +76,13 @@ void Player::postEventToController(QEvent* event)
     qDebug() << "Done here";
 
 }
+
+
+void Player::writeXml(QXmlStreamWriter& xmlOut) 
+{
+    xmlOut.writeStartElement("player");
+    xmlOut.writeAttribute("id", QString::number(m_id));
+    xmlOut.writeAttribute("name", m_name);
+    xmlOut.writeEndElement();
+
+}

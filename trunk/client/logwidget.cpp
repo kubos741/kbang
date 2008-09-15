@@ -37,7 +37,7 @@ void LogWidget::appendLogMessage(QString message)
 
 void LogWidget::appendIncomingXml(QString message)
 {
-    mp_xmlView->setTextColor(Qt::green);
+    //mp_xmlView->setTextColor(Qt::green);
     mp_xmlView->append(message);
 }
 

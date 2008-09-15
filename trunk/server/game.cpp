@@ -98,7 +98,19 @@ Player* Game::createNewPlayer(const QString& name, const QString& password)
     }
     Player* newPlayer = new Player(m_nextPlayerId, name, password, this);
     m_players[m_nextPlayerId] = newPlayer;
+    m_playerList.append(newPlayer);
     return newPlayer;
 }
 
 
+
+
+QList<Player *> Game::playerList()
+{
+    return m_playerList;
+}
+
+void Game::postMessage(Player* player, const QString& message)
+{
+    emit chatMessage(player->id(), player->name(), message);
+}

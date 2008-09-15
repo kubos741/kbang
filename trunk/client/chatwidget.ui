@@ -14,7 +14,14 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
-    <widget class="QTextBrowser" name="mp_chatView" />
+    <widget class="QTextBrowser" name="mp_chatView" >
+     <property name="focusPolicy" >
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLineEdit" name="mp_messageBox" />

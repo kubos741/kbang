@@ -44,6 +44,7 @@ private slots:
     void connectToServer();
     void disconnectFromServer();
     void joinGame();
+    void leaveGame();
     
     void serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
 

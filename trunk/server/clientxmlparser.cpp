@@ -172,4 +172,13 @@ void ClientXmlParser::sendLeaveGame()
     m_xmlOut.writeEndElement();
 }
 
-
+void ClientXmlParser::sendChatMessage(int senderId, const QString& senderName, const QString& message)
+{
+    m_xmlOut.writeStartElement("event");
+    m_xmlOut.writeStartElement("chat-message");
+    m_xmlOut.writeAttribute("senderId", QString::number(senderId));
+    m_xmlOut.writeAttribute("senderName", senderName);
+    m_xmlOut.writeAttribute("message", message);
+    m_xmlOut.writeEndElement();
+    m_xmlOut.writeEndElement();
+}

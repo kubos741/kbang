@@ -26,7 +26,10 @@ JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnecti
  : QDialog(parent), mp_serverConnection(serverConnection)
 {
     setupUi(this);
+    connect(mp_refreshButton, SIGNAL(clicked()),
+            this, SLOT(refreshGameList()));
     refreshGameList();
+    doButtons();
 }
 
 
@@ -42,12 +45,21 @@ void JoinGameDialog::refreshGameList()
     serverQuery->post();
 }
 
+void JoinGameDialog::loadGameDetails(int gameId)
+{
+    ServerQuery* serverQuery = mp_serverConnection->serverQuery("game");
+    serverQuery->addAttribute("id", QString::number(gameId));
+    connect(serverQuery, SIGNAL(responseRecieved(XmlNode*)),
+            this, SLOT(recievedGameDetails(XmlNode*)));
+    serverQuery->post();
+}
 
 void JoinGameDialog::recievedGameList(XmlNode* node)
 {
     XmlNode* gameListNode = node->getFirstChild();
     if (gameListNode && gameListNode->name() == "gamelist")
     {
+        mp_gameListView->clear();
         foreach(XmlNode* gameNode, gameListNode->getChildren())
         {
             QTreeWidgetItem* item = new QTreeWidgetItem(mp_gameListView);
@@ -58,22 +70,68 @@ void JoinGameDialog::recievedGameList(XmlNode* node)
                                                .arg(gameNode->attribute("maxPlayers")));
         }
     }
+    delete node;
 }
 
-void JoinGameDialog::show()
+void JoinGameDialog::recievedGameDetails(XmlNode* node)
 {
+    XmlNode* gameNode = node->getFirstChild();
+    if (gameNode && gameNode->name() == "game")
+    {
+        XmlNode* playersNode = gameNode->getFirstChild();
+        if (playersNode && playersNode->name() == "players")
+        {
+            mp_playerListView->clear();
+            foreach(XmlNode* playerNode, playersNode->getChildren())
+            {
+                if (!playerNode || playerNode->name() != "player") continue;
+                QTreeWidgetItem* item = new QTreeWidgetItem(mp_playerListView);;
+                item->setText(0, playerNode->attribute("name"));
+            }
+        }
+    }
+    delete node;
+}
+
+
+void JoinGameDialog::show()
+{        
     refreshGameList();
     QDialog::show();
 }
 
 void JoinGameDialog::on_mp_gameListView_itemClicked(QTreeWidgetItem* item, int column)
 {
-
+    doButtons();
+    int gameId = item->data(0, Qt::UserRole).toUInt();
+    loadGameDetails(gameId);
 }
 
-void JoinGameDialog::on_mp_gameListView_itemDoubleClicked(QTreeWidgetItem * item, int column)
+void JoinGameDialog::doButtons()
 {
-
+    bool ok = (mp_gameListView->currentItem() == 0);
+    mp_playButton->setEnabled(!ok);
+    mp_spectateButton->setEnabled(!ok);
 }
+
+void JoinGameDialog::on_mp_playButton_clicked()
+{
+    Q_ASSERT(mp_gameListView->currentItem() != 0);
+    int gameId = mp_gameListView->currentItem()->data(0, Qt::UserRole).toUInt();
+    QString gameName = mp_gameListView->currentItem()->text(0);
+    emit joinGame(gameId, gameName, 0, ""); // TODO PASSWORD
+    close();
+}
+
+void JoinGameDialog::on_mp_spectateButton_clicked()
+{
+    Q_ASSERT(mp_gameListView->currentItem() != 0);
+    int gameId = mp_gameListView->currentItem()->data(0, Qt::UserRole).toUInt();
+    QString gameName = mp_gameListView->currentItem()->text(0);
+    emit joinGame(gameId, gameName, 1, ""); // TODO PASSWORD
+    close();
+}
+
+
 
 

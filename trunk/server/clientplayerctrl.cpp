@@ -104,6 +104,14 @@ void ClientPlayerCtrl::detachPlayer()
     AbstractPlayerCtrl::detachPlayer();
 }
 
+void ClientPlayerCtrl::incomingChatMessage(int senderId, const QString& senderName, const QString& message)
+{
+    QMetaObject::invokeMethod(mp_parser, "sendChatMessage", 
+                                Q_ARG(int, senderId),
+                                Q_ARG(QString, senderName),
+                                Q_ARG(QString, message));
+}
+
 
 
 

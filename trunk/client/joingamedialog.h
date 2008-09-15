@@ -40,15 +40,18 @@ public:
 
 public slots:
     void refreshGameList();
+    void loadGameDetails(int gameId);
     void recievedGameList(XmlNode*);
+    void recievedGameDetails(XmlNode*);
     void on_mp_gameListView_itemClicked(QTreeWidgetItem * item, int column);
-    void on_mp_gameListView_itemDoubleClicked(QTreeWidgetItem * item, int column);
-
+    void on_mp_playButton_clicked();
+    void on_mp_spectateButton_clicked();
+    void doButtons();
 
 
 
 signals:
-    void joinGame(int gameId, bool spectate, QString password);
+    void joinGame(int gameId, QString gameName, bool spectate, QString password);
 
 private:
     ServerConnection* mp_serverConnection;

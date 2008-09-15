@@ -95,10 +95,12 @@ private:
     struct { quint16 major, minor; } m_protocolVersion;
 
 
+
+
 public slots:
     void sendJoinGame(int gameId, int type);
     void sendLeaveGame();
-
+    void sendChatMessage(int senderId, const QString& senderName, const QString& message);
 };
 
 #endif

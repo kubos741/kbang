@@ -45,7 +45,11 @@ public:
 public slots:
     void connectToServer(QString serverHost, int serverPort);
     void disconnectFromServer();
-    void joinGame(int gameId, bool spectate, QString password);
+    void joinGame(int gameId, QString gameName, bool spectate, QString password);
+    void leaveGame();
+    void sendChatMessage(const QString& message);
+
+
 
 private slots:
     void connected();
@@ -54,6 +58,9 @@ private slots:
     
     
     void recievedServerInfo(XmlNode* node);
+    void recievedEventJoinGame(XmlNode* node);
+    void recievedEventLeaveGame(XmlNode* node);
+    void recievedEventChatMessage(XmlNode* node);
 
 private:
     void processStanza(XmlNode* rootNode);
@@ -75,6 +82,8 @@ signals:
     void statusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
     void logMessage(QString message);
     void incomingXml(QString message);
+    
+    void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
 };
 

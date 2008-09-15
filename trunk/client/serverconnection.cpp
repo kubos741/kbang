@@ -149,7 +149,26 @@ void ServerConnection::processStanza(XmlNode* rootNode)
 {
     if (rootNode->name() == "query" && rootNode->attribute("type") == "result")
     {
-        ServerQuery::processResultQuery(rootNode);
+        ServerQuery::processResultQuery(rootNode); return;
+    }
+    XmlNode* childNode = rootNode->getFirstChild();
+    if (rootNode->name() == "event" && childNode)
+    {
+        if (childNode->name() == "join-game")
+        {
+            recievedEventJoinGame(rootNode);
+            return;
+        }
+        if (childNode->name() == "leave-game")
+        {
+            recievedEventLeaveGame(rootNode);
+            return;
+        }
+        if (childNode->name() == "chat-message")
+        {
+            recievedEventChatMessage(rootNode);
+            return;
+        }
     }
 
 }
@@ -165,8 +184,9 @@ void ServerConnection::recievedServerInfo(XmlNode* node)
     }
 }
 
-void ServerConnection::joinGame(int gameId, bool spectate, QString password)
+void ServerConnection::joinGame(int gameId, QString gameName, bool spectate, QString password)
 {
+    emit logMessage(tr("Joining game %1.").arg(gameName));
     QXmlStreamWriter* x = mp_xmlStreamWriter;
     x->writeStartElement("action");
     x->writeStartElement("join-game");
@@ -181,5 +201,49 @@ void ServerConnection::joinGame(int gameId, bool spectate, QString password)
     x->writeEndElement();
     x->writeEndElement();
 }
+
+void ServerConnection::leaveGame()
+{
+    QXmlStreamWriter* x = mp_xmlStreamWriter;
+    x->writeStartElement("action");
+    x->writeEmptyElement("leave-game");
+    x->writeEndElement();
+}
+
+
+
+void ServerConnection::recievedEventJoinGame(XmlNode* node)
+{
+    emit logMessage(tr("You have entered the game."));
+    delete node;
+}
+
+void ServerConnection::recievedEventLeaveGame(XmlNode* node)
+{
+    emit logMessage(tr("You have left the game."));
+    delete node;
+}
+
+void ServerConnection::recievedEventChatMessage(XmlNode* node)
+{
+    XmlNode* messageNode = node->getFirstChild();
+    Q_ASSERT(messageNode);
+    const int& senderId = messageNode->attribute("senderId").toUInt();
+    const QString& senderName = messageNode->attribute("senderName");
+    const QString& message = messageNode->attribute("message");
+    emit incomingChatMessage(senderId, senderName, message);
+    delete node;
+}
+
+void ServerConnection::sendChatMessage(const QString& message)
+{
+    QXmlStreamWriter* x = mp_xmlStreamWriter;
+    x->writeStartElement("action");
+    x->writeStartElement("chat-message");
+    x->writeAttribute("message", message);
+    x->writeEndElement();
+    x->writeEndElement();
+}
+
 
 

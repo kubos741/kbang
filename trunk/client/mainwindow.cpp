@@ -61,7 +61,8 @@ void MainWindow::joinGame()
     if (!mp_joinGameDialog)
     {
         mp_joinGameDialog = new JoinGameDialog(this, &m_serverConnection);
-        // Add some connections
+        connect(mp_joinGameDialog, SIGNAL(joinGame(int, QString, bool, QString)),
+                &m_serverConnection, SLOT(joinGame(int, QString, bool, QString)));
     }
     mp_joinGameDialog->show();
 }
@@ -77,7 +78,6 @@ void MainWindow::createStatusBar()
 
 void MainWindow::serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription)
 {
-    qDebug("D:%s\n", qPrintable(serverName));
     if (connected)
     {
         QString text;
@@ -105,6 +105,8 @@ void MainWindow::createActions()
             this, SLOT(disconnectFromServer()));
     connect(mp_actionJoinGame, SIGNAL(triggered()),
             this, SLOT(joinGame()));
+    connect(mp_actionLeaveGame, SIGNAL(triggered()),
+            this, SLOT(leaveGame()));
 }
 
 
@@ -112,13 +114,14 @@ void MainWindow::createActions()
 void MainWindow::createMenu()
 {
     mp_actionDisconnectFromServer->setEnabled(0);
+//    mp_actionJoinGame->setEnabled(0);
+//    mp_actionLeaveGame->setEnabled(0);
     connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
             mp_actionConnectToServer, SLOT(setDisabled(bool)));
     connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
             mp_actionDisconnectFromServer, SLOT(setEnabled(bool)));
     connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
             mp_actionJoinGame, SLOT(setEnabled(bool)));
-
 }
 
 void MainWindow::createWidgets()
@@ -137,8 +140,17 @@ void MainWindow::createWidgets()
     layout = new QGridLayout();
     layout->addWidget(mp_chatWidget);
     mp_chatFrame->setLayout(layout);
+    connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
+            &m_serverConnection, SLOT(sendChatMessage(const QString&)));
+    connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
+            mp_chatWidget, SLOT(incomingMessage(int, const QString&, const QString&)));
     
     
+}
+
+void MainWindow::leaveGame()
+{
+    m_serverConnection.leaveGame();
 }
 
 

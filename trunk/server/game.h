@@ -213,6 +213,7 @@ public:
      */
     Player* createNewPlayer(const QString& name, const QString& password);
 
+    QList<Player*> playerList();
 
 
     const PublicGameView* publicGameView() const
@@ -220,8 +221,12 @@ public:
         return &m_publicGameView;
     }
 
+
+    void postMessage(Player* player, const QString& message);
+
 private:
-    QMap<int, Player*> m_players;
+    QMap<int, Player*>   m_players;     // look-up player
+    QList<Player*>       m_playerList;  // player order
 //    int m_state;
 
     const int            m_gameId;
@@ -237,6 +242,10 @@ private:
     int                  m_nextPlayerId;
     GameState            m_gameState;
     const PublicGameView m_publicGameView;
+    
+signals:
+    void chatMessage(int senderId, const QString& senderName, const QString& message);
+
 };
 
 #endif

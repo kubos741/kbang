@@ -20,6 +20,7 @@
 
 #include "abstractplayerctrl.h"
 #include "player.h"
+#include "publicgameview.h"
 
 AbstractPlayerCtrl::AbstractPlayerCtrl():
 QObject(0), mp_privatePlayerView(0), mp_publicGameView(0), mp_playerActions(0),
@@ -50,5 +51,13 @@ void AbstractPlayerCtrl::detachPlayer()
 AbstractPlayerCtrl::~ AbstractPlayerCtrl()
 {
     qDebug() << "Destroying AbstractPlayerCtrl" << this;
+}
+
+
+
+int AbstractPlayerCtrl::gameId() const
+{
+    if (!m_attached) return 0;
+    return mp_publicGameView->gameId();
 }
 
