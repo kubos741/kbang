@@ -88,6 +88,7 @@ void PlayerControllerRunner::attachPlayerController(AbstractPlayerCtrl* playerCo
                                      );
     connect(mp_player, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
             mp_playerController, SLOT(incomingChatMessage(int, const QString&, const QString&)));
+            
     
 }
 

@@ -105,7 +105,7 @@ public:
         return &m_runner;
     }
 
-    const Game* game() const
+    Game* game() const
     {
         return mp_game;
     }
@@ -145,7 +145,7 @@ private:
     WeaponCard*               m_weaponCard;
     QString                   m_name;
     QString                   m_password;
-    Game const*               mp_game;
+    Game*                     mp_game;
     PlayerControllerRunner    m_runner;
     const PublicPlayerView    m_publicPlayerView;
     const PrivatePlayerView   m_privatePlayerView;

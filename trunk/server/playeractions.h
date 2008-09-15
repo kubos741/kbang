@@ -39,10 +39,11 @@ private:
 
 public slots:
     void leaveGame() const;
-
+    void sendMessage(const QString& message) const;
     
 signals:
     void leaveGameSignal() const;
+    void sendMessageSignal(const QString& message) const;
 
 private:
     mutable Player* mp_player;

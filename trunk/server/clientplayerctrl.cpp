@@ -84,13 +84,20 @@ bool ClientPlayerCtrl::event(QEvent* e)
 void ClientPlayerCtrl::actionLeaveGame()
 {
     mp_playerActions->leaveGame();
-    
 }
 
 void ClientPlayerCtrl::start()
 {
     qDebug() << "ClientPlayerCtrl::start()" << QThread::currentThread();
-    connect((QObject*)mp_client->clientController(), SIGNAL(actionLeaveGame()), (QObject*)this, SLOT(actionLeaveGame()),Qt::QueuedConnection);
+    
+    connect(mp_client->clientController(), SIGNAL(actionLeaveGame()),
+            this,     SLOT(actionLeaveGame()),
+            Qt::QueuedConnection);
+    
+    connect(mp_client->clientController(), SIGNAL(actionSendMessage(QString)),
+            this,     SLOT(actionSendMessage(QString)),
+            Qt::QueuedConnection);
+            
     mp_client->clientController()->test();
     
     //connect(mp_client->clientController(), SIGNAL(actionLeaveGame()),
@@ -110,6 +117,12 @@ void ClientPlayerCtrl::incomingChatMessage(int senderId, const QString& senderNa
                                 Q_ARG(int, senderId),
                                 Q_ARG(QString, senderName),
                                 Q_ARG(QString, message));
+}
+
+void ClientPlayerCtrl::actionSendMessage(QString message)
+{
+    qDebug() << __FILE__ << ":" << __LINE__ <<  message;
+    mp_playerActions->sendMessage(message);
 }
 
 

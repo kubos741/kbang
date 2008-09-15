@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "playeractions.h"
 #include "player.h"
+#include "game.h"
 
 #define QUEUEDCALL(signal) if (QThread::currentThread() != thread()) { emit signal; return; }
 
@@ -26,6 +27,8 @@ PlayerActions::PlayerActions(Player* player):
 mp_player(player)
 {
     connect(this, SIGNAL(leaveGameSignal()), this, SLOT(leaveGame()));
+    connect(this, SIGNAL(sendMessageSignal(const QString&)),
+            this, SLOT(sendMessage(const QString&)));
 
 }
 
@@ -35,12 +38,6 @@ PlayerActions::~ PlayerActions()
 
 void PlayerActions::leaveGame() const
 {
-    if (QThread::currentThread() != thread())
-    {
-        // This code is executed in the playerController thread
-        //mp_player->playerControllerRunner()->quit();
-    }
-    
     QUEUEDCALL(leaveGameSignal());
     
     /// If the player is not already playing (before the game is active),
@@ -49,4 +46,11 @@ void PlayerActions::leaveGame() const
     /// TODO: implement this idea
     
     mp_player->detachPlayerController();
+}
+
+void PlayerActions::sendMessage(const QString& message) const
+{
+    QUEUEDCALL(sendMessageSignal(message));
+    Game* theGame = mp_player->game();
+    theGame->postMessage(mp_player, message);
 }

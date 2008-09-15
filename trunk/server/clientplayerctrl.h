@@ -50,7 +50,7 @@ public slots:
      * Tells the client to leave the game.
      */
     void actionLeaveGame();
-    
+    void actionSendMessage(QString message);
 
     
     

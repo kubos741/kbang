@@ -49,7 +49,7 @@ private:
     
 signals:
     void actionLeaveGame();
-    void actionSendMessage();
+    void actionSendMessage(QString message);
 
 };
 

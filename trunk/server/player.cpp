@@ -34,6 +34,8 @@ m_publicPlayerView(this),
 m_privatePlayerView(this),
 m_playerActions(this)
 {
+    connect(game, SIGNAL(chatMessage(int, const QString&, const QString&)),
+            this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     //    mp_client->mp_player = this;
     //    m_id = mp_game->appendNewPlayer(this);
 }
