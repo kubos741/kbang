@@ -39,27 +39,27 @@ void ClientPlayerCtrl::playTurn()
 {
 }
 
-void ClientPlayerCtrl::underAttack(const PublicPlayerView & attacker, const PlayingCard & card)
+void ClientPlayerCtrl::underAttack(const PublicPlayerView&, const PlayingCard&)
 {
 }
 
-const CharacterCard & ClientPlayerCtrl::pickACharacter(const CharacterCardList & characterList)
+const CharacterCard& ClientPlayerCtrl::pickACharacter(const CharacterCardList&)
 {
 }
 
-const PlayingCard & ClientPlayerCtrl::pickACard(const PlayingCardList & cardList)
+const PlayingCard& ClientPlayerCtrl::pickACard(const PlayingCardList&)
 {
 }
 
-void ClientPlayerCtrl::playerRecievesCards(const PublicPlayerView & player, const PlayingCardList & cardList)
+void ClientPlayerCtrl::playerRecievesCards(const PublicPlayerView&, const PlayingCardList&)
 {
 }
 
-void ClientPlayerCtrl::playerPlaysCard(const PublicPlayerView & player, const PlayingCard & card, const PublicPlayerView * targetPlayer, const PlayingCard * targetCard)
+void ClientPlayerCtrl::playerPlaysCard(const PublicPlayerView&, const PlayingCard&, const PublicPlayerView*, const PlayingCard*)
 {
 }
 
-void ClientPlayerCtrl::playerDiscardsCard(const PublicPlayerView & player, const PlayingCardList & cardList)
+void ClientPlayerCtrl::playerDiscardsCard(const PublicPlayerView&, const PlayingCardList&)
 {
 }
 

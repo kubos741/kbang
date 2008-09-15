@@ -33,6 +33,7 @@ class CharacterCard;
 class WeaponCard;
 class Client;
 class Game;
+class QXmlStreamWriter;
 
 /**
  * The Player class represents a kbang player. The instance of this object

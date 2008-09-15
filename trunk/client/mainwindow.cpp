@@ -24,9 +24,9 @@
 #include "chatwidget.h"
 
 MainWindow::MainWindow():
-    m_serverConnection(this),
     mp_connectToServerDialog(0),
-    mp_joinGameDialog(0)
+    mp_joinGameDialog(0),
+    m_serverConnection(this)    
 {
     setupUi(this);
     createActions();
@@ -76,7 +76,7 @@ void MainWindow::createStatusBar()
     statusBar()->addPermanentWidget(mp_labelStatusBarServerState);
 }
 
-void MainWindow::serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription)
+void MainWindow::serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString)
 {
     if (connected)
     {

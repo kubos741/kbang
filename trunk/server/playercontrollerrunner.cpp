@@ -113,7 +113,7 @@ void PlayerControllerRunner::detachPlayerController()
                mp_playerController, SLOT(incomingChatMessage(int, const QString&, const QString&)));
 }
 
-bool PlayerControllerRunner::postEventToController(QEvent* e)
+bool PlayerControllerRunner::postEventToController(QEvent*)
 {
 
     qDebug() << "Inside PlayerControllerRunner::event()";
@@ -129,6 +129,7 @@ bool PlayerControllerRunner::postEventToController(QEvent* e)
     QCoreApplication::postEvent(mp_playerController, e);
     return true;
 */
+    return 1;
 }
 
 

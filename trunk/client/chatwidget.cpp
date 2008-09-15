@@ -32,7 +32,7 @@ ChatWidget::~ChatWidget()
 {
 }
 
-void ChatWidget::incomingMessage(int senderId, const QString& senderName, const QString& message)
+void ChatWidget::incomingMessage(int, const QString& senderName, const QString& message)
 {
     mp_chatView->append(QString("<b>%1:</b> %2").arg(senderName).arg(message));
 }

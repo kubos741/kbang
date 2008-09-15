@@ -100,7 +100,7 @@ void JoinGameDialog::show()
     QDialog::show();
 }
 
-void JoinGameDialog::on_mp_gameListView_itemClicked(QTreeWidgetItem* item, int column)
+void JoinGameDialog::on_mp_gameListView_itemClicked(QTreeWidgetItem* item, int)
 {
     doButtons();
     int gameId = item->data(0, Qt::UserRole).toUInt();

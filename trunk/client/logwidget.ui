@@ -68,11 +68,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
   </layout>
-  <zorder>mp_frame</zorder>
   <zorder>mp_tabWidget</zorder>
-  <zorder>textBrowser</zorder>
-  <zorder>plainTextEdit</zorder>
-  <zorder>lineEdit</zorder>
   <zorder>mp_tabWidget</zorder>
  </widget>
  <resources/>
