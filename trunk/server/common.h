@@ -23,7 +23,10 @@
 
 #include <QtDebug>
 
+
+#ifndef NO_TENGO_CONFIG_HACK
 #include "config.h"
+#endif
 
 
 #define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)

@@ -17,16 +17,59 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef SERVERQUERY_H
+#define SERVERQUERY_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QObject>
+#include <QHash>
+#include <QXmlStreamAttributes>
+#include "serverconnection.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
+class XmlNode;
 
+/**
+ * 
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ServerQuery : public QObject
+{
+Q_OBJECT
+friend class ServerConnection;
+private:
+    ServerQuery(QObject *parent, const QString& elementName );
+    ~ServerQuery();
+
+public:
+    
+    void addAttribute(const QString& name, const QString& value);
+    /**
+     * You shouldn't keep pointer after calling post(). As soon as response from
+     * server is gotten, signal is emited and instance is destroyed.
+     */
+    void post();
+
+signals:
+    void responseRecieved(XmlNode* node);
+
+
+private:
+    static QXmlStreamWriter  *smp_xmlStreamWriter;
+    static QHash<QString, ServerQuery*> sm_serverQueries;
+    static QString sm_lock;
+    
+    
+    
+    QString                         m_elementName;
+    QXmlStreamAttributes            m_attributes;
+    QString                         m_id;
+    bool                            m_posted;
+    
+    
+    
+private:
+    inline void emitResponseRecieved(XmlNode* node);
+    static void processResultQuery(XmlNode* node);
+
+};
+
+#endif

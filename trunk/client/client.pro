@@ -6,10 +6,32 @@ TEMPLATE = app
 
 # Input
 HEADERS += gameloop.h \
- connecttoserverdialog.h
-FORMS += connecttoserverdialog.ui joinserverdialog.ui mainwindow.ui
+ connecttoserverdialog.h \
+ mainwindow.h \
+ serverconnection.h \
+ serverquery.h \
+ common.h \
+ xmlnode.h \
+ joingamedialog.h \
+ logwidget.h \
+ chatwidget.h
+FORMS += connecttoserverdialog.ui mainwindow.ui \
+ joingamedialog.ui \
+ logwidget.ui \
+ chatwidget.ui
 SOURCES += gameloop.cpp main.cpp \
- connecttoserverdialog.cpp
+ connecttoserverdialog.cpp \
+ mainwindow.cpp \
+ serverconnection.cpp \
+ serverquery.cpp \
+ common.cpp \
+ xmlnode.cpp \
+ joingamedialog.cpp \
+ logwidget.cpp \
+ chatwidget.cpp
 
-QT += network
+QT += network \
+ xml
+
+RESOURCES += client.qrc
 

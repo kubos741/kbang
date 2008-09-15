@@ -25,8 +25,6 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
     setupUi(this);
     connect(mp_cancelButton, SIGNAL(clicked()),
             this, SLOT(close()));
-    
-
 }
 
 
@@ -67,6 +65,24 @@ void ConnectToServerDialog::on_mp_favoriteList_itemClicked(QTreeWidgetItem * ite
     mp_lineEditNickName->setText(item->text(3));
 
 }
+
+void ConnectToServerDialog::on_mp_favoriteList_itemDoubleClicked(QTreeWidgetItem * item, int column)
+{
+    on_mp_favoriteList_itemClicked(item, column);
+    on_mp_connectButton_clicked();
+}
+
+void ConnectToServerDialog::on_mp_connectButton_clicked()
+{
+    emit connectToServer(mp_lineEditHostName->text(), mp_spinBoxPort->value(), mp_lineEditNickName->text());
+    close();
+}
+
+void ConnectToServerDialog::setConnectButtonStatus()
+{
+
+}
+
 
 
 

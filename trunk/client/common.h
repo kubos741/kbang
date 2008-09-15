@@ -18,15 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#ifndef COMMON_H
+#define COMMON_H
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
+#include <QtDebug>
 
+
+
+
+
+#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
+
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+
+QString randomToken(int minLength, int maxLength);
+
+#endif

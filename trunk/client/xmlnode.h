@@ -17,16 +17,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef XMLNODE_H
+#define XMLNODE_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QObject>
+#include <QPair>
+#include <QString>
+#include <QMap>
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
 
+class QXmlStreamAttributes;
+class QStringRef;
+
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class XmlNode : public QObject
+{
+Q_OBJECT
+public:
+    XmlNode(XmlNode *parent, const QString& elementName);
+    XmlNode(XmlNode *parent, const QStringRef& elementName, const QXmlStreamAttributes& attributes);
+    
+    XmlNode* createChildNode(const QString& elementName);
+    XmlNode* createChildNode(const QStringRef& elementName, const QXmlStreamAttributes& attributes);
+    void     createAttribute(const QString& name, const QString& value);
+    void     createAttributes(const QXmlStreamAttributes& attributes);
+    
+    void     debugPrint(int indent = 0) const;
+    
+    QString name() const;
+    QString attribute(const QString& name) const;
+    XmlNode* getFirstChild() const;
+    QList<XmlNode*> getChildren() const;
+    
+    
+    virtual XmlNode* parentNode();
+    virtual ~XmlNode();
+
+private:
+    const QString           m_elementName;
+    QMap<QString, QString>  m_attributes;
+    QList<XmlNode*>         m_children;
+};
+
+#endif

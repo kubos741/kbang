@@ -295,9 +295,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>mp_buttonDeleteFavorite</tabstop>
   <tabstop>mp_connectButton</tabstop>
   <tabstop>mp_cancelButton</tabstop>
-  <tabstop>pushButton_3</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>treeWidget_2</tabstop>
  </tabstops>
  <resources/>
  <connections/>

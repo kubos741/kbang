@@ -57,9 +57,11 @@ void Stanza::writeErrorElement(QXmlStreamWriter& xmlOut)
 {
     switch(m_state)
     {
-        case STATE_INVALID_TYPE:   xmlOut.writeEmptyElement("invalid-type");   break;
-        case STATE_BAD_QUERY:      xmlOut.writeEmptyElement("bad-query");      break;
         case STATE_NOT_EXIST:      xmlOut.writeEmptyElement("not-exist");      break;
+        case STATE_INVALID_TYPE:   xmlOut.writeEmptyElement("invalid-type");   break;
+        case STATE_MISSING_ID:     xmlOut.writeEmptyElement("missing-id");     break;
+        case STATE_BAD_QUERY:      xmlOut.writeEmptyElement("bad-query");      break;
+        case STATE_BAD_ACTION:     xmlOut.writeEmptyElement("bad-action");     break;
         case STATE_NOT_AVAILABLE:  xmlOut.writeEmptyElement("not-available");  break;
         case STATE_NOT_COMPLETE:   xmlOut.writeEmptyElement("not-complete");   break;
         case STATE_ACCESS_DENIED:  xmlOut.writeEmptyElement("access-denied");  break;

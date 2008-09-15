@@ -17,16 +17,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "serverconnection.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
 
+class ConnectToServerDialog;
+class JoinGameDialog;
+class LogWidget;
+class ChatWidget;
+class QLabel;
+
+/**
+ *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class MainWindow : public QMainWindow, public Ui::MainWindow
+{
+Q_OBJECT
+public:
+    MainWindow();
+    virtual ~MainWindow();
+    
+private slots:
+    void connectToServer();
+    void disconnectFromServer();
+    void joinGame();
+    
+    void serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
+
+private:
+    ConnectToServerDialog* mp_connectToServerDialog;
+    JoinGameDialog*        mp_joinGameDialog;
+    LogWidget*             mp_logWidget;
+    ChatWidget*            mp_chatWidget;
+    ServerConnection       m_serverConnection;
+    
+    
+    QLabel*                mp_labelStatusBarServerState;
+
+
+private:
+    void createStatusBar();
+    void createMenu();
+    void createActions();
+    void createWidgets();
+
+};
+
+#endif

@@ -154,19 +154,22 @@
       <envvars/>
       <runarguments>
         <server/>
-        <servertester></servertester>
+        <servertester/>
+        <client></client>
       </runarguments>
       <cwd>
         <server>/home/macjariel/devel/kbang</server>
         <servertester>/home/macjariel/devel/kbang</servertester>
+        <client>/home/macjariel/devel/kbang</client>
       </cwd>
       <debugarguments>
         <server/>
-        <servertester></servertester>
+        <servertester/>
+        <client></client>
       </debugarguments>
     </run>
     <general>
-      <activedir>servertester</activedir>
+      <activedir>client</activedir>
     </general>
     <make>
       <abortonerror>true</abortonerror>

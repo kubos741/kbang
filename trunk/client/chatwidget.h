@@ -17,16 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CHATWIDGET_H
+#define CHATWIDGET_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QWidget>
+#include "ui_chatwidget.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
+/**
+ *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ChatWidget : public QWidget, public Ui::ChatWidget
+{
+Q_OBJECT
+public:
+    ChatWidget(QWidget *parent = 0);
 
+    ~ChatWidget();
+
+};
+
+#endif

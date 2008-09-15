@@ -17,16 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef LOGWIDGET_H
+#define LOGWIDGET_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QWidget>
+#include "ui_logwidget.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
 
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class LogWidget : public QWidget, public Ui::LogWidget
+{
+Q_OBJECT
+public:
+    LogWidget(QWidget *parent = 0);
+
+    ~LogWidget();
+    
+public slots:
+    void appendLogMessage(QString message);
+    void appendIncomingXml(QString message);
+
+};
+
+#endif

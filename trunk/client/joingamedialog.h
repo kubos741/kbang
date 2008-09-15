@@ -17,16 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef JOINGAMEDIALOG_H
+#define JOINGAMEDIALOG_H
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QDialog>
+#include "ui_joingamedialog.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
-}
+class ServerConnection;
+class XmlNode;
 
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class JoinGameDialog : public QDialog, public Ui::JoinGameDialog
+{
+Q_OBJECT
+public:
+    JoinGameDialog(QWidget *parent, ServerConnection* serverConnection);
+    ~JoinGameDialog();
+    virtual void show();
+
+
+public slots:
+    void refreshGameList();
+    void recievedGameList(XmlNode*);
+    void on_mp_gameListView_itemClicked(QTreeWidgetItem * item, int column);
+    void on_mp_gameListView_itemDoubleClicked(QTreeWidgetItem * item, int column);
+
+
+
+
+signals:
+    void joinGame(int gameId, bool spectate, QString password);
+
+private:
+    ServerConnection* mp_serverConnection;
+
+};
+
+#endif

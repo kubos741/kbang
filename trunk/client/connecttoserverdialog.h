@@ -36,6 +36,13 @@ public:
 private slots:
     void on_mp_buttonSaveFavorite_clicked();
     void on_mp_favoriteList_itemClicked(QTreeWidgetItem * item, int column);
+    void on_mp_favoriteList_itemDoubleClicked(QTreeWidgetItem * item, int column);
+    void on_mp_connectButton_clicked();
+    void setConnectButtonStatus();
+    
+signals:
+    void connectToServer(QString serverAddress, int serverPort, QString nickname);
+    
 };
 
 #endif

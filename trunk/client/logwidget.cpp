@@ -17,16 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "logwidget.h"
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
-
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
+LogWidget::LogWidget(QWidget *parent)
+ : QWidget(parent)
+{
+    setupUi(this);
 }
+
+
+LogWidget::~LogWidget()
+{
+}
+
+void LogWidget::appendLogMessage(QString message)
+{
+    mp_logView->append(message);
+}
+
+void LogWidget::appendIncomingXml(QString message)
+{
+    mp_xmlView->setTextColor(Qt::green);
+    mp_xmlView->append(message);
+}
+
 

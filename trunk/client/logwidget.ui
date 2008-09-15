@@ -1,0 +1,62 @@
+<ui version="4.0" >
+ <class>LogWidget</class>
+ <widget class="QWidget" name="LogWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>296</width>
+    <height>279</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" >
+    <widget class="QTabWidget" name="mp_tabWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="mp_tabLog" >
+      <attribute name="title" >
+       <string>Log</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3" >
+       <item row="0" column="0" >
+        <widget class="QTextBrowser" name="mp_logView" >
+         <property name="styleSheet" >
+          <string notr="true" >color: rgb(255, 255, 0);</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="mp_tabDebug" >
+      <attribute name="title" >
+       <string>Xml</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2" >
+       <item row="0" column="0" >
+        <widget class="QTextBrowser" name="mp_xmlView" >
+         <property name="styleSheet" >
+          <string notr="true" >background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 0);</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+  <zorder>mp_frame</zorder>
+  <zorder>mp_tabWidget</zorder>
+  <zorder>textBrowser</zorder>
+  <zorder>plainTextEdit</zorder>
+  <zorder>lineEdit</zorder>
+  <zorder>mp_tabWidget</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

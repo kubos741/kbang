@@ -18,15 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QApplication>
-#include <QDialog> 
-#include "mainwindow.h"
+#include <QString>
+#include "common.h"
 
-int main(int argc, char *argv[]) 
-{ 
-    QApplication app(argc, argv); 
-    MainWindow mainWindow;
-    mainWindow.show(); 
-    return app.exec(); 
+QString randomToken(int minLength, int maxLength)
+{
+    Q_ASSERT(minLength <= maxLength);
+    const static char* chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    const static int charl = strlen(chars);
+    int length = minLength + ((int)qrand() % (maxLength - minLength + 1));
+    char token[length+1];
+    for (int i = 0; i < length; ++i)
+    {
+        token[i] = chars[qrand() % charl];
+    }
+    token[length - 1] = '\0';
+    return QString(token);
 }
-
