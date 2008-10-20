@@ -1,0 +1,9 @@
+#summary This is a description of the structure of source files.
+
+{{{
++-kbang
+   +-client
+   +-common
+      +-parser
+   +-server
+}}}
