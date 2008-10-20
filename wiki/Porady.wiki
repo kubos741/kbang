@@ -1,0 +1,7 @@
+#summary This page is used for project briefings. It's written in czech.
+
+= 20. 10. 2008 =
+== Cíle ==
+ * reorganizace zdrojových souborů
+ * vytvoření obecného obousměrného parseru pro síťovou komunikaci
+ * založení dokumentace progressu - milestones, ...
