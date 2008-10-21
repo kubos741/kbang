@@ -23,6 +23,10 @@
 #include <QObject>
 #include <QList>
 
+class QIODevice;
+class QXmlStreamReader;
+class QXmlStreamWriter;
+
 /**
  * TODO: Write some shiny cool doc comment. :)
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
@@ -32,91 +36,64 @@ class Parser: public QObject
 Q_OBJECT
 public:
     Parser(QObject* parent);
-    Parser(QObject* parent, QTcpSocket* socket);
+    Parser(QObject* parent, QIODevice* socket);
     virtual ~Parser();
 
+public slots:    
+    void attachSocket(QIODevice* socket);
+    void detachSocket();
+        
      
     //////////////
     /// CLIENT ///
     //////////////
     void initializeStream();
-    void queryServerInfo();
-    void queryGameList();
-    void queryGameInfo(int gameId);
+//    void queryServerInfo();
+//    void queryGameList();
+//    void queryGameInfo(int gameId);
     
-    void actionJoinGame(int gameId);
-    void actionLeaveGame();
+//    void actionJoinGame(int gameId);
+//    void actionLeaveGame();
 
 
     
-public signals:
-    void sigResultServerInfo(const StructServerInfo&);
-    void sigResultGameList(const StructGameList&);
-    void sigResultGameInfo(const StructGame&);
+signals:
+    //void sigResultServerInfo(const StructServerInfo&);
+    //void sigResultGameList(const StructGameList&);
+    //void sigResultGameInfo(const StructGame&);
     
-    void sigEventJoinGame(int gameId);
-    void sigEventLeaveGame();
+    //void sigEventJoinGame(int gameId);
+    //void sigEventLeaveGame();
 
 
     //////////////
     /// SERVER ///
     //////////////
-    void resultServerInfo(const StructServerInfo&);
-    void resultGameList(const StructGameList&);
-    void resultGameInfo(const StructGame&);
+public:
+    //void resultServerInfo(const StructServerInfo&);
+    //void resultGameList(const StructGameList&);
+    //void resultGameInfo(const StructGame&);
 
-    void eventJoinGame(int gameId);
-    void eventLeaveGame();
+    //void eventJoinGame(int gameId);
+    //void eventLeaveGame();
 
-public signals:
-    void sigQueryServerInfo();
-    void sigQueryGameList();
-    void sigQueryGameInfo(int gameId);
+signals:
+    //void sigQueryServerInfo();
+    //void sigQueryGameList();
+    //void sigQueryGameInfo(int gameId);
     
-    void sigActionJoinGame(int gameId);
-    void sigActionLeaveGame();
+    //void sigActionJoinGame(int gameId);
+    //void sigActionLeaveGame();
 
 
-
-
-
-    * This method is called either manually to force disconnection from
-     * the other party or it is called as slot when the other party disconnects
-     * from server. 
-     */
-    void disconnectFromHost();
-    
-    
-    /**
-     * Reads and parses data from the input stream.
-     */
-    void readData();
+public:
+    static QString protocolVersion();
 
 
 private:
-    void parseStream();
-    void parseStanza();
-    void sendData(const QString& data);
-
-private:
-    QXmlStreamReader m_xmlIn;
-    QXmlStreamWriter m_xmlOut;
-    QTcpSocket* mp_socket;
-    Client* mp_client;
-
-    int m_depth;
-    bool m_inStreamInitialized;
-    bool m_outStreamInitialized;
-    Stanza* mp_stanza;
-    struct { quint16 major, minor; } m_protocolVersion;
-
-
-
-
-public slots:
-    void sendJoinGame(int gameId, int type);
-    void sendLeaveGame();
-    void sendChatMessage(int senderId, const QString& senderName, const QString& message);
+    QIODevice*        mp_socket;
+    QXmlStreamReader* mp_streamReader;
+    QXmlStreamWriter* mp_streamWriter;
 };
 
 #endif
