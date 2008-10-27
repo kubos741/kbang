@@ -6,7 +6,7 @@
  * dodělání obecného obousměrného parseru pro síťovou komunikaci
  * spustitelný server - joinování her
 
-= 20. 10. 2008 =
+= 20. 10. 2008 (takova pul cokolada) =
 == Cíle ==
  * reorganizace zdrojových souborů
  * vytvoření obecného obousměrného parseru pro síťovou komunikaci
