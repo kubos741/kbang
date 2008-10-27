@@ -12,6 +12,7 @@ private slots:
     void cleanupTestCase();
 
 
+    void initializationTest();
 
 
 private:
@@ -20,4 +21,19 @@ private:
 
     Parser* mp_clientParser;
     Parser* mp_serverParser;
+
+public slots:
+    void clientStreamInitialized()
+    {
+        m_clientStreamInitialized++;
+    }
+    void serverStreamInitialized()
+    {
+        m_serverStreamInitialized++;
+    }
+    void serverinfoRequestRecieved();
+
+private:
+    int m_clientStreamInitialized, m_serverStreamInitialized;
+    QString m_serverName, m_serverDescription;
 };

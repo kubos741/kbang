@@ -1,9 +1,15 @@
-HEADERS += parser.h
-SOURCES += parser.cpp
+HEADERS += queryget.h \
+	   parser.h \
+	parserstructs.h \
+queryresult.h \
+util.h
+SOURCES += parser.cpp \
+queryget.cpp \
+queryresult.cpp \
+util.cpp
 TEMPLATE = app
 
-CONFIG -= release
-CONFIG += debug
+QT += xml
 
-QT += xml \
-      network
+INCLUDEPATH += ..
+

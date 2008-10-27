@@ -3,4 +3,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += server \
 client \
- servertester
+ servertester \
+ common/parser/parser.pro \
+ common/parser/testparser/testparser.pro

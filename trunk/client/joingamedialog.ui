@@ -41,12 +41,6 @@
        <property name="allColumnsShowFocus" >
         <bool>false</bool>
        </property>
-       <property name="headerHidden" >
-        <bool>false</bool>
-       </property>
-       <property name="expandsOnDoubleClick" >
-        <bool>true</bool>
-       </property>
        <column>
         <property name="text" >
          <string>Game</string>
@@ -95,12 +89,6 @@
        </property>
        <property name="allColumnsShowFocus" >
         <bool>false</bool>
-       </property>
-       <property name="headerHidden" >
-        <bool>false</bool>
-       </property>
-       <property name="expandsOnDoubleClick" >
-        <bool>true</bool>
        </property>
        <column>
         <property name="text" >

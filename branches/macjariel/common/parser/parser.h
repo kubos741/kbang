@@ -22,10 +22,13 @@
 
 #include <QObject>
 #include <QList>
+#include <QHash>
+#include "parserstructs.h"
 
 class QIODevice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+class QueryGet;
 
 /**
  * TODO: Write some shiny cool doc comment. :)
@@ -39,29 +42,37 @@ public:
     Parser(QObject* parent, QIODevice* socket);
     virtual ~Parser();
 
-public slots:    
+    typedef QString QueryId;
+
+public slots:
     void attachSocket(QIODevice* socket);
     void detachSocket();
-        
-     
+
+
+signals:
+    void streamInitialized();
+
+
+public slots:
+
     //////////////
     /// CLIENT ///
     //////////////
     void initializeStream();
-//    void queryServerInfo();
+    QueryGet* queryGet();
 //    void queryGameList();
 //    void queryGameInfo(int gameId);
-    
+
 //    void actionJoinGame(int gameId);
 //    void actionLeaveGame();
 
 
-    
+
 signals:
-    //void sigResultServerInfo(const StructServerInfo&);
+    void sigResultServerInfo(const StructServerInfo&);
     //void sigResultGameList(const StructGameList&);
     //void sigResultGameInfo(const StructGame&);
-    
+
     //void sigEventJoinGame(int gameId);
     //void sigEventLeaveGame();
 
@@ -70,7 +81,7 @@ signals:
     /// SERVER ///
     //////////////
 public:
-    //void resultServerInfo(const StructServerInfo&);
+    void resultServerInfo(const StructServerInfo&);
     //void resultGameList(const StructGameList&);
     //void resultGameInfo(const StructGame&);
 
@@ -78,10 +89,10 @@ public:
     //void eventLeaveGame();
 
 signals:
-    //void sigQueryServerInfo();
+    void sigQueryServerInfo();
     //void sigQueryGameList();
     //void sigQueryGameInfo(int gameId);
-    
+
     //void sigActionJoinGame(int gameId);
     //void sigActionLeaveGame();
 
@@ -90,10 +101,44 @@ public:
     static QString protocolVersion();
 
 
+private slots:
+    void readData();
+
 private:
+    void stateStart();
+    void stateReady();
+    void stateQueryGet();
+    void stateQueryResult();
+
+    void sendInitialization();
+
+
+
+
+private:
+    typedef enum {
+        S_Start = 0,
+        S_Ready,
+        S_QueryGet,
+        S_QeuryResult,
+        S_QueryError,
+        S_Action,
+        S_Event,
+        S_UnknownStanza,
+        S_Terminated,
+        S_Error
+    } ReaderState;
     QIODevice*        mp_socket;
     QXmlStreamReader* mp_streamReader;
     QXmlStreamWriter* mp_streamWriter;
+
+    bool              m_streamInitialized;
+
+    ReaderState       m_readerState;
+    int               m_readerDepth;
+
+    QHash<QString, QueryGet*> m_getQueries;
+    QueryGet*         mp_queryGet;
 };
 
 #endif
