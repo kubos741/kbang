@@ -1,5 +1,11 @@
 #summary This page is used for project briefings. It's written in czech.
 
+= 27. 10. 2008 =
+== Cíle ==
+ * reorganizace zdrojových souborů (images)
+ * dodělání obecného obousměrného parseru pro síťovou komunikaci
+ * spustitelný server - joinování her
+
 = 20. 10. 2008 =
 == Cíle ==
  * reorganizace zdrojových souborů
