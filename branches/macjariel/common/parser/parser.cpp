@@ -22,6 +22,8 @@
 #include "parser.h"
 #include "queryget.h"
 #include "util.h"
+#include "xmlnode.h"
+
 #include <QtDebug>
 
 #include <QIODevice>
@@ -32,13 +34,13 @@
 #define ASSERT_SOCKET if (!mp_socket) return
 
 Parser::Parser(QObject* parent):
-QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0)
+QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
 {
 
 }
 
 Parser::Parser(QObject* parent, QIODevice* socket):
-QObject(parent), mp_socket(0),  m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0)
+QObject(parent), mp_socket(0),  m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
 {
     attachSocket(socket);
 }
@@ -94,12 +96,12 @@ void Parser::readData()
         if (!(mp_streamReader->isStartElement() ||
               mp_streamReader->isEndElement() ||
               (mp_streamReader->isCharacters() && !mp_streamReader->isWhitespace()))) continue;
-        qDebug() << this << "token: " << mp_streamReader->tokenType() <<
-                            "name: " << mp_streamReader->name().toString() <<
-                            "text: " << mp_streamReader->text().toString();
+//        qDebug() << this << "token: " << mp_streamReader->tokenType() <<
+//                            "name: " << mp_streamReader->name().toString() <<
+//                            "text: " << mp_streamReader->text().toString();
 
 
-        if (mp_streamReader->isEndElement()) m_depth--;
+        if (mp_streamReader->isEndElement()) m_readerDepth--;
 
         switch(m_readerState)
         {
@@ -109,73 +111,17 @@ void Parser::readData()
         case S_Ready:
             stateReady();
             break;
-        case S_QueryGet:
-            stateQueryGet();
+        case S_Stanza:
+            stateStanza();
             break;
-        case S_QeuryResult:
-            stateQueryResult();
+        case S_Terminated: // TODO
             break;
-        case S_QueryError:
-            break;
-        case S_Action:
-            break;
-        case S_Event:
-            break;
-        case S_UnknownStanza:
+        case S_Error: // TODO
             break;
         }
+        
 
-        if (mp_streamReader->isStartElement()) m_depth++;
-
-
-        if (mp_streamReader->isEndElement()) m_depth--;
-        switch(m_depth)
-        {
-            case 0:
-                parseInitialization();
-                break;
-            case 1:
-                if (mp_streamReader->name() == "query")
-                {
-                    m_stanzaType = TypeQuery;
-                    QString type = mp_streamReader->attributes().value("type").toString();
-                    QString id = mp_streamReader->attributes().value("id").toString();
-                    if (type == "get")
-                    {
-
-                    }
-                    else if (type == "result")
-                    {
-                        if (!m_getQueries.contains(id))
-                        {
-                            m_ignoreStanza = 1;
-                            break;
-                        }
-                        mp_queryGet = m_getQueries[id];
-                    }
-
-                } else if (mp_streamReader->name() == "action")
-                {
-                    m_stanzaType = TypeQuery;
-                }
-                break;
-            case 2:
-                if (m_ignoreStanza) break;
-                if (!mp_streamReader->isStartElement()) break;
-                if (m_stanzaType == TypeQuery)
-                {
-                    if (mp_streamReader->name() == "serverinfo")
-                    {
-                        emit sigQueryServerInfo();
-                    }
-                }
-                break;
-//            default:
-//                qDebug() << "Depth: " << m_depth << " not reached";
-//                break;
-
-        }
-
+        if (mp_streamReader->isStartElement()) m_readerDepth++;
     }
 }
 
@@ -212,66 +158,62 @@ void Parser::stateReady()
         m_readerState = S_Error;
         return;
     }
-    if (mp_streamReader->name() == "query")
+    // Starting to read new stanza
+    Q_ASSERT(mp_parsedStanza == 0);
+    mp_parsedXmlElement = mp_parsedStanza = new XmlNode(0, mp_streamReader->name(), mp_streamReader->attributes());
+    m_readerState = S_Stanza;
+}
+
+void Parser::stateStanza()
+{
+    if (mp_streamReader->isEndElement() && m_readerDepth == 1)
     {
-        QString type = mp_streamReader->attributes().value("type").toString();
-        QString id   = mp_streamReader->attributes().value("id").toString();
-        if (type == "get")
+        
+        processStanza();
+        // TODO: Process the stanza
+//        mp_parsedStanza->debugPrint();
+        delete mp_parsedStanza;
+        mp_parsedStanza = mp_parsedXmlElement = 0;
+        m_readerState = S_Ready;
+        return;
+    }
+    if (mp_streamReader->isStartElement())
+    {
+        mp_parsedXmlElement = mp_parsedXmlElement->createChildNode(mp_streamReader->name(), mp_streamReader->attributes());
+    }
+    if (mp_streamReader->isEndElement())
+    {
+        mp_parsedXmlElement = mp_parsedXmlElement->parentNode();
+    }
+}
+
+void Parser::processStanza()
+{
+    if (mp_parsedStanza->name() == "query")
+    {
+        const QString& id = mp_parsedStanza->attribute("id");
+        if (mp_parsedStanza->attribute("type") == "get")
         {
-            m_readerState = S_QueryGet;
-            m_stanzaId = id;
-            return;
-        }
-        if (type == "result")
-        {
-            if (!m_getQueries.contains(id))
+            XmlNode* query = mp_parsedStanza->getFirstChild();
+            if (query->name() == "serverinfo")
             {
-                m_readerState = S_InvalidStanza;
+                emit sigQueryServerInfo(QueryResult(mp_streamWriter, id));
                 return;
             }
-            m_readerState = S_QueryResult;
-            m_stanzaId = id;
-            mp_queryGet = m_getQueries[id];
-            return;
         }
-        if (type == "error")
+        if (mp_parsedStanza->attribute("type") == "result")
         {
-            m_readerState = S_QueryError;
-            m_stanzaId = id;
-            return;
+            if (m_getQueries.contains(id))
+            {
+                m_getQueries[id]->parseResult(mp_parsedStanza->getFirstChild());
+                m_getQueries[id]->deleteLater();
+                m_getQueries.remove(id);
+            }
         }
-        m_readerState = S_InvalidStanza;
-        return;
+    
+    
     }
-}
 
-void Parser::stateQueryGet()
-{
-    if (mp_streamReader->isEndElement() && m_readerDepth == 1)
-    {
-        // Fire the query
-        m_readerState = S_Ready;
-        return;
-    }
-    if (mp_streamReader->isStartElement() && m_readerDepth == 2)
-    {
-        if (mp_streamReader->name() == "serverinfo")
-        {
-
-        }
-
-    }
-}
-
-void Parser::stateQueryResult()
-{
-    if (mp_streamReader->isEndElement() && m_readerDepth == 1)
-    {
-        // Fire the query
-        m_readerState = S_Ready;
-        return;
-    }
-    mp_queryGet->parseResult(mp_streamReader);
 }
 
 void Parser::sendInitialization()

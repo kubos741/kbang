@@ -26,6 +26,8 @@
 
 class Parser;
 class QXmlStreamWriter;
+class QXmlStreamReader;
+class XmlNode;
 
 class QueryGet: public QObject
 {
@@ -37,14 +39,20 @@ private:
     void writeStartQuery();
     void writeEndQuery();
 
-    void parseResult(const QXmlStreamReader*);
+    void parseResult(XmlNode*);
+    
+    StructGame getGameFromXml(XmlNode*);
 
 public:
     void getServerInfo();
+    void getGame(int id);
+    void getGameList();
 
 
 signals:
     void result(const StructServerInfo&);
+    void result(const StructGame&);
+    void result(const StructGameList&);
 
 private:
     Parser* mp_parser;

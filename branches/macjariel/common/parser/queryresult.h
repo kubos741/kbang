@@ -22,22 +22,26 @@
 #define QUERYRESULT_H
 
 #include "parserstructs.h"
-#include <QObject>
 #include <QString>
 
-class Parser;
+class QXmlStreamWriter;
 
-class QueryResult: public QObject
+
+class QueryResult
 {
-    Q_OBJECT
-    QueryResult(Parser* parser, const QString& id);
-    virtual ~QueryResult();
+public:
+    QueryResult(QXmlStreamWriter* streamWriter, const QString& id);
+    //virtual ~QueryResult();
 
 public:
     void sendData(const StructServerInfo&);
 
 private:
-    Parser* mp_parser;
+    void writeStartQuery();
+    void writeEndQuery();
+
+private:
+    QXmlStreamWriter* mp_streamWriter;
     QString m_id;
     bool    m_sent;
 };

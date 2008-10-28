@@ -24,11 +24,13 @@
 #include <QList>
 #include <QHash>
 #include "parserstructs.h"
+#include "queryget.h"
+#include "queryresult.h"
 
 class QIODevice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
-class QueryGet;
+class XmlNode;
 
 /**
  * TODO: Write some shiny cool doc comment. :)
@@ -89,7 +91,7 @@ public:
     //void eventLeaveGame();
 
 signals:
-    void sigQueryServerInfo();
+    void sigQueryServerInfo(QueryResult);
     //void sigQueryGameList();
     //void sigQueryGameInfo(int gameId);
 
@@ -107,8 +109,9 @@ private slots:
 private:
     void stateStart();
     void stateReady();
-    void stateQueryGet();
-    void stateQueryResult();
+    void stateStanza();
+    
+    void processStanza();
 
     void sendInitialization();
 
@@ -119,12 +122,7 @@ private:
     typedef enum {
         S_Start = 0,
         S_Ready,
-        S_QueryGet,
-        S_QeuryResult,
-        S_QueryError,
-        S_Action,
-        S_Event,
-        S_UnknownStanza,
+        S_Stanza,
         S_Terminated,
         S_Error
     } ReaderState;
@@ -136,6 +134,9 @@ private:
 
     ReaderState       m_readerState;
     int               m_readerDepth;
+    
+    XmlNode*          mp_parsedStanza;
+    XmlNode*          mp_parsedXmlElement;
 
     QHash<QString, QueryGet*> m_getQueries;
     QueryGet*         mp_queryGet;

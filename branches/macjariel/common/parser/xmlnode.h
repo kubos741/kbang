@@ -17,27 +17,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
+#ifndef XMLNODE_H
+#define XMLNODE_H
 
+#include <QObject>
+#include <QPair>
 #include <QString>
-#include <QList>
+#include <QMap>
 
-struct StructServerInfo
+
+class QXmlStreamAttributes;
+class QStringRef;
+
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class XmlNode : public QObject
 {
-    QString name, description;
-};
+Q_OBJECT
+public:
+    XmlNode(XmlNode *parent, const QString& elementName);
+    XmlNode(XmlNode *parent, const QStringRef& elementName, const QXmlStreamAttributes& attributes);
+    
+    XmlNode* createChildNode(const QString& elementName);
+    XmlNode* createChildNode(const QStringRef& elementName, const QXmlStreamAttributes& attributes);
+    void     createAttribute(const QString& name, const QString& value);
+    void     createAttributes(const QXmlStreamAttributes& attributes);
+    
+    void     debugPrint(int indent = 0) const;
+    
+    QString name() const;
+    QString attribute(const QString& name) const;
+    XmlNode* getFirstChild() const;
+    QList<XmlNode*> getChildren() const;
+    
+    
+    virtual XmlNode* parentNode();
+    virtual ~XmlNode();
 
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
+private:
+    const QString           m_elementName;
+    QMap<QString, QString>  m_attributes;
+    QList<XmlNode*>         m_children;
 };
-
-typedef QList<StructGame> StructGameList;
 
 #endif

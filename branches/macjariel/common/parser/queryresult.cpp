@@ -20,15 +20,33 @@
 
 #include "queryresult.h"
 #include "parser.h"
+#include <QXmlStreamWriter>
 
-QueryResult::QueryResult(Parser* parser, const QString& id):
-mp_parser(parser), m_id(id), m_sent(0)
+QueryResult::QueryResult(QXmlStreamWriter* streamWriter, const QString& id):
+mp_streamWriter(streamWriter), m_id(id), m_sent(0)
 {
 }
 
 void QueryResult::sendData(const StructServerInfo& data)
 {
+    writeStartQuery();
+    mp_streamWriter->writeStartElement("serverinfo");
+    mp_streamWriter->writeAttribute("name", data.name);
+    mp_streamWriter->writeAttribute("description", data.description);
+    mp_streamWriter->writeEndElement();
+    writeEndQuery();
+}
 
+void QueryResult::writeStartQuery()
+{
+    mp_streamWriter->writeStartElement("query");
+    mp_streamWriter->writeAttribute("type", "result");
+    mp_streamWriter->writeAttribute("id", m_id);
+}
+
+void QueryResult::writeEndQuery()
+{
+    mp_streamWriter->writeEndElement();
 }
 
 
