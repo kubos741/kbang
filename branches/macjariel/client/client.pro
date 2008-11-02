@@ -35,3 +35,9 @@ QT += network \
 
 RESOURCES += client.qrc
 
+INCLUDEPATH += ../common
+
+LIBS += ../common/libcommon.a
+
+TARGETDEPS += ../common/libcommon.a
+

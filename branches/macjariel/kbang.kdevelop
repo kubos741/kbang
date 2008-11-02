@@ -80,10 +80,7 @@
       <designer>/usr/bin/designer</designer>
       <designerpluginpaths/>
     </qt>
-    <references>
-      <pcs>Gcc</pcs>
-      <pcs>Qt4</pcs>
-    </references>
+    <references/>
     <codecompletion>
       <automaticCodeCompletion>false</automaticCodeCompletion>
       <automaticArgumentsHint>true</automaticArgumentsHint>

@@ -45,7 +45,7 @@ void QueryGet::getGame(int id)
 {
     writeStartQuery();
     mp_streamWriter->writeStartElement("game");
-    mp_streamWriter->writeAttribute("id", QString::number(idm);
+    mp_streamWriter->writeAttribute("id", QString::number(id));
     mp_streamWriter->writeEndElement();
     writeEndQuery();
 }
