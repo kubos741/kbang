@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="table" >
-    <file>images/tablebg.png</file>
-  </qresource>
-  <qresource prefix="icons" >
-    <file>images/icon-connect.svg</file>
-  </qresource>
-</RCC>
