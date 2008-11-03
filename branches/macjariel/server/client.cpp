@@ -20,132 +20,64 @@
 
 #include "client.h"
 #include "gameserver.h"
-#include "player.h"
-#include "clientplayerctrl.h"
-#include "clientcontroller.h"
+#include "game.h"
 
 #include <QTcpSocket>
-#include <QXmlStreamWriter>
 
-
-
-Client::Client(GameServer *parent, int clientId, QTcpSocket *socket)
- : QObject(parent), m_clientId(clientId), m_xmlParser(this, socket),
-   mp_player(0)
+Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
+ QObject(parent), m_id(clientId)
 {
-    mp_clientPlayerCtrl = new ClientPlayerCtrl(this, &m_xmlParser);
-    mp_clientController = new ClientController(this, mp_clientPlayerCtrl);
-    Q_ASSERT(clientId != 0);
-    qDebug("%s:%d: Client #%d connected.", __FILE__, __LINE__, m_clientId);
-    connect(&m_xmlParser, SIGNAL(disconnected()),
+    Q_ASSERT(m_id != 0);
+    mp_parser = new Parser(this, socket);
+    qDebug("%s:%d: Client #%d connected.", __FILE__, __LINE__, m_id);
+    connect(mp_parser, SIGNAL(terminated()),
             this, SLOT(deleteLater()));
+    connect(mp_parser, SIGNAL(sigQueryServerInfo(QueryResult)),
+            parent, SLOT(queryServerInfo(QueryResult)));
+    connect(mp_parser, SIGNAL(sigQueryGame(int, QueryResult)),
+            parent, SLOT(queryGame(int, QueryResult)));
+    connect(mp_parser, SIGNAL(sigQueryGameList(QueryResult)),
+            parent, SLOT(queryGameList(QueryResult)));
+    connect(mp_parser, SIGNAL(sigActionCreateGame(StructGame, StructPlayer)),
+            parent, SLOT(actionCreateGame(StructGame, StructPlayer)));
+    connect(mp_parser, SIGNAL(sigActionJoinGame(int, StructPlayer)),
+            parent, SLOT(actionJoinGame(int, StructPlayer)));
+    connect(mp_parser, SIGNAL(sigActionLeaveGame()),
+            parent, SLOT(actionLeaveGame()));
 }
 
 
 Client::~Client()
 {
-    emit disconnected(m_clientId);
-    delete mp_clientPlayerCtrl;
-    qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_clientId);
+    emit disconnected(m_id);
+    qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_id);
 }
 
-
-
-/*
-bool Client::parseStart()
+int Client::id() const
 {
-    if (!m_xml.isStartElement() || m_xml.name() != "stream")
-    {
-        qDebug("Invalid client. Opening stream tag expected.");
-        disconnectFromHost();
-        return 1;
-    }
-    QXmlStreamAttributes attrs = m_xml.attributes();
-    QStringList version = attrs.value("", "version").toString().split(".");
-    if (version.size() >= 1) m_protocolVersion.first = version[0].toInt();
-    if (version.size() >= 2) m_protocolVersion.second = version[1].toInt();
-    m_clientState = CLIENT_STATE_INIT_RECIEVED;
-    m_parseLevel = 0;
-    sendStart();
-    return 0;
+    return m_id;
 }
 
-void Client::parseEnd()
+void Client::actionCreateGame(StructGame game, StructPlayer player)
 {
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << "</stream>\n";
-    mp_tcpSocket->write(block);
-    disconnectFromHost();
+    /// TODO: test if client is already in game
+    
+    Game* newGame = GameServer::instance().createGame(game);
+    Player* newPlayer = newGame->createNewPlayer(player);
+    
+    
 }
 
-void Client::sendStart()
+void Client::actionJoinGame(int gameId, StructPlayer player)
 {
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << "<stream version=\"1.0\">\n";
-    mp_tcpSocket->write(block);
-
+    /// TODO: join games...
 }
 
-void Client::parseIq()
+void Client::actionLeaveGame()
 {
-    QXmlStreamAttributes attrs = m_xml.attributes();
-    QString id = attrs.value("", "id");
-    QString type = attrs.value("", "type");
-    if (id.isEmpty() || type.isEmpty()) return sendIqError();
+    /// TODO: leave games
 
 }
 
-void Client::sendIqError()
-{
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << "<iq type=\"error\" id="" />\n";
-    mp_tcpSocket->write(block);
-}
-*/
 
-void Client::writeXml(QXmlStreamWriter& xmlOut)
-{
-    xmlOut.writeStartElement("client");
-    xmlOut.writeAttribute("id", QString::number(m_clientId));
-    xmlOut.writeAttribute("name", m_clientName);
-    xmlOut.writeEndElement();
-}
-
-ClientController* Client::clientController() const
-{
-    return mp_clientController;
-}
-
-AbstractPlayerCtrl* Client::playerController() const
-{
-    return mp_clientPlayerCtrl;
-}
-
-bool Client::isInGame() const
-{
-    return mp_clientPlayerCtrl->isAttached();
-}
-
-void Client::setPlayer(Player* player)
-{
-    mp_player = player;
-}
-
-Player* Client::player()
-{
-    return mp_player;
-}
-
-void Client::postEventToController(QEvent* event)
-{
-    QCoreApplication::postEvent(mp_clientPlayerCtrl, event);
-}
-
-int Client::gameId() const
-{
-    return mp_clientController->gameId();
-}
 

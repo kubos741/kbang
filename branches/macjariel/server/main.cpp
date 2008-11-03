@@ -24,6 +24,7 @@
 #include "common.h"
 #include <QCoreApplication>
 
+#include "parser/parserstructs.h"
 
 
 int main(int argc, char* argv[])
@@ -33,7 +34,13 @@ int main(int argc, char* argv[])
     QObject::connect(&server, SIGNAL(aboutToQuit()),
                      &app, SLOT(quit()));
     server.listen();
-    server.createGame("Testovaci hra", "Popis testovaci hry", 0, 5, 7, 99, QString(), QString(), 0);
+    StructGame x;
+    x.name = "Testovaci hra";
+    x.description = "Popis testovaci hry";
+    x.maxPlayers = 5;
+    x.maxSpectators = 10;
+    server.createGame(x);
+    server.createGame(x);
     Console* console = new Console(&server, stdin, stdout);
     QObject::connect(&server, SIGNAL(aboutToQuit()),
                      console, SLOT(terminate()));

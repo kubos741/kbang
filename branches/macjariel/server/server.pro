@@ -12,20 +12,14 @@ weaponcard.h \
  consolecommand.h \
  client.h \
  tcpserver.h \
- clientxmlparser.h \
- stanza.h \
  common.h \
- stanzaquery.h \
  config.h \
- stanzaaction.h \
  publicgameview.h \
- clientplayerctrl.h \
  playerctrlevents.h \
  publicplayerview.h \
  privateplayerview.h \
  playercontrollerrunner.h \
- playeractions.h \
- clientcontroller.h
+ playeractions.h
 SOURCES += main.cpp \
 gamearbiter.cpp \
 charactercard.cpp \
@@ -39,21 +33,15 @@ playingcard.cpp \
  consolecommand.cpp \
  client.cpp \
  tcpserver.cpp \
- clientxmlparser.cpp \
- stanza.cpp \
- stanzaquery.cpp \
  config.cpp \
- stanzaaction.cpp \
  common.cpp \
  publicgameview.cpp \
- clientplayerctrl.cpp \
  abstractplayerctrl.cpp \
  playerctrlevents.cpp \
  publicplayerview.cpp \
  privateplayerview.cpp \
  playercontrollerrunner.cpp \
- playeractions.cpp \
- clientcontroller.cpp
+ playeractions.cpp
 TEMPLATE = app
 
 CONFIG -= release
@@ -62,3 +50,9 @@ CONFIG += debug
 
 QT += xml \
 network
+INCLUDEPATH += ../common
+
+LIBS += ../common/libcommon.a
+
+TARGETDEPS += ../common/libcommon.a
+

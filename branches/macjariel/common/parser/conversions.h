@@ -17,41 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "clientcontroller.h"
-#include "clientplayerctrl.h"
-#include "client.h"
 
-ClientController::ClientController(Client* client, ClientPlayerCtrl* clientPlayerController):
-        QObject(client), mp_client(client), mp_clientPlayerController(clientPlayerController)
-{
-//    connect(this, SIGNAL(actionLeaveGame()), clientPlayerController, SLOT(actionLeaveGame()),Qt::QueuedConnection);
-}
+#ifndef CONVERSIONS_H
+#define CONVERSIONS_H
 
-void ClientController::leaveGame()
-{
-    qDebug() << "ClientController::leaveGame()"  << QThread::currentThread();
-//    mp_clientPlayerController->actionLeaveGame();
-    emit actionLeaveGame();
-}
+#include "parser/parserstructs.h"
+#include "parser/xmlnode.h"
 
-ClientController::~ ClientController()
-{
-}
-
-void ClientController::test()
-{
-    qDebug() << "Number: " << (int)receivers(SIGNAL(actionLeaveGame()));
-}
+StructGame getGameFromXml(XmlNode*);
+StructPlayer getPlayerFromXml(XmlNode*);
 
 
 
-
-int ClientController::gameId() const
-{
-    return mp_clientPlayerController->gameId();
-}
-
-void ClientController::sendMessage(const QString& message)
-{
-    emit actionSendMessage(message);
-}
+#endif

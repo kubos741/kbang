@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "gamearbiter.h"
 #include "publicgameview.h"
+#include "parser/parserstructs.h"
 
 
 class Client;
@@ -56,31 +57,10 @@ public:
      * Creates an instance of Game. The GameServer class is responsible
      * for creating instances of Game.
      * @param parent parent of the Game is a GameServer
-     * @param gameId id of the game - the GameServer class is responsible to set it unique
-     * @param name name of the game
-     * @param description description of the game
-     * @param creatorId id of client that creates the game (if the game is created by server, use special value 0)
-     * @param minPlayers minimal count of players
-     * @param maxPlayers maximal count of players
-     * @param maxObservers maximal count of observers
-     * @param playerPassword playerPassword (null string means no password)
-     * @param observerPassword observerPassword (null string means no password)
-     * @param shufflePlayers shuffle-players feature
      * @see GameServer::createGame()
      */
-    Game(GameServer* parent,
-              int gameId,
-              const QString& name,
-              const QString& description,
-              int creatorId,
-              int minPlayers,
-              int maxPlayers,
-              int maxObservers,
-              // TODO: implement rulesets
-              const QString& playerPassword,
-              const QString& observerPassword,
-              bool shufflePlayers);
-
+    Game(GameServer* parent, const StructGame&);
+    
     /**
      * Destroys the Game instance.
      */
@@ -198,7 +178,7 @@ public:
         return (password == m_playerPassword || password == m_observerPassword);
     }
 
-    /**
+    /** DEPRECATED
      * Writes information about this game (the game tag) to
      * XmlStreamWriter. A verbosity can be specified. The default
      * value is 0.
@@ -206,12 +186,13 @@ public:
      */
     void writeXml(QXmlStreamWriter& xmlOut, int level = 0);
 
+    StructGame structGame() const;
 
     /**
      * Creates a new player, enters it into the list of players and
      * returns a pointer to it.
      */
-    Player* createNewPlayer(const QString& name, const QString& password);
+    Player* createNewPlayer(StructPlayer player);
 
     QList<Player*> playerList();
 

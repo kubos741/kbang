@@ -17,51 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef STANZAACTION_H
-#define STANZAACTION_H
 
-#include <QHash>
-#include <QMap>
-#include <stanza.h>
 
-/**
- * The StanzaAction class represents the action stanzas recieved from client.
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class StanzaAction : public Stanza
+#include "parser/conversions.h"
+
+StructGame getGameFromXml(XmlNode* node)
 {
-friend class Stanza;
-private:
-    typedef void (StanzaAction::*ExecuteMethod)(QXmlStreamWriter&);
+    StructGame x;
+    //if (node->name() == "game")
+    //{
+        x.id = node->attribute("id").toInt();
+        x.creatorId = node->attribute("creatorId").toInt();
+        x.name = node->attribute("name");
+        x.description = node->attribute("description");
+        x.minPlayers = node->attribute("minPlayers").toInt();
+        x.maxPlayers = node->attribute("maxPlayers").toInt();
+        x.maxSpectators = node->attribute("maxSpectators").toInt();
+        x.playerPassword = node->attribute("playerPassword");
+        x.spectatorPassword = node->attribute("spectatorPassword");
+        x.hasPlayerPassword = (node->attribute("hasPlayerPassword") == "1");
+        x.hasSpectatorPassword = (node->attribute("hasSpectatorPassword") == "1");
+        x.flagShufflePlayers = (node->attribute("flagShufflePlayers") == "1");
+    //}
+    return x;
+}
 
-protected:
-    StanzaAction(const QXmlStreamReader& xmlIn);
-
-public:
-    virtual void processToken(const QXmlStreamReader& xmlIn);
-    virtual void execute(QXmlStreamWriter& xmlOut);
-    virtual ~StanzaAction();
-
-private:
-    static void initializeMethods();
-    void writeErrorElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaStartElement(QXmlStreamWriter& xmlOut);
-    //    void writeStanzaEndElement(QXmlStreamWriter& xmlOut);
-
-private:
-    void createGame(QXmlStreamWriter& xmlOut);
-    void joinGame(QXmlStreamWriter& xmlOut);
-    void leaveGame(QXmlStreamWriter& xmlOut);
-    void chatMessage(QXmlStreamWriter& xmlOut);
-
-
-private:
-    static QHash<QString, ExecuteMethod> sm_methods;
-    static bool sm_initialized;
-
-    QString              m_elementName;
-    QXmlStreamAttributes m_attributes;
-    QMap<QString, QXmlStreamAttributes> m_optElements;
-};
-
-#endif
+StructPlayer getPlayerFromXml(XmlNode* node)
+{
+    StructPlayer x;
+    x.id = node->attribute("id").toInt();
+    x.name = node->attribute("name");
+    x.password = node->attribute("password");
+    return x;
+}

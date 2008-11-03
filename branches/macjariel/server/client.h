@@ -20,7 +20,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "clientxmlparser.h"
+#include "parser/parser.h"
 
 #include "player.h"
 
@@ -31,10 +31,6 @@
 
 class GameServer;
 class QTcpSocket;
-class QXmlStreamWriter;
-class AbstractPlayerCtrl;
-class ClientPlayerCtrl;
-class ClientController;
 
 
 /**
@@ -49,47 +45,20 @@ public:
     Client(GameServer* parent, int clientId, QTcpSocket* socket);
     virtual ~Client();
 
-    friend class Player;
-
-    inline int id() const
-    {
-        return m_clientId;
-    }
-    Player* player();
-    ClientController* clientController() const;
-    AbstractPlayerCtrl* playerController() const;
-    void setPlayer(Player* player);
-    void postEventToController(QEvent* event);
-
+    inline int id() const;
+    
 signals:
     void disconnected(int clientId);
 
+
+public slots: // These slots are connected to parser
+    void actionCreateGame(StructGame game, StructPlayer player);
+    void actionJoinGame(int gameId, StructPlayer player);
+    void actionLeaveGame();
+
 private:
-
-    const int           m_clientId;
-    ClientXmlParser     m_xmlParser;
-    ClientController*   mp_clientController;
-    QString             m_clientName;
-    QPair<int,int>      m_protocolVersion;
-    ClientPlayerCtrl*   mp_clientPlayerCtrl;
-    Player*             mp_player;
-
-    // STATE REPRESENTATION:
-    // m_gameId =  0 => client is not connected to a game
-    // m_gameId != 0 => client is connected to the game
-    //    int m_gameId;
-
-public:
-    bool isInGame() const;
-    int  gameId() const;
-
-
-
-public:
-    /**
-     * Writes the xml output about this client.
-     */
-    void writeXml(QXmlStreamWriter&);
+    const int           m_id;
+    Parser*             mp_parser;
 };
 
 #endif

@@ -22,7 +22,9 @@
 #include "queryget.h"
 #include "parser.h"
 #include "xmlnode.h"
+#include "conversions.h"
 #include <QtXml>
+
 
 QueryGet::QueryGet(Parser* parser, QXmlStreamWriter* streamWriter, const QString& id):
 QObject(parser), mp_streamWriter(streamWriter), m_id(id)
@@ -95,27 +97,6 @@ void QueryGet::parseResult(XmlNode* node)
         StructGame x = getGameFromXml(node);
         emit result(x);
     }
-}
-
-StructGame QueryGet::getGameFromXml(XmlNode* node)
-{
-    StructGame x;
-    if (node->name() == "game")
-    {
-        x.id = node->attribute("id").toInt();
-        x.creatorId = node->attribute("creatorId").toInt();
-        x.name = node->attribute("name");
-        x.description = node->attribute("description");
-        x.minPlayers = node->attribute("minPlayers").toInt();
-        x.maxPlayers = node->attribute("maxPlayers").toInt();
-        x.maxSpectators = node->attribute("maxSpectators").toInt();
-        x.playerPassword = node->attribute("playerPassword");
-        x.spectatorPassword = node->attribute("spectatorPassword");
-        x.hasPlayerPassword = (node->attribute("hasPlayerPassword") == "1");
-        x.hasSpectatorPassword = (node->attribute("hasSpectatorPassword") == "1");
-        x.flagShufflePlayers = (node->attribute("flagShufflePlayers") == "1");
-    }
-    return x;
 }
 
 

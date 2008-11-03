@@ -41,7 +41,7 @@ private:
 
     void parseResult(XmlNode*);
     
-    StructGame getGameFromXml(XmlNode*);
+    
 
 public:
     void getServerInfo();

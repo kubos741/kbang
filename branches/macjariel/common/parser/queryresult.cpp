@@ -49,4 +49,32 @@ void QueryResult::writeEndQuery()
     mp_streamWriter->writeEndElement();
 }
 
+void QueryResult::sendData(const StructGame& game)
+{
+    writeStartQuery();
+    writeGame(game);
+    writeEndQuery();
+}
+
+void QueryResult::sendData(const StructGameList& gamelist)
+{
+    writeStartQuery();
+    mp_streamWriter->writeStartElement("gamelist");
+    foreach(const StructGame& i, gamelist)
+    {
+        writeGame(i);
+    }
+    mp_streamWriter->writeEndElement();
+    writeEndQuery();
+}
+
+void QueryResult::writeGame(const StructGame& game)
+{
+    mp_streamWriter->writeStartElement("game");
+    mp_streamWriter->writeAttribute("id", QString::number(game.id));
+    mp_streamWriter->writeEndElement();
+
+}
+
+
 

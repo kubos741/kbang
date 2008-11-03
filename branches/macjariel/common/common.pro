@@ -1,7 +1,6 @@
-TEMPLATE     = lib
-CONFIG      += staticlib
-QT          += xml 
-INCLUDEPATH += testparser
+TEMPLATE = lib
+CONFIG += staticlib
+QT += xml 
 
 ##########
 # PARSER #
@@ -23,8 +22,10 @@ SOURCES += parser/parser.cpp \
 # MISC #
 ########
 
-HEADERS += util.h
+HEADERS += util.h \
+ parser/conversions.h
 
-SOURCES += util.cpp
+SOURCES += util.cpp \
+ parser/conversions.cpp
 
 

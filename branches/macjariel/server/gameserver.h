@@ -21,6 +21,8 @@
 #define GAMESERVER_H
 
 #include <QtCore>
+#include "parser/parser.h"
+#include "parser/parserstructs.h"
 
 class Game;
 class Client;
@@ -56,15 +58,7 @@ public:
      * @returns pointer to newly created Game
      * @see Game constructor
      */
-    Game* createGame(const QString& name,
-                          const QString& description,
-                          int creatorId,
-                          int minPlayers,
-                          int maxPlayers,
-                          int maxObservers,
-                          const QString& playerPassword,
-                          const QString& observerPassword,
-                          bool shufflePlayers);
+    Game* createGame(StructGame);
 
 
     /**
@@ -118,12 +112,7 @@ public:
         return m_description;
     }
 
-    /**
-     * Writes the information about the server to
-     * given QXmlStreamWriter.
-     */
-    void writeXml(QXmlStreamWriter& xmlOut);
-
+    
     /**
      * Tells the GameServer to listen for incoming connections.
      * @returns false in case of error, otherwise true
@@ -141,6 +130,10 @@ signals:
 public slots:
     void createClient();
     void deleteClient(int clientId);
+    void queryServerInfo(QueryResult result);
+    void queryGame(int gameId, QueryResult result);
+    void queryGameList(QueryResult result);
+   
 
 private:
     static GameServer*       sm_instance;

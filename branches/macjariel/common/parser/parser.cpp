@@ -23,6 +23,7 @@
 #include "queryget.h"
 #include "util.h"
 #include "xmlnode.h"
+#include "conversions.h"
 
 #include <QtDebug>
 
@@ -114,7 +115,7 @@ void Parser::readData()
         case S_Stanza:
             stateStanza();
             break;
-        case S_Terminated: // TODO
+        case S_Terminated:
             break;
         case S_Error: // TODO
             break;
@@ -151,6 +152,7 @@ void Parser::stateReady()
     if (mp_streamReader->isEndElement())
     {
         m_readerState = S_Terminated;
+        sendTermination();
         return;
     }
     if (!mp_streamReader->isStartElement())
@@ -195,9 +197,21 @@ void Parser::processStanza()
         if (mp_parsedStanza->attribute("type") == "get")
         {
             XmlNode* query = mp_parsedStanza->getFirstChild();
+            if (!query) return;
             if (query->name() == "serverinfo")
             {
                 emit sigQueryServerInfo(QueryResult(mp_streamWriter, id));
+                return;
+            }
+            if (query->name() == "game")
+            {
+                int gameId = query->attribute("id").toInt();
+                emit sigQueryGame(gameId, QueryResult(mp_streamWriter, id));
+                return;
+            }
+            if (query->name() == "gamelist")
+            {
+                emit sigQueryGameList(QueryResult(mp_streamWriter, id));
                 return;
             }
         }
@@ -213,6 +227,34 @@ void Parser::processStanza()
     
     
     }
+    if (mp_parsedStanza->name() == "action")
+    {
+        XmlNode* action = mp_parsedStanza->getFirstChild();
+        if (!action) return;
+        if (action->name() == "create-game")
+        {
+            XmlNode* player = action->getFirstChild();
+            if (!player) return;
+            StructGame game = getGameFromXml(action);
+            StructPlayer p = getPlayerFromXml(player);
+            emit sigActionCreateGame(game, p);
+            return;
+        }
+        if (action->name() == "join-game")
+        {
+            int gameId = action->attribute("id").toInt();
+            XmlNode* player = action->getFirstChild();
+            if (!player) return;
+            StructPlayer p = getPlayerFromXml(player);
+            emit sigActionJoinGame(gameId, p);
+            return;
+        }
+        if (action->name() == "leave-game")
+        {
+            emit sigActionLeaveGame();
+            return;
+        }
+    }
 
 }
 
@@ -225,6 +267,15 @@ void Parser::sendInitialization()
     mp_streamWriter->writeCharacters("");
     m_streamInitialized = 1;
 }
+
+void Parser::sendTermination()
+{
+    mp_streamWriter->writeEndElement();
+    mp_streamWriter->writeEndDocument();
+    emit terminated();
+}
+
+
 
 QueryGet* Parser::queryGet()
 {

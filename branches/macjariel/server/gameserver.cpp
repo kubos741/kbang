@@ -40,16 +40,12 @@ GameServer::GameServer():
 }
 
 
-Game* GameServer::createGame(const QString & name, const QString & description, int creatorId,
-                                  int minPlayers, int maxPlayers, int maxObservers,
-                                  const QString & playerPassword, const QString & observerPassword,
-                                  bool shufflePlayers)
+Game* GameServer::createGame(StructGame x)
 {
     while (!m_nextGameId || m_games.contains(m_nextGameId)) m_nextGameId++;
-    int gameId = m_nextGameId++;
-    Game* newGame = new Game(this, gameId, name, description, creatorId, minPlayers, maxPlayers,
-                                       maxObservers, playerPassword, observerPassword, shufflePlayers);
-    m_games[gameId] = newGame;
+    x.id = m_nextGameId++;
+    Game* newGame = new Game(this, x);
+    m_games[x.id] = newGame;
     return newGame;
 }
 
@@ -104,17 +100,34 @@ void GameServer::deleteClient(int clientId)
     m_clients.remove(clientId);
 }
 
-void GameServer::writeXml(QXmlStreamWriter & xmlOut)
+void GameServer::queryServerInfo(QueryResult result)
 {
-    xmlOut.writeStartElement("serverinfo");
-    xmlOut.writeAttribute("name", m_name);
-    xmlOut.writeAttribute("description", m_description);
-    xmlOut.writeEndElement();
+    StructServerInfo x;
+    x.name = m_name;
+    x.description = m_description;
+    result.sendData(x);
 }
 
+void GameServer::queryGame(int gameId, QueryResult result)
+{
+    if (m_games.contains(gameId))
+    {
+        result.sendData(m_games[gameId]->structGame());
+    }
+    else
+    {
+        //TODO: send error
+    }
+}
 
-
-
-
+void GameServer::queryGameList(QueryResult result)
+{
+    StructGameList x;
+    foreach(const Game* game, m_games.values())
+    {
+        x.append(game->structGame());
+    }
+    result.sendData(x);
+}
 
 

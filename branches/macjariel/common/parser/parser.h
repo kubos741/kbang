@@ -53,6 +53,7 @@ public slots:
 
 signals:
     void streamInitialized();
+    void terminated();
 
 
 public slots:
@@ -92,11 +93,14 @@ public:
 
 signals:
     void sigQueryServerInfo(QueryResult);
+    void sigQueryGameList(QueryResult);
+    void sigQueryGame(int gameId, QueryResult);
     //void sigQueryGameList();
     //void sigQueryGameInfo(int gameId);
 
-    //void sigActionJoinGame(int gameId);
-    //void sigActionLeaveGame();
+    void sigActionCreateGame(StructGame game, StructPlayer player);
+    void sigActionJoinGame(int gameId, StructPlayer player);
+    void sigActionLeaveGame();
 
 
 public:
@@ -114,7 +118,7 @@ private:
     void processStanza();
 
     void sendInitialization();
-
+    void sendTermination();
 
 
 

@@ -40,4 +40,16 @@ struct StructGame
 
 typedef QList<StructGame> StructGameList;
 
+struct StructClient
+{
+    int id;
+    QString name;
+};
+
+struct StructPlayer
+{
+    int id;
+    QString name, password;
+};
+
 #endif

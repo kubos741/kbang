@@ -35,10 +35,13 @@ public:
 
 public:
     void sendData(const StructServerInfo&);
-
+    void sendData(const StructGameList&);
+    void sendData(const StructGame&);
+    
 private:
     void writeStartQuery();
     void writeEndQuery();
+    void writeGame(const StructGame&);
 
 private:
     QXmlStreamWriter* mp_streamWriter;

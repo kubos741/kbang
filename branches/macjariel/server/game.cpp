@@ -28,32 +28,26 @@
 
 
 
-Game::Game(GameServer* parent, int gameId, const QString& name, const QString& description,
-                     int creatorId, int minPlayers, int maxPlayers, int maxObservers,
-                     const QString& playerPassword, const QString& observerPassword,
-                     bool shufflePlayers):
+Game::Game(GameServer* parent, const StructGame& g):
 QObject(parent),
-m_gameId(gameId),
-m_name(name),
-m_description(description),
-m_creatorId(creatorId),
-m_minPlayers(minPlayers),
-m_maxPlayers(maxPlayers),
-m_maxObservers(maxObservers),
-m_playerPassword(playerPassword),
-m_observerPassword(observerPassword),
-m_shufflePlayers(shufflePlayers),
+m_gameId(g.id),
+m_name(g.name),
+m_description(g.description),
+m_creatorId(g.creatorId),
+m_minPlayers(g.minPlayers),
+m_maxPlayers(g.maxPlayers),
+m_maxObservers(g.maxSpectators),
+m_playerPassword(g.playerPassword),
+m_observerPassword(g.spectatorPassword),
+m_shufflePlayers(g.flagShufflePlayers),
 m_nextPlayerId(0),
 m_gameState(WaitingForPlayers),
 m_publicGameView(this)
+
 {
     Q_ASSERT(!m_name.isEmpty());
-    Q_ASSERT(minPlayers <= maxPlayers);
+    Q_ASSERT(m_minPlayers <= m_maxPlayers);
     Q_ASSERT(m_observerPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
-    //    m_adminPassword = randomToken(10, 16);
-
-
-
 }
 
 void Game::writeXml(QXmlStreamWriter& xmlOut, int level)
@@ -90,13 +84,13 @@ Game::~Game()
 }
 
 
-Player* Game::createNewPlayer(const QString& name, const QString& password)
+Player* Game::createNewPlayer(StructPlayer player)
 {
     while (!m_nextPlayerId || m_players.contains(m_nextPlayerId))
     {
         m_nextPlayerId++;
     }
-    Player* newPlayer = new Player(m_nextPlayerId, name, password, this);
+    Player* newPlayer = new Player(m_nextPlayerId, player.name, player.password, this);
     m_players[m_nextPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     return newPlayer;
@@ -114,3 +108,22 @@ void Game::postMessage(Player* player, const QString& message)
 {
     emit chatMessage(player->id(), player->name(), message);
 }
+
+StructGame Game::structGame() const
+{
+    StructGame r;
+    r.id = m_gameId;
+    r.creatorId = m_creatorId;
+    r.name = m_name;
+    r.description = m_description;
+    r.minPlayers = m_minPlayers;
+    r.maxPlayers = m_maxPlayers;
+    r.maxSpectators = m_maxObservers;
+    r.playerPassword = m_playerPassword;
+    r.spectatorPassword = m_observerPassword;
+    r.hasPlayerPassword = (!m_playerPassword.isNull());
+    r.hasSpectatorPassword = (!m_observerPassword.isNull());
+    r.flagShufflePlayers = m_shufflePlayers;
+    return r;
+}
+
