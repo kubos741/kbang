@@ -1,6 +1,12 @@
 #summary This page is used for project briefings. It's written in czech.
 
-= 27. 10. 2008 =
+= 3. 11. 2008 =
+== Cíle ==
+ * spustitelný server - odjoinování her
+ * chat
+ * stav serveru stejny, jako v trunku
+
+= 27. 10. 2008 (OK) =
 == Cíle ==
  * reorganizace zdrojových souborů (images)
  * dodělání obecného obousměrného parseru pro síťovou komunikaci
