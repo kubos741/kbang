@@ -21,7 +21,6 @@
 #define GAME_H
 
 #include <QtCore>
-#include "gamearbiter.h"
 #include "publicgameview.h"
 #include "parser/parserstructs.h"
 
@@ -33,12 +32,8 @@ class Game;
 class QXmlStreamWriter;
 
 /**
- * The Game class is the major class that control a bang game. Every bang game running
- * on the server has just one instance of this class. This class stores all global information
- * about the game and thus must not be accessible to player controllers, because they could
- * cheat.
- * The bang game is created by a client (creator) by sending the specified stanza. The only
- * place in code, where new Game objects should be created is in the GameServer class.
+ * The Game class represents a bang game. It handles creating and destroying players and generates
+ * signals about global events in game.
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
 class Game: public QObject
@@ -178,24 +173,22 @@ public:
         return (password == m_playerPassword || password == m_observerPassword);
     }
 
-    /** DEPRECATED
-     * Writes information about this game (the game tag) to
-     * XmlStreamWriter. A verbosity can be specified. The default
-     * value is 0.
-     * @param xmlOut QXmlStreamWriter to write into
-     */
-    void writeXml(QXmlStreamWriter& xmlOut, int level = 0);
-
     StructGame structGame() const;
+    StructPlayerList structPlayerList() const;
 
     /**
      * Creates a new player, enters it into the list of players and
-     * returns a pointer to it.
+     * returns a pointer to it. This method can be called only in the initialization state.
      */
     Player* createNewPlayer(StructPlayer player);
+    void removePlayer(int playerId);
 
     QList<Player*> playerList();
 
+    /**
+     * If the game is in the 'waiting for players' state, it is started.
+     */
+    void startGame();
 
     const PublicGameView* publicGameView() const
     {
@@ -203,7 +196,17 @@ public:
     }
 
 
-    void postMessage(Player* player, const QString& message);
+    void sendMessage(Player* player, const QString& message);
+
+/// Signals to player controllers
+signals:
+    void playerJoinedGame(int gameId, const StructPlayer&);
+    void playerLeavedGame(int playerId);
+    void incomingMessage(int senderId, const QString& senderName, const QString& message);
+    void chatMessage(int senderId, const QString& senderName, const QString& message);
+    
+
+
 
 private:
     QMap<int, Player*>   m_players;     // look-up player
@@ -225,7 +228,7 @@ private:
     const PublicGameView m_publicGameView;
     
 signals:
-    void chatMessage(int senderId, const QString& senderName, const QString& message);
+    
 
 };
 

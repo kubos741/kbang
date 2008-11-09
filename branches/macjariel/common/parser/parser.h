@@ -83,8 +83,11 @@ signals:
     //////////////
     /// SERVER ///
     //////////////
-public:
-    void resultServerInfo(const StructServerInfo&);
+public slots:
+    void eventJoinGame(int gameId, const StructPlayer&, bool other = 1);
+    void eventLeaveGame(int playerId, bool other = 1);
+    void eventMessage(int senderId, const QString& senderName, const QString& message);
+    //void resultServerInfo(const StructServerInfo&);
     //void resultGameList(const StructGameList&);
     //void resultGameInfo(const StructGame&);
 
@@ -101,6 +104,8 @@ signals:
     void sigActionCreateGame(StructGame game, StructPlayer player);
     void sigActionJoinGame(int gameId, StructPlayer player);
     void sigActionLeaveGame();
+    void sigActionStartGame();
+    void sigActionMessage(const QString& message);
 
 
 public:
@@ -119,7 +124,11 @@ private:
 
     void sendInitialization();
     void sendTermination();
+    
+    void eventStart();
+    void eventEnd();
 
+    void streamError();
 
 
 private:

@@ -52,4 +52,6 @@ struct StructPlayer
     QString name, password;
 };
 
+typedef QList<StructPlayer> StructPlayerList;
+
 #endif

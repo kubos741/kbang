@@ -55,10 +55,21 @@ public slots: // These slots are connected to parser
     void actionCreateGame(StructGame game, StructPlayer player);
     void actionJoinGame(int gameId, StructPlayer player);
     void actionLeaveGame();
+    
+public slots: // These slots are connected to player/game
+    void leavingGame(int playerId);
+
+private:
+    void joinGame(Game*, const StructPlayer&);
 
 private:
     const int           m_id;
     Parser*             mp_parser;
+    Player*             mp_player;
+
+    void connectPlayer();
+    void disconnectPlayer();
+
 };
 
 #endif

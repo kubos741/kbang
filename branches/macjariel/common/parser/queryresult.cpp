@@ -56,6 +56,14 @@ void QueryResult::sendData(const StructGame& game)
     writeEndQuery();
 }
 
+void QueryResult::sendData(const StructGame& game, const StructPlayerList& playerList)
+{
+    writeStartQuery();
+    writeGame(game, &playerList);
+    writeEndQuery();
+}
+
+
 void QueryResult::sendData(const StructGameList& gamelist)
 {
     writeStartQuery();
@@ -68,13 +76,33 @@ void QueryResult::sendData(const StructGameList& gamelist)
     writeEndQuery();
 }
 
-void QueryResult::writeGame(const StructGame& game)
+
+void QueryResult::writeGame(const StructGame& game, const StructPlayerList* playerlist)
 {
     mp_streamWriter->writeStartElement("game");
     mp_streamWriter->writeAttribute("id", QString::number(game.id));
+    mp_streamWriter->writeAttribute("name", game.name);
+    mp_streamWriter->writeAttribute("minPlayers", QString::number(game.minPlayers));
+    mp_streamWriter->writeAttribute("maxPlayers", QString::number(game.maxPlayers));
+    mp_streamWriter->writeAttribute("maxSpectators", QString::number(game.maxSpectators));
+    mp_streamWriter->writeAttribute("hasPlayerPassword", game.hasPlayerPassword ? "1" : "0");
+    mp_streamWriter->writeAttribute("hasSpectatorPassword", game.hasPlayerPassword ? "1" : "0");
+    mp_streamWriter->writeAttribute("flagShufflePlayers", game.flagShufflePlayers ? "1" : "0");
+    if (playerlist)
+    {
+        mp_streamWriter->writeStartElement("players");
+        foreach(const StructPlayer& i, *playerlist)
+        {
+            mp_streamWriter->writeStartElement("player");
+            mp_streamWriter->writeAttribute("id", QString::number(i.id));
+            mp_streamWriter->writeAttribute("name", i.name);
+            mp_streamWriter->writeEndElement();
+        }
+        mp_streamWriter->writeEndElement();
+    }
     mp_streamWriter->writeEndElement();
-
 }
+
 
 
 

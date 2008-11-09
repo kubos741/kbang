@@ -25,17 +25,10 @@
 Player::Player(int id, const QString& name, const QString& password, Game* game):
 QObject(game),
 m_id(id),
-//m_controller(0),
 m_name(name),
 m_password(password),
-mp_game(game),
-m_runner(this),
-m_publicPlayerView(this),
-m_privatePlayerView(this),
-m_playerActions(this)
+mp_game(game)
 {
-    connect(game, SIGNAL(chatMessage(int, const QString&, const QString&)),
-            this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     //    mp_client->mp_player = this;
     //    m_id = mp_game->appendNewPlayer(this);
 }
@@ -46,45 +39,43 @@ Player::~Player()
 
 }
 
-
-void Player::attachPlayerController(AbstractPlayerCtrl* controller)
+const int Player::id() const
 {
-    m_runner.attachPlayerController(controller);
-    m_runner.start();
+    return m_id;
 }
 
-void Player::detachPlayerController()
+QString Player::name() const
 {
-    m_runner.detachPlayerController();
+    return m_name;
 }
 
-
-/*
-Player* Player::construct(const QString&      name,
-                          const QString&      password,
-                          Client*             client,
-                          Game*          game)
+void Player::startGame()
 {
-    player = new Player(game, name, password, client);
-    Q_ASSERT(player);
-
-}
-*/
-
-void Player::postEventToController(QEvent* event)
-{
-    qDebug() << "Trying to post event to m_runner";
-    m_runner.postEventToController(event);
-    qDebug() << "Done here";
-
+    if (mp_game->creatorId() != m_id) return; // TODO: error to client
+    mp_game->startGame();
 }
 
-
-void Player::writeXml(QXmlStreamWriter& xmlOut) 
+void Player::leaveGame()
 {
-    xmlOut.writeStartElement("player");
-    xmlOut.writeAttribute("id", QString::number(m_id));
-    xmlOut.writeAttribute("name", m_name);
-    xmlOut.writeEndElement();
-
+    mp_game->removePlayer(m_id);
 }
+
+void Player::sendMessage(const QString& message)
+{
+    mp_game->sendMessage(this, message);
+}
+
+StructPlayer Player::structPlayer()
+{
+    StructPlayer x;
+    x.id = m_id;
+    x.name = m_name;
+    x.password = m_password;
+    return x;
+}
+
+Game* Player::game() const
+{
+    return mp_game;
+}
+

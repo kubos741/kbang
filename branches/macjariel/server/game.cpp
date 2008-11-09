@@ -50,34 +50,6 @@ m_publicGameView(this)
     Q_ASSERT(m_observerPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
 }
 
-void Game::writeXml(QXmlStreamWriter& xmlOut, int level)
-{
-    xmlOut.writeStartElement("game");
-    xmlOut.writeAttribute("id", QString::number(m_gameId));
-    xmlOut.writeAttribute("name", m_name);
-    xmlOut.writeAttribute("description", m_description);
-    xmlOut.writeAttribute("creatorId", QString::number(m_creatorId));
-    xmlOut.writeAttribute("minPlayers", QString::number(m_minPlayers));
-    xmlOut.writeAttribute("maxPlayers", QString::number(m_maxPlayers));
-    xmlOut.writeAttribute("maxObservers", QString::number(m_maxObservers));
-    xmlOut.writeAttribute("playerPassword", QString::number(hasPlayerPassword()));
-    xmlOut.writeAttribute("observerPassword", QString::number(hasObserverPassword()));
-    xmlOut.writeAttribute("shufflePlayers", QString::number(hasShufflePlayers()));
-    if (level > 0)
-    {
-        xmlOut.writeStartElement("players");
-        foreach(Player* player, m_players.values())
-        {
-            xmlOut.writeStartElement("player");
-            xmlOut.writeAttribute("name", player->name());
-            // TODO: write about client
-            xmlOut.writeEndElement();
-        }
-        xmlOut.writeEndElement();
-    }
-    xmlOut.writeEndElement();
-}
-
 
 Game::~Game()
 {
@@ -86,6 +58,7 @@ Game::~Game()
 
 Player* Game::createNewPlayer(StructPlayer player)
 {
+    if (m_gameState != WaitingForPlayers) return 0;
     while (!m_nextPlayerId || m_players.contains(m_nextPlayerId))
     {
         m_nextPlayerId++;
@@ -93,7 +66,18 @@ Player* Game::createNewPlayer(StructPlayer player)
     Player* newPlayer = new Player(m_nextPlayerId, player.name, player.password, this);
     m_players[m_nextPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
+    emit playerJoinedGame(m_gameId, newPlayer->structPlayer());
     return newPlayer;
+}
+
+void Game::removePlayer(int playerId)
+{
+    Q_ASSERT(m_players.contains(playerId));
+    m_players[playerId]->deleteLater();
+    m_playerList.removeAll(m_players[playerId]);
+    m_players.remove(playerId);
+    emit playerLeavedGame(playerId);
+    // TODO: other states of game
 }
 
 
@@ -104,9 +88,9 @@ QList<Player *> Game::playerList()
     return m_playerList;
 }
 
-void Game::postMessage(Player* player, const QString& message)
+void Game::sendMessage(Player* player, const QString& message)
 {
-    emit chatMessage(player->id(), player->name(), message);
+    emit incomingMessage(player->id(), player->name(), message);
 }
 
 StructGame Game::structGame() const
@@ -126,4 +110,24 @@ StructGame Game::structGame() const
     r.flagShufflePlayers = m_shufflePlayers;
     return r;
 }
+
+
+StructPlayerList Game::structPlayerList() const
+{
+    StructPlayerList r;
+    foreach(Player* i, m_playerList)
+    {
+        r.append(i->structPlayer());
+    }
+    return r;
+}
+
+
+
+void Game::startGame()
+{
+    // TODO: start game
+}
+
+
 

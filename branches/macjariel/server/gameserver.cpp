@@ -112,7 +112,7 @@ void GameServer::queryGame(int gameId, QueryResult result)
 {
     if (m_games.contains(gameId))
     {
-        result.sendData(m_games[gameId]->structGame());
+        result.sendData(m_games[gameId]->structGame(), m_games[gameId]->structPlayerList());
     }
     else
     {

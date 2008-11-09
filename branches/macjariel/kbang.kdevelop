@@ -115,19 +115,23 @@
   </kdevfilecreate>
   <kdevtrollproject>
     <general>
-      <activedir>common/parser/parser.pro</activedir>
+      <activedir>server</activedir>
     </general>
     <run>
       <directoryradio>executable</directoryradio>
       <runarguments>
-        <parser></parser>
+        <parser/>
+        <server></server>
       </runarguments>
       <cwd>
         <parser>/home/macjariel/devel/kbang/branches/macjariel</parser>
+        <server>/home/macjariel/devel/kbang/branches/macjariel</server>
       </cwd>
       <debugarguments>
-        <parser></parser>
+        <parser/>
+        <server></server>
       </debugarguments>
     </run>
+    <subclassing/>
   </kdevtrollproject>
 </kdevelop>

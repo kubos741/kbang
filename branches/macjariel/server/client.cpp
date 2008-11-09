@@ -25,7 +25,7 @@
 #include <QTcpSocket>
 
 Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
- QObject(parent), m_id(clientId)
+ QObject(parent), m_id(clientId), mp_player(0)
 {
     Q_ASSERT(m_id != 0);
     mp_parser = new Parser(this, socket);
@@ -39,11 +39,11 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
     connect(mp_parser, SIGNAL(sigQueryGameList(QueryResult)),
             parent, SLOT(queryGameList(QueryResult)));
     connect(mp_parser, SIGNAL(sigActionCreateGame(StructGame, StructPlayer)),
-            parent, SLOT(actionCreateGame(StructGame, StructPlayer)));
+            this, SLOT(actionCreateGame(StructGame, StructPlayer)));
     connect(mp_parser, SIGNAL(sigActionJoinGame(int, StructPlayer)),
-            parent, SLOT(actionJoinGame(int, StructPlayer)));
+            this, SLOT(actionJoinGame(int, StructPlayer)));
     connect(mp_parser, SIGNAL(sigActionLeaveGame()),
-            parent, SLOT(actionLeaveGame()));
+            this, SLOT(actionLeaveGame()));
 }
 
 
@@ -60,24 +60,71 @@ int Client::id() const
 
 void Client::actionCreateGame(StructGame game, StructPlayer player)
 {
-    /// TODO: test if client is already in game
-    
+    if (mp_player) return; // TODO: error
     Game* newGame = GameServer::instance().createGame(game);
-    Player* newPlayer = newGame->createNewPlayer(player);
-    
-    
+    Q_ASSERT(newGame != 0);
+    joinGame(newGame, player);
 }
 
 void Client::actionJoinGame(int gameId, StructPlayer player)
 {
-    /// TODO: join games...
+    Game* game = GameServer::instance().game(gameId);
+    if (game == 0) return; // TODO: error
+    joinGame(game, player);
 }
+
+void Client::joinGame(Game* game, const StructPlayer& player)
+{
+    mp_player = game->createNewPlayer(player);
+    if (!mp_player) return;  // TODO: error
+    connectPlayer();
+    mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0);
+}
+
 
 void Client::actionLeaveGame()
 {
-    /// TODO: leave games
-
+    disconnectPlayer();
+    int playerId = mp_player->id();
+    mp_player->leaveGame();
+    // TODO: eventLeaveGame shouldn't be posted here, but by game (v pripade ze nas server vykopne, chceme to taky vedet)
+    //mp_parser->eventLeaveGame(playerId, 0);
 }
+
+void Client::connectPlayer()
+{
+    connect(mp_parser, SIGNAL(sigActionStartGame()),
+            mp_player, SLOT(startGame()));
+    connect(mp_parser, SIGNAL(sigActionMessage(const QString&)),
+            mp_player, SLOT(sendMessage(const QString&)));
+    connect(mp_player->game(), SIGNAL(incomingMessage(int, const QString&, const QString&)),
+            mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
+    connect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
+            mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
+    connect(mp_player->game(), SIGNAL(playerLeavedGame(int)),
+            this, SLOT(leavingGame(int)));
+}
+
+void Client::disconnectPlayer()
+{
+    /// Since the player is destroyed later, we don't need to
+    /// manually disconnect signal-slot connections.
+}
+
+void Client::leavingGame(int playerId)
+{
+    Q_ASSERT(mp_player);
+    if (playerId == mp_player->id())
+    {
+        mp_parser->eventLeaveGame(playerId, 0);
+        mp_player = 0;
+    }
+    else
+    {
+        mp_parser->eventLeaveGame(playerId, 1);
+    }
+}
+
 
 
 

@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
     StructGame x;
     x.name = "Testovaci hra";
     x.description = "Popis testovaci hry";
+    x.minPlayers = 1;
     x.maxPlayers = 5;
     x.maxSpectators = 10;
     server.createGame(x);

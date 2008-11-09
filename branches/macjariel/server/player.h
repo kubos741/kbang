@@ -23,22 +23,17 @@
 #include <QtCore>
 
 #include "playingcard.h"
-#include "playercontrollerrunner.h"
 #include "publicplayerview.h"
 #include "privateplayerview.h"
-#include "playeractions.h"
+#include "parser/parserstructs.h"
 
-class AbstractPlayerCtrl;
 class CharacterCard;
 class WeaponCard;
-class Client;
 class Game;
-class QXmlStreamWriter;
 
 /**
  * The Player class represents a kbang player. The instance of this object
- * is created when a client joins a game as a player and it lives as long
- * as the game exists.
+ * is created when a client joins a game and it lives as long as the game exists.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Player : public QObject
@@ -48,109 +43,98 @@ public:
     /**
      * Creates a new instance of Player class. You should always create instances
      * of this class on heap (with the ''new'' operator) because the lifetime of
-     * this objects is managed inside. After creation of the object, the given client
-     * and game are modified.
+     * this objects is managed inside.
      */
     Player(int id, const QString& name, const QString& password, Game* game);
     ~Player();
 
 public:
 
+    /// Getters
+
+    /**
+     * Returns the game id.
+     */
+    const int id() const;
+
+    /**
+     * Returns the name of the game.
+     */
+    QString name() const;
+
+    /**
+     * Returns the pointer to the game, which the player
+     * belongs to.
+     */
+    Game* game() const;
+
     /**
      * Returns number of life-points.
      */
-    inline int lifePoints() const
-    {
-        return m_lifePoints;
-    }
-
+    //int lifePoints() const;
+    
     /**
      * Returns the players' character.
      */
-    inline const CharacterCard& getCharacterCard() const
-    {
-        return *m_characterCard;
-    }
-
+    //const CharacterCard& getCharacterCard() const;
 
     /**
      * Returns the number of cards in player's hand.
      */
-    inline int getCardsInHandCount() const
-    {
-        return m_cardsInHand.size();
-    }
+    //int getCardsInHandCount() const
 
-    inline QString name() const
-    {
-        return m_name;
-    }
-
-    const PublicPlayerView* publicPlayerView() const
-    {
-        return &m_publicPlayerView;
-    }
-
-    const PrivatePlayerView* privatePlayerView() const
-    {
-        return &m_privatePlayerView;
-    }
-
-    const PlayerActions* playerActions() const
-    {
-        return &m_playerActions;
-    }
-    
-    const PlayerControllerRunner* playerControllerRunner()
-    {
-        return &m_runner;
-    }
-
-    Game* game() const
-    {
-        return mp_game;
-    }
-
-    const int id() const
-    {
-        return m_id;
-    }
 
     /**
-     * This method attaches the PlayerController to the Player.
-     * Player has to have his controller detached at the moment
-     * of calling this method.
-     * The controller is then started automatically.
+     * Returns player struct.
      */
-     void attachPlayerController(AbstractPlayerCtrl* controller);
+     StructPlayer structPlayer();
+
+    //const PublicPlayerView* publicView() const;
+    //const PrivatePlayerView* privateView() const;
+
+    //const PlayerActions* playerActions() const;
+
+
+/// Commands from the controller of the player
+public slots:
+    /**
+     * If this method is called for a player that is the creator
+     * of the game and the game is in the 'waiting for players'
+     * state, then the game starts.
+     */
+    void startGame();
 
     /**
-     * This method detaches the PlayerController of the Player.
+     * The player leaves the game. The game can handle this situation
+     * differently in different states of game.
      */
-     void detachPlayerController();
-     
-     
-     void postEventToController(QEvent* event);
-     
-     void writeXml(QXmlStreamWriter&);
+    void leaveGame();
 
+    /**
+     * The player sends a chat message to other players in the game.
+     */
+    void sendMessage(const QString& message);
+
+
+/// Signals from players. To be connected to slots of the controller
 signals:
-    void incomingChatMessage(int senderId, const QString& senderName, const QString& message);
+    void leavingGame();
+
 
 
 private:
     int                       m_id;
     int                       m_lifePoints;
-    CharacterCard*            m_characterCard;
-    PlayingCardList           m_cardsInHand;
-    WeaponCard*               m_weaponCard;
+//    CharacterCard*            m_characterCard;
+//    PlayingCardList           m_cardsInHand;
+//    WeaponCard*               m_weaponCard;
     QString                   m_name;
     QString                   m_password;
     Game*                     mp_game;
-    PlayerControllerRunner    m_runner;
-    const PublicPlayerView    m_publicPlayerView;
-    const PrivatePlayerView   m_privatePlayerView;
-    const PlayerActions       m_playerActions;
+    
+    
+//    const PublicPlayerView    m_publicPlayerView;
+//    const PrivatePlayerView   m_privatePlayerView;
 };
 
 #endif

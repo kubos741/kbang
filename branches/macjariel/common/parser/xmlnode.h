@@ -36,11 +36,10 @@ class XmlNode : public QObject
 {
 Q_OBJECT
 public:
-    XmlNode(XmlNode *parent, const QString& elementName);
-    XmlNode(XmlNode *parent, const QStringRef& elementName, const QXmlStreamAttributes& attributes);
-    
+    XmlNode(XmlNode *parent, const QString& elementName, bool textElement = 0);
     XmlNode* createChildNode(const QString& elementName);
     XmlNode* createChildNode(const QStringRef& elementName, const QXmlStreamAttributes& attributes);
+    XmlNode* createChildTextNode(const QStringRef& text);
     void     createAttribute(const QString& name, const QString& value);
     void     createAttributes(const QXmlStreamAttributes& attributes);
     
@@ -48,6 +47,8 @@ public:
     
     QString name() const;
     QString attribute(const QString& name) const;
+    QString text() const;
+    bool isTextElement() const;
     XmlNode* getFirstChild() const;
     QList<XmlNode*> getChildren() const;
     
@@ -57,6 +58,7 @@ public:
 
 private:
     const QString           m_elementName;
+    bool                    m_isTextElement;
     QMap<QString, QString>  m_attributes;
     QList<XmlNode*>         m_children;
 };

@@ -37,7 +37,7 @@
 Parser::Parser(QObject* parent):
 QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
 {
-
+    
 }
 
 Parser::Parser(QObject* parent, QIODevice* socket):
@@ -61,6 +61,7 @@ void Parser::attachSocket(QIODevice* socket)
 
     mp_streamReader = new QXmlStreamReader(mp_socket);
     mp_streamWriter = new QXmlStreamWriter(mp_socket);
+    mp_streamWriter->setAutoFormatting(1);
     connect(mp_socket, SIGNAL(readyRead()),
             this, SLOT(readData()));
 
@@ -94,6 +95,7 @@ void Parser::readData()
     while (!mp_streamReader->atEnd())
     {
         mp_streamReader->readNext();
+        if (mp_streamReader->hasError()) streamError();
         if (!(mp_streamReader->isStartElement() ||
               mp_streamReader->isEndElement() ||
               (mp_streamReader->isCharacters() && !mp_streamReader->isWhitespace()))) continue;
@@ -162,7 +164,8 @@ void Parser::stateReady()
     }
     // Starting to read new stanza
     Q_ASSERT(mp_parsedStanza == 0);
-    mp_parsedXmlElement = mp_parsedStanza = new XmlNode(0, mp_streamReader->name(), mp_streamReader->attributes());
+    mp_parsedXmlElement = mp_parsedStanza = new XmlNode(0, mp_streamReader->name().toString());
+    mp_parsedXmlElement->createAttributes(mp_streamReader->attributes());
     m_readerState = S_Stanza;
 }
 
@@ -187,6 +190,11 @@ void Parser::stateStanza()
     {
         mp_parsedXmlElement = mp_parsedXmlElement->parentNode();
     }
+    if (mp_streamReader->isCharacters())
+    {
+        mp_parsedXmlElement->createChildTextNode(mp_streamReader->text());
+    }
+
 }
 
 void Parser::processStanza()
@@ -254,6 +262,12 @@ void Parser::processStanza()
             emit sigActionLeaveGame();
             return;
         }
+        if (action->name() == "message")
+        {
+            XmlNode* messageNode = action->getFirstChild();
+            if (!messageNode || !messageNode->isTextElement()) return;
+            emit sigActionMessage(messageNode->text());
+        }
     }
 
 }
@@ -287,3 +301,63 @@ QueryGet* Parser::queryGet()
     m_getQueries[id] = query;
     return query;
 }
+
+void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("join-game");
+    mp_streamWriter->writeAttribute("id", QString::number(gameId));
+    if (other)
+    {
+        mp_streamWriter->writeAttribute("other", "1");
+    }
+    mp_streamWriter->writeStartElement("player");
+    mp_streamWriter->writeAttribute("id", QString::number(player.id));
+    mp_streamWriter->writeAttribute("name", player.name);
+    mp_streamWriter->writeEndElement();
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventStart()
+{
+    mp_streamWriter->writeStartElement("event");
+}
+
+void Parser::eventEnd()
+{
+    mp_streamWriter->writeEndElement();
+}
+
+void Parser::eventLeaveGame(int playerId, bool other)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("leave-game");
+    mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
+    if (other)
+    {
+        mp_streamWriter->writeAttribute("other", "1");
+    }
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventMessage(int senderId, const QString& senderName, const QString& message)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("message");
+    mp_streamWriter->writeAttribute("senderId", QString::number(senderId));
+    mp_streamWriter->writeAttribute("senderName", senderName);
+    mp_streamWriter->writeCharacters(message);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+
+void Parser::streamError()
+{
+    if (mp_streamReader->error() == QXmlStreamReader::PrematureEndOfDocumentError) return;
+    qDebug("Parser input error: %s", qPrintable(mp_streamReader->errorString()));
+    m_readerState = S_Error;
+}
+
