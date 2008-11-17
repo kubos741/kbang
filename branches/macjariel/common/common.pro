@@ -22,10 +22,9 @@ SOURCES += parser/parser.cpp \
 # MISC #
 ########
 
-HEADERS += util.h \
- parser/conversions.h
+HEADERS += util.h
 
 SOURCES += util.cpp \
- parser/conversions.cpp
+ parser/parserstructs.cpp
 
 

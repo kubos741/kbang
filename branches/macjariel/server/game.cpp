@@ -76,7 +76,7 @@ void Game::removePlayer(int playerId)
     m_players[playerId]->deleteLater();
     m_playerList.removeAll(m_players[playerId]);
     m_players.remove(playerId);
-    emit playerLeavedGame(playerId);
+    emit playerLeavedGame(m_gameId, playerId);
     // TODO: other states of game
 }
 

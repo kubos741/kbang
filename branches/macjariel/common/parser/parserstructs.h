@@ -23,22 +23,17 @@
 #include <QString>
 #include <QList>
 
+class XmlNode;
+class QXmlStreamWriter;
+
 struct StructServerInfo
 {
     QString name, description;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+    static QString elementName;
 };
 
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-};
-
-typedef QList<StructGame> StructGameList;
 
 struct StructClient
 {
@@ -50,8 +45,27 @@ struct StructPlayer
 {
     int id;
     QString name, password;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*, bool writePassword = 0) const;
+    static QString elementName;
 };
 
 typedef QList<StructPlayer> StructPlayerList;
+
+struct StructGame
+{
+    int id, creatorId;
+    QString name, description;
+    int minPlayers, maxPlayers, maxSpectators;
+    QString playerPassword, spectatorPassword;
+    bool hasPlayerPassword, hasSpectatorPassword;
+    bool flagShufflePlayers;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
+    static QString elementName;
+};
+
+typedef QList<StructGame> StructGameList;
+
 
 #endif

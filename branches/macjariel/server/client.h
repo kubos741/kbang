@@ -46,7 +46,7 @@ public:
     virtual ~Client();
 
     inline int id() const;
-    
+
 signals:
     void disconnected(int clientId);
 
@@ -55,9 +55,9 @@ public slots: // These slots are connected to parser
     void actionCreateGame(StructGame game, StructPlayer player);
     void actionJoinGame(int gameId, StructPlayer player);
     void actionLeaveGame();
-    
+
 public slots: // These slots are connected to player/game
-    void leavingGame(int playerId);
+    void leavingGame(int gameId, int playerId);
 
 private:
     void joinGame(Game*, const StructPlayer&);

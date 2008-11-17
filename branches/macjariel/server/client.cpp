@@ -101,8 +101,8 @@ void Client::connectPlayer()
             mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
     connect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
             mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
-    connect(mp_player->game(), SIGNAL(playerLeavedGame(int)),
-            this, SLOT(leavingGame(int)));
+    connect(mp_player->game(), SIGNAL(playerLeavedGame(int,int)),
+            this, SLOT(leavingGame(int,int)));
 }
 
 void Client::disconnectPlayer()
@@ -111,17 +111,17 @@ void Client::disconnectPlayer()
     /// manually disconnect signal-slot connections.
 }
 
-void Client::leavingGame(int playerId)
+void Client::leavingGame(int gameId, int playerId)
 {
     Q_ASSERT(mp_player);
     if (playerId == mp_player->id())
     {
-        mp_parser->eventLeaveGame(playerId, 0);
+        mp_parser->eventLeaveGame(gameId, playerId, 0);
         mp_player = 0;
     }
     else
     {
-        mp_parser->eventLeaveGame(playerId, 1);
+        mp_parser->eventLeaveGame(gameId, playerId, 1);
     }
 }
 

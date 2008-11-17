@@ -66,8 +66,8 @@ public slots:
 //    void queryGameList();
 //    void queryGameInfo(int gameId);
 
-//    void actionJoinGame(int gameId);
-//    void actionLeaveGame();
+    void actionJoinGame(int gameId, const StructPlayer& player);
+    void actionLeaveGame();
 
 
 
@@ -76,8 +76,9 @@ signals:
     //void sigResultGameList(const StructGameList&);
     //void sigResultGameInfo(const StructGame&);
 
-    //void sigEventJoinGame(int gameId);
-    //void sigEventLeaveGame();
+    void sigEventJoinGame(int gameId, const StructPlayer&, bool other);
+    void sigEventLeaveGame(int gameId, int playerId, bool other = 1);
+    void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
 
     //////////////
@@ -85,7 +86,7 @@ signals:
     //////////////
 public slots:
     void eventJoinGame(int gameId, const StructPlayer&, bool other = 1);
-    void eventLeaveGame(int playerId, bool other = 1);
+    void eventLeaveGame(int gameId, int playerId, bool other = 1);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
     //void resultServerInfo(const StructServerInfo&);
     //void resultGameList(const StructGameList&);
@@ -119,14 +120,17 @@ private:
     void stateStart();
     void stateReady();
     void stateStanza();
-    
+
     void processStanza();
 
     void sendInitialization();
     void sendTermination();
-    
+
     void eventStart();
     void eventEnd();
+    void actionStart();
+    void actionEnd();
+
 
     void streamError();
 
@@ -147,7 +151,7 @@ private:
 
     ReaderState       m_readerState;
     int               m_readerDepth;
-    
+
     XmlNode*          mp_parsedStanza;
     XmlNode*          mp_parsedXmlElement;
 

@@ -55,7 +55,7 @@ public:
      * @see GameServer::createGame()
      */
     Game(GameServer* parent, const StructGame&);
-    
+
     /**
      * Destroys the Game instance.
      */
@@ -201,10 +201,10 @@ public:
 /// Signals to player controllers
 signals:
     void playerJoinedGame(int gameId, const StructPlayer&);
-    void playerLeavedGame(int playerId);
+    void playerLeavedGame(int gameId, int playerId);
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
-    
+
 
 
 
@@ -226,9 +226,9 @@ private:
     int                  m_nextPlayerId;
     GameState            m_gameState;
     const PublicGameView m_publicGameView;
-    
+
 signals:
-    
+
 
 };
 

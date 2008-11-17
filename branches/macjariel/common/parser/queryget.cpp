@@ -22,7 +22,6 @@
 #include "queryget.h"
 #include "parser.h"
 #include "xmlnode.h"
-#include "conversions.h"
 #include <QtXml>
 
 
@@ -76,11 +75,10 @@ void QueryGet::writeEndQuery()
 
 void QueryGet::parseResult(XmlNode* node)
 {
-    if (node->name() == "serverinfo")
+    if (node->name() == StructServerInfo::elementName)
     {
         StructServerInfo x;
-        x.name = node->attribute("name");
-        x.description = node->attribute("description");
+        x.read(node);
         emit result(x);
     }
     if (node->name() == "gamelist")
@@ -88,13 +86,16 @@ void QueryGet::parseResult(XmlNode* node)
         StructGameList x;
         foreach(XmlNode* game, node->getChildren())
         {
-            x.append(getGameFromXml(game));
+            StructGame g;
+            g.read(game);
+            x.append(g);
         }
         emit result(x);
     }
-    if (node->name() == "game")
+    if (node->name() == StructGame::elementName)
     {
-        StructGame x = getGameFromXml(node);
+        StructGame x;
+        x.read(node);
         emit result(x);
     }
 }

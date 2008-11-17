@@ -23,10 +23,8 @@
 #include "queryget.h"
 #include "util.h"
 #include "xmlnode.h"
-#include "conversions.h"
 
 #include <QtDebug>
-
 #include <QIODevice>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -37,7 +35,7 @@
 Parser::Parser(QObject* parent):
 QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
 {
-    
+
 }
 
 Parser::Parser(QObject* parent, QIODevice* socket):
@@ -87,7 +85,7 @@ void Parser::initializeStream()
 
 QString Parser::protocolVersion()
 {
-    return QString(PROTOCOL_VERSION);
+    return PROTOCOL_VERSION;
 }
 
 void Parser::readData()
@@ -122,7 +120,7 @@ void Parser::readData()
         case S_Error: // TODO
             break;
         }
-        
+
 
         if (mp_streamReader->isStartElement()) m_readerDepth++;
     }
@@ -173,7 +171,7 @@ void Parser::stateStanza()
 {
     if (mp_streamReader->isEndElement() && m_readerDepth == 1)
     {
-        
+
         processStanza();
         // TODO: Process the stanza
 //        mp_parsedStanza->debugPrint();
@@ -206,12 +204,12 @@ void Parser::processStanza()
         {
             XmlNode* query = mp_parsedStanza->getFirstChild();
             if (!query) return;
-            if (query->name() == "serverinfo")
+            if (query->name() == StructServerInfo::elementName)
             {
                 emit sigQueryServerInfo(QueryResult(mp_streamWriter, id));
                 return;
             }
-            if (query->name() == "game")
+            if (query->name() == StructGame::elementName)
             {
                 int gameId = query->attribute("id").toInt();
                 emit sigQueryGame(gameId, QueryResult(mp_streamWriter, id));
@@ -232,8 +230,8 @@ void Parser::processStanza()
                 m_getQueries.remove(id);
             }
         }
-    
-    
+
+
     }
     if (mp_parsedStanza->name() == "action")
     {
@@ -243,8 +241,10 @@ void Parser::processStanza()
         {
             XmlNode* player = action->getFirstChild();
             if (!player) return;
-            StructGame game = getGameFromXml(action);
-            StructPlayer p = getPlayerFromXml(player);
+            StructGame game;
+            game.read(action);
+            StructPlayer p;
+            p.read(player);
             emit sigActionCreateGame(game, p);
             return;
         }
@@ -253,7 +253,8 @@ void Parser::processStanza()
             int gameId = action->attribute("id").toInt();
             XmlNode* player = action->getFirstChild();
             if (!player) return;
-            StructPlayer p = getPlayerFromXml(player);
+            StructPlayer p;
+            p.read(player);
             emit sigActionJoinGame(gameId, p);
             return;
         }
@@ -269,6 +270,42 @@ void Parser::processStanza()
             emit sigActionMessage(messageNode->text());
         }
     }
+
+    if (mp_parsedStanza->name() == "event")
+    {
+        XmlNode* event = mp_parsedStanza->getFirstChild();
+        if (!event) return;
+        if (event->name() == "join-game")
+        {
+            XmlNode* player = event->getFirstChild();
+            if (!player) return;
+            int gameId = event->attribute("gameId").toInt();
+            bool other = !event->attribute("other").isEmpty();
+            StructPlayer p;
+            p.read(player);
+            emit sigEventJoinGame(gameId, p, other);
+            return;
+        }
+        if (event->name() == "leave-game")
+        {
+            int gameId = event->attribute("gameId").toInt();
+            int playerId = event->attribute("playerId").toInt();
+            bool other = !event->attribute("other").isEmpty();
+            emit sigEventLeaveGame(gameId, playerId, other);
+            return;
+        }
+        if (event->name() == "message")
+        {
+            XmlNode* messageNode = event->getFirstChild();
+            if (!messageNode || !messageNode->isTextElement()) return;
+            int senderId = event->attribute("senderId").toInt();
+            QString senderName = event->attribute("senderName");
+            emit sigEventMessage(senderId, senderName, messageNode->text());
+        }
+
+    }
+
+
 
 }
 
@@ -306,33 +343,27 @@ void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other)
 {
     eventStart();
     mp_streamWriter->writeStartElement("join-game");
-    mp_streamWriter->writeAttribute("id", QString::number(gameId));
+    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
     if (other)
     {
         mp_streamWriter->writeAttribute("other", "1");
     }
-    mp_streamWriter->writeStartElement("player");
-    mp_streamWriter->writeAttribute("id", QString::number(player.id));
-    mp_streamWriter->writeAttribute("name", player.name);
-    mp_streamWriter->writeEndElement();
+    player.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
 
-void Parser::eventStart()
-{
-    mp_streamWriter->writeStartElement("event");
-}
+void Parser::eventStart()  { mp_streamWriter->writeStartElement("event");  }
+void Parser::eventEnd()    { mp_streamWriter->writeEndElement();           }
+void Parser::actionStart() { mp_streamWriter->writeStartElement("action"); }
+void Parser::actionEnd()   { mp_streamWriter->writeEndElement();           }
 
-void Parser::eventEnd()
-{
-    mp_streamWriter->writeEndElement();
-}
 
-void Parser::eventLeaveGame(int playerId, bool other)
+void Parser::eventLeaveGame(int gameId, int playerId, bool other)
 {
     eventStart();
     mp_streamWriter->writeStartElement("leave-game");
+    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
     mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
     if (other)
     {
@@ -359,5 +390,15 @@ void Parser::streamError()
     if (mp_streamReader->error() == QXmlStreamReader::PrematureEndOfDocumentError) return;
     qDebug("Parser input error: %s", qPrintable(mp_streamReader->errorString()));
     m_readerState = S_Error;
+}
+
+void Parser::actionJoinGame(int gameId, const StructPlayer& player)
+{
+    actionStart();
+    mp_streamWriter->writeStartElement("join");
+    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
+    player.write(mp_streamWriter, 1);
+    mp_streamWriter->writeEndElement();
+    actionEnd();
 }
 
