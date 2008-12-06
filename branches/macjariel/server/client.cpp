@@ -87,8 +87,6 @@ void Client::actionLeaveGame()
     disconnectPlayer();
     int playerId = mp_player->id();
     mp_player->leaveGame();
-    // TODO: eventLeaveGame shouldn't be posted here, but by game (v pripade ze nas server vykopne, chceme to taky vedet)
-    //mp_parser->eventLeaveGame(playerId, 0);
 }
 
 void Client::connectPlayer()

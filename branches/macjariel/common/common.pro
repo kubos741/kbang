@@ -13,6 +13,7 @@ HEADERS += parser/parser.h \
            parser/xmlnode.h
 
 SOURCES += parser/parser.cpp \
+           parser/parserstructs.cpp \
            parser/queryget.cpp \
            parser/queryresult.cpp \
            parser/xmlnode.cpp
@@ -25,6 +26,5 @@ SOURCES += parser/parser.cpp \
 HEADERS += util.h
 
 SOURCES += util.cpp \
- parser/parserstructs.cpp
 
 

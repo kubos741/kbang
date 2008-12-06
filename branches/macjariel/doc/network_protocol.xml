@@ -19,7 +19,7 @@
     <title>Introduction</title>
     <para>
     The KBang protocol is an open XML based protocol used in the KBang game. This protocol is still
-    in development and may change.
+    in development and may change, although the basic features are ready.
     </para>
   </section>
   <section>
@@ -50,13 +50,15 @@
     <section>
       <title>Server</title>
       <para>A server acts as an arbitor that serves and judges several KBang games. 
-        All the intelligence in KBang is concentrated to the server.
+        Most of the intelligence in KBang is concentrated to the server.
       </para>
     </section>
     <section>
       <title>Client</title>
       <para>A client connects directly to the server over a TCP connection. Then it can
-        create a new bang game or join games either as a player or as an observer.</para>
+        create a new bang game or join games either as a player or as an observer.
+        Clients only display the state of the game and send actions (mostly card movements).
+      </para>
     </section>
   </section>
   <section>
@@ -88,11 +90,26 @@
     <title>Stanzas</title>
     <para>Stanza is a group of XML elements that represents a command. In the XML structure it is formed by a subtree
           that has its root element on level 2 (right under the root &lt;stream&gt; element).</para>
-    <para>Every stanza should have a unique id. This id is used to match more stanzas, ie. when client requests
-          some information the resulting stanza will have the same id as the client used in the request stanza.
+    <para>Stanza can have an id. This id is used to pair a request with its response, thus is essential in query stanzas.
           The id is a string of at most 16 alphanumeric characters and is passed as the id attribute in the root
           stanza element.</para>
     <para>There are several types of stanzas:</para>
+    <itemizedlist>
+      <listitem>
+        <para>query stanza. This type of stanza is used to get a specific information from the other side. Typically, clients
+          are sending queries, that are answered by server. The query stanza has three types: get, result and error. First one is
+          used to make a query, the others are used to respond to a query, either with a result or with an error. All query stanzas
+          must have a unique id (per client).</para>
+      </listitem>
+      <listitem>
+        <para>action stanza. The action stanza is used to post some actions that typically change the state of the other side. They
+              are sent only by clients, server never send action stanzas.</para>
+      </listitem>
+      <listitem>
+        <para>event stanzas</para>
+      </listitem>
+    </itemizedlist>
+ 
   </section>
   <section>
     <title>Client states</title>

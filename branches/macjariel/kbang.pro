@@ -1,8 +1,10 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS += server \
-	   client \
-	   common \
+CONFIG += ordered
+
+SUBDIRS += common \
+           server \
            servertester \
-	   tests/testparser
+    	   tests/testparser \
+	   client
