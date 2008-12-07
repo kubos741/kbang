@@ -17,55 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
 
-#include <QString>
-#include <QList>
+#ifndef COMMON_H
+#define COMMON_H
 
-class XmlNode;
-class QXmlStreamWriter;
-
-struct StructServerInfo
-{
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
-};
+#include <QtDebug>
 
 
-struct StructClient
-{
-    int id;
-    QString name;
-};
 
-struct StructPlayer
-{
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
 
-typedef QList<StructPlayer> StructPlayerList;
 
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
+#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
 
-typedef QList<StructGame> StructGameList;
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
+QString randomToken(int minLength, int maxLength);
 
 #endif

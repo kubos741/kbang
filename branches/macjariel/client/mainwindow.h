@@ -17,55 +17,54 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <QString>
-#include <QList>
+#include "ui_mainwindow.h"
+#include "serverconnection.h"
 
-class XmlNode;
-class QXmlStreamWriter;
 
-struct StructServerInfo
+class ConnectToServerDialog;
+class JoinGameDialog;
+class LogWidget;
+class ChatWidget;
+class QLabel;
+
+/**
+ *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class MainWindow : public QMainWindow, public Ui::MainWindow
 {
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
+Q_OBJECT
+public:
+    MainWindow();
+    virtual ~MainWindow();
+    
+private slots:
+    void connectToServer();
+    void disconnectFromServer();
+    void joinGame();
+    void leaveGame();
+    
+    void serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
+
+private:
+    ConnectToServerDialog* mp_connectToServerDialog;
+    JoinGameDialog*        mp_joinGameDialog;
+    LogWidget*             mp_logWidget;
+    ChatWidget*            mp_chatWidget;
+    ServerConnection       m_serverConnection;
+    
+    
+    QLabel*                mp_labelStatusBarServerState;
+
+
+private:
+    void createStatusBar();
+    void createMenu();
+    void createActions();
+    void createWidgets();
+
 };
-
-
-struct StructClient
-{
-    int id;
-    QString name;
-};
-
-struct StructPlayer
-{
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructPlayer> StructPlayerList;
-
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructGame> StructGameList;
-
 
 #endif

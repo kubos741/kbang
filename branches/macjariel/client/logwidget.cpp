@@ -17,55 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
+#include "logwidget.h"
 
-#include <QString>
-#include <QList>
-
-class XmlNode;
-class QXmlStreamWriter;
-
-struct StructServerInfo
+LogWidget::LogWidget(QWidget *parent)
+ : QWidget(parent)
 {
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
-};
+    setupUi(this);
+}
 
 
-struct StructClient
+LogWidget::~LogWidget()
 {
-    int id;
-    QString name;
-};
+}
 
-struct StructPlayer
+void LogWidget::appendLogMessage(QString message)
 {
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
+    mp_logView->append(message);
+}
 
-typedef QList<StructPlayer> StructPlayerList;
-
-struct StructGame
+void LogWidget::appendIncomingXml(QString message)
 {
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructGame> StructGameList;
+    //mp_xmlView->setTextColor(Qt::green);
+    mp_xmlView->append(message);
+}
 
 
-#endif

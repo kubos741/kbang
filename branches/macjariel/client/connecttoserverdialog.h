@@ -17,55 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
+#ifndef CONNECTTOSERVERDIALOG_H
+#define CONNECTTOSERVERDIALOG_H
 
-#include <QString>
-#include <QList>
+#include <QDialog>
+#include <ui_connecttoserverdialog.h>
 
-class XmlNode;
-class QXmlStreamWriter;
-
-struct StructServerInfo
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ConnectToServerDialog : public QDialog, public Ui::ConnectToServerDialog
 {
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
+Q_OBJECT
+public:
+    ConnectToServerDialog(QWidget *parent = 0);
+    ~ConnectToServerDialog();
+    
+private slots:
+    void on_mp_buttonSaveFavorite_clicked();
+    void on_mp_favoriteList_itemClicked(QTreeWidgetItem * item, int column);
+    void on_mp_favoriteList_itemDoubleClicked(QTreeWidgetItem * item, int column);
+    void on_mp_connectButton_clicked();
+    void setConnectButtonStatus();
+    
+signals:
+    void connectToServer(QString serverAddress, int serverPort, QString nickname);
+    
 };
-
-
-struct StructClient
-{
-    int id;
-    QString name;
-};
-
-struct StructPlayer
-{
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructPlayer> StructPlayerList;
-
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructGame> StructGameList;
-
 
 #endif

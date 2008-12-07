@@ -17,58 +17,68 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef SERVERCONNECTION_H
+#define SERVERCONNECTION_H
 
-#include "parser/parser.h"
-
-#include "player.h"
-
-
+#include "parser/parserstructs.h"
 #include <QObject>
-#include <QPair>
 
 
-class GameServer;
+
+/// Forward declarations
 class QTcpSocket;
-
+class Parser;
+class QueryGet;
 
 /**
- * NOTE: There cannot be a client with id = 0.
- *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
+class ServerConnection : public QObject
 {
 Q_OBJECT
 public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
-    virtual ~Client();
+    ServerConnection(QObject *parent);
+    virtual ~ServerConnection();
 
-    inline int id() const;
+    QueryGet* queryGet();
+
+public slots:
+    void connectToServer(QString serverHost, int serverPort);
+    void disconnectFromServer();
+    void joinGame(int gameId, const QString& gamePassword, const QString& playerName);
+    void leaveGame();
+    void sendChatMessage(const QString& message);
+
+
+
+private slots:
+    void connected();
+    void disconnected();
+
+    void recievedServerInfo(const StructServerInfo&);
+
+    void recievedEventJoinGame(int gameId, const StructPlayer&, bool other);
+    void recievedEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
+
+private:
+    void initializeParserConnections();
+
+
+
+private:
+    QTcpSocket*         mp_tcpSocket;
+    Parser*             mp_parser;
+
+    QString             m_serverHost;
+    QString             m_serverName;
+    QString             m_serverDescription;
 
 signals:
-    void disconnected(int clientId);
+    void statusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
+    void logMessage(QString message);
+    void incomingXml(QString message);
 
-
-public slots: // These slots are connected to parser
-    void actionCreateGame(const StructGame& game, const StructPlayer& player);
-    void actionJoinGame(int gameId, const StructPlayer& player);
-    void actionLeaveGame();
-
-public slots: // These slots are connected to player/game
-    void leavingGame(int gameId, const StructPlayer& player);
-
-private:
-    void joinGame(Game*, const StructPlayer&);
-
-private:
-    const int           m_id;
-    Parser*             mp_parser;
-    Player*             mp_player;
-
-    void connectPlayer();
-    void disconnectPlayer();
+    void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
 };
 

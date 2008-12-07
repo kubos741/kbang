@@ -57,6 +57,7 @@ void Player::startGame()
 
 void Player::leaveGame()
 {
+    Q_ASSERT(mp_game != 0);
     mp_game->removePlayer(m_id);
 }
 

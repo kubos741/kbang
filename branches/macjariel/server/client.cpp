@@ -58,25 +58,30 @@ int Client::id() const
     return m_id;
 }
 
-void Client::actionCreateGame(StructGame game, StructPlayer player)
+void Client::actionCreateGame(const StructGame& game, const StructPlayer& player)
 {
-    if (mp_player) return; // TODO: error
+    if (mp_player) return; // Already in game - do nothing
     Game* newGame = GameServer::instance().createGame(game);
     Q_ASSERT(newGame != 0);
     joinGame(newGame, player);
 }
 
-void Client::actionJoinGame(int gameId, StructPlayer player)
+void Client::actionJoinGame(int gameId, const StructPlayer& player)
 {
+    qDebug() << gameId;
+    if (mp_player) return; // TODO: Already in game - do nothing
     Game* game = GameServer::instance().game(gameId);
+    qDebug() << game;
     if (game == 0) return; // TODO: error
+    qDebug("actionJoinGame");
     joinGame(game, player);
 }
 
 void Client::joinGame(Game* game, const StructPlayer& player)
 {
+    qDebug(qPrintable(QString("Player %1 is joining the game %2").arg(player.name).arg(game->name())));
     mp_player = game->createNewPlayer(player);
-    if (!mp_player) return;  // TODO: error
+    Q_ASSERT(mp_player != 0);
     connectPlayer();
     mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0);
 }
@@ -84,8 +89,8 @@ void Client::joinGame(Game* game, const StructPlayer& player)
 
 void Client::actionLeaveGame()
 {
+    if (mp_player == 0) return; // Client is not in a game
     disconnectPlayer();
-    int playerId = mp_player->id();
     mp_player->leaveGame();
 }
 
@@ -99,8 +104,8 @@ void Client::connectPlayer()
             mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
     connect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
             mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
-    connect(mp_player->game(), SIGNAL(playerLeavedGame(int,int)),
-            this, SLOT(leavingGame(int,int)));
+    connect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
+            this, SLOT(leavingGame(int,const StructPlayer&)));
 }
 
 void Client::disconnectPlayer()
@@ -109,17 +114,17 @@ void Client::disconnectPlayer()
     /// manually disconnect signal-slot connections.
 }
 
-void Client::leavingGame(int gameId, int playerId)
+void Client::leavingGame(int gameId, const StructPlayer& player)
 {
     Q_ASSERT(mp_player);
-    if (playerId == mp_player->id())
+    if (player.id == mp_player->id())
     {
-        mp_parser->eventLeaveGame(gameId, playerId, 0);
+        mp_parser->eventLeaveGame(gameId, player, 0);
         mp_player = 0;
     }
     else
     {
-        mp_parser->eventLeaveGame(gameId, playerId, 1);
+        mp_parser->eventLeaveGame(gameId, player, 1);
     }
 }
 

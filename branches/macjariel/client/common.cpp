@@ -17,55 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
 
 #include <QString>
-#include <QList>
+#include "common.h"
 
-class XmlNode;
-class QXmlStreamWriter;
-
-struct StructServerInfo
+QString randomToken(int minLength, int maxLength)
 {
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
-};
-
-
-struct StructClient
-{
-    int id;
-    QString name;
-};
-
-struct StructPlayer
-{
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructPlayer> StructPlayerList;
-
-struct StructGame
-{
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructGame> StructGameList;
-
-
-#endif
+    Q_ASSERT(minLength <= maxLength);
+    const static char* chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    const static int charl = strlen(chars);
+    int length = minLength + ((int)qrand() % (maxLength - minLength + 1));
+    char token[length+1];
+    for (int i = 0; i < length; ++i)
+    {
+        token[i] = chars[qrand() % charl];
+    }
+    token[length - 1] = '\0';
+    return QString(token);
+}

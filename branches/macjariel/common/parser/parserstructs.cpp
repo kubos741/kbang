@@ -40,7 +40,7 @@ void StructServerInfo::write(QXmlStreamWriter* writer) const
 
 QString StructGame::elementName("game");
 
-void StructGame::read(XmlNode* node)
+void StructGame::read(XmlNode* node, StructPlayerList* playerList)
 {
     id = node->attribute("id").toInt();
     creatorId = node->attribute("creatorId").toInt();
@@ -54,6 +54,19 @@ void StructGame::read(XmlNode* node)
     hasPlayerPassword = (node->attribute("hasPlayerPassword") == "1");
     hasSpectatorPassword = (node->attribute("hasSpectatorPassword") == "1");
     flagShufflePlayers = (node->attribute("flagShufflePlayers") == "1");
+    if (playerList)
+    {
+        XmlNode* players = node->getFirstChild();
+        if (players && players->name() == "players")
+        {
+            foreach(XmlNode* playerNode, players->getChildren())
+            {
+                StructPlayer player;
+                player.read(playerNode);
+                playerList->append(player);
+            }
+        }
+    }
 }
 
 void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerlist) const

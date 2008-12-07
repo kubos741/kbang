@@ -38,7 +38,7 @@ QueryGet::~QueryGet()
 void QueryGet::getServerInfo()
 {
     writeStartQuery();
-    mp_streamWriter->writeEmptyElement("serverinfo");
+    mp_streamWriter->writeEmptyElement(StructServerInfo::elementName);
     writeEndQuery();
 }
 
@@ -95,6 +95,13 @@ void QueryGet::parseResult(XmlNode* node)
     if (node->name() == StructGame::elementName)
     {
         StructGame x;
+        StructPlayerList y;
+        x.read(node, &y);
+        emit result(x, y);
+    }
+    if (node->name() == StructServerInfo::elementName)
+    {
+        StructServerInfo x;
         x.read(node);
         emit result(x);
     }

@@ -17,55 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PARSERSTRUCTS_H
-#define PARSERSTRUCTS_H
+#include "chatwidget.h"
 
-#include <QString>
-#include <QList>
-
-class XmlNode;
-class QXmlStreamWriter;
-
-struct StructServerInfo
+ChatWidget::ChatWidget(QWidget *parent)
+ : QWidget(parent)
 {
-    QString name, description;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
-    static QString elementName;
-};
+    setupUi(this);
+    connect(mp_messageBox, SIGNAL(returnPressed()),
+            this, SLOT(sendMessage()));
+}
 
 
-struct StructClient
+ChatWidget::~ChatWidget()
 {
-    int id;
-    QString name;
-};
+}
 
-struct StructPlayer
+void ChatWidget::incomingMessage(int, const QString& senderName, const QString& message)
 {
-    int id;
-    QString name, password;
-    void read(XmlNode*);
-    void write(QXmlStreamWriter*, bool writePassword = 0) const;
-    static QString elementName;
-};
+    mp_chatView->append(QString("<b>%1:</b> %2").arg(senderName).arg(message));
+}
 
-typedef QList<StructPlayer> StructPlayerList;
-
-struct StructGame
+void ChatWidget::sendMessage()
 {
-    int id, creatorId;
-    QString name, description;
-    int minPlayers, maxPlayers, maxSpectators;
-    QString playerPassword, spectatorPassword;
-    bool hasPlayerPassword, hasSpectatorPassword;
-    bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
-    static QString elementName;
-};
-
-typedef QList<StructGame> StructGameList;
+    const QString& message = mp_messageBox->text();
+    mp_messageBox->clear();
+    emit outgoingMessage(message);
+}
 
 
-#endif

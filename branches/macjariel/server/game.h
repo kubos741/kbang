@@ -201,7 +201,7 @@ public:
 /// Signals to player controllers
 signals:
     void playerJoinedGame(int gameId, const StructPlayer&);
-    void playerLeavedGame(int gameId, int playerId);
+    void playerLeavedGame(int gameId, const StructPlayer&);
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
 

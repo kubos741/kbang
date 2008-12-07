@@ -115,14 +115,14 @@
   </kdevfilecreate>
   <kdevtrollproject>
     <general>
-      <activedir>client</activedir>
+      <activedir>server</activedir>
     </general>
     <run>
       <directoryradio>executable</directoryradio>
       <runarguments>
         <parser/>
         <server/>
-        <client></client>
+        <client/>
       </runarguments>
       <cwd>
         <parser>/home/macjariel/devel/kbang/branches/macjariel</parser>
@@ -132,7 +132,7 @@
       <debugarguments>
         <parser/>
         <server/>
-        <client></client>
+        <client/>
       </debugarguments>
     </run>
     <subclassing/>

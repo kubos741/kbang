@@ -250,9 +250,9 @@ void Parser::processStanza()
         }
         if (action->name() == "join-game")
         {
-            int gameId = action->attribute("id").toInt();
+            int gameId = action->attribute("gameId").toInt();
             XmlNode* player = action->getFirstChild();
-            if (!player) return;
+            if (!player) return; // Malformed join-game action
             StructPlayer p;
             p.read(player);
             emit sigActionJoinGame(gameId, p);
@@ -288,10 +288,13 @@ void Parser::processStanza()
         }
         if (event->name() == "leave-game")
         {
+            XmlNode* player = event->getFirstChild();
+            if (!player) return;
+            StructPlayer p;
+            p.read(player);
             int gameId = event->attribute("gameId").toInt();
-            int playerId = event->attribute("playerId").toInt();
             bool other = !event->attribute("other").isEmpty();
-            emit sigEventLeaveGame(gameId, playerId, other);
+            emit sigEventLeaveGame(gameId, p, other);
             return;
         }
         if (event->name() == "message")
@@ -359,16 +362,16 @@ void Parser::actionStart() { mp_streamWriter->writeStartElement("action"); }
 void Parser::actionEnd()   { mp_streamWriter->writeEndElement();           }
 
 
-void Parser::eventLeaveGame(int gameId, int playerId, bool other)
+void Parser::eventLeaveGame(int gameId, const StructPlayer& player, bool other)
 {
     eventStart();
     mp_streamWriter->writeStartElement("leave-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
-    mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
     if (other)
     {
         mp_streamWriter->writeAttribute("other", "1");
     }
+    player.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -392,13 +395,29 @@ void Parser::streamError()
     m_readerState = S_Error;
 }
 
-void Parser::actionJoinGame(int gameId, const StructPlayer& player)
+void Parser::actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player)
 {
     actionStart();
-    mp_streamWriter->writeStartElement("join");
+    mp_streamWriter->writeStartElement("join-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
+    if (!gamePassword.isEmpty()) mp_streamWriter->writeAttribute("gamePassword", gamePassword);
     player.write(mp_streamWriter, 1);
     mp_streamWriter->writeEndElement();
     actionEnd();
 }
 
+void Parser::actionLeaveGame()
+{
+    actionStart();
+    mp_streamWriter->writeEmptyElement("leave-game");
+    actionEnd();
+}
+
+void Parser::actionMessage(const QString& message)
+{
+    actionStart();
+    mp_streamWriter->writeStartElement("message");
+    mp_streamWriter->writeCharacters(message);
+    mp_streamWriter->writeEndElement();
+    actionEnd();
+}
