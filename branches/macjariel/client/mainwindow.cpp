@@ -33,9 +33,10 @@ MainWindow::MainWindow():
     createMenu();
     createStatusBar();
     createWidgets();
+    updateActions();
 
-    connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
-            this, SLOT(serverConnectionStatusChanged(bool, QString, QString, QString)));
+    connect(&m_serverConnection, SIGNAL(statusChanged()),
+            this, SLOT(serverConnectionStatusChanged()));
 }
 
 
@@ -75,28 +76,30 @@ void MainWindow::joinGame()
 void MainWindow::createStatusBar()
 {
     mp_labelStatusBarServerState = new QLabel;
-    serverConnectionStatusChanged(0, "", "", "");
+    serverConnectionStatusChanged();
     statusBar()->addPermanentWidget(mp_labelStatusBarServerState);
 }
 
-void MainWindow::serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString)
+void MainWindow::serverConnectionStatusChanged()
 {
-    if (connected)
+    updateActions();
+    if (m_serverConnection.isConnected())
     {
+        const QString& serverName = m_serverConnection.serverName();
+        const QString& hostName = m_serverConnection.hostName();
         QString text;
         if (serverName.isEmpty())
         {
-            text = QString("%0: %1").arg(tr("Connected to server")).arg(serverHost);
+            text = QString("%0: %1").arg(tr("Connected to server")).arg(hostName);
         }
         else
         {
-            text = QString("%0: %1(%2)").arg(tr("Connected to server")).arg(serverName).arg(serverHost);
+            text = QString("%0: %1  (%2)").arg(tr("Connected to server")).arg(serverName).arg(hostName);
         }
         mp_labelStatusBarServerState->setText(text);
     } else {
         mp_labelStatusBarServerState->setText(tr("Not connected to server."));
     }
-
 }
 
 
@@ -112,19 +115,36 @@ void MainWindow::createActions()
             this, SLOT(leaveGame()));
 }
 
+void MainWindow::updateActions()
+{
+    if (m_serverConnection.isConnected())
+    {
+        mp_actionConnectToServer->setEnabled(0);
+        mp_actionDisconnectFromServer->setEnabled(1);
+        if (m_serverConnection.isInGame())
+        {
+            mp_actionJoinGame->setEnabled(0);
+            mp_actionLeaveGame->setEnabled(1);
+        }
+        else
+        {
+            mp_actionJoinGame->setEnabled(1);
+            mp_actionLeaveGame->setEnabled(0);
+        }
+    }
+    else
+    {
+        mp_actionConnectToServer->setEnabled(1);
+        mp_actionDisconnectFromServer->setEnabled(0); 
+        mp_actionJoinGame->setEnabled(0);
+        mp_actionLeaveGame->setEnabled(0);
+    }
+}
 
 
 void MainWindow::createMenu()
 {
-    mp_actionDisconnectFromServer->setEnabled(0);
-//    mp_actionJoinGame->setEnabled(0);
-//    mp_actionLeaveGame->setEnabled(0);
-    connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
-            mp_actionConnectToServer, SLOT(setDisabled(bool)));
-    connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
-            mp_actionDisconnectFromServer, SLOT(setEnabled(bool)));
-    connect(&m_serverConnection, SIGNAL(statusChanged(bool, QString, QString, QString)),
-            mp_actionJoinGame, SLOT(setEnabled(bool)));
+
 }
 
 void MainWindow::createWidgets()

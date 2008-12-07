@@ -90,7 +90,6 @@ void Client::joinGame(Game* game, const StructPlayer& player)
 void Client::actionLeaveGame()
 {
     if (mp_player == 0) return; // Client is not in a game
-    disconnectPlayer();
     mp_player->leaveGame();
 }
 
@@ -110,8 +109,12 @@ void Client::connectPlayer()
 
 void Client::disconnectPlayer()
 {
-    /// Since the player is destroyed later, we don't need to
-    /// manually disconnect signal-slot connections.
+    disconnect(mp_player->game(), SIGNAL(incomingMessage(int, const QString&, const QString&)),
+               mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
+    disconnect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
+               mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
+    disconnect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
+               this, SLOT(leavingGame(int,const StructPlayer&)));
 }
 
 void Client::leavingGame(int gameId, const StructPlayer& player)
@@ -120,6 +123,7 @@ void Client::leavingGame(int gameId, const StructPlayer& player)
     if (player.id == mp_player->id())
     {
         mp_parser->eventLeaveGame(gameId, player, 0);
+        disconnectPlayer();
         mp_player = 0;
     }
     else

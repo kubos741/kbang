@@ -41,6 +41,10 @@ public:
     virtual ~ServerConnection();
 
     QueryGet* queryGet();
+    bool isConnected();
+    bool isInGame();
+    QString serverName();
+    QString hostName();
 
 public slots:
     void connectToServer(QString serverHost, int serverPort);
@@ -72,13 +76,16 @@ private:
     QString             m_serverHost;
     QString             m_serverName;
     QString             m_serverDescription;
+    int                 m_gameId;
 
 signals:
-    void statusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
+    void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
     void logMessage(QString message);
     void incomingXml(QString message);
-
+    
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
+    
+    
 
 };
 

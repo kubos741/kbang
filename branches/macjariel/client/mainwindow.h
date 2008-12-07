@@ -46,7 +46,7 @@ private slots:
     void joinGame();
     void leaveGame();
     
-    void serverConnectionStatusChanged(bool connected, QString serverHost, QString serverName, QString serverDescription);
+    void serverConnectionStatusChanged();
 
 private:
     ConnectToServerDialog* mp_connectToServerDialog;
@@ -64,6 +64,8 @@ private:
     void createMenu();
     void createActions();
     void createWidgets();
+    
+    void updateActions();
 
 };
 

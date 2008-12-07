@@ -46,3 +46,4 @@ LIBS += ../common/libcommon.a
 
 TARGETDEPS += ../common/libcommon.a
 
+QMAKE_CXXFLAGS_DEBUG += -Wall

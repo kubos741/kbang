@@ -26,7 +26,7 @@
        <item row="0" column="0" >
         <widget class="QTextBrowser" name="mp_logView" >
          <property name="styleSheet" >
-          <string notr="true" >color: rgb(255, 255, 0);</string>
+          <string notr="true" />
          </property>
          <property name="horizontalScrollBarPolicy" >
           <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -68,8 +68,6 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
   </layout>
-  <zorder>mp_tabWidget</zorder>
-  <zorder>mp_tabWidget</zorder>
  </widget>
  <resources/>
  <connections/>

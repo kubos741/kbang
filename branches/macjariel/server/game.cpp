@@ -74,10 +74,11 @@ void Game::removePlayer(int playerId)
 {
     Q_ASSERT(m_players.contains(playerId));
     StructPlayer p = m_players[playerId]->structPlayer();
-    m_players[playerId]->deleteLater();
+    Player* plr = m_players[playerId];
     m_playerList.removeAll(m_players[playerId]);
     m_players.remove(playerId);
     emit playerLeavedGame(m_gameId, p);
+    plr->deleteLater();
     // TODO: other states of game
 }
 

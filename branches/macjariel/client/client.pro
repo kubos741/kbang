@@ -37,3 +37,8 @@ LIBS += ../common/libcommon.a
 
 TARGETDEPS += ../common/libcommon.a
 
+CONFIG -= release
+
+CONFIG += debug
+
+QMAKE_CXXFLAGS_DEBUG += -Wall

@@ -1,5 +1,6 @@
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib \
+ debug
 QT += xml 
 
 ##########
@@ -28,3 +29,6 @@ HEADERS += util.h
 SOURCES += util.cpp \
 
 
+CONFIG -= release
+
+QMAKE_CXXFLAGS_DEBUG += -Wall
