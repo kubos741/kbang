@@ -17,66 +17,50 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef GAME_H
+#define GAME_H
 
+#include <QObject>
 #include <QHash>
+#include "parser/parserstructs.h"
 
-#include "ui_mainwindow.h"
-#include "serverconnection.h"
-
-
-
-class ConnectToServerDialog;
-class JoinGameDialog;
-class LogWidget;
-class ChatWidget;
-class QLabel;
+class ServerConnection;
+class QLayout;
 class OpponentWidget;
-class Game;
 
 /**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class MainWindow : public QMainWindow, public Ui::MainWindow
-{
-Q_OBJECT
+class Game: public QObject {
+Q_OBJECT;
 public:
-    MainWindow();
-    virtual ~MainWindow();
-    
-private slots:
-    void connectToServer();
-    void disconnectFromServer();
-    void joinGame();
-    void leaveGame();
-    
-    
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-    
-    
-    void serverConnectionStatusChanged();
+    Game(QObject* parent, int gameId, const StructPlayer& player, ServerConnection* serverConnection);
+
+    /* for MainWindow */
+    void init();
+    void delegateVisualElements(QLayout* opponentsLayout);
+
+    virtual ~Game();
 
 private:
-    ConnectToServerDialog* mp_connectToServerDialog;
-    JoinGameDialog*        mp_joinGameDialog;
-    LogWidget*             mp_logWidget;
-    ChatWidget*            mp_chatWidget;
-    ServerConnection       m_serverConnection;
-    Game*                  mp_game;
+    const int m_playerId;
+    const QString m_playerName;
+    const int m_gameId;
+    ServerConnection* mp_serverConnection;
+    QHash<int, OpponentWidget*> m_opponentWidgets;
     
-    QLabel*                mp_labelStatusBarServerState;
-
-
-private:
-    void createStatusBar();
-    void createMenu();
-    void createActions();
-    void createWidgets();
+/*  Visual elements - provided by MainWindow */
+    QLayout* mp_opponentsLayout;
     
-    void updateActions();
 
+    
+public slots:
+    void opponentJoinedGame(const StructPlayer& player);
+    void opponentLeavedGame(const StructPlayer& player);    
+    
+    void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
+    
+    
 };
 
 #endif

@@ -57,6 +57,8 @@ signals:
 
 
 public slots:
+    void terminate();
+
 
     //////////////
     /// CLIENT ///

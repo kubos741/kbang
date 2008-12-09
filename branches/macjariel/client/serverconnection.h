@@ -41,10 +41,9 @@ public:
     virtual ~ServerConnection();
 
     QueryGet* queryGet();
-    bool isConnected();
-    bool isInGame();
-    QString serverName();
-    QString hostName();
+    bool isConnected() const;
+    QString serverName() const;
+    QString hostName() const;
 
 public slots:
     void connectToServer(QString serverHost, int serverPort);
@@ -61,8 +60,6 @@ private slots:
 
     void recievedServerInfo(const StructServerInfo&);
 
-    void recievedEventJoinGame(int gameId, const StructPlayer&, bool other);
-    void recievedEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
 
 private:
     void initializeParserConnections();
@@ -76,7 +73,6 @@ private:
     QString             m_serverHost;
     QString             m_serverName;
     QString             m_serverDescription;
-    int                 m_gameId;
 
 signals:
     void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
@@ -84,6 +80,9 @@ signals:
     void incomingXml(QString message);
     
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
+    
+    void playerJoinedGame(int gameId, const StructPlayer& player, bool other);
+    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     
     
 

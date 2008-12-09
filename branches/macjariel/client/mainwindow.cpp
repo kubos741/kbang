@@ -22,11 +22,16 @@
 #include "joingamedialog.h"
 #include "logwidget.h"
 #include "chatwidget.h"
+#include "opponentwidget.h"
+#include "parser/queryget.h"
+#include "game.h"
+
 
 MainWindow::MainWindow():
     mp_connectToServerDialog(0),
     mp_joinGameDialog(0),
-    m_serverConnection(this)
+    m_serverConnection(this),
+    mp_game(0)
 {
     setupUi(this);
     createActions();
@@ -37,6 +42,10 @@ MainWindow::MainWindow():
 
     connect(&m_serverConnection, SIGNAL(statusChanged()),
             this, SLOT(serverConnectionStatusChanged()));
+    connect(&m_serverConnection, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool)),
+            this, SLOT(playerJoinedGame(int, const StructPlayer&, bool)));
+    connect(&m_serverConnection, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)),
+            this, SLOT(playerLeavedGame(int, const StructPlayer&, bool)));
 }
 
 
@@ -121,7 +130,7 @@ void MainWindow::updateActions()
     {
         mp_actionConnectToServer->setEnabled(0);
         mp_actionDisconnectFromServer->setEnabled(1);
-        if (m_serverConnection.isInGame())
+        if (mp_game != 0)
         {
             mp_actionJoinGame->setEnabled(0);
             mp_actionLeaveGame->setEnabled(1);
@@ -174,6 +183,42 @@ void MainWindow::createWidgets()
 void MainWindow::leaveGame()
 {
     m_serverConnection.leaveGame();
+}
+
+void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool other)
+{
+    if (other == 1)
+    {
+        Q_ASSERT(mp_game != 0);
+        mp_game->opponentJoinedGame(player);
+    }
+    else
+    {
+        // PLAYER HAS ENTERED GAME
+        
+        Q_ASSERT(mp_game == 0);
+        mp_game = new Game(this, gameId, player, &m_serverConnection);
+        mp_game->delegateVisualElements(mp_opponentContainer);
+        mp_game->init();
+        updateActions();
+    }
+    
+}
+
+
+void MainWindow::playerLeavedGame(int gameId, const StructPlayer& player, bool other)
+{
+    if (other == 0)
+    {
+        mp_game->deleteLater();
+        mp_game = 0; // MEMORY LEAK JAK CIP - TODO
+        updateActions();
+    }
+    else
+    {
+        Q_ASSERT(mp_game != 0);
+        mp_game->opponentLeavedGame(player);
+    }
 }
 
 

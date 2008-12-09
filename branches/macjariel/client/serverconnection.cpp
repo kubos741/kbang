@@ -25,7 +25,7 @@
 #include <QTcpSocket>
 
 ServerConnection::ServerConnection(QObject *parent)
- : QObject(parent), mp_parser(0), m_gameId(0)
+ : QObject(parent), mp_parser(0)
 {
     mp_tcpSocket = new QTcpSocket();
     connect(mp_tcpSocket, SIGNAL(connected()),
@@ -54,7 +54,7 @@ void ServerConnection::disconnectFromServer()
     if (mp_tcpSocket->state() != QAbstractSocket::UnconnectedState)
     {
         emit logMessage(tr("Disconnecting from %1.").arg(m_serverHost));
-        mp_tcpSocket->disconnectFromHost();
+        mp_parser->terminate();
     }
 }
 
@@ -65,7 +65,6 @@ void ServerConnection::connected()
     mp_parser = new Parser(this, mp_tcpSocket);
     initializeParserConnections();
     mp_parser->initializeStream();
-    m_gameId = 0;
 
     QueryGet* query = queryGet();
     connect(query, SIGNAL(result(const StructServerInfo&)),
@@ -111,7 +110,7 @@ QueryGet* ServerConnection::queryGet()
     Q_ASSERT(mp_parser != 0);
     return mp_parser->queryGet();
 }
-
+/*
 void ServerConnection::recievedEventJoinGame(int gameId, const StructPlayer& player, bool other)
 {
     if (!other)
@@ -126,7 +125,7 @@ void ServerConnection::recievedEventJoinGame(int gameId, const StructPlayer& pla
     }
 }
 
-void ServerConnection::recievedEventLeaveGame(int /*gameId*/, const StructPlayer& player, bool other)
+void ServerConnection::recievedEventLeaveGame(int gameId, const StructPlayer& player, bool other)
 {
     if (!other)
     {
@@ -138,35 +137,30 @@ void ServerConnection::recievedEventLeaveGame(int /*gameId*/, const StructPlayer
     {
         emit logMessage(tr("%1 has left the game.").arg(player.name));
     }
-
 }
+*/
 
 void ServerConnection::initializeParserConnections()
 {
     connect(mp_parser, SIGNAL(sigEventJoinGame(int, const StructPlayer&, bool)),
-            this, SLOT(recievedEventJoinGame(int, const StructPlayer&, bool)));
+            this, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventLeaveGame(int, const StructPlayer&, bool)),
-            this, SLOT(recievedEventLeaveGame(int, const StructPlayer&, bool)));
+            this, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
 }
 
-bool ServerConnection::isConnected()
+bool ServerConnection::isConnected() const
 {
     return (mp_parser != 0);
 }
 
-bool ServerConnection::isInGame()
-{
-    return (isConnected() && (m_gameId != 0));
-}
-
-QString ServerConnection::serverName()
+QString ServerConnection::serverName() const
 {
     return m_serverName;
 }
 
-QString ServerConnection::hostName()
+QString ServerConnection::hostName() const
 {
     return m_serverHost;
 }

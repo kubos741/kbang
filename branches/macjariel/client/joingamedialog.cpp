@@ -104,7 +104,8 @@ void JoinGameDialog::on_mp_playButton_clicked()
     Q_ASSERT(mp_gameListView->currentItem() != 0);
     int gameId = mp_gameListView->currentItem()->data(0, Qt::UserRole).toUInt();
     QString gameName = mp_gameListView->currentItem()->text(0);
-    emit joinGame(gameId, "", "Player"); // TODO: gamePassword, playerName
+    QString playerName = mp_playerNameEdit->text();
+    emit joinGame(gameId, "", playerName); // TODO: gamePassword, playerName
     close();
 }
 

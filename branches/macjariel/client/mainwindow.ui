@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>818</width>
+    <width>606</width>
     <height>738</height>
    </rect>
   </property>
@@ -20,6 +20,43 @@
     <bool>false</bool>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" >
+    <item>
+     <widget class="QFrame" name="frame" >
+      <property name="minimumSize" >
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="frameShape" >
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow" >
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2" >
+       <item>
+        <layout class="QHBoxLayout" name="mp_opponentContainer" />
+       </item>
+       <item>
+        <widget class="QLabel" name="label" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>List of player widgets - later this component will be nicer.</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
     <item>
      <spacer name="verticalSpacer" >
       <property name="orientation" >
@@ -127,7 +164,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>818</width>
+     <width>606</width>
      <height>26</height>
     </rect>
    </property>
@@ -157,7 +194,7 @@
   <widget class="QStatusBar" name="mp_statusbar" />
   <action name="mp_actionConnectToServer" >
    <property name="icon" >
-    <iconset resource="client.qrc" >
+    <iconset>
      <normaloff>:/icons/images/icon-connect.svg</normaloff>:/icons/images/icon-connect.svg</iconset>
    </property>
    <property name="text" >

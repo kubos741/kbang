@@ -17,66 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "opponentwidget.h"
 
-#include <QHash>
-
-#include "ui_mainwindow.h"
-#include "serverconnection.h"
-
-
-
-class ConnectToServerDialog;
-class JoinGameDialog;
-class LogWidget;
-class ChatWidget;
-class QLabel;
-class OpponentWidget;
-class Game;
-
-/**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class MainWindow : public QMainWindow, public Ui::MainWindow
+OpponentWidget::OpponentWidget(QWidget *parent, const StructPlayer& player)
+ : QWidget(parent)
 {
-Q_OBJECT
-public:
-    MainWindow();
-    virtual ~MainWindow();
+    setupUi(this);
+    mp_labelPlayerName->setText(player.name);
+    m_id = player.id;
     
-private slots:
-    void connectToServer();
-    void disconnectFromServer();
-    void joinGame();
-    void leaveGame();
-    
-    
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-    
-    
-    void serverConnectionStatusChanged();
+    //frame->setFrameStyle(QFrame::Box |  QFrame::Plain);
+    //frame->setLineWidth(1);
 
-private:
-    ConnectToServerDialog* mp_connectToServerDialog;
-    JoinGameDialog*        mp_joinGameDialog;
-    LogWidget*             mp_logWidget;
-    ChatWidget*            mp_chatWidget;
-    ServerConnection       m_serverConnection;
-    Game*                  mp_game;
-    
-    QLabel*                mp_labelStatusBarServerState;
+}
 
 
-private:
-    void createStatusBar();
-    void createMenu();
-    void createActions();
-    void createWidgets();
-    
-    void updateActions();
+OpponentWidget::~OpponentWidget()
+{
+}
 
-};
+QString OpponentWidget::name() const
+{
+    return mp_labelPlayerName->text();
+}
 
-#endif
+int OpponentWidget::id() const
+{
+    return m_id;
+}
+
+

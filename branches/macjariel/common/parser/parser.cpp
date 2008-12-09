@@ -32,6 +32,8 @@
 #define PROTOCOL_VERSION "1.0"
 #define ASSERT_SOCKET if (!mp_socket) return
 
+
+
 Parser::Parser(QObject* parent):
 QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
 {
@@ -54,8 +56,8 @@ void Parser::attachSocket(QIODevice* socket)
     Q_ASSERT(socket);
     if (mp_socket) detachSocket();
     mp_socket = socket;
-//    connect(mp_socket, SIGNAL(disconnected()),
-//            this, SLOT(detachSocket()));
+    connect(mp_socket, SIGNAL(disconnected()),
+            this, SLOT(detachSocket()));
 
     mp_streamReader = new QXmlStreamReader(mp_socket);
     mp_streamWriter = new QXmlStreamWriter(mp_socket);
@@ -73,6 +75,8 @@ void Parser::detachSocket()
                this, SLOT(detachSocket()));
     delete mp_streamWriter;
     delete mp_streamReader;
+    mp_socket = 0;
+    emit terminated();
 }
 
 
@@ -97,10 +101,11 @@ void Parser::readData()
         if (!(mp_streamReader->isStartElement() ||
               mp_streamReader->isEndElement() ||
               (mp_streamReader->isCharacters() && !mp_streamReader->isWhitespace()))) continue;
-//        qDebug() << this << "token: " << mp_streamReader->tokenType() <<
-//                            "name: " << mp_streamReader->name().toString() <<
-//                            "text: " << mp_streamReader->text().toString();
-
+/*
+        qDebug() << this << "token: " << mp_streamReader->tokenType() <<
+                            "name: " << mp_streamReader->name().toString() <<
+                            "text: " << mp_streamReader->text().toString();
+*/
 
         if (mp_streamReader->isEndElement()) m_readerDepth--;
 
@@ -148,11 +153,13 @@ void Parser::stateStart()
 }
 void Parser::stateReady()
 {
-    Q_ASSERT(m_readerDepth == 1);
+    Q_ASSERT(m_readerDepth <= 1);
     if (mp_streamReader->isEndElement())
     {
+//        qDebug("Recieved end of stream.");
         m_readerState = S_Terminated;
         sendTermination();
+        mp_socket->close();
         return;
     }
     if (!mp_streamReader->isStartElement())
@@ -326,7 +333,6 @@ void Parser::sendTermination()
 {
     mp_streamWriter->writeEndElement();
     mp_streamWriter->writeEndDocument();
-    emit terminated();
 }
 
 
@@ -364,6 +370,7 @@ void Parser::actionEnd()   { mp_streamWriter->writeEndElement();           }
 
 void Parser::eventLeaveGame(int gameId, const StructPlayer& player, bool other)
 {
+    ASSERT_SOCKET;
     eventStart();
     mp_streamWriter->writeStartElement("leave-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
@@ -378,6 +385,7 @@ void Parser::eventLeaveGame(int gameId, const StructPlayer& player, bool other)
 
 void Parser::eventMessage(int senderId, const QString& senderName, const QString& message)
 {
+    ASSERT_SOCKET;
     eventStart();
     mp_streamWriter->writeStartElement("message");
     mp_streamWriter->writeAttribute("senderId", QString::number(senderId));
@@ -397,6 +405,7 @@ void Parser::streamError()
 
 void Parser::actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player)
 {
+    ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("join-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
@@ -408,6 +417,7 @@ void Parser::actionJoinGame(int gameId, const QString& gamePassword, const Struc
 
 void Parser::actionLeaveGame()
 {
+    ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeEmptyElement("leave-game");
     actionEnd();
@@ -415,9 +425,15 @@ void Parser::actionLeaveGame()
 
 void Parser::actionMessage(const QString& message)
 {
+    ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("message");
     mp_streamWriter->writeCharacters(message);
     mp_streamWriter->writeEndElement();
     actionEnd();
+}
+
+void Parser::terminate()
+{
+    sendTermination();
 }

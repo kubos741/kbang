@@ -49,6 +49,7 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
 
 Client::~Client()
 {
+    if (mp_player) actionLeaveGame(); // If client is in game, it should leave it
     emit disconnected(m_id);
     qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_id);
 }

@@ -17,65 +17,29 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef OPPONENTWIDGET_H
+#define OPPONENTWIDGET_H
 
-#include <QHash>
+#include <QWidget>
+#include "ui_opponentwidget.h"
 
-#include "ui_mainwindow.h"
-#include "serverconnection.h"
+#include "parser/parserstructs.h"
 
-
-
-class ConnectToServerDialog;
-class JoinGameDialog;
-class LogWidget;
-class ChatWidget;
-class QLabel;
-class OpponentWidget;
-class Game;
 
 /**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class MainWindow : public QMainWindow, public Ui::MainWindow
-{
-Q_OBJECT
+class OpponentWidget: public QWidget, public Ui::OpponentWidget {
+
 public:
-    MainWindow();
-    virtual ~MainWindow();
-    
-private slots:
-    void connectToServer();
-    void disconnectFromServer();
-    void joinGame();
-    void leaveGame();
-    
-    
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-    
-    
-    void serverConnectionStatusChanged();
+    OpponentWidget(QWidget *parent, const StructPlayer&);
+    ~OpponentWidget();
 
-private:
-    ConnectToServerDialog* mp_connectToServerDialog;
-    JoinGameDialog*        mp_joinGameDialog;
-    LogWidget*             mp_logWidget;
-    ChatWidget*            mp_chatWidget;
-    ServerConnection       m_serverConnection;
-    Game*                  mp_game;
+    int id() const;
+    QString name() const;
     
-    QLabel*                mp_labelStatusBarServerState;
-
-
-private:
-    void createStatusBar();
-    void createMenu();
-    void createActions();
-    void createWidgets();
-    
-    void updateActions();
+private:    
+    int m_id;
 
 };
 

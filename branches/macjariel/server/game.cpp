@@ -58,6 +58,7 @@ Game::~Game()
 
 Player* Game::createNewPlayer(StructPlayer player)
 {
+    qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(player.id).arg(player.name)));
     if (m_gameState != WaitingForPlayers) return 0;
     while (!m_nextPlayerId || m_players.contains(m_nextPlayerId))
     {
@@ -73,6 +74,7 @@ Player* Game::createNewPlayer(StructPlayer player)
 void Game::removePlayer(int playerId)
 {
     Q_ASSERT(m_players.contains(playerId));
+    qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
     StructPlayer p = m_players[playerId]->structPlayer();
     Player* plr = m_players[playerId];
     m_playerList.removeAll(m_players[playerId]);
