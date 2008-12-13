@@ -2,4 +2,7 @@
   <qresource prefix="icons" >
     <file>../data/gfx/icon-connect.svg</file>
   </qresource>
+  <qresource prefix="misc" >
+    <file>../data/gfx/background.png</file>
+  </qresource>
 </RCC>

@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>738</height>
+    <width>735</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -15,9 +15,25 @@
   <property name="autoFillBackground" >
    <bool>false</bool>
   </property>
-  <widget class="QWidget" name="centralwidget" >
+  <property name="styleSheet" >
+   <string notr="true" >QWidget#centralWidget {
+	background-image: url(:/misc/data/gfx/background.png);
+}
+
+QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(0, 170, 0), stop:1 darkgreen); }
+
+
+
+</string>
+  </property>
+  <widget class="QWidget" name="centralWidget" >
    <property name="autoFillBackground" >
     <bool>false</bool>
+   </property>
+   <property name="styleSheet" >
+    <string notr="true" >
+
+</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" >
     <item>
@@ -81,13 +97,13 @@
          </size>
         </property>
         <property name="styleSheet" >
-         <string notr="true" >background-color: rgba(0, 0, 0, 15);</string>
+         <string notr="true" />
         </property>
         <property name="frameShape" >
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow" >
-         <enum>QFrame::Raised</enum>
+         <enum>QFrame::Plain</enum>
         </property>
        </widget>
       </item>
@@ -116,10 +132,10 @@
          </size>
         </property>
         <property name="styleSheet" >
-         <string notr="true" >background-color: rgba(0, 0, 0, 15);</string>
+         <string notr="true" />
         </property>
         <property name="frameShadow" >
-         <enum>QFrame::Raised</enum>
+         <enum>QFrame::Plain</enum>
         </property>
        </widget>
       </item>
@@ -148,10 +164,10 @@
          </size>
         </property>
         <property name="styleSheet" >
-         <string notr="true" >background-color: rgba(0, 0, 0, 15);</string>
+         <string notr="true" />
         </property>
         <property name="frameShadow" >
-         <enum>QFrame::Raised</enum>
+         <enum>QFrame::Plain</enum>
         </property>
        </widget>
       </item>
@@ -164,7 +180,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>606</width>
+     <width>735</width>
      <height>26</height>
     </rect>
    </property>

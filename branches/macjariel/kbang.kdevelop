@@ -97,7 +97,9 @@
       <designer>/usr/bin/designer</designer>
       <designerpluginpaths/>
     </qt>
-    <references/>
+    <references>
+      <pcs>Qt4</pcs>
+    </references>
     <codecompletion>
       <automaticCodeCompletion>false</automaticCodeCompletion>
       <automaticArgumentsHint>true</automaticArgumentsHint>
