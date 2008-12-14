@@ -13,6 +13,7 @@ HEADERS += gameloop.h \
  joingamedialog.h \
  logwidget.h \
  chatwidget.h \
+ card.h \
  opponentwidget.h \
  game.h
 FORMS += connecttoserverdialog.ui mainwindow.ui \
@@ -28,6 +29,7 @@ SOURCES += gameloop.cpp main.cpp \
  joingamedialog.cpp \
  logwidget.cpp \
  chatwidget.cpp \
+ card.cpp
  opponentwidget.cpp \
  game.cpp
 
