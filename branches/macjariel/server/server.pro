@@ -14,7 +14,12 @@ weaponcard.h \
  config.h \
  publicgameview.h \
  publicplayerview.h \
- privateplayerview.h
+ privateplayerview.h \
+ cardabstract.h \
+ cardplayable.h \
+ cardbang.h \
+ cardmissed.h \
+ cards.h
 SOURCES += main.cpp \
 charactercard.cpp \
 player.cpp \
@@ -31,7 +36,11 @@ playingcard.cpp \
  publicgameview.cpp \
  abstractplayerctrl.cpp \
  publicplayerview.cpp \
- privateplayerview.cpp
+ privateplayerview.cpp \
+ cardabstract.cpp \
+ cardplayable.cpp \
+ cardbang.cpp \
+ cardmissed.cpp
 TEMPLATE = app
 
 CONFIG -= release

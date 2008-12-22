@@ -144,7 +144,7 @@ void MainWindow::updateActions()
     else
     {
         mp_actionConnectToServer->setEnabled(1);
-        mp_actionDisconnectFromServer->setEnabled(0); 
+        mp_actionDisconnectFromServer->setEnabled(0);
         mp_actionJoinGame->setEnabled(0);
         mp_actionLeaveGame->setEnabled(0);
     }
@@ -195,14 +195,14 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
     else
     {
         // PLAYER HAS ENTERED GAME
-        
+
         Q_ASSERT(mp_game == 0);
         mp_game = new Game(this, gameId, player, &m_serverConnection);
         mp_game->delegateVisualElements(mp_opponentContainer);
         mp_game->init();
         updateActions();
     }
-    
+
 }
 
 

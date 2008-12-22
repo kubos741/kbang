@@ -17,26 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CARDPLAYABLE_H
+#define CARDPLAYABLE_H
 
-#ifndef UTIL_H
-#define UTIL_H
+#include <cardabstract.h>
 
-#include <QString>
-#include <QList>
-
-#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-QString randomToken(int minLength, int maxLength);
-
-template <typename T>
-inline void shuffleList(QList<T>& list)
+/**
+ * This is an abstract class for all cards that can be played, which means
+ * that player can use this card by putting it on the top of the graveyard.
+ * Some of these cards can also require to specify a target player or target
+ * card.
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class CardPlayable: public CardAbstract
 {
-    int size = list.count();
-    int swapCount = size * 4;
-    while(swapCount-- != 0)
-    {
-        list.swap(random() % size, random() % size);
-    }
-}
+Q_OBJECT
+public:
+    CardPlayable(Game* game, int id);
+    virtual ~CardPlayable();
+
+    virtual bool play();
+    virtual bool play(Player* targetPlayer) = 0;
+    virtual bool play(CardAbstract* targetCard) = 0;
+
+    virtual void noReaction(Player* reactingPlayer) = 0;
+};
 
 #endif

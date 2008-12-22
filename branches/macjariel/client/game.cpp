@@ -22,6 +22,8 @@
 #include "parser/queryget.h"
 #include "opponentwidget.h"
 
+#include <QtDebug>
+
 Game::Game(QObject* parent, int gameId, const StructPlayer& player, ServerConnection* serverConnection):
     QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId), mp_serverConnection(serverConnection)
 {
@@ -48,6 +50,8 @@ Game::~Game()
 
 void Game::opponentJoinedGame(const StructPlayer& player)
 {
+    qDebug() << player.id;
+    qDebug() << player.name;
     m_opponentWidgets[player.id] = new OpponentWidget(0, player);
     mp_opponentsLayout->addWidget(m_opponentWidgets[player.id]);
     qDebug(qPrintable(QString("Player %1 has entered the game!").arg(player.name)));

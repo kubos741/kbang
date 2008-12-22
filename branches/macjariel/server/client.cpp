@@ -44,6 +44,8 @@ Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
             this, SLOT(actionJoinGame(int, StructPlayer)));
     connect(mp_parser, SIGNAL(sigActionLeaveGame()),
             this, SLOT(actionLeaveGame()));
+    connect(mp_parser, SIGNAL(sigActionStartGame()),
+            this, SLOT(actionStartGame()));
 }
 
 
@@ -62,7 +64,9 @@ int Client::id() const
 void Client::actionCreateGame(const StructGame& game, const StructPlayer& player)
 {
     if (mp_player) return; // Already in game - do nothing
-    Game* newGame = GameServer::instance().createGame(game);
+    StructGame g = game;
+    g.creatorId = id();
+    Game* newGame = GameServer::instance().createGame(g);
     Q_ASSERT(newGame != 0);
     joinGame(newGame, player);
 }
@@ -106,6 +110,8 @@ void Client::connectPlayer()
             mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
     connect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
             this, SLOT(leavingGame(int,const StructPlayer&)));
+    connect(mp_player->game(), SIGNAL(playerDrawedCard(Player*, CardAbstract*)),
+            this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
 }
 
 void Client::disconnectPlayer()
@@ -116,6 +122,9 @@ void Client::disconnectPlayer()
                mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
     disconnect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
                this, SLOT(leavingGame(int,const StructPlayer&)));
+    disconnect(mp_player->game(), SIGNAL(playerDrawedCard(Player*, CardAbstract*)),
+               this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
+
 }
 
 void Client::leavingGame(int gameId, const StructPlayer& player)
@@ -131,6 +140,28 @@ void Client::leavingGame(int gameId, const StructPlayer& player)
     {
         mp_parser->eventLeaveGame(gameId, player, 1);
     }
+}
+
+void Client::actionStartGame()
+{
+    if (mp_player == 0) return;
+    if (mp_player->game()->creatorId() == id())
+    {
+        mp_player->game()->startGame();
+    }
+}
+
+void Client::playerDrawedCard(Player *player, CardAbstract *card)
+{
+    StructCardMovement x;
+    x.pocketFrom = POCKET_DECK;
+    x.pocketTo   = POCKET_HAND;
+    x.playerTo   = player->id();
+    if (player == mp_player)
+    {
+        x.cardDetails = card->cardDetails();
+    }
+    mp_parser->eventCardMovement(x);
 }
 
 

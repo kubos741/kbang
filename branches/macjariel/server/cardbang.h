@@ -17,26 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CARDBANG_H
+#define CARDBANG_H
 
-#ifndef UTIL_H
-#define UTIL_H
+#include <cardplayable.h>
 
-#include <QString>
-#include <QList>
-
-#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-QString randomToken(int minLength, int maxLength);
-
-template <typename T>
-inline void shuffleList(QList<T>& list)
+/**
+ * This class represents the Bang! cards.
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class CardBang: public CardPlayable
 {
-    int size = list.count();
-    int swapCount = size * 4;
-    while(swapCount-- != 0)
-    {
-        list.swap(random() % size, random() % size);
-    }
-}
+Q_OBJECT
+public:
+    CardBang(Game* game, int id);
+    ~CardBang();
+
+    /**
+     * Bang! card can be played without specifying target player only in
+     * certain situations:
+     *   * player is in Duel                    (NIY)
+     *   * player responds to Indians card      (NIY)
+     */
+    virtual bool play();
+    virtual bool play(Player* targetPlayer);
+    virtual bool play(CardAbstract* targetCard);
+
+    virtual QString type() const { return "bang"; }
+
+    virtual void noReaction(Player* reactingPlayer);
+};
 
 #endif

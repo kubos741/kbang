@@ -15,7 +15,9 @@ HEADERS += gameloop.h \
  chatwidget.h \
  card.h \
  opponentwidget.h \
- game.h
+ game.h \
+ cardwidget.h
+
 FORMS += connecttoserverdialog.ui mainwindow.ui \
  joingamedialog.ui \
  logwidget.ui \
@@ -29,9 +31,10 @@ SOURCES += gameloop.cpp main.cpp \
  joingamedialog.cpp \
  logwidget.cpp \
  chatwidget.cpp \
- card.cpp
+ card.cpp \
  opponentwidget.cpp \
- game.cpp
+ game.cpp \
+ cardwidget.cpp
 
 QT += network \
  xml

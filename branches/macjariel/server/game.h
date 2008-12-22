@@ -29,7 +29,8 @@ class Client;
 class Player;
 class GameServer;
 class Game;
-class QXmlStreamWriter;
+class CardAbstract;
+class CardPlayable;
 
 /**
  * The Game class represents a bang game. It handles creating and destroying players and generates
@@ -40,13 +41,6 @@ class Game: public QObject
 {
     Q_OBJECT;
 public:
-    enum GameState {
-        Invalid = 0,
-        WaitingForPlayers,
-        WaitingForCharacters,
-        Playing,
-        Finished
-    };
 
     /**
      * Creates an instance of Game. The GameServer class is responsible
@@ -195,6 +189,44 @@ public:
         return &m_publicGameView;
     }
 
+    /**
+     * Returns true, if the player that is on turn has the right
+     * to decide what to do. The opposite situation means that
+     * there has been a card played and we are still waiting for
+     * the resolution of the card effect.
+     */
+    bool isBaseTurn() const;
+
+    /**
+     * Returns the pointer to Player that is currently on turn.
+     */
+    Player* playerOnTurn() const;
+
+    /**
+     * Appends a playable card to the playedCards list. This should
+     * be exclusively used by CardPlayable::play methods.
+     */
+    void appendPlayedCard(CardPlayable* card);
+
+    /**
+     * Returns the last played card.
+     */
+    CardPlayable* peakPlayedCards() const;
+
+    /**
+     * Clears the playedCards list by appending its content
+     * to the graveyard.
+     */
+    void clearPlayedCards();
+
+
+    /**
+     * Returns the distance from one player to another. The effect
+     * of "horse" cards is considered and therefore this function
+     * does not have to be symmetric. Generally getDistance(A,B) !=
+     * getDistance(B,A).
+     */
+    int getDistance(Player* fromPlayer, Player* toPlayer);
 
     void sendMessage(Player* player, const QString& message);
 
@@ -204,8 +236,23 @@ signals:
     void playerLeavedGame(int gameId, const StructPlayer&);
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
+    void statusChanged(const GameState&);
 
+    void playerDrawedCard(Player* player, CardAbstract* card);
 
+private:
+    void shufflePlayers();
+    void shuffleDeck();
+    void setRoles();
+    void generateCards();
+    void dealCards();
+    CardAbstract* popCardFromDeck();
+    int uniqueCardId();
+    QList<PlayerRole> getRoleList();
+    void regenerateDeck();
+
+public:
+    void drawCard(Player* p, int count = 1);
 
 
 private:
@@ -226,6 +273,13 @@ private:
     int                  m_nextPlayerId;
     GameState            m_gameState;
     const PublicGameView m_publicGameView;
+
+    int m_playerOnTurnId; /// index to m_playerList
+
+    QList<CardAbstract*> m_deck;
+    QList<CardAbstract*> m_graveyard;
+    QList<CardPlayable*> m_playedCards;
+    QMap<int, CardAbstract*> m_cards;
 
 signals:
 

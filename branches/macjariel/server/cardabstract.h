@@ -17,26 +17,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CARDABSTRACT_H
+#define CARDABSTRACT_H
 
-#ifndef UTIL_H
-#define UTIL_H
+#include <QObject>
+#include "game.h"
+#include "parser/parserstructs.h"
 
-#include <QString>
-#include <QList>
+class Player;
 
-#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-QString randomToken(int minLength, int maxLength);
-
-template <typename T>
-inline void shuffleList(QList<T>& list)
+/**
+ * The base class for all cards that are in the desk. Character and role
+ * cards are not included.
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class CardAbstract: public QObject
 {
-    int size = list.count();
-    int swapCount = size * 4;
-    while(swapCount-- != 0)
-    {
-        list.swap(random() % size, random() % size);
-    }
-}
+Q_OBJECT
+public:
+    CardAbstract(Game *game, int id);
+    virtual ~CardAbstract();
+
+    inline void setOwner(Player *owner) { mp_owner = owner; }
+    inline void setPocket(const Pocket& pocket) { m_pocket = pocket; }
+
+    inline int id() const { return m_id; }
+    virtual QString type() const = 0;
+    inline StructCardDetails cardDetails() const { return StructCardDetails(m_id, type()); }
+    inline Player* owner() const { return mp_owner; }
+    inline Pocket  pocket() const { return m_pocket; }
+
+protected:
+    Game *mp_game;
+
+private:
+    Player *mp_owner;
+    Pocket  m_pocket;
+    const int m_id;
+};
 
 #endif

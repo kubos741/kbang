@@ -17,26 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "cardplayable.h"
 
-#ifndef UTIL_H
-#define UTIL_H
-
-#include <QString>
-#include <QList>
-
-#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-QString randomToken(int minLength, int maxLength);
-
-template <typename T>
-inline void shuffleList(QList<T>& list)
+CardPlayable::CardPlayable(Game* game, int id): CardAbstract(game, id)
 {
-    int size = list.count();
-    int swapCount = size * 4;
-    while(swapCount-- != 0)
-    {
-        list.swap(random() % size, random() % size);
-    }
 }
 
-#endif
+CardPlayable::~CardPlayable()
+{
+}
+
+bool CardPlayable::play()
+{
+    // TODO: remove from player hands
+    // owner()->removeCardFromHand(this);
+    mp_game->appendPlayedCard(this);
+    setPocket(POCKET_PLAYED);
+    return 1;
+}
+
+

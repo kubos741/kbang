@@ -270,6 +270,11 @@ void Parser::processStanza()
             emit sigActionLeaveGame();
             return;
         }
+        if (action->name() == "start-game")
+        {
+            emit sigActionStartGame();
+            return;
+        }
         if (action->name() == "message")
         {
             XmlNode* messageNode = action->getFirstChild();
@@ -336,7 +341,6 @@ void Parser::sendTermination()
 }
 
 
-
 QueryGet* Parser::queryGet()
 {
     QString id;
@@ -395,6 +399,27 @@ void Parser::eventMessage(int senderId, const QString& senderName, const QString
     eventEnd();
 }
 
+void Parser::eventCardMovement(const StructCardMovement& cardMovement)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("card-movement");
+    mp_streamWriter->writeAttribute("pocketFrom", QString::number(cardMovement.pocketFrom));
+    mp_streamWriter->writeAttribute("pocketTo", QString::number(cardMovement.pocketTo));
+    if (cardMovement.playerFrom != 0)
+        mp_streamWriter->writeAttribute("playerFrom", QString::number(cardMovement.playerFrom));
+    if (cardMovement.playerTo != 0)
+        mp_streamWriter->writeAttribute("playerTo", QString::number(cardMovement.playerTo));
+    if (cardMovement.cardDetails.cardId != 0)
+    {
+        mp_streamWriter->writeAttribute("cardId", QString::number(cardMovement.cardDetails.cardId));
+        mp_streamWriter->writeAttribute("cardType", cardMovement.cardDetails.cardType);
+    }
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+
 
 void Parser::streamError()
 {
@@ -437,3 +462,4 @@ void Parser::terminate()
 {
     sendTermination();
 }
+

@@ -23,7 +23,7 @@
 #include "parser/parser.h"
 
 #include "player.h"
-
+#include "cards.h"
 
 #include <QObject>
 #include <QPair>
@@ -55,9 +55,11 @@ public slots: // These slots are connected to parser
     void actionCreateGame(const StructGame& game, const StructPlayer& player);
     void actionJoinGame(int gameId, const StructPlayer& player);
     void actionLeaveGame();
+    void actionStartGame();
 
 public slots: // These slots are connected to player/game
     void leavingGame(int gameId, const StructPlayer& player);
+    void playerDrawedCard(Player*, CardAbstract*);
 
 private:
     void joinGame(Game*, const StructPlayer&);

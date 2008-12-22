@@ -34,7 +34,7 @@ typedef Card* CardPointer;
 class Card
 {
 public:
-    
+
     typedef enum {
         CT_CHARACTER,
         CT_ROLE,
@@ -66,10 +66,9 @@ private:
     QPixmap m_image;
     QString m_imageSmallFile;
     QString m_imageFile;
-    // some way to store image of card
 
     static QMap<QString, CardPointer> sm_cards;
-    
+
 };
 
 #endif

@@ -34,6 +34,46 @@ struct StructServerInfo
     static QString elementName;
 };
 
+enum GameState {
+        Invalid = 0,
+        WaitingForPlayers,
+        WaitingForCharacters,
+        Playing,
+        Finished
+};
+
+enum PlayerRole {
+    ROLE_INVALID,
+    ROLE_SHERIFF,
+    ROLE_DEPUTY,
+    ROLE_BANDITA, // RENAME
+    ROLE_RENEGADE
+};
+
+enum Pocket {
+    POCKET_DECK         = 1,
+    POCKET_GRAVEYARD    = 2,
+    POCKET_HAND         = 3,
+    POCKET_TABLE        = 4,
+    POCKET_PLAYED       = 5,
+    POCKET_SELECTION    = 6
+};
+
+struct StructCardDetails {
+    int cardId;
+    QString cardType;
+    StructCardDetails(): cardId(0) {}
+    StructCardDetails(int i, const QString& t): cardId(i), cardType(t) {}
+};
+
+struct StructCardMovement {
+    Pocket            pocketFrom;
+    Pocket            pocketTo;
+    int               playerFrom;
+    int               playerTo;
+    StructCardDetails cardDetails;
+    StructCardMovement(): playerFrom(0), playerTo(0) {}
+};
 
 struct StructClient
 {

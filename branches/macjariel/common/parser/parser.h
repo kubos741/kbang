@@ -91,6 +91,9 @@ public slots:
     void eventJoinGame(int gameId, const StructPlayer&, bool other = 1);
     void eventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
+
+    void eventCardMovement(const StructCardMovement&);
+
     //void resultServerInfo(const StructServerInfo&);
     //void resultGameList(const StructGameList&);
     //void resultGameInfo(const StructGame&);

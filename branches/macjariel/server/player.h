@@ -27,6 +27,8 @@
 #include "privateplayerview.h"
 #include "parser/parserstructs.h"
 
+
+class CardAbstract;
 class CharacterCard;
 class WeaponCard;
 class Game;
@@ -72,10 +74,11 @@ public:
      * Returns number of life-points.
      */
     //int lifePoints() const;
-    
+
     /**
      * Returns the players' character.
      */
+
     //const CharacterCard& getCharacterCard() const;
 
     /**
@@ -83,16 +86,28 @@ public:
      */
     //int getCardsInHandCount() const
 
+    inline PlayerRole role() const { return m_role; }
+
+    int initialCardCount() const;
+
+    int weaponRange() const { return 1; } // TODO
+
+    void modifyLifePoints(int x);
 
     /**
      * Returns player struct.
      */
      StructPlayer structPlayer();
 
+    void appendCardToHand(CardAbstract* card);
+
+
     //const PublicPlayerView* publicView() const;
     //const PrivatePlayerView* privateView() const;
 
     //const PlayerActions* playerActions() const;
+
+    inline void setRole(const PlayerRole& role) { m_role = role; }
 
 
 /// Commands from the controller of the player
@@ -128,11 +143,13 @@ private:
 //    CharacterCard*            m_characterCard;
 //    PlayingCardList           m_cardsInHand;
 //    WeaponCard*               m_weaponCard;
+    QList<CardAbstract*>      m_cardsInHand;
     QString                   m_name;
     QString                   m_password;
+    PlayerRole                m_role;
     Game*                     mp_game;
-    
-    
+
+
 //    const PublicPlayerView    m_publicPlayerView;
 //    const PrivatePlayerView   m_privatePlayerView;
 };

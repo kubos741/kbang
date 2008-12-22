@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include "util.h"
+#include <stdlib.h>
+#include <QList>
 
 QString randomToken(int minLength, int maxLength)
 {
@@ -34,3 +36,4 @@ QString randomToken(int minLength, int maxLength)
     token[length - 1] = '\0';
     return QString(token);
 }
+

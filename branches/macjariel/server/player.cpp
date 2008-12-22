@@ -20,7 +20,7 @@
 #include "player.h"
 #include "game.h"
 #include "client.h"
-
+#include "cards.h"
 
 Player::Player(int id, const QString& name, const QString& password, Game* game):
 QObject(game),
@@ -80,3 +80,23 @@ Game* Player::game() const
     return mp_game;
 }
 
+void Player::modifyLifePoints(int x)
+{
+    m_lifePoints += x;
+}
+
+void Player::appendCardToHand(CardAbstract * card)
+{
+    m_cardsInHand.append(card);
+    card->setOwner(this);
+    card->setPocket(POCKET_HAND);
+}
+
+
+
+int Player::initialCardCount() const
+{
+    int cardCount = 4;
+    if (role() == ROLE_SHERIFF) cardCount++;
+    return cardCount;
+}
