@@ -17,73 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef CREATEGAMEDIALOG_H
+#define CREATEGAMEDIALOG_H
 
-#include <QHash>
-#include <QList>
-#include <QGridLayout>
+#include <QDialog>
+#include <ui_creategamedialog.h>
 
-#include "ui_mainwindow.h"
-#include "serverconnection.h"
+#include "parser/parserstructs.h"
 
-
-
-class ConnectToServerDialog;
-class CreateGameDialog;
-class JoinGameDialog;
-class LogWidget;
-class ChatWidget;
-class QLabel;
-class PlayerWidget;
-class OpponentWidget;
-class Game;
 
 /**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class MainWindow : public QMainWindow, public Ui::MainWindow
+class CreateGameDialog : public QDialog, public Ui::CreateGameDialog
 {
 Q_OBJECT
 public:
-    MainWindow();
-    virtual ~MainWindow();
+    CreateGameDialog(QWidget *parent);
+
+    ~CreateGameDialog();
+
 
 private slots:
-    void connectToServer();
-    void disconnectFromServer();
-    void showCreateGameDialog();
-    void showJoinGameDialog();
-    void leaveGame();
+    void playerRangeChanged();
+    void validateInput();
+    void on_pushButtonCreate_clicked();
 
-
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-
-
-    void serverConnectionStatusChanged();
-
-private:
-    ConnectToServerDialog* mp_connectToServerDialog;
-    CreateGameDialog*      mp_createGameDialog;
-    JoinGameDialog*        mp_joinGameDialog;
-    LogWidget*             mp_logWidget;
-    ChatWidget*            mp_chatWidget;
-    ServerConnection       m_serverConnection;
-    Game*                  mp_game;
-    QLabel*                mp_labelStatusBarServerState;
-    QList<OpponentWidget*> mp_opponentWidgets;
-    QGridLayout*           mp_layout;
-
-
-private:
-    void createStatusBar();
-    void createMenu();
-    void createActions();
-    void createWidgets();
-
-    void updateActions();
-
+signals:
+    void createGame(const StructGame&, const StructPlayer&);
 };
 
 #endif

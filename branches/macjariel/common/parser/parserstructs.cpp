@@ -72,7 +72,7 @@ void StructGame::read(XmlNode* node, StructPlayerList* playerList)
 void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerlist) const
 {
     writer->writeStartElement("game");
-    writer->writeAttribute("id", QString::number(id));
+    if (id != 0) writer->writeAttribute("id", QString::number(id));
     writer->writeAttribute("name", name);
     writer->writeAttribute("minPlayers", QString::number(minPlayers));
     writer->writeAttribute("maxPlayers", QString::number(maxPlayers));

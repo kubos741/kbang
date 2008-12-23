@@ -87,6 +87,12 @@ void ServerConnection::recievedServerInfo(const StructServerInfo& serverInfo)
     emit statusChanged();
 }
 
+void ServerConnection::createGame(const StructGame& game, const StructPlayer& player)
+{
+    emit logMessage(tr("Creating game \"%1\".").arg(game.name));
+    mp_parser->actionCreateGame(game, player);
+}
+
 void ServerConnection::joinGame(int gameId, const QString& gamePassword, const QString& playerName)
 {
     emit logMessage(tr("Joining game id %1.").arg(gameId));
@@ -142,8 +148,8 @@ void ServerConnection::recievedEventLeaveGame(int gameId, const StructPlayer& pl
 
 void ServerConnection::initializeParserConnections()
 {
-    connect(mp_parser, SIGNAL(sigEventJoinGame(int, const StructPlayer&, bool)),
-            this, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool)));
+    connect(mp_parser, SIGNAL(sigEventJoinGame(int, const StructPlayer&, bool, bool)),
+            this, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool, bool)));
     connect(mp_parser, SIGNAL(sigEventLeaveGame(int, const StructPlayer&, bool)),
             this, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
@@ -164,6 +170,7 @@ QString ServerConnection::hostName() const
 {
     return m_serverHost;
 }
+
 
 
 

@@ -246,13 +246,25 @@ void Parser::processStanza()
         if (!action) return;
         if (action->name() == "create-game")
         {
-            XmlNode* player = action->getFirstChild();
-            if (!player) return;
+            XmlNode* gameElem = 0;
+            XmlNode* playerElem = 0;
+            foreach(XmlNode* child, action->getChildren())
+            {
+                if (child->name() == "game" && gameElem == 0)
+                {
+                    gameElem = child;
+                }
+                if (child->name() == "player" && playerElem == 0)
+                {
+                    playerElem = child;
+                }
+            }
+            if (!gameElem || !playerElem) return; // TODO: error handling
             StructGame game;
-            game.read(action);
-            StructPlayer p;
-            p.read(player);
-            emit sigActionCreateGame(game, p);
+            game.read(gameElem);
+            StructPlayer player;
+            player.read(playerElem);
+            emit sigActionCreateGame(game, player);
             return;
         }
         if (action->name() == "join-game")
@@ -293,9 +305,10 @@ void Parser::processStanza()
             if (!player) return;
             int gameId = event->attribute("gameId").toInt();
             bool other = !event->attribute("other").isEmpty();
+            bool creator = !event->attribute("creator").isEmpty();
             StructPlayer p;
             p.read(player);
-            emit sigEventJoinGame(gameId, p, other);
+            emit sigEventJoinGame(gameId, p, other, creator);
             return;
         }
         if (event->name() == "leave-game")
@@ -352,7 +365,7 @@ QueryGet* Parser::queryGet()
     return query;
 }
 
-void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other)
+void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other, bool creator)
 {
     eventStart();
     mp_streamWriter->writeStartElement("join-game");
@@ -360,6 +373,12 @@ void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other)
     if (other)
     {
         mp_streamWriter->writeAttribute("other", "1");
+    }
+    qDebug() << "creator:" << creator;
+    if (creator)
+    {
+
+        mp_streamWriter->writeAttribute("creator", "1");
     }
     player.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();
@@ -428,6 +447,18 @@ void Parser::streamError()
     m_readerState = S_Error;
 }
 
+void Parser::actionCreateGame(const StructGame& game , const StructPlayer& player)
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeStartElement("create-game");
+    game.write(mp_streamWriter);
+    player.write(mp_streamWriter, 1);
+    mp_streamWriter->writeEndElement();
+    actionEnd();
+}
+
+
 void Parser::actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player)
 {
     ASSERT_SOCKET;
@@ -462,4 +493,6 @@ void Parser::terminate()
 {
     sendTermination();
 }
+
+
 

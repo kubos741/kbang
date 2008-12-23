@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>735</width>
+    <width>730</width>
     <height>596</height>
    </rect>
   </property>
@@ -31,157 +31,16 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     <bool>false</bool>
    </property>
    <property name="styleSheet" >
-    <string notr="true" >
-
-</string>
+    <string notr="true" />
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" >
-    <item>
-     <widget class="QFrame" name="frame" >
-      <property name="minimumSize" >
-       <size>
-        <width>0</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="frameShape" >
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow" >
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2" >
-       <item>
-        <layout class="QHBoxLayout" name="mp_opponentContainer" />
-       </item>
-       <item>
-        <widget class="QLabel" name="label" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text" >
-          <string>List of player widgets - later this component will be nicer.</string>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer" >
-      <property name="orientation" >
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0" >
-       <size>
-        <width>258</width>
-        <height>572</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" >
-      <item>
-       <widget class="QFrame" name="mp_chatFrame" >
-        <property name="minimumSize" >
-         <size>
-          <width>150</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="styleSheet" >
-         <string notr="true" />
-        </property>
-        <property name="frameShape" >
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow" >
-         <enum>QFrame::Plain</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QFrame" name="mp_playerFrame" >
-        <property name="minimumSize" >
-         <size>
-          <width>200</width>
-          <height>100</height>
-         </size>
-        </property>
-        <property name="styleSheet" >
-         <string notr="true" />
-        </property>
-        <property name="frameShadow" >
-         <enum>QFrame::Plain</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QFrame" name="mp_logFrame" >
-        <property name="minimumSize" >
-         <size>
-          <width>150</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="styleSheet" >
-         <string notr="true" />
-        </property>
-        <property name="frameShadow" >
-         <enum>QFrame::Plain</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>735</width>
-     <height>26</height>
+     <width>730</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="autoFillBackground" >
@@ -194,6 +53,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     <addaction name="mp_actionConnectToServer" />
     <addaction name="mp_actionDisconnectFromServer" />
     <addaction name="separator" />
+    <addaction name="actionCreateGame" />
     <addaction name="mp_actionJoinGame" />
     <addaction name="mp_actionLeaveGame" />
     <addaction name="mp_actionExit" />
@@ -240,6 +100,11 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
   <action name="actionConfigure_Profile" >
    <property name="text" >
     <string>Configure Profile</string>
+   </property>
+  </action>
+  <action name="actionCreateGame" >
+   <property name="text" >
+    <string>C&amp;reate Game</string>
    </property>
   </action>
  </widget>

@@ -48,6 +48,8 @@ public:
 public slots:
     void connectToServer(QString serverHost, int serverPort);
     void disconnectFromServer();
+
+    void createGame(const StructGame&, const StructPlayer&);
     void joinGame(int gameId, const QString& gamePassword, const QString& playerName);
     void leaveGame();
     void sendChatMessage(const QString& message);
@@ -78,13 +80,13 @@ signals:
     void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
     void logMessage(QString message);
     void incomingXml(QString message);
-    
+
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
-    
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other);
+
+    void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-    
-    
+
+
 
 };
 

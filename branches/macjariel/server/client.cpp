@@ -88,7 +88,8 @@ void Client::joinGame(Game* game, const StructPlayer& player)
     mp_player = game->createNewPlayer(player);
     Q_ASSERT(mp_player != 0);
     connectPlayer();
-    mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0);
+    bool creator = game->creatorId() == id();
+    mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0, creator);
 }
 
 

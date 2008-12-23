@@ -5,24 +5,63 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>233</width>
-    <height>123</height>
+    <width>440</width>
+    <height>230</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="baseSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
    <item row="0" column="0" >
-    <widget class="QFrame" name="frame" >
+    <widget class="QFrame" name="mainFrame" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="styleSheet" >
-      <string notr="true" >background-color: rgba(0, 0, 0, 64);</string>
+      <string notr="true" >QFrame#mainFrame
+	{
+
+	background-color: rgba(0,0,0,32);
+	background-clip: content;
+
+	border: 5px solid black;
+	border-left-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.9, y2:0, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));
+	border-right-color: qlineargradient(spread:reflect, x1:0.1, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 64), stop:1 rgba(0, 0, 0, 0));
+
+	border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));
+	border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:0, y2:0.1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64))
+
+}
+
+</string>
      </property>
      <property name="frameShape" >
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Plain</enum>
+      <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="lineWidth" >
       <number>2</number>
@@ -31,6 +70,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="client.qrc" />
+ </resources>
  <connections/>
 </ui>
