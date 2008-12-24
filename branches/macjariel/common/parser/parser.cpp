@@ -322,6 +322,13 @@ void Parser::processStanza()
             emit sigEventLeaveGame(gameId, p, other);
             return;
         }
+        if (event->name() == "game-startable")
+        {
+            int gameId = event->attribute("gameId").toInt();
+            bool startable = event->attribute("startable") == "1";
+            emit sigEventGameStartable(gameId, startable);
+            return;
+        }
         if (event->name() == "message")
         {
             XmlNode* messageNode = event->getFirstChild();
@@ -381,6 +388,16 @@ void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other, b
         mp_streamWriter->writeAttribute("creator", "1");
     }
     player.write(mp_streamWriter);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventGameStartable(int gameId, bool startable)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("game-startable");
+    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
+    mp_streamWriter->writeAttribute("startable", startable ? "1" : "0");
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -471,6 +488,15 @@ void Parser::actionJoinGame(int gameId, const QString& gamePassword, const Struc
     actionEnd();
 }
 
+void Parser::actionStartGame()
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeStartElement("start-game");
+    mp_streamWriter->writeEndElement();
+    actionEnd();
+}
+
 void Parser::actionLeaveGame()
 {
     ASSERT_SOCKET;
@@ -493,6 +519,8 @@ void Parser::terminate()
 {
     sendTermination();
 }
+
+
 
 
 

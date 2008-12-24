@@ -72,7 +72,8 @@ private:
     ServerConnection       m_serverConnection;
     Game*                  mp_game;
     QLabel*                mp_labelStatusBarServerState;
-    QList<OpponentWidget*> mp_opponentWidgets;
+    PlayerWidget*          mp_playerWidget;
+    QList<OpponentWidget*> m_opponentWidgets;
     QGridLayout*           mp_layout;
 
 

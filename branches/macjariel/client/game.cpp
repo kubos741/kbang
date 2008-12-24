@@ -24,8 +24,12 @@
 
 #include <QtDebug>
 
-Game::Game(QObject* parent, int gameId, const StructPlayer& player, ServerConnection* serverConnection):
-    QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId), mp_serverConnection(serverConnection)
+Game::Game(QObject* parent, int gameId, const StructPlayer& player,
+           ServerConnection* serverConnection, const GameWidgets& gameWidgets):
+QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId),
+mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
+m_opponentWidgets(gameWidgets.opponentWidget), mp_playerWidget(gameWidgets.playerWidget),
+m_creator(0)
 {
 }
 
@@ -35,16 +39,27 @@ void Game::init()
     connect(get, SIGNAL(result(const StructGame&, const StructPlayerList&)),
             this, SLOT(initialGameStateRecieved(const StructGame&, const StructPlayerList&)));
     get->getGame(m_gameId);
+    if (m_creator)
+    {
+        mp_startButton = new QPushButton(0);
+        mp_layout->addWidget(mp_startButton, 1, 1, 2, 2);
+        mp_layout->setAlignment(mp_startButton, Qt::AlignCenter);
+        mp_startButton->setText(tr("Start game"));
+        mp_startButton->setEnabled(0);
+        connect(mp_startButton, SIGNAL(clicked()),
+                this, SLOT(startButtonClicked()));
+        connect(mp_serverConnection, SIGNAL(startableChanged(int, bool)),
+                this, SLOT(startableChanged(int, bool)));
+    }
+
+
     qDebug("You have entered the game!");
 }
 
 
 Game::~Game()
 {
-    foreach(int i, m_opponentWidgets.keys())
-    {
-        m_opponentWidgets[i]->deleteLater();
-    }
+
 }
 
 
@@ -52,17 +67,25 @@ void Game::opponentJoinedGame(const StructPlayer& player)
 {
     qDebug() << player.id;
     qDebug() << player.name;
-    m_opponentWidgets[player.id] = new OpponentWidget(0, player);
-    mp_opponentsLayout->addWidget(m_opponentWidgets[player.id]);
+    for(int i = 0; i < m_opponentWidgets.count(); ++i)
+    {
+        OpponentWidget* w = m_opponentWidgets[i];
+        if (w->isEmpty())
+        {
+            w->setPlayer(player);
+            m_opponents[player.id] = i;
+            break;
+        }
+    }
     qDebug(qPrintable(QString("Player %1 has entered the game!").arg(player.name)));
 }
 
 void Game::opponentLeavedGame(const StructPlayer& player)
 {
-    if (m_opponentWidgets.contains(player.id))
+    if (m_opponents.contains(player.id))
     {
-        m_opponentWidgets[player.id]->deleteLater();
-        m_opponentWidgets.remove(player.id);
+        m_opponentWidgets[m_opponents[player.id]]->unsetPlayer();
+        m_opponents.remove(player.id);
     }
 }
 
@@ -78,11 +101,17 @@ void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& p
     }
 }
 
-void Game::delegateVisualElements(QLayout* opponentsLayout)
+void Game::startableChanged(int, bool startable)
 {
-    mp_opponentsLayout = opponentsLayout;
+    mp_startButton->setEnabled(startable);
 }
 
+void Game::startButtonClicked()
+{
+    disconnect(mp_startButton, SIGNAL(clicked()),
+               this, SLOT(startButtonClicked()));
+    mp_serverConnection->startGame();
+}
 
 
 

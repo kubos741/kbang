@@ -89,6 +89,11 @@ void Client::joinGame(Game* game, const StructPlayer& player)
     Q_ASSERT(mp_player != 0);
     connectPlayer();
     bool creator = game->creatorId() == id();
+    if (creator)
+    {
+        connect(mp_player->game(), SIGNAL(startableChanged(int, bool)),
+                mp_parser, SLOT(eventGameStartable(int, bool)));
+    }
     mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0, creator);
 }
 
@@ -117,15 +122,11 @@ void Client::connectPlayer()
 
 void Client::disconnectPlayer()
 {
-    disconnect(mp_player->game(), SIGNAL(incomingMessage(int, const QString&, const QString&)),
-               mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
-    disconnect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
-               mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
-    disconnect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
-               this, SLOT(leavingGame(int,const StructPlayer&)));
-    disconnect(mp_player->game(), SIGNAL(playerDrawedCard(Player*, CardAbstract*)),
-               this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
 
+    disconnect(mp_player->game(), 0,
+               mp_parser, 0);
+    disconnect(mp_player->game(), 0,
+               this, 0);
 }
 
 void Client::leavingGame(int gameId, const StructPlayer& player)

@@ -151,7 +151,7 @@
   </kdevfilecreate>
   <kdevtrollproject>
     <general>
-      <activedir>client</activedir>
+      <activedir>common</activedir>
     </general>
     <run>
       <directoryradio>executable</directoryradio>

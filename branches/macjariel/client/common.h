@@ -22,15 +22,23 @@
 #define COMMON_H
 
 #include <QtDebug>
+#include <QList>
+
+class PlayerWidget;
+class OpponentWidget;
+class QGridLayout;
+
+struct GameWidgets
+{
+    QGridLayout* layout;
+    PlayerWidget* playerWidget;
+    QList<OpponentWidget*> opponentWidget;
+    GameWidgets(QGridLayout* l, PlayerWidget* p, const QList<OpponentWidget*>& o):
+        layout(l), playerWidget(p), opponentWidget(o) {}
+};
 
 
 
 
-
-#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-
-QString randomToken(int minLength, int maxLength);
 
 #endif

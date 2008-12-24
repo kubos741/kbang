@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "common.h"
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "creategamedialog.h"
@@ -181,7 +182,8 @@ void MainWindow::createWidgets()
     mp_layout = new QGridLayout();
     for(int i = 0; i < 6; ++i)
     {
-        QWidget* w = new OpponentWidget(this, StructPlayer());
+        OpponentWidget* w = new OpponentWidget(this);
+        m_opponentWidgets.append(w);
         switch(i)
         {
         case 0: mp_layout->addWidget(w, 1, 0, 2, 1); break;
@@ -210,8 +212,8 @@ void MainWindow::createWidgets()
 
     mp_layout->addWidget(mp_logWidget, 3, 3, 1, 1);
 
-    PlayerWidget* playerWidget = new PlayerWidget(this  );
-    mp_layout->addWidget(playerWidget, 3, 1, 1, 2);
+    mp_playerWidget = new PlayerWidget(this  );
+    mp_layout->addWidget(mp_playerWidget, 3, 1, 1, 2);
 
     Ui::MainWindow::centralWidget->setLayout(mp_layout);
 }
@@ -233,16 +235,9 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
         // PLAYER HAS ENTERED GAME
 
         Q_ASSERT(mp_game == 0);
-        mp_game = new Game(this, gameId, player, &m_serverConnection);
-
-        if (creator)
-        {
-            QPushButton* b = new QPushButton(this);
-            mp_layout->addWidget(b, 1, 1, 2, 2);
-            mp_layout->setAlignment(b, Qt::AlignCenter);
-            b->setText(tr("Start game"));
-
-        }
+        GameWidgets x(mp_layout, mp_playerWidget, m_opponentWidgets);
+        mp_game = new Game(this, gameId, player, &m_serverConnection, x);
+        mp_game->setCreator(creator);
         //        mp_game->delegateVisualElements(mp_opponentContainer);
         mp_game->init();
         updateActions();

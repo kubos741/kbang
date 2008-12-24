@@ -19,13 +19,15 @@
  ***************************************************************************/
 #include "opponentwidget.h"
 
-OpponentWidget::OpponentWidget(QWidget *parent, const StructPlayer& player)
- : QWidget(parent)
+OpponentWidget::OpponentWidget(QWidget *parent)
+: QWidget(parent), m_id(0)
 {
     setupUi(this);
-    mp_labelPlayerName->setText(player.name);
-    m_id = player.id;
-    
+
+
+    //    mp_labelPlayerName->setText(player.name);
+    //m_id = player.id;
+
     //frame->setFrameStyle(QFrame::Box |  QFrame::Plain);
     //frame->setLineWidth(1);
 
@@ -34,16 +36,39 @@ OpponentWidget::OpponentWidget(QWidget *parent, const StructPlayer& player)
 
 OpponentWidget::~OpponentWidget()
 {
+
 }
 
-QString OpponentWidget::name() const
+void OpponentWidget::setPlayer(const StructPlayer& player)
 {
-    return mp_labelPlayerName->text();
+    m_id = player.id;
+    m_name = player.name;
+    updateWidgets();
 }
 
-int OpponentWidget::id() const
+void OpponentWidget::unsetPlayer()
 {
-    return m_id;
+    m_id = 0;
+    updateWidgets();
 }
 
 
+QSize OpponentWidget::sizeHint() const
+{
+    return QWidget::sizeHint();
+    //    return QSize(220, 220);
+}
+
+
+
+void OpponentWidget::updateWidgets()
+{
+    if (isEmpty())
+    {
+        mp_labelPlayerName->setText("");
+    }
+    else
+    {
+        mp_labelPlayerName->setText(m_name);
+    }
+}

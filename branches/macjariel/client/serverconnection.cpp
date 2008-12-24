@@ -106,6 +106,12 @@ void ServerConnection::leaveGame()
     mp_parser->actionLeaveGame();
 }
 
+void ServerConnection::startGame()
+{
+    mp_parser->actionStartGame();
+}
+
+
 void ServerConnection::sendChatMessage(const QString& message)
 {
     mp_parser->actionMessage(message);
@@ -154,6 +160,8 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
+    connect(mp_parser, SIGNAL(sigEventGameStartable(int, bool)),
+            this, SIGNAL(startableChanged(int, bool)));
 }
 
 bool ServerConnection::isConnected() const
@@ -170,6 +178,7 @@ QString ServerConnection::hostName() const
 {
     return m_serverHost;
 }
+
 
 
 

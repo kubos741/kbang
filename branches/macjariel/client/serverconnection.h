@@ -52,6 +52,7 @@ public slots:
     void createGame(const StructGame&, const StructPlayer&);
     void joinGame(int gameId, const QString& gamePassword, const QString& playerName);
     void leaveGame();
+    void startGame();
     void sendChatMessage(const QString& message);
 
 
@@ -85,6 +86,7 @@ signals:
 
     void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
+    void startableChanged(int gameId, bool startable);
 
 
 

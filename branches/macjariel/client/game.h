@@ -22,11 +22,12 @@
 
 #include <QObject>
 #include <QHash>
+#include <QList>
+#include <QPushButton>
 #include "parser/parserstructs.h"
+#include "common.h"
 
 class ServerConnection;
-class QLayout;
-class OpponentWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -34,33 +35,37 @@ class OpponentWidget;
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, const StructPlayer& player, ServerConnection* serverConnection);
+    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&);
 
     /* for MainWindow */
     void init();
-    void delegateVisualElements(QLayout* opponentsLayout);
-
     virtual ~Game();
+
+    void setCreator(bool creator) { m_creator = creator; }
 
 private:
     const int m_playerId;
     const QString m_playerName;
     const int m_gameId;
     ServerConnection* mp_serverConnection;
-    QHash<int, OpponentWidget*> m_opponentWidgets;
-    
-/*  Visual elements - provided by MainWindow */
-    QLayout* mp_opponentsLayout;
-    
 
-    
+/*  Visual elements - provided by MainWindow */
+    QGridLayout*            mp_layout;
+    QList<OpponentWidget*>  m_opponentWidgets;
+    QHash<int, int>         m_opponents;
+    PlayerWidget*           mp_playerWidget;
+    QPushButton*            mp_startButton;
+    bool                    m_creator;
+
 public slots:
     void opponentJoinedGame(const StructPlayer& player);
-    void opponentLeavedGame(const StructPlayer& player);    
-    
+    void opponentLeavedGame(const StructPlayer& player);
+    void startableChanged(int gameId, bool startable);
+    void startButtonClicked();
+
     void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
-    
-    
+
+
 };
 
 #endif

@@ -57,105 +57,18 @@ public:
 
 
 
-    /**
-     * Returns the id of the game.
-     */
-    inline int gameId() const
-    {
-        return m_gameId;
-    }
-
-    /**
-     * Returns name of the game.
-     */
-    inline QString name() const
-    {
-        return m_name;
-    }
-
-    /**
-     * Returns description of the game.
-     */
-    inline QString description() const
-    {
-        return m_description;
-    }
-
-    /**
-     * Returns minimal count of players.
-     */
-    inline int minPlayers() const
-    {
-        return m_minPlayers;
-    }
-
-    /**
-     * Returns maximal count of players.
-     */
-    inline int maxPlayers() const
-    {
-        return m_maxPlayers;
-    }
-
-    /**
-     * Returns maximal count of observers.
-     */
-    inline int maxObservers() const
-    {
-        return m_maxObservers;
-    }
-
-    /**
-     * Returns count of players.
-     */
-    inline int playersCount() const
-    {
-        return m_players.size();
-    }
-
-    /**
-     * Returns count of observers.
-     */
-    inline int observersCount() const
-    {
-        return 0; // TODO: implement this
-    }
-
-    /**
-     * Returns 1 if player password is set,
-     * otherwise returns 0.
-     */
-    inline bool hasPlayerPassword() const
-    {
-        return !m_playerPassword.isNull();
-    }
-
-    /**
-     * Returns 1 if observer password is set,
-     * otherwise returns 0.
-     */
-    inline bool hasObserverPassword() const
-    {
-        return !m_observerPassword.isNull();
-    }
-
-    /**
-     * Returns the id of the client that created this game.
-     */
-    inline int creatorId() const
-    {
-        return m_creatorId;
-    }
-
-    /**
-     * Returns true if shuffle-players feature is set, otherwise
-     * returns false. This feature shuffles players after the
-     * game starts.
-     */
-    inline bool hasShufflePlayers() const
-    {
-        return m_shufflePlayers;
-    }
+    inline int      gameId() const { return m_gameId; }
+    inline QString  name() const { return m_name; }
+    inline QString  description() const { return m_description; }
+    inline int      minPlayers() const { return m_minPlayers; }
+    inline int      maxPlayers() const { return m_maxPlayers; }
+    inline int      maxObservers() const { return m_maxObservers; }
+    inline int      playersCount() const { return m_players.size(); }
+    inline int      observersCount() const { return 0; /*TODO:implement this*/ }
+    inline bool     hasPlayerPassword() const { return !m_playerPassword.isNull(); }
+    inline bool     hasObserverPassword() const { return !m_observerPassword.isNull(); }
+    inline int      creatorId() const { return m_creatorId; }
+    inline bool     hasShufflePlayers() const { return m_shufflePlayers; }
 
     inline bool comparePlayerPassword(const QString& password) const
     {
@@ -175,6 +88,7 @@ public:
      * returns a pointer to it. This method can be called only in the initialization state.
      */
     Player* createNewPlayer(StructPlayer player);
+
     void removePlayer(int playerId);
 
     QList<Player*> playerList();
@@ -237,10 +151,13 @@ signals:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
     void statusChanged(const GameState&);
+    void startableChanged(int gameId, bool startable);
 
     void playerDrawedCard(Player* player, CardAbstract* card);
 
 private:
+    void checkStartable();
+
     void shufflePlayers();
     void shuffleDeck();
     void setRoles();
@@ -273,6 +190,7 @@ private:
     int                  m_nextPlayerId;
     GameState            m_gameState;
     const PublicGameView m_publicGameView;
+    bool                 m_startable;
 
     int m_playerOnTurnId; /// index to m_playerList
 

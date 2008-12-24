@@ -32,14 +32,26 @@
 class OpponentWidget: public QWidget, public Ui::OpponentWidget {
 
 public:
-    OpponentWidget(QWidget *parent, const StructPlayer&);
+    OpponentWidget(QWidget *parent);
     ~OpponentWidget();
 
-    int id() const;
-    QString name() const;
-    
-private:    
+    inline bool isEmpty() const { return m_id == 0; }
+    inline int playerId() const { return m_id; }
+    inline QString playerName() const { return m_name; }
+
+    void setPlayer(const StructPlayer&);
+    void unsetPlayer();
+
+
+    virtual QSize sizeHint() const;
+
+private:
+    void updateWidgets();
+
+private:
     int m_id;
+    QString m_name;
+
 
 };
 

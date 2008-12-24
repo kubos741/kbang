@@ -46,7 +46,8 @@ m_observerPassword(g.spectatorPassword),
 m_shufflePlayers(g.flagShufflePlayers),
 m_nextPlayerId(0),
 m_gameState(WaitingForPlayers),
-m_publicGameView(this)
+m_publicGameView(this),
+m_startable(0)
 
 {
     Q_ASSERT(!m_name.isEmpty());
@@ -72,6 +73,7 @@ Player* Game::createNewPlayer(StructPlayer player)
     m_players[m_nextPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     emit playerJoinedGame(m_gameId, newPlayer->structPlayer());
+    checkStartable();
     return newPlayer;
 }
 
@@ -84,6 +86,7 @@ void Game::removePlayer(int playerId)
     m_playerList.removeAll(m_players[playerId]);
     m_players.remove(playerId);
     emit playerLeavedGame(m_gameId, p);
+    checkStartable();
     plr->deleteLater();
     // TODO: other states of game
 }
@@ -307,6 +310,22 @@ void Game::regenerateDeck()
     m_graveyard.clear();
     m_graveyard << m_deck.takeLast();
     shuffleList(m_graveyard);
+}
+
+void Game::checkStartable()
+{
+    bool newStartable;
+    if (m_playerList.count() >= m_minPlayers && m_playerList.count() <= m_maxPlayers)
+    {
+        newStartable = 1;
+    }
+    else
+    {
+        newStartable = 0;
+    }
+    if (m_startable != newStartable)
+        emit startableChanged(m_gameId, newStartable);
+    m_startable = newStartable;
 }
 
 

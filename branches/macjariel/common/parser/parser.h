@@ -71,6 +71,7 @@ public slots:
     void actionCreateGame(const StructGame&, const StructPlayer&);
     void actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player);
     void actionLeaveGame();
+    void actionStartGame();
     void actionMessage(const QString& message);
 
 
@@ -82,6 +83,7 @@ signals:
 
     void sigEventJoinGame(int gameId, const StructPlayer&, bool other, bool creator);
     void sigEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
+    void sigEventGameStartable(int gameId, bool startable);
     void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
 
@@ -94,6 +96,8 @@ public slots:
     void eventMessage(int senderId, const QString& senderName, const QString& message);
 
     void eventCardMovement(const StructCardMovement&);
+
+    void eventGameStartable(int gameId, bool startable);
 
     //void resultServerInfo(const StructServerInfo&);
     //void resultGameList(const StructGameList&);
