@@ -17,40 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#ifndef CARDMOVEMENT_H
+#define CARDMOVEMENT_H
 
-#include <QLabel>
+#include <QObject>
+#include <QPoint>
 
+class QWidget;
+class QTimer;
+class CardWidget;
+class CardPocket;
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class CardWidget: public QLabel
+class CardMovement : public QObject
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    CardMovement(QWidget *mainWindow, CardWidget* card, CardPocket* destination);
+    ~CardMovement();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
-
-    QPoint absPos() const;
-
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
-
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
+public slots:
+    void onTimerShot();
 
 private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
-};
+    void finished();
 
+private:
+    CardPocket* mp_dest;
+    QPoint m_origin;
+    QPoint m_destination;
+    qreal  m_length;
+    QTimer* mp_timer;
+    int    m_tick;
+    CardWidget* mp_card;
+};
 
 #endif

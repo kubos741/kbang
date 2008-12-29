@@ -38,7 +38,8 @@ public:
     typedef enum {
         CT_CHARACTER,
         CT_ROLE,
-        CT_PLAYING
+        CT_PLAYING,
+        CT_BACK
     } Type;
 
 private:

@@ -17,28 +17,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDSELECTIONWIDGET_H
-#define CARDSELECTIONWIDGET_H
-
-#include <QWidget>
-
-class CardWidget;
-
+#include "cardpilewidget.h"
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ *
+ * @param parent
  */
-class CardSelectionWidget : public QWidget
+CardPileWidget::CardPileWidget(QWidget *parent)
+ : CardPocket(parent)
 {
-Q_OBJECT
-public:
-    CardSelectionWidget(QWidget *parent = 0, CardList cards);
+    setMinimumSize(CardWidget::normalSize());
+    setMaximumSize(CardWidget::normalSize());
+}
 
-    ~CardSelectionWidget();
-    
-public slots:
-    void cardSelected(Card*);
 
-};
+CardPileWidget::~CardPileWidget()
+{
 
-#endif
+}
+CardWidget* CardPileWidget::peek()
+{
+    return m_cards.top();
+}
+
+CardWidget* CardPileWidget::pop()
+{
+    return m_cards.pop();
+}
+
+void CardPileWidget::push(CardWidget* card)
+{
+    m_cards.push(card);
+    card->setParent(this);
+    card->setCardSize(CardWidget::SIZE_SMALL);
+    card->applyNewProperties();
+    card->move(0,0);
+    card->raise();
+    card->show();
+}
+
+QPoint CardPileWidget::newCardPosition() const
+{
+    return pos();
+}

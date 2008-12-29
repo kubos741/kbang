@@ -162,6 +162,12 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     connect(mp_parser, SIGNAL(sigEventGameStartable(int, bool)),
             this, SIGNAL(startableChanged(int, bool)));
+    connect(mp_parser, SIGNAL(incomingData(const QByteArray&)),
+            this, SIGNAL(incomingData(const QByteArray&)));
+    connect(mp_parser, SIGNAL(outgoingData(const QByteArray&)),
+            this, SIGNAL(outgoingData(const QByteArray&)));
+    connect(mp_parser, SIGNAL(sigEventStartGame(const StructGame&, const StructPlayerList&)),
+            this, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)));
 }
 
 bool ServerConnection::isConnected() const

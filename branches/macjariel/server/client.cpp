@@ -24,6 +24,7 @@
 
 #include <QTcpSocket>
 
+
 Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
  QObject(parent), m_id(clientId), mp_player(0)
 {
@@ -118,6 +119,8 @@ void Client::connectPlayer()
             this, SLOT(leavingGame(int,const StructPlayer&)));
     connect(mp_player->game(), SIGNAL(playerDrawedCard(Player*, CardAbstract*)),
             this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
+    connect(mp_player->game(), SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
+            mp_parser, SLOT(eventStartGame(const StructGame&, const StructPlayerList&)));
 }
 
 void Client::disconnectPlayer()

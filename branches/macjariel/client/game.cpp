@@ -20,9 +20,12 @@
 #include "game.h"
 #include "serverconnection.h"
 #include "parser/queryget.h"
+#include "playerwidget.h"
 #include "opponentwidget.h"
+#include "cardmovement.h"
 
 #include <QtDebug>
+#include <QBoxLayout>
 
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
            ServerConnection* serverConnection, const GameWidgets& gameWidgets):
@@ -51,6 +54,8 @@ void Game::init()
         connect(mp_serverConnection, SIGNAL(startableChanged(int, bool)),
                 this, SLOT(startableChanged(int, bool)));
     }
+    connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
+            this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
 
 
     qDebug("You have entered the game!");
@@ -98,6 +103,10 @@ void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& p
         {
             opponentJoinedGame(p);
         }
+        else
+        {
+            mp_playerWidget->setPlayer(p);
+        }
     }
 }
 
@@ -113,6 +122,56 @@ void Game::startButtonClicked()
     mp_serverConnection->startGame();
 }
 
+void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
+{
+    int pI;
+    for(pI = 0; pI < playerList.count(); pI++)
+    {
+        if (playerList[pI].id == m_playerId) break;
+    }
+    qDebug() << "player: " << pI;
+    mp_playerWidget->setPlayer(playerList[pI]);
+    foreach(OpponentWidget* w, m_opponentWidgets)
+    {
+        w->unsetPlayer();
+    }
+    for (int i = pI + 1; i < playerList.count(); ++i)
+    {
+        int pos = i - (pI + 1);
+        m_opponents[playerList[i].id] = pos;
+        m_opponentWidgets[pos]->setPlayer(playerList[i]);
+    }
+    for (int i = pI - 1; i >= 0; --i)
+    {
+        int pos = i - pI + 6;
+        m_opponents[playerList[i].id] = pos;
+        m_opponentWidgets[pos]->setPlayer(playerList[i]);
+    }
+    if (mp_startButton)
+    {
+        mp_startButton->hide();
+        mp_startButton->deleteLater();
+    }
 
+    mp_deck = new DeckWidget(0);
+    mp_graveyard = new CardPileWidget(0);
+    QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
+    l->addStretch(3);
+    l->addWidget(mp_graveyard);
+    l->addStretch(1);
+    l->addWidget(mp_deck);
+    l->addStretch(3);
+    mp_layout->addLayout(l, 1, 1, 2, 2);
+    mp_layout->setAlignment(l, Qt::AlignCenter);
+    QTimer::singleShot(1, this, SLOT(test()));
+}
+
+
+void Game::test()
+{
+    new CardMovement(mp_layout->parentWidget(),
+                     mp_deck->pop(),
+                     mp_graveyard);
+}
 
 

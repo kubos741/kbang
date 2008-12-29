@@ -24,7 +24,7 @@ OpponentWidget::OpponentWidget(QWidget *parent)
 {
     setupUi(this);
 
-
+    mp_labelPlayerName->setText("");
     //    mp_labelPlayerName->setText(player.name);
     //m_id = player.id;
 

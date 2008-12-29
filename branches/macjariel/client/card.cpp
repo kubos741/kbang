@@ -57,11 +57,16 @@ void Card::loadDefaultRuleset()
 {
     new Card("sheriff",  "Sheriff",  CT_ROLE, "", "");
     new Card("renegade", "Renegade", CT_ROLE, "", "");
-    new Card("bandita",  "Bandita",  CT_ROLE, "", "");
+    new Card("outlaw",   "Outlaw",   CT_ROLE, "", "");
     new Card("deputy",   "Deputy",   CT_ROLE, "", "");
-    
-    new Card("bang", "Bang!", CT_PLAYING, "", "");
-    new Card("mancato", "Vedle!", CT_PLAYING, "", "");
+
+    new Card("bang",  "Bang!",   CT_PLAYING, ":/cards/gfx/cards/bang.png", ":/cards/gfx/cards/bang.png");
+    new Card("missed","Mancato", CT_PLAYING, ":/cards/gfx/cards/missed.png", ":/cards/gfx/cards/missed.png");
+
+    new Card("back-bullets", "Bullets", CT_BACK, ":/cards/gfx/cards/back-bullets.png", ":/cards/gfx/cards/back-bullets.png");
+    new Card("back-bang", "Back", CT_BACK, ":/cards/gfx/cards/back-bang.png", ":/cards/gfx/cards/back-bang  .png");
+
+
 }
 
 const CardPointer Card::findCard(const QString& id)

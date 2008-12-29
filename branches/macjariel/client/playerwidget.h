@@ -20,8 +20,12 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
+
+
 #include <QWidget>
 #include <ui_playerwidget.h>
+
+#include "parser/parserstructs.h"
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -32,6 +36,16 @@ Q_OBJECT
 public:
     PlayerWidget(QWidget* parent);
     ~PlayerWidget();
+
+    void setPlayer(const StructPlayer&);
+    void unsetPlayer();
+
+private:
+    void updateWidgets();
+
+private:
+    int     m_id;
+    QString m_name;
 };
 
 #endif

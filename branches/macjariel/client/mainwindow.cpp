@@ -29,6 +29,7 @@
 #include "parser/queryget.h"
 #include "game.h"
 
+#include "card.h"
 
 MainWindow::MainWindow():
     mp_connectToServerDialog(0),
@@ -38,11 +39,14 @@ MainWindow::MainWindow():
     mp_game(0)
 {
     setupUi(this);
+    Card::loadDefaultRuleset();
+
     createActions();
     createMenu();
     createStatusBar();
     createWidgets();
     updateActions();
+
 
     connect(&m_serverConnection, SIGNAL(statusChanged()),
             this, SLOT(serverConnectionStatusChanged()));
@@ -50,6 +54,7 @@ MainWindow::MainWindow():
             this, SLOT(playerJoinedGame(int, const StructPlayer&, bool, bool)));
     connect(&m_serverConnection, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)),
             this, SLOT(playerLeavedGame(int, const StructPlayer&, bool)));
+
 }
 
 
@@ -207,8 +212,11 @@ void MainWindow::createWidgets()
     mp_logWidget = new LogWidget();
     connect(&m_serverConnection, SIGNAL(logMessage(QString)),
             mp_logWidget, SLOT(appendLogMessage(QString)));
-    connect(&m_serverConnection, SIGNAL(incomingXml(QString)),
-            mp_logWidget, SLOT(appendIncomingXml(QString)));
+    connect(&m_serverConnection, SIGNAL(incomingData(const QByteArray&)),
+            mp_logWidget, SLOT(appendIncomingData(const QByteArray&)));
+    connect(&m_serverConnection, SIGNAL(outgoingData(const QByteArray&)),
+            mp_logWidget, SLOT(appendOutgoingData(const QByteArray&)));
+
 
     mp_layout->addWidget(mp_logWidget, 3, 3, 1, 1);
 
@@ -238,7 +246,6 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
         GameWidgets x(mp_layout, mp_playerWidget, m_opponentWidgets);
         mp_game = new Game(this, gameId, player, &m_serverConnection, x);
         mp_game->setCreator(creator);
-        //        mp_game->delegateVisualElements(mp_opponentContainer);
         mp_game->init();
         updateActions();
     }

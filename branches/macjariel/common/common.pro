@@ -7,13 +7,15 @@ QT += xml
 # PARSER #
 ##########
 
-HEADERS += parser/parser.h \
+HEADERS += parser/ioproxy.h \
+	   parser/parser.h \
            parser/parserstructs.h \
            parser/queryget.h \
            parser/queryresult.h \
            parser/xmlnode.h
 
-SOURCES += parser/parser.cpp \
+SOURCES += parser/ioproxy.cpp \
+           parser/parser.cpp \
            parser/parserstructs.cpp \
            parser/queryget.cpp \
            parser/queryresult.cpp \
@@ -26,8 +28,7 @@ SOURCES += parser/parser.cpp \
 
 HEADERS += util.h
 
-SOURCES += util.cpp \
-
+SOURCES += util.cpp
 
 CONFIG -= release
 

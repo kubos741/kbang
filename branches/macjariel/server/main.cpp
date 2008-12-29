@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
     x.minPlayers = 1;
     x.maxPlayers = 5;
     x.maxSpectators = 10;
+    x.creatorId = 1;
     server.createGame(x);
     server.createGame(x);
     Console* console = new Console(&server, stdin, stdout);

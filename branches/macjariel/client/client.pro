@@ -18,7 +18,12 @@ HEADERS += gameloop.h \
  game.h \
  cardwidget.h \
  creategamedialog.h \
- playerwidget.h
+ playerwidget.h \
+ playercharacterwidget.h \
+ cardpilewidget.h \
+ deckwidget.h \
+ cardmovement.h \
+ cardpocket.h
 
 FORMS += connecttoserverdialog.ui mainwindow.ui \
  joingamedialog.ui \
@@ -40,12 +45,17 @@ SOURCES += gameloop.cpp main.cpp \
  game.cpp \
  cardwidget.cpp \
  creategamedialog.cpp \
- playerwidget.cpp
+ playerwidget.cpp \
+ playercharacterwidget.cpp \
+ cardpilewidget.cpp \
+ deckwidget.cpp \
+ cardmovement.cpp
 
 QT += network \
  xml
 
-RESOURCES += client.qrc
+RESOURCES += client.qrc \
+ cards.qrc
 
 INCLUDEPATH += ../common
 

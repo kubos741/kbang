@@ -17,7 +17,7 @@
   </property>
   <property name="styleSheet" >
    <string notr="true" >QWidget#centralWidget {
-	background-image: url(:/misc/data/gfx/background.png);
+	background-image: url(:/misc/gfx/misc/background.png)
 }
 
 QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(0, 170, 0), stop:1 darkgreen); }
@@ -70,8 +70,8 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
   <widget class="QStatusBar" name="mp_statusbar" />
   <action name="mp_actionConnectToServer" >
    <property name="icon" >
-    <iconset>
-     <normaloff>:/icons/images/icon-connect.svg</normaloff>:/icons/images/icon-connect.svg</iconset>
+    <iconset resource="client.qrc" >
+     <normaloff>:/icons/gfx/icons/icon-connect.svg</normaloff>:/icons/gfx/icons/icon-connect.svg</iconset>
    </property>
    <property name="text" >
     <string>&amp;Connect to Server</string>
@@ -110,6 +110,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
  </widget>
  <resources>
   <include location="client.qrc" />
+  <include location="cards.qrc" />
  </resources>
  <connections>
   <connection>

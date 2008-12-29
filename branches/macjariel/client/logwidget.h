@@ -34,11 +34,16 @@ public:
     LogWidget(QWidget *parent = 0);
 
     ~LogWidget();
-    
+
 public slots:
     void appendLogMessage(QString message);
-    void appendIncomingXml(QString message);
+    void appendIncomingData(const QByteArray& data);
+    void appendOutgoingData(const QByteArray& data);
 
+
+
+private:
+    int m_dataType;
 };
 
 #endif

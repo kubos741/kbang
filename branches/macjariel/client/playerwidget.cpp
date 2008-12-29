@@ -18,11 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "playerwidget.h"
+#include "cardwidget.h"
 
 PlayerWidget::PlayerWidget(QWidget *parent)
  : QWidget(parent), Ui::PlayerWidget()
 {
     setupUi(this);
+    characterWidget->show();
+
 }
 
 
@@ -30,5 +33,31 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 PlayerWidget::~PlayerWidget()
 {
 }
+
+void PlayerWidget::setPlayer(const StructPlayer& player)
+{
+    m_id = player.id;
+    m_name = player.name;
+    updateWidgets();
+}
+
+void PlayerWidget::unsetPlayer()
+{
+    m_id = 0;
+    updateWidgets();
+}
+
+void PlayerWidget::updateWidgets()
+{
+    if (m_id != 0)
+    {
+        labelPlayerName->setText(m_name);
+    }
+    else
+    {
+        labelPlayerName->setText("");
+    }
+}
+
 
 

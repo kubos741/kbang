@@ -1,8 +1,8 @@
 <RCC>
-  <qresource prefix="icons" >
-    <file>../data/gfx/icon-connect.svg</file>
-  </qresource>
   <qresource prefix="misc" >
-    <file>../data/gfx/background.png</file>
+    <file>gfx/misc/background.png</file>
+  </qresource>
+  <qresource prefix="icons" >
+    <file>gfx/icons/icon-connect.svg</file>
   </qresource>
 </RCC>

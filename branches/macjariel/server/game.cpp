@@ -14,12 +14,12 @@
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                         mp_streamWriter->writeAttribute("senderName", senderName);
-                  *
+ *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include <QXmlStreamWriter>
+#include <QTimer>
 
 #include <stdlib.h>
 
@@ -73,7 +73,7 @@ Player* Game::createNewPlayer(StructPlayer player)
     m_players[m_nextPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     emit playerJoinedGame(m_gameId, newPlayer->structPlayer());
-    checkStartable();
+    QTimer::singleShot(1, this, SLOT(checkStartable()));
     return newPlayer;
 }
 
@@ -137,16 +137,17 @@ StructPlayerList Game::structPlayerList() const
 
 void Game::startGame()
 {
-    qDebug() << "Start Game";
     if (m_gameState != WaitingForPlayers) return; /* TODO: error handling */
     // TODO: character selection first
-    qDebug() << "Start Game #2";
     m_gameState = Playing;
     if (m_shufflePlayers) shufflePlayers();
+    emit gameStarted(structGame(), structPlayerList());
     setRoles();
     generateCards();
     dealCards();
     statusChanged(m_gameState);
+
+
     // TODO: start game
 }
 

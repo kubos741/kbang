@@ -17,40 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#include "deckwidget.h"
 
-#include <QLabel>
-
-
-/**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class CardWidget: public QLabel
+DeckWidget::DeckWidget(QWidget *parent)
+ : CardPileWidget(parent)
 {
-Q_OBJECT
-public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    m_cards.push(newCard());
+}
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
+DeckWidget::~DeckWidget()
+{
+}
 
-    QPoint absPos() const;
+CardWidget* DeckWidget::pop()
+{
+    return newCard();
+}
 
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
+void DeckWidget::push(CardWidget* card)
+{
+    card->hide();
+    card->deleteLater();
+}
 
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
-
-private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
-};
-
-
-#endif
+CardWidget* DeckWidget::newCard()
+{
+    CardWidget* w = new CardWidget(this);
+    w->setCardClass("back-bang");
+    w->setCardSize(CardWidget::SIZE_SMALL);
+    w->applyNewProperties();
+    w->raise();
+    w->show();
+    return w;
+}

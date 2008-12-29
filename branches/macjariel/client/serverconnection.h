@@ -80,13 +80,17 @@ private:
 signals:
     void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
     void logMessage(QString message);
-    void incomingXml(QString message);
+
+    void incomingData(const QByteArray&);
+    void outgoingData(const QByteArray&);
+
 
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
     void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     void startableChanged(int gameId, bool startable);
+    void gameStarted(const StructGame&, const StructPlayerList&);
 
 
 

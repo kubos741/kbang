@@ -17,40 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#ifndef DECKWIDGET_H
+#define DECKWIDGET_H
 
-#include <QLabel>
+#include <QtDebug>
+#include <QWidget>
+#include <QMoveEvent>
 
+#include <cardpilewidget.h>
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class CardWidget: public QLabel
+class DeckWidget : public CardPileWidget
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    DeckWidget(QWidget *parent = 0);
+    ~DeckWidget();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
-
-    QPoint absPos() const;
-
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
-
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
+    virtual CardWidget* pop();
+    virtual void push(CardWidget* card);
 
 private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
+    CardWidget* newCard();
 };
-
 
 #endif

@@ -17,39 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
-
-#include <QLabel>
+#ifndef IOPROXY_H
+#define IOPROXY_H
 
 
-/**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class CardWidget: public QLabel
+#include <QIODevice>
+
+class IOProxy: public QIODevice
 {
-Q_OBJECT
+    Q_OBJECT
+
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    IOProxy(QObject* parent);
+    virtual ~IOProxy();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
+    virtual qint64 readData(char* data, qint64 maxSize);
+    virtual qint64 writeData(const char* data, qint64 maxSize);
+    //    virtual qint64 bytesAvailable() const;
 
-    QPoint absPos() const;
-
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
-
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
+    //    virtual bool isSequential() const { return 1; }
 
 private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
+    //      QByteArray m_buffer;
+
+signals:
+    void networkOut(QByteArray data);
+
+
+public slots:
+    //  void networkIn(QByteArray data);
+
 };
 
 

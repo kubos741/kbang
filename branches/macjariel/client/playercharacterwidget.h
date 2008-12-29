@@ -17,40 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#ifndef PLAYERCHARACTERWIDGET_H
+#define PLAYERCHARACTERWIDGET_H
 
-#include <QLabel>
-
+#include <QWidget>
+#include <QTimer>
+#include <QSize>
+#include "cardwidget.h"
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class CardWidget: public QLabel
+class PlayerCharacterWidget: public QWidget
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    PlayerCharacterWidget(QWidget *parent = 0);
+    virtual ~PlayerCharacterWidget();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
+    inline QString character() const { return m_character; }
+    inline int     lifePoints() const { return m_lifePoints; }
 
-    QPoint absPos() const;
 
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
+    void setCharacter(const QString& character);
+    void setLifePoints(int lifePoints);
+    void unset();
 
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
+    virtual QSize sizeHint() const { return m_sizeHint; }
 
 private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
-};
+    void lifePointsChanged();
 
+private slots:
+    void animateCard();
+
+private:
+    QString m_character;
+    int m_lifePoints;
+    int m_targetY;
+
+    CardWidget* mp_backCard;
+    CardWidget* mp_characterCard;
+
+    QTimer* mp_timer;
+    QSize m_sizeHint;
+
+};
 
 #endif

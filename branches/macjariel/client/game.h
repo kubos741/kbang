@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include "parser/parserstructs.h"
 #include "common.h"
+#include "deckwidget.h"
 
 class ServerConnection;
 
@@ -55,6 +56,8 @@ private:
     QHash<int, int>         m_opponents;
     PlayerWidget*           mp_playerWidget;
     QPushButton*            mp_startButton;
+    DeckWidget*             mp_deck;
+    CardPileWidget*         mp_graveyard;
     bool                    m_creator;
 
 public slots:
@@ -62,10 +65,13 @@ public slots:
     void opponentLeavedGame(const StructPlayer& player);
     void startableChanged(int gameId, bool startable);
     void startButtonClicked();
+    void gameStarted(const StructGame&, const StructPlayerList&);
 
     void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
 
 
+
+    void test();
 };
 
 #endif

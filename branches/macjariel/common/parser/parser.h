@@ -23,10 +23,12 @@
 #include <QObject>
 #include <QList>
 #include <QHash>
+
 #include "parserstructs.h"
 #include "queryget.h"
 #include "queryresult.h"
 
+class IOProxy;
 class QIODevice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
@@ -83,6 +85,7 @@ signals:
 
     void sigEventJoinGame(int gameId, const StructPlayer&, bool other, bool creator);
     void sigEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
+    void sigEventStartGame(const StructGame&, const StructPlayerList&);
     void sigEventGameStartable(int gameId, bool startable);
     void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
@@ -93,10 +96,9 @@ signals:
 public slots:
     void eventJoinGame(int gameId, const StructPlayer&, bool other = 1, bool creator = 0);
     void eventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
+    void eventStartGame(const StructGame&, const StructPlayerList&);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
-
     void eventCardMovement(const StructCardMovement&);
-
     void eventGameStartable(int gameId, bool startable);
 
     //void resultServerInfo(const StructServerInfo&);
@@ -120,12 +122,17 @@ signals:
     void sigActionMessage(const QString& message);
 
 
+signals:
+    void incomingData(const QByteArray&);
+    void outgoingData(const QByteArray&);
+
 public:
     static QString protocolVersion();
 
 
 private slots:
     void readData();
+    void writeData(const QByteArray&);
 
 private:
     void stateStart();
@@ -154,6 +161,7 @@ private:
         S_Terminated,
         S_Error
     } ReaderState;
+    IOProxy*          mp_ioProxy;
     QIODevice*        mp_socket;
     QXmlStreamReader* mp_streamReader;
     QXmlStreamWriter* mp_streamWriter;
@@ -162,12 +170,16 @@ private:
 
     ReaderState       m_readerState;
     int               m_readerDepth;
+    int*              mp_ints;
 
     XmlNode*          mp_parsedStanza;
+
     XmlNode*          mp_parsedXmlElement;
 
     QHash<QString, QueryGet*> m_getQueries;
+
     QueryGet*         mp_queryGet;
+
 };
 
 #endif

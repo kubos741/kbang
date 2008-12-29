@@ -29,26 +29,42 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
+#include "ioproxy.h"
+
 #define PROTOCOL_VERSION "1.0"
 #define ASSERT_SOCKET if (!mp_socket) return
 
 
 
 Parser::Parser(QObject* parent):
-QObject(parent), mp_socket(0), m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
-{
+QObject(parent),
+mp_ioProxy(0),
+mp_socket(0),
+m_streamInitialized(0),
+m_readerState(S_Start),
+m_readerDepth(0),
+mp_parsedStanza(0),
+mp_queryGet(0)
 
+{
 }
 
 Parser::Parser(QObject* parent, QIODevice* socket):
-QObject(parent), mp_socket(0),  m_streamInitialized(0), m_readerState(S_Start), m_readerDepth(0), mp_parsedStanza(0)
+QObject(parent),
+mp_ioProxy(0),
+mp_socket(0),
+m_streamInitialized(0),
+m_readerState(S_Start),
+m_readerDepth(0),
+mp_parsedStanza(0),
+mp_queryGet(0)
 {
     attachSocket(socket);
 }
 
 Parser::~Parser()
 {
-
+    if (mp_ioProxy != 0) delete mp_ioProxy;
 }
 
 void Parser::attachSocket(QIODevice* socket)
@@ -56,11 +72,21 @@ void Parser::attachSocket(QIODevice* socket)
     Q_ASSERT(socket);
     if (mp_socket) detachSocket();
     mp_socket = socket;
+    mp_ioProxy = new IOProxy(this);
+
+
+
     connect(mp_socket, SIGNAL(disconnected()),
             this, SLOT(detachSocket()));
 
     mp_streamReader = new QXmlStreamReader(mp_socket);
-    mp_streamWriter = new QXmlStreamWriter(mp_socket);
+    //mp_streamWriter = new QXmlStreamWriter(mp_socket);
+    mp_streamWriter = new QXmlStreamWriter(mp_ioProxy);
+
+
+    connect(mp_ioProxy, SIGNAL(networkOut(const QByteArray&)),
+            this, SLOT(writeData(const QByteArray&)));
+
     mp_streamWriter->setAutoFormatting(1);
     connect(mp_socket, SIGNAL(readyRead()),
             this, SLOT(readData()));
@@ -75,9 +101,19 @@ void Parser::detachSocket()
                this, SLOT(detachSocket()));
     delete mp_streamWriter;
     delete mp_streamReader;
+    delete mp_ioProxy;
+    mp_ioProxy = 0;
     mp_socket = 0;
     emit terminated();
 }
+
+void Parser::writeData(const QByteArray& data)
+{
+    //qDebug() << ">>OUT>>" << data;
+    mp_socket->write(data);
+    emit outgoingData(data);
+}
+
 
 
 void Parser::initializeStream()
@@ -94,6 +130,8 @@ QString Parser::protocolVersion()
 
 void Parser::readData()
 {
+    //qDebug() << "<<IN<<" << mp_socket->peek(mp_socket->bytesAvailable());
+    emit incomingData(mp_socket->peek(mp_socket->bytesAvailable()));
     while (!mp_streamReader->atEnd())
     {
         mp_streamReader->readNext();
@@ -329,6 +367,15 @@ void Parser::processStanza()
             emit sigEventGameStartable(gameId, startable);
             return;
         }
+        if (event->name() == "start-game")
+        {
+            XmlNode* game = event->getFirstChild();
+            StructGame x;
+            StructPlayerList y;
+            x.read(game, &y);
+            emit sigEventStartGame(x, y);
+            return;
+        }
         if (event->name() == "message")
         {
             XmlNode* messageNode = event->getFirstChild();
@@ -381,7 +428,6 @@ void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other, b
     {
         mp_streamWriter->writeAttribute("other", "1");
     }
-    qDebug() << "creator:" << creator;
     if (creator)
     {
 
@@ -419,6 +465,16 @@ void Parser::eventLeaveGame(int gameId, const StructPlayer& player, bool other)
         mp_streamWriter->writeAttribute("other", "1");
     }
     player.write(mp_streamWriter);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventStartGame(const StructGame& game, const StructPlayerList& players)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("start-game");
+    game.write(mp_streamWriter, &players);
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -519,6 +575,9 @@ void Parser::terminate()
 {
     sendTermination();
 }
+
+
+
 
 
 

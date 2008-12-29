@@ -17,40 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#ifndef CARDPILEWIDGET_H
+#define CARDPILEWIDGET_H
 
-#include <QLabel>
-
+#include <QWidget>
+#include <QStack>
+#include "cardwidget.h"
+#include "cardpocket.h"
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel@gmail.com>
  */
-class CardWidget: public QLabel
+class CardPileWidget : public CardPocket
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    CardPileWidget(QWidget *parent = 0);
+    ~CardPileWidget();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
+    virtual CardWidget* peek();
+    virtual CardWidget* pop();
+    virtual void push(CardWidget* card);
+    virtual QPoint newCardPosition() const;
 
-    QPoint absPos() const;
-
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
-
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
-
-private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
+protected:
+    QStack<CardWidget*> m_cards;
 };
-
 
 #endif

@@ -20,9 +20,10 @@
 #include "logwidget.h"
 
 LogWidget::LogWidget(QWidget *parent)
- : QWidget(parent)
+: QWidget(parent), m_dataType(0)
 {
     setupUi(this);
+    mp_xmlView->setFontPointSize(8);
 }
 
 
@@ -35,10 +36,44 @@ void LogWidget::appendLogMessage(QString message)
     mp_logView->append(message);
 }
 
-void LogWidget::appendIncomingXml(QString message)
+
+void LogWidget::appendIncomingData(const QByteArray & data)
 {
-    //mp_xmlView->setTextColor(Qt::green);
-    mp_xmlView->append(message);
+    QTextCursor x = mp_xmlView->textCursor();
+    x.movePosition(QTextCursor::End);
+    mp_xmlView->setTextCursor(x);
+    if (m_dataType == 2)
+    {
+        mp_xmlView->append("");
+    }
+    if (m_dataType != 1)
+    {
+        mp_xmlView->setTextColor(Qt::yellow);
+    }
+    mp_xmlView->insertPlainText(data);
+    m_dataType = 1;
+    x = mp_xmlView->textCursor();
+    x.movePosition(QTextCursor::End);
+    mp_xmlView->setTextCursor(x);
 }
 
-
+void LogWidget::appendOutgoingData(const QByteArray & data)
+{
+    QTextCursor x = mp_xmlView->textCursor();
+    x.movePosition(QTextCursor::End);
+    mp_xmlView->setTextCursor(x);
+    if (m_dataType == 1)
+    {
+        mp_xmlView->append("");
+    }
+    if (m_dataType != 2)
+    {
+        mp_xmlView->setTextColor(Qt::white);
+    }
+    mp_xmlView->setFontPointSize(9);
+    mp_xmlView->insertPlainText(data);
+    m_dataType = 2;
+    x = mp_xmlView->textCursor();
+    x.movePosition(QTextCursor::End);
+    mp_xmlView->setTextCursor(x);
+}

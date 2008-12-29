@@ -17,40 +17,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDWIDGET_H
-#define CARDWIDGET_H
+#include "cardmovement.h"
 
-#include <QLabel>
+#include <QTimer>
+#include <QWidget>
+#include <QtDebug>
 
+#include "cardwidget.h"
+#include "cardpocket.h"
+#include <math.h>
 
-/**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class CardWidget: public QLabel
+const int tickTime = 5;
+const double pixelsPerTick = 16;
+
+CardMovement::CardMovement(QWidget *mainWidget, CardWidget* card, CardPocket* destination)
+: QObject(mainWidget), mp_dest(destination), m_tick(0), mp_card(card)
 {
-Q_OBJECT
-public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    if (card->parent() != parent())
+    {
+        QPoint pos = card->mapTo(mainWidget, QPoint(0,0));
+        card->setParent(mainWidget);
+        card->move(pos);
+    }
+    card->raise();
+    card->show();
 
-    CardWidget(QWidget *parent = 0);
-    ~CardWidget();
+    m_origin = card->pos();
+    m_destination = destination->newCardPosition();
+    m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) +
+                    pow(m_destination.y() - m_origin.y(), 2));
+    mp_timer = new QTimer(this);
+    mp_timer->setInterval(tickTime);
+    connect(mp_timer, SIGNAL(timeout()),
+            this, SLOT(onTimerShot()));
+    mp_timer->start();
+}
 
-    QPoint absPos() const;
+CardMovement::~CardMovement()
+{
+}
 
-    void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
-    void applyNewProperties();
+void CardMovement::onTimerShot()
+{
+    m_tick++;
+    qreal progress = (m_tick* pixelsPerTick) / m_length;
+    if (progress > 1)
+    {
+        finished();
+        return;
+    }
+    QPoint pos = m_origin + (m_destination - m_origin) * progress;
+    mp_card->move(pos);
+}
 
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
+void CardMovement::finished()
+{
+    mp_timer->stop();
+    mp_timer->deleteLater();
+    mp_dest->push(mp_card);
+    deleteLater();
+}
 
-private:
-    QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
-    Size    m_size;
-};
-
-
-#endif

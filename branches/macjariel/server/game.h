@@ -151,12 +151,14 @@ signals:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
     void statusChanged(const GameState&);
+    void gameStarted(const StructGame&, const StructPlayerList&);
     void startableChanged(int gameId, bool startable);
 
     void playerDrawedCard(Player* player, CardAbstract* card);
 
-private:
+private slots:
     void checkStartable();
+private:
 
     void shufflePlayers();
     void shuffleDeck();
