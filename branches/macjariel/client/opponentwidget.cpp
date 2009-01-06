@@ -18,13 +18,33 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "opponentwidget.h"
+#include "cardwidget.h"
+#include "cardlist.h"
+
+#include "cardpilewidget.h"
+
+using namespace client;
 
 OpponentWidget::OpponentWidget(QWidget *parent)
-: QWidget(parent), m_id(0)
+: PlayerWidget(parent), m_id(0)
 {
     setupUi(this);
 
     mp_labelPlayerName->setText("");
+
+    mp_hand = new CardList(0, CardWidget::smallSize());
+    horizontalLayout->addWidget(mp_hand);
+//((QBoxLayout*)layout())->addLayout(l);
+
+    /*
+    QBoxLayout* l = new QBoxLayout(QBoxLayout::TopToBottom);
+    //l->addWidget(mp_table);
+    l->addWidget(x);
+    tableSpace->setLayout(l);
+    tableSpace->show();
+    mp_table->show();
+    */
+
     //    mp_labelPlayerName->setText(player.name);
     //m_id = player.id;
 

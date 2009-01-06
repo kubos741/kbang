@@ -23,7 +23,9 @@ HEADERS += gameloop.h \
  cardpilewidget.h \
  deckwidget.h \
  cardmovement.h \
- cardpocket.h
+ cardpocket.h \
+ localplayerwidget.h \
+ cardlist.h
 
 FORMS += connecttoserverdialog.ui mainwindow.ui \
  joingamedialog.ui \
@@ -31,7 +33,7 @@ FORMS += connecttoserverdialog.ui mainwindow.ui \
  chatwidget.ui \
  opponentwidget.ui \
  creategamedialog.ui \
- playerwidget.ui
+ localplayerwidget.ui
 SOURCES += gameloop.cpp main.cpp \
  connecttoserverdialog.cpp \
  mainwindow.cpp \
@@ -49,7 +51,9 @@ SOURCES += gameloop.cpp main.cpp \
  playercharacterwidget.cpp \
  cardpilewidget.cpp \
  deckwidget.cpp \
- cardmovement.cpp
+ cardmovement.cpp \
+ localplayerwidget.cpp \
+ cardlist.cpp
 
 QT += network \
  xml

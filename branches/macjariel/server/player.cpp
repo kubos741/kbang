@@ -66,12 +66,16 @@ void Player::sendMessage(const QString& message)
     mp_game->sendMessage(this, message);
 }
 
-StructPlayer Player::structPlayer()
+StructPlayer Player::structPlayer(bool returnPrivateInfo)
 {
     StructPlayer x;
     x.id = m_id;
     x.name = m_name;
     x.password = m_password;
+    if (returnPrivateInfo)
+    {
+        x.role = m_role;
+    }
     return x;
 }
 
@@ -99,4 +103,9 @@ int Player::initialCardCount() const
     int cardCount = 4;
     if (role() == ROLE_SHERIFF) cardCount++;
     return cardCount;
+}
+
+void Player::announceGameStarted(const StructGame& game, const StructPlayerList& playerList)
+{
+    emit gameStarted(game, playerList);
 }

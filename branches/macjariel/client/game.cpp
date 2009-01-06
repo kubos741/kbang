@@ -20,19 +20,22 @@
 #include "game.h"
 #include "serverconnection.h"
 #include "parser/queryget.h"
-#include "playerwidget.h"
+#include "localplayerwidget.h"
 #include "opponentwidget.h"
 #include "cardmovement.h"
+#include "cardlist.h"
 
 #include <QtDebug>
 #include <QBoxLayout>
+
+using namespace client;
 
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
            ServerConnection* serverConnection, const GameWidgets& gameWidgets):
 QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId),
 mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
-m_opponentWidgets(gameWidgets.opponentWidget), mp_playerWidget(gameWidgets.playerWidget),
-m_creator(0)
+m_opponentWidgets(gameWidgets.opponentWidget), mp_localPlayerWidget(gameWidgets.localPlayerWidget),
+mp_startButton(0), m_creator(0)
 {
 }
 
@@ -56,9 +59,12 @@ void Game::init()
     }
     connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
             this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
+    connect(mp_serverConnection, SIGNAL(eventCardMovement(const StructCardMovement&)),
+            this, SLOT(moveCard(const StructCardMovement&)));
 
 
     qDebug("You have entered the game!");
+
 }
 
 
@@ -78,7 +84,7 @@ void Game::opponentJoinedGame(const StructPlayer& player)
         if (w->isEmpty())
         {
             w->setPlayer(player);
-            m_opponents[player.id] = i;
+            m_players[player.id] = w;
             break;
         }
     }
@@ -87,10 +93,10 @@ void Game::opponentJoinedGame(const StructPlayer& player)
 
 void Game::opponentLeavedGame(const StructPlayer& player)
 {
-    if (m_opponents.contains(player.id))
+    if (m_players.contains(player.id))
     {
-        m_opponentWidgets[m_opponents[player.id]]->unsetPlayer();
-        m_opponents.remove(player.id);
+        m_players[player.id]->unsetPlayer();
+        m_players.remove(player.id);
     }
 }
 
@@ -105,7 +111,7 @@ void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& p
         }
         else
         {
-            mp_playerWidget->setPlayer(p);
+            mp_localPlayerWidget->setPlayer(p);
         }
     }
 }
@@ -130,7 +136,7 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
         if (playerList[pI].id == m_playerId) break;
     }
     qDebug() << "player: " << pI;
-    mp_playerWidget->setPlayer(playerList[pI]);
+    mp_localPlayerWidget->setPlayer(playerList[pI]);
     foreach(OpponentWidget* w, m_opponentWidgets)
     {
         w->unsetPlayer();
@@ -138,13 +144,13 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
     for (int i = pI + 1; i < playerList.count(); ++i)
     {
         int pos = i - (pI + 1);
-        m_opponents[playerList[i].id] = pos;
+        m_players[playerList[i].id] = m_opponentWidgets[pos];
         m_opponentWidgets[pos]->setPlayer(playerList[i]);
     }
     for (int i = pI - 1; i >= 0; --i)
     {
         int pos = i - pI + 6;
-        m_opponents[playerList[i].id] = pos;
+        m_players[playerList[i].id] = m_opponentWidgets[pos];
         m_opponentWidgets[pos]->setPlayer(playerList[i]);
     }
     if (mp_startButton)
@@ -163,15 +169,100 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
     l->addStretch(3);
     mp_layout->addLayout(l, 1, 1, 2, 2);
     mp_layout->setAlignment(l, Qt::AlignCenter);
-    QTimer::singleShot(1, this, SLOT(test()));
+    test();
+    //QTimer::singleShot(10, this, SLOT(test()));
 }
 
 
 void Game::test()
 {
+
     new CardMovement(mp_layout->parentWidget(),
                      mp_deck->pop(),
                      mp_graveyard);
+    new CardMovement(mp_layout->parentWidget(),
+                     mp_deck->pop(),
+                     m_opponentWidgets[2]->hand());
+
+
+}
+
+void Game::moveCard(const StructCardMovement& mov)
+{
+    /* determine destination */
+    CardWidget* card = 0;
+    CardPocket* dest = 0;
+    PlayerWidget* srcPlayer  = playerWidget(mov.playerFrom);
+    PlayerWidget* destPlayer = playerWidget(mov.playerTo);
+
+
+    switch(mov.pocketTypeFrom)
+    {
+    case POCKET_DECK:
+        card = mp_deck->pop();
+        break;
+    case POCKET_GRAVEYARD:
+        card = mp_graveyard->pop();
+        break;
+    case POCKET_HAND:
+        if (!srcPlayer) break;
+        if (srcPlayer->isLocalPlayer())
+        {
+            // todo
+        }
+        else
+        {
+            card = srcPlayer->hand()->pop();
+        }
+        break;
+    case POCKET_TABLE:
+        if (!srcPlayer) break;
+        card = srcPlayer->table()->get(mov.cardDetails.cardId);
+        break;
+    case POCKET_PLAYED:
+        // todo
+        break;
+    case POCKET_SELECTION:
+        // todo
+        break;
+    case POCKET_INVALID:
+        break;
+    }
+
+    switch(mov.pocketTypeTo)
+    {
+    case POCKET_DECK:
+        dest = mp_deck;
+        break;
+    case POCKET_GRAVEYARD:
+        dest = mp_graveyard;
+        break;
+    case POCKET_HAND:
+        dest = destPlayer != 0 ? destPlayer->hand() : 0;
+        break;
+    case POCKET_TABLE:
+        dest = destPlayer != 0 ? destPlayer->table() : 0;
+        break;
+    case POCKET_PLAYED:
+        /// \todo Implement moveCard to POCKET_PLAYED
+        break;
+    case POCKET_SELECTION:
+        /// \todo Implement moveCard to POCKET_SELECTION
+        break;
+    case POCKET_INVALID:
+        break;
+    }
+    if (card == 0)
+    {
+        qWarning("Cannot find card for movement.");
+        return;
+    }
+    if (dest == 0)
+    {
+        qWarning("Cannot find target pocket for card movement.");
+        return;
+    }
+    new CardMovement(mp_layout->parentWidget(), card, dest);
 }
 
 

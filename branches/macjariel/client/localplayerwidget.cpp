@@ -17,45 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef OPPONENTWIDGET_H
-#define OPPONENTWIDGET_H
+#include "localplayerwidget.h"
+#include "cardwidget.h"
 
-#include <QWidget>
-#include "ui_opponentwidget.h"
-#include "playerwidget.h"
+using namespace client;
 
-#include "parser/parserstructs.h"
+LocalPlayerWidget::LocalPlayerWidget(QWidget *parent)
+ : PlayerWidget(parent), Ui::LocalPlayerWidget()
+{
+    setupUi(this);
+    characterWidget->show();
 
-namespace client {
-class CardList;
-
-/**
- * @author MacJariel <MacJariel@gmail.com>
- */
-class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
-
-public:
-    OpponentWidget(QWidget *parent);
-    ~OpponentWidget();
-
-    inline bool isEmpty() const { return m_id == 0; }
-    inline int playerId() const { return m_id; }
-    inline QString playerName() const { return m_name; }
-
-    virtual void setPlayer(const StructPlayer&);
-    virtual void unsetPlayer();
-
-    virtual bool isLocalPlayer() { return 0; }
-
-    virtual QSize sizeHint() const;
-
-private:
-    void updateWidgets();
-
-private:
-    int m_id;
-    QString m_name;
-
-};
 }
-#endif
+
+
+
+LocalPlayerWidget::~LocalPlayerWidget()
+{
+}
+
+void LocalPlayerWidget::setPlayer(const StructPlayer& player)
+{
+    m_id = player.id;
+    m_name = player.name;
+    updateWidgets();
+}
+
+void LocalPlayerWidget::unsetPlayer()
+{
+    m_id = 0;
+    updateWidgets();
+}
+
+void LocalPlayerWidget::updateWidgets()
+{
+    if (m_id != 0)
+    {
+        labelPlayerName->setText(m_name);
+    }
+    else
+    {
+        labelPlayerName->setText("");
+    }
+}
+
+
+

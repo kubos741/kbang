@@ -24,21 +24,22 @@
 #include <QtDebug>
 #include <QList>
 
-class PlayerWidget;
-class OpponentWidget;
 class QGridLayout;
+
+namespace client
+{
+class LocalPlayerWidget;
+class OpponentWidget;
 
 struct GameWidgets
 {
     QGridLayout* layout;
-    PlayerWidget* playerWidget;
+    LocalPlayerWidget* localPlayerWidget;
     QList<OpponentWidget*> opponentWidget;
-    GameWidgets(QGridLayout* l, PlayerWidget* p, const QList<OpponentWidget*>& o):
-        layout(l), playerWidget(p), opponentWidget(o) {}
+    GameWidgets(QGridLayout* l, LocalPlayerWidget* p, const QList<OpponentWidget*>& o):
+        layout(l), localPlayerWidget(p), opponentWidget(o) {}
 };
 
-
-
-
+}
 
 #endif

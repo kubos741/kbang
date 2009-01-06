@@ -22,6 +22,8 @@
 
 #include "parser/queryget.h"
 
+using namespace client;
+
 JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnection)
  : QDialog(parent), mp_serverConnection(serverConnection)
 {

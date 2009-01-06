@@ -22,6 +22,8 @@
 #include "card.h"
 #include "cardwidget.h"
 
+using namespace client;
+
 CardWidget::CardWidget(QWidget* parent): QLabel(parent)
 {
     setScaledContents(1);
@@ -85,16 +87,15 @@ void CardWidget::applyNewProperties()
         qWarning(qPrintable(QString("Cannot find card id %1.").arg(m_cardClassId)));
         return;
     }
+    setPixmap(card->image());
     if (m_size == SIZE_NORMAL)
     {
-        setPixmap(card->image());
         setMinimumSize(normalSize());
         setMaximumSize(normalSize());
         resize(normalSize());
     }
     else
     {
-        setPixmap(card->imageSmall());
         setMinimumSize(smallSize());
         setMaximumSize(smallSize());
         resize(smallSize());

@@ -17,45 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef OPPONENTWIDGET_H
-#define OPPONENTWIDGET_H
+#include "cardlist.h"
+#include "cardwidget.h"
 
-#include <QWidget>
-#include "ui_opponentwidget.h"
-#include "playerwidget.h"
 
-#include "parser/parserstructs.h"
+using namespace client;
 
-namespace client {
-class CardList;
-
-/**
- * @author MacJariel <MacJariel@gmail.com>
- */
-class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
-
-public:
-    OpponentWidget(QWidget *parent);
-    ~OpponentWidget();
-
-    inline bool isEmpty() const { return m_id == 0; }
-    inline int playerId() const { return m_id; }
-    inline QString playerName() const { return m_name; }
-
-    virtual void setPlayer(const StructPlayer&);
-    virtual void unsetPlayer();
-
-    virtual bool isLocalPlayer() { return 0; }
-
-    virtual QSize sizeHint() const;
-
-private:
-    void updateWidgets();
-
-private:
-    int m_id;
-    QString m_name;
-
-};
+CardList::CardList(QWidget *parent, const QSize& cardSize)
+: CardPocket(parent), m_cardSize(cardSize)
+{
+    setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
+    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QSize widgetSize(cardSize.width() * 3, cardSize.height() + 8);
+    setMinimumSize(widgetSize);
+    setMaximumSize(widgetSize);
+    resize(widgetSize);
 }
-#endif
+
+CardList::~CardList()
+{
+}
+
+void CardList::push(CardWidget* card)
+{
+    m_cards.push_back(card);
+    card->setParent(this);
+    card->setCardSize(CardWidget::SIZE_SMALL);
+    card->applyNewProperties();
+    card->move(0,0);
+    card->raise();
+    card->show();
+    // todo
+}
+
+QPoint CardList::newCardPosition() const
+{
+    return QPoint(0,0);
+}
+
+CardWidget* CardList::get(int)
+{
+    return m_cards.takeLast();
+}
+
+CardWidget* CardList::pop()
+{
+    return m_cards.takeLast();
+}
+

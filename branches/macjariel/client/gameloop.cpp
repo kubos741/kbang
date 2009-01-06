@@ -20,6 +20,8 @@
 
 #include "gameloop.h"
 
+using namespace client;
+
 void GameLoop::run()
 {
 

@@ -23,6 +23,9 @@
 #include <QWidget>
 #include "ui_chatwidget.h"
 
+namespace client
+{
+
 /**
  *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
@@ -43,5 +46,5 @@ signals:
     void outgoingMessage(const QString& message);
 
 };
-
+}
 #endif

@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "chatwidget.h"
 
+using namespace client;
+
 ChatWidget::ChatWidget(QWidget *parent)
  : QWidget(parent)
 {

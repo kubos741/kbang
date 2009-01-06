@@ -26,6 +26,8 @@
 
 #include <cardpilewidget.h>
 
+namespace client {
+
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
@@ -42,5 +44,5 @@ public:
 private:
     CardWidget* newCard();
 };
-
+}
 #endif

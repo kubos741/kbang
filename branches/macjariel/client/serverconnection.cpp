@@ -24,6 +24,8 @@
 
 #include <QTcpSocket>
 
+using namespace client;
+
 ServerConnection::ServerConnection(QObject *parent)
  : QObject(parent), mp_parser(0)
 {
@@ -168,6 +170,8 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(outgoingData(const QByteArray&)));
     connect(mp_parser, SIGNAL(sigEventStartGame(const StructGame&, const StructPlayerList&)),
             this, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)));
+    connect(mp_parser, SIGNAL(sigEventCardMovement(const StructCardMovement&)),
+            this, SIGNAL(eventCardMovement(const StructCardMovement&)));
 }
 
 bool ServerConnection::isConnected() const

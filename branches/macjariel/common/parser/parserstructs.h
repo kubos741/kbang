@@ -26,6 +26,8 @@
 class XmlNode;
 class QXmlStreamWriter;
 
+
+
 struct StructServerInfo
 {
     QString name, description;
@@ -44,19 +46,21 @@ enum GameState {
 
 enum PlayerRole {
     ROLE_INVALID,
+    ROLE_UNKNOWN,
     ROLE_SHERIFF,
     ROLE_DEPUTY,
-    ROLE_BANDITA, // RENAME
+    ROLE_OUTLAW,
     ROLE_RENEGADE
 };
 
-enum Pocket {
-    POCKET_DECK         = 1,
-    POCKET_GRAVEYARD    = 2,
-    POCKET_HAND         = 3,
-    POCKET_TABLE        = 4,
-    POCKET_PLAYED       = 5,
-    POCKET_SELECTION    = 6
+enum PocketType {
+    POCKET_INVALID,
+    POCKET_DECK,
+    POCKET_GRAVEYARD,
+    POCKET_HAND,
+    POCKET_TABLE,
+    POCKET_PLAYED,
+    POCKET_SELECTION
 };
 
 struct StructCardDetails {
@@ -67,12 +71,14 @@ struct StructCardDetails {
 };
 
 struct StructCardMovement {
-    Pocket            pocketFrom;
-    Pocket            pocketTo;
+    PocketType        pocketTypeFrom;
+    PocketType        pocketTypeTo;
     int               playerFrom;
     int               playerTo;
     StructCardDetails cardDetails;
     StructCardMovement(): playerFrom(0), playerTo(0) {}
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
 };
 
 struct StructClient
@@ -85,9 +91,11 @@ struct StructPlayer
 {
     int id;
     QString name, password;
+    PlayerRole role;
     void read(XmlNode*);
     void write(QXmlStreamWriter*, bool writePassword = 0) const;
     static QString elementName;
+    StructPlayer();
 };
 
 typedef QList<StructPlayer> StructPlayerList;

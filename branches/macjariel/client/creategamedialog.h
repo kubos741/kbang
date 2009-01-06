@@ -25,6 +25,7 @@
 
 #include "parser/parserstructs.h"
 
+namespace client {
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -46,5 +47,7 @@ private slots:
 signals:
     void createGame(const StructGame&, const StructPlayer&);
 };
+
+}
 
 #endif

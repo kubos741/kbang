@@ -17,45 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef OPPONENTWIDGET_H
-#define OPPONENTWIDGET_H
+#ifndef LOCALPLAYERWIDGET_H
+#define LOCALPLAYERWIDGET_H
+
+
 
 #include <QWidget>
-#include "ui_opponentwidget.h"
-#include "playerwidget.h"
+#include <ui_localplayerwidget.h>
 
 #include "parser/parserstructs.h"
+#include "playerwidget.h"
 
 namespace client {
-class CardList;
 
 /**
+ * The LocalPlayerWidget instance represent the PlayerWidget that belongs to
+ * the local player.
  * @author MacJariel <MacJariel@gmail.com>
  */
-class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
-
+class LocalPlayerWidget: public PlayerWidget, public Ui::LocalPlayerWidget
+{
+Q_OBJECT
 public:
-    OpponentWidget(QWidget *parent);
-    ~OpponentWidget();
-
-    inline bool isEmpty() const { return m_id == 0; }
-    inline int playerId() const { return m_id; }
-    inline QString playerName() const { return m_name; }
+    LocalPlayerWidget(QWidget* parent);
+    virtual ~LocalPlayerWidget();
 
     virtual void setPlayer(const StructPlayer&);
     virtual void unsetPlayer();
-
     virtual bool isLocalPlayer() { return 0; }
 
-    virtual QSize sizeHint() const;
 
 private:
     void updateWidgets();
 
 private:
-    int m_id;
+    int     m_id;
     QString m_name;
-
 };
 }
 #endif

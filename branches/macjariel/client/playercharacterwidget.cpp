@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "playercharacterwidget.h"
 
+using namespace client;
+
 PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
  : QWidget(parent)
 {

@@ -17,45 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef OPPONENTWIDGET_H
-#define OPPONENTWIDGET_H
+#ifndef CLIENTCARDLIST_H
+#define CLIENTCARDLIST_H
 
-#include <QWidget>
-#include "ui_opponentwidget.h"
-#include "playerwidget.h"
+#include <cardpocket.h>
 
-#include "parser/parserstructs.h"
+#include <QList>
+#include <QSize>
 
 namespace client {
-class CardList;
+class CardWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
-class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
-
+class CardList: public CardPocket
+{
+Q_OBJECT
 public:
-    OpponentWidget(QWidget *parent);
-    ~OpponentWidget();
+    CardList(QWidget *parent, const QSize& cardSize);
+    virtual ~CardList();
 
-    inline bool isEmpty() const { return m_id == 0; }
-    inline int playerId() const { return m_id; }
-    inline QString playerName() const { return m_name; }
+    virtual void push(CardWidget* card);
+    virtual QPoint newCardPosition() const;
 
-    virtual void setPlayer(const StructPlayer&);
-    virtual void unsetPlayer();
+    virtual CardWidget* get(int id);
+    virtual CardWidget* pop();
 
-    virtual bool isLocalPlayer() { return 0; }
-
-    virtual QSize sizeHint() const;
+protected:
+    QList<CardWidget*> m_cards;
 
 private:
-    void updateWidgets();
-
-private:
-    int m_id;
-    QString m_name;
-
+    QSize m_cardSize;
+    bool  m_revealed;
 };
+
 }
+
 #endif

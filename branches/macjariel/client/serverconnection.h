@@ -27,8 +27,11 @@
 
 /// Forward declarations
 class QTcpSocket;
+
 class Parser;
+
 class QueryGet;
+namespace client {
 
 /**
  *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
@@ -87,13 +90,15 @@ signals:
 
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
+
+
     void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     void startableChanged(int gameId, bool startable);
     void gameStarted(const StructGame&, const StructPlayerList&);
-
+    void eventCardMovement(const StructCardMovement&);
 
 
 };
-
+}
 #endif

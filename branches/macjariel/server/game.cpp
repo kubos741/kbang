@@ -94,6 +94,7 @@ void Game::removePlayer(int playerId)
 
 
 
+
 QList<Player *> Game::playerList()
 {
     return m_playerList;
@@ -123,12 +124,12 @@ StructGame Game::structGame() const
 }
 
 
-StructPlayerList Game::structPlayerList() const
+StructPlayerList Game::structPlayerList(Player* privatePlayer) const
 {
     StructPlayerList r;
     foreach(Player* i, m_playerList)
     {
-        r.append(i->structPlayer());
+        r.append(i->structPlayer(privatePlayer == i));
     }
     return r;
 }
@@ -141,8 +142,14 @@ void Game::startGame()
     // TODO: character selection first
     m_gameState = Playing;
     if (m_shufflePlayers) shufflePlayers();
-    emit gameStarted(structGame(), structPlayerList());
+    //setCharacters();
     setRoles();
+
+    StructGame g = structGame();
+    foreach(Player* p, m_playerList)
+    {
+        p->announceGameStarted(g, structPlayerList(p));
+    }
     generateCards();
     dealCards();
     statusChanged(m_gameState);
@@ -182,7 +189,7 @@ void Game::dealCards()
 void Game::setRoles()
 {
     QList<PlayerRole> roles = getRoleList();
-    // TODO: shuffle roles list
+    shuffleList(roles);
     QListIterator<Player*> pIt(m_playerList);
     QListIterator<PlayerRole> rIt(roles);
     int i = 0;
@@ -206,7 +213,7 @@ QList<PlayerRole> Game::getRoleList()
         switch(*i)
         {
             case 'S': res.append(ROLE_SHERIFF); break;
-            case 'B': res.append(ROLE_BANDITA); break;
+            case 'B': res.append(ROLE_OUTLAW); break;
             case 'V': res.append(ROLE_DEPUTY); break;
             case 'R': res.append(ROLE_RENEGADE); break;
         }

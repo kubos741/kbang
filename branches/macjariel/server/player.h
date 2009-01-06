@@ -95,9 +95,11 @@ public:
     void modifyLifePoints(int x);
 
     /**
-     * Returns player struct.
+     * Returns the player struct.
+     * @param returnPrivateInfo include private items if set to true
+     * (defaults to false)
      */
-     StructPlayer structPlayer();
+     StructPlayer structPlayer(bool returnPrivateInfo = 0);
 
     void appendCardToHand(CardAbstract* card);
 
@@ -108,6 +110,8 @@ public:
     //const PlayerActions* playerActions() const;
 
     inline void setRole(const PlayerRole& role) { m_role = role; }
+    void announceGameStarted(const StructGame&, const StructPlayerList&);
+
 
 
 /// Commands from the controller of the player
@@ -133,6 +137,7 @@ public slots:
 
 /// Signals from players. To be connected to slots of the controller
 signals:
+    void gameStarted(const StructGame&, const StructPlayerList&);
     void leavingGame();
 
 

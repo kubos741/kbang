@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>PlayerWidget</class>
- <widget class="QWidget" name="PlayerWidget" >
+ <class>LocalPlayerWidget</class>
+ <widget class="QWidget" name="LocalPlayerWidget" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -76,10 +76,10 @@
       <item>
        <layout class="QGridLayout" name="gridLayout_2" >
         <item rowspan="2" row="0" column="0" >
-         <widget class="PlayerCharacterWidget" native="1" name="characterWidget" />
+         <widget class="client::PlayerCharacterWidget" native="1" name="characterWidget" />
         </item>
         <item row="0" column="1" >
-         <widget class="CardWidget" native="1" name="roleWidget" />
+         <widget class="client::CardWidget" native="1" name="roleWidget" />
         </item>
         <item row="1" column="1" >
          <widget class="QLabel" name="label" >
@@ -143,13 +143,13 @@ color: white;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CardWidget</class>
+   <class>client::CardWidget</class>
    <extends>QWidget</extends>
    <header>cardwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PlayerCharacterWidget</class>
+   <class>client::PlayerCharacterWidget</class>
    <extends>QWidget</extends>
    <header>playercharacterwidget.h</header>
    <container>1</container>

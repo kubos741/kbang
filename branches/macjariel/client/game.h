@@ -27,6 +27,10 @@
 #include "parser/parserstructs.h"
 #include "common.h"
 #include "deckwidget.h"
+#include "playerwidget.h"
+
+namespace client {
+
 
 class ServerConnection;
 
@@ -44,6 +48,11 @@ public:
 
     void setCreator(bool creator) { m_creator = creator; }
 
+
+private:
+
+    inline PlayerWidget* playerWidget(int id) { return m_players.contains(id) ? m_players[id] : 0; }
+
 private:
     const int m_playerId;
     const QString m_playerName;
@@ -51,14 +60,14 @@ private:
     ServerConnection* mp_serverConnection;
 
 /*  Visual elements - provided by MainWindow */
-    QGridLayout*            mp_layout;
-    QList<OpponentWidget*>  m_opponentWidgets;
-    QHash<int, int>         m_opponents;
-    PlayerWidget*           mp_playerWidget;
-    QPushButton*            mp_startButton;
-    DeckWidget*             mp_deck;
-    CardPileWidget*         mp_graveyard;
-    bool                    m_creator;
+    QGridLayout*              mp_layout;
+    QList<OpponentWidget*>    m_opponentWidgets;
+    QHash<int, PlayerWidget*> m_players;
+    LocalPlayerWidget*        mp_localPlayerWidget;
+    QPushButton*              mp_startButton;
+    DeckWidget*               mp_deck;
+    CardPileWidget*           mp_graveyard;
+    bool                      m_creator;
 
 public slots:
     void opponentJoinedGame(const StructPlayer& player);
@@ -66,6 +75,7 @@ public slots:
     void startableChanged(int gameId, bool startable);
     void startButtonClicked();
     void gameStarted(const StructGame&, const StructPlayerList&);
+    void moveCard(const StructCardMovement&);
 
     void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
 
@@ -73,5 +83,5 @@ public slots:
 
     void test();
 };
-
+}
 #endif

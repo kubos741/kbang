@@ -24,11 +24,32 @@
 #include <QString>
 #include <QPixmap>
 
+namespace client
+{
 class Card;
 typedef Card* CardPointer;
 
-
 /**
+ * This class is a type of a card in Bang! game. The whole set of Card instances
+ * is created during the start of the client. This class manages lifetime of its
+ * objects by itself. It's only sufficient to create an instance with \b{new}
+ * operator and you should never free any instances with \b{delete} operator by
+ * yourself.
+ *
+ * Cards can be then looked up by their id string. The identification of common cards
+ * is specified in KBang specification, so you can use card identification that you
+ * got from server (more specifically the parser class) to get the card object.
+ *
+ * The Card class is almost exclusively used in the CardWidget class.
+ * @see client::CardWidget
+ *
+ * \note In future it may be possible to use different card sets. This will be
+ *       implemented by adding a kind of card-set-manager class that will manage
+ *       creating the Card objects.
+ *
+ * \todo The class will use only one pixmap of the largest size. CardWidget can resize
+ *       this pixmap on fly.
+ *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Card
@@ -36,40 +57,43 @@ class Card
 public:
 
     typedef enum {
-        CT_CHARACTER,
-        CT_ROLE,
-        CT_PLAYING,
-        CT_BACK
+        CT_CHARACTER, /**< Character card (Susy Lafayete, etc.) */
+        CT_ROLE,      /**< Role card (Sheriff, etc.) */
+        CT_PLAYING,   /**< Playing card (Bang!, etc.) */
+        CT_BACK       /**< Back of a card (back of a playing card, back of a character card (bullets), etc.) */
     } Type;
 
 private:
-    Card(const QString& id, const QString& name, Type type, const QString& imageSmall, const QString& image);
-    Card(const Card&);
-    const Card& operator=(const Card& other);
+    /**
+     * Constructs a new Card according to given parameters.
+     * @param id The unique card identificator.
+     * @param name The localized card name (should be used with QObject::tr).
+     * @param image The filename of the image, as used in QPixmap constructor.
+     */
+    Card(const QString& id, const QString& name, Type type, const QString& imageFileName);
+    Card(const Card&);                    ///< Copy constructor is private.
+    const Card& operator=(const Card&);   ///< Assignment operator is private.
 
 public:
-    QString id() { return m_id; }
-    QString name() { return m_name; }
-    Type type() { return m_type; }
-
-    QPixmap imageSmall();
-    QPixmap image();
+    inline QString id()    { return m_id;    } ///< Returns unique indentifier.
+    inline QString name()  { return m_name;  } ///< Returns card name.
+    inline Type    type()  { return m_type;  } ///< Returns card type. @see Card::Type
+    inline QPixmap image() { return m_image; } ///< Returns image pixmap.
 
 public: /* static */
-    static void loadDefaultRuleset();
-    static const CardPointer findCard(const QString& id);
+    static void loadDefaultRuleset();  ///< Loads default ruleset. To be replaced with ruleset manager.
+    inline static const CardPointer findCard(const QString& id) ///< Looks up a card by its identifier.
+    {
+        return (sm_cards.contains(id) ? sm_cards[id] : 0);
+    }
 
 private:
     QString m_id;
     QString m_name;
     Type    m_type;
-    QPixmap m_imageSmall;
     QPixmap m_image;
-    QString m_imageSmallFile;
-    QString m_imageFile;
-
+    QString m_imageFileName;
     static QMap<QString, CardPointer> sm_cards;
-
 };
-
+}
 #endif

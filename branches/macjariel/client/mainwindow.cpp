@@ -25,11 +25,13 @@
 #include "logwidget.h"
 #include "chatwidget.h"
 #include "opponentwidget.h"
-#include "playerwidget.h"
+#include "localplayerwidget.h"
 #include "parser/queryget.h"
 #include "game.h"
 
 #include "card.h"
+
+using namespace client;
 
 MainWindow::MainWindow():
     mp_connectToServerDialog(0),
@@ -220,8 +222,8 @@ void MainWindow::createWidgets()
 
     mp_layout->addWidget(mp_logWidget, 3, 3, 1, 1);
 
-    mp_playerWidget = new PlayerWidget(this  );
-    mp_layout->addWidget(mp_playerWidget, 3, 1, 1, 2);
+    mp_localPlayerWidget = new LocalPlayerWidget(this);
+    mp_layout->addWidget(mp_localPlayerWidget, 3, 1, 1, 2);
 
     Ui::MainWindow::centralWidget->setLayout(mp_layout);
 }
@@ -243,7 +245,7 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
         // PLAYER HAS ENTERED GAME
 
         Q_ASSERT(mp_game == 0);
-        GameWidgets x(mp_layout, mp_playerWidget, m_opponentWidgets);
+        GameWidgets x(mp_layout, mp_localPlayerWidget, m_opponentWidgets);
         mp_game = new Game(this, gameId, player, &m_serverConnection, x);
         mp_game->setCreator(creator);
         mp_game->init();

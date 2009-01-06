@@ -20,32 +20,35 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
-
-
 #include <QWidget>
-#include <ui_playerwidget.h>
-
 #include "parser/parserstructs.h"
 
+namespace client {
+class CardList;
+
 /**
+ * The PlayerWidget class provides the abstraction for a widget that contains
+ * a representation of player properties and state, like his name, his cards, etc.
+ *
  * @author MacJariel <MacJariel@gmail.com>
  */
-class PlayerWidget : public QWidget, public Ui::PlayerWidget
-{
+class PlayerWidget: public QWidget {
 Q_OBJECT
 public:
-    PlayerWidget(QWidget* parent);
-    ~PlayerWidget();
+    PlayerWidget(QWidget* parent): QWidget(parent), mp_hand(0), mp_table(0) {}
+    virtual ~PlayerWidget() {}
 
-    void setPlayer(const StructPlayer&);
-    void unsetPlayer();
+    virtual void setPlayer(const StructPlayer&) = 0;
+    virtual void unsetPlayer() = 0;
 
-private:
-    void updateWidgets();
+    inline CardList* hand()  { return mp_hand;  }
+    inline CardList* table() { return mp_table; }
 
-private:
-    int     m_id;
-    QString m_name;
+    virtual bool isLocalPlayer() = 0;
+
+protected:
+    CardList* mp_hand;
+    CardList* mp_table;
 };
-
+}
 #endif

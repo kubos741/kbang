@@ -87,6 +87,7 @@ signals:
     void sigEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
     void sigEventStartGame(const StructGame&, const StructPlayerList&);
     void sigEventGameStartable(int gameId, bool startable);
+    void sigEventCardMovement(const StructCardMovement&);
     void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
 

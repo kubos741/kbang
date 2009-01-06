@@ -25,6 +25,8 @@
 #include <QSize>
 #include "cardwidget.h"
 
+namespace client {
+
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
@@ -64,4 +66,5 @@ private:
 
 };
 
+}
 #endif

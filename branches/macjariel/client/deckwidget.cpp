@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "deckwidget.h"
 
+using namespace client;
+
 DeckWidget::DeckWidget(QWidget *parent)
  : CardPileWidget(parent)
 {
@@ -47,6 +49,7 @@ CardWidget* DeckWidget::newCard()
     w->setCardSize(CardWidget::SIZE_SMALL);
     w->applyNewProperties();
     w->raise();
+    w->move(0,0);
     w->show();
     return w;
 }

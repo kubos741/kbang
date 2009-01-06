@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "logwidget.h"
 
+using namespace client;
+
 LogWidget::LogWidget(QWidget *parent)
 : QWidget(parent), m_dataType(0)
 {

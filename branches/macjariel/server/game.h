@@ -81,7 +81,12 @@ public:
     }
 
     StructGame structGame() const;
-    StructPlayerList structPlayerList() const;
+    /**
+     * Returns the list of StructPlayer structures.
+     * @param privatePlayer this player will have private items included
+     * in the resulting list
+     */
+    StructPlayerList structPlayerList(Player* privatePlayer = 0) const;
 
     /**
      * Creates a new player, enters it into the list of players and
@@ -151,7 +156,6 @@ signals:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
     void statusChanged(const GameState&);
-    void gameStarted(const StructGame&, const StructPlayerList&);
     void startableChanged(int gameId, bool startable);
 
     void playerDrawedCard(Player* player, CardAbstract* card);

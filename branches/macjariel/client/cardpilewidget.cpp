@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "cardpilewidget.h"
 
+using namespace client;
+
 /**
  *
  * @param parent
@@ -28,13 +30,14 @@ CardPileWidget::CardPileWidget(QWidget *parent)
 {
     setMinimumSize(CardWidget::normalSize());
     setMaximumSize(CardWidget::normalSize());
+    setStyleSheet("padding: 4px; background-color: rgba(0, 0, 0, 64);");
 }
 
 
 CardPileWidget::~CardPileWidget()
 {
-
 }
+
 CardWidget* CardPileWidget::peek()
 {
     return m_cards.top();
@@ -58,5 +61,5 @@ void CardPileWidget::push(CardWidget* card)
 
 QPoint CardPileWidget::newCardPosition() const
 {
-    return pos();
+    return QPoint(0,0);
 }

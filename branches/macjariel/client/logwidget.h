@@ -23,6 +23,7 @@
 #include <QWidget>
 #include "ui_logwidget.h"
 
+namespace client {
 
 /**
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
@@ -45,5 +46,5 @@ public slots:
 private:
     int m_dataType;
 };
-
+}
 #endif

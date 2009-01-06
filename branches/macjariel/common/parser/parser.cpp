@@ -376,6 +376,13 @@ void Parser::processStanza()
             emit sigEventStartGame(x, y);
             return;
         }
+        if (event->name() == "card-movement")
+        {
+            StructCardMovement x;
+            x.read(event);
+            emit sigEventCardMovement(x);
+            return;
+        }
         if (event->name() == "message")
         {
             XmlNode* messageNode = event->getFirstChild();
@@ -495,19 +502,7 @@ void Parser::eventCardMovement(const StructCardMovement& cardMovement)
 {
     ASSERT_SOCKET;
     eventStart();
-    mp_streamWriter->writeStartElement("card-movement");
-    mp_streamWriter->writeAttribute("pocketFrom", QString::number(cardMovement.pocketFrom));
-    mp_streamWriter->writeAttribute("pocketTo", QString::number(cardMovement.pocketTo));
-    if (cardMovement.playerFrom != 0)
-        mp_streamWriter->writeAttribute("playerFrom", QString::number(cardMovement.playerFrom));
-    if (cardMovement.playerTo != 0)
-        mp_streamWriter->writeAttribute("playerTo", QString::number(cardMovement.playerTo));
-    if (cardMovement.cardDetails.cardId != 0)
-    {
-        mp_streamWriter->writeAttribute("cardId", QString::number(cardMovement.cardDetails.cardId));
-        mp_streamWriter->writeAttribute("cardType", cardMovement.cardDetails.cardType);
-    }
-    mp_streamWriter->writeEndElement();
+    cardMovement.write(mp_streamWriter);
     eventEnd();
 }
 

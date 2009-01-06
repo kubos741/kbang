@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "connecttoserverdialog.h"
 
+using namespace client;
+
 ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
  : QDialog(parent)
 {

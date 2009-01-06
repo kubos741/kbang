@@ -19,58 +19,34 @@
  ***************************************************************************/
 
 #include <QtDebug>
-
 #include "card.h"
+
+using namespace client;
 
 QMap<QString, CardPointer> Card::sm_cards;
 
-Card::Card(const QString& id, const QString& name, Type type, const QString& imageSmall, const QString& image):
-    m_id(id), m_name(name), m_type(type), m_imageSmallFile(imageSmall), m_imageFile(image)
+Card::Card(const QString& id, const QString& name, Type type, const QString& imageFileName):
+    m_id(id), m_name(name), m_type(type), m_imageFileName(imageFileName)
 {
     if (sm_cards.contains(id))
     {
-        qWarning() << "Cannot create a card with already used id.";
+        qWarning(qPrintable(QString("Unable to create a card. Card with id '%1' already exists.").arg(id)));
         return;
     }
     sm_cards[id] = this;
-}
-
-QPixmap Card::imageSmall()
-{
-    if (m_imageSmall.isNull())
-    {
-        m_imageSmall.load(m_imageSmallFile); // flags?
-    }
-    return m_imageSmall;
-}
-
-QPixmap Card::image()
-{
-    if (m_image.isNull())
-    {
-        m_image.load(m_imageFile);
-    }
-    return m_image;
+    m_image.load(m_imageFileName);
 }
 
 void Card::loadDefaultRuleset()
 {
-    new Card("sheriff",  "Sheriff",  CT_ROLE, "", "");
-    new Card("renegade", "Renegade", CT_ROLE, "", "");
-    new Card("outlaw",   "Outlaw",   CT_ROLE, "", "");
-    new Card("deputy",   "Deputy",   CT_ROLE, "", "");
+    new Card("sheriff",     "Sheriff",  CT_ROLE,    "");
+    new Card("renegade",    "Renegade", CT_ROLE,    "");
+    new Card("outlaw",      "Outlaw",   CT_ROLE,    "");
+    new Card("deputy",      "Deputy",   CT_ROLE,    "");
 
-    new Card("bang",  "Bang!",   CT_PLAYING, ":/cards/gfx/cards/bang.png", ":/cards/gfx/cards/bang.png");
-    new Card("missed","Mancato", CT_PLAYING, ":/cards/gfx/cards/missed.png", ":/cards/gfx/cards/missed.png");
+    new Card("bang",        "Bang!",    CT_PLAYING, ":/cards/gfx/cards/bang.png");
+    new Card("missed",      "Mancato",  CT_PLAYING, ":/cards/gfx/cards/missed.png");
 
-    new Card("back-bullets", "Bullets", CT_BACK, ":/cards/gfx/cards/back-bullets.png", ":/cards/gfx/cards/back-bullets.png");
-    new Card("back-bang", "Back", CT_BACK, ":/cards/gfx/cards/back-bang.png", ":/cards/gfx/cards/back-bang  .png");
-
-
-}
-
-const CardPointer Card::findCard(const QString& id)
-{
-    if (!sm_cards.contains(id)) return 0;
-    return sm_cards[id];
+    new Card("back-bullets","Bullets",  CT_BACK,    ":/cards/gfx/cards/back-bullets.png");
+    new Card("back-bang",   "Back",     CT_BACK,    ":/cards/gfx/cards/back-bang.png");
 }

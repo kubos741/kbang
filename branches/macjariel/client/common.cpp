@@ -21,6 +21,8 @@
 #include <QString>
 #include "common.h"
 
+using namespace client;
+
 QString randomToken(int minLength, int maxLength)
 {
     Q_ASSERT(minLength <= maxLength);

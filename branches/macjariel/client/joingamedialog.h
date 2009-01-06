@@ -25,6 +25,8 @@
 
 #include "parser/parserstructs.h"
 
+namespace client {
+
 class ServerConnection;
 
 /**
@@ -56,5 +58,5 @@ private:
     ServerConnection* mp_serverConnection;
 
 };
-
+}
 #endif

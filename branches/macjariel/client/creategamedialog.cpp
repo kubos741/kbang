@@ -22,6 +22,8 @@
 #include <QRegExp>
 #include "creategamedialog.h"
 
+using namespace client;
+
 const int minPlayers = 3, maxPlayers = 7;
 
 CreateGameDialog::CreateGameDialog(QWidget *parent)

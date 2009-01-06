@@ -22,6 +22,8 @@
 
 #include <QThread>
 
+namespace client {
+
 /**
  * The GameLoop class is a entity that controls the game...
  * @author MacJariel <macjariel@users.sourceforge.net>
@@ -33,5 +35,5 @@ public:
     void run();
 
 };
-
+}
 #endif

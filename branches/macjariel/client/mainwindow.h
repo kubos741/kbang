@@ -27,15 +27,16 @@
 #include "ui_mainwindow.h"
 #include "serverconnection.h"
 
+class QLabel;
 
+namespace client {
 
 class ConnectToServerDialog;
 class CreateGameDialog;
 class JoinGameDialog;
 class LogWidget;
 class ChatWidget;
-class QLabel;
-class PlayerWidget;
+class LocalPlayerWidget;
 class OpponentWidget;
 class Game;
 
@@ -72,7 +73,7 @@ private:
     ServerConnection       m_serverConnection;
     Game*                  mp_game;
     QLabel*                mp_labelStatusBarServerState;
-    PlayerWidget*          mp_playerWidget;
+    LocalPlayerWidget*     mp_localPlayerWidget;
     QList<OpponentWidget*> m_opponentWidgets;
     QGridLayout*           mp_layout;
 
@@ -86,5 +87,5 @@ private:
     void updateActions();
 
 };
-
+}
 #endif

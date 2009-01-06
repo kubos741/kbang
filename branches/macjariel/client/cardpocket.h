@@ -20,23 +20,25 @@
 #ifndef CARDPOCKET_H
 #define CARDPOCKET_H
 
-#include <QWidget>
+#include <QFrame>
 #include <QPoint>
 
+namespace client
+{
 class CardWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardPocket : public QWidget
+class CardPocket : public QFrame
 {
 Q_OBJECT
 public:
-    CardPocket(QWidget *parent): QWidget(parent) {}
+    CardPocket(QWidget *parent): QFrame(parent) {}
     virtual QPoint newCardPosition() const = 0;
     virtual void push(CardWidget*) = 0;
 signals:
     void newCardPositionChanged(const QPoint&);
 };
-
+}
 #endif

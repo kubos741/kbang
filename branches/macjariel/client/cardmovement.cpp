@@ -27,25 +27,17 @@
 #include "cardpocket.h"
 #include <math.h>
 
+using namespace client;
+
 const int tickTime = 5;
-const double pixelsPerTick = 16;
+const double pixelsPerTick = 1;
+const int delay = 500;
+int CardMovement::sm_startedAnimations(0);
+
 
 CardMovement::CardMovement(QWidget *mainWidget, CardWidget* card, CardPocket* destination)
-: QObject(mainWidget), mp_dest(destination), m_tick(0), mp_card(card)
+: QObject(mainWidget), mp_dest(destination), mp_mainWidget(mainWidget), m_tick(0), mp_card(card), m_waiting(1), m_firstShot(1)
 {
-    if (card->parent() != parent())
-    {
-        QPoint pos = card->mapTo(mainWidget, QPoint(0,0));
-        card->setParent(mainWidget);
-        card->move(pos);
-    }
-    card->raise();
-    card->show();
-
-    m_origin = card->pos();
-    m_destination = destination->newCardPosition();
-    m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) +
-                    pow(m_destination.y() - m_origin.y(), 2));
     mp_timer = new QTimer(this);
     mp_timer->setInterval(tickTime);
     connect(mp_timer, SIGNAL(timeout()),
@@ -57,8 +49,40 @@ CardMovement::~CardMovement()
 {
 }
 
+void CardMovement::startAnimation()
+{
+    if (!mp_dest->isVisible() || !mp_card->isVisible()) return;
+    if (mp_card->parent() != parent())
+    {
+        QPoint pos = mp_card->mapTo(mp_mainWidget, QPoint(0,0));
+        mp_card->setParent(mp_mainWidget);
+        mp_card->move(pos);
+    }
+    mp_card->raise();
+    mp_card->show();
+    m_origin = mp_card->pos();
+    m_destination = mp_dest->mapTo(mp_mainWidget, mp_dest->newCardPosition());
+    m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) +
+                    pow(m_destination.y() - m_origin.y(), 2));
+    mp_timer = new QTimer(this);
+    mp_timer->setInterval(tickTime + sm_startedAnimations * delay);
+    sm_startedAnimations++;
+    m_waiting = 0;
+}
+
 void CardMovement::onTimerShot()
 {
+    if (m_waiting)
+    {
+        startAnimation();
+        return;
+    }
+    if (m_firstShot)
+    {
+        m_firstShot = 0;
+        sm_startedAnimations--;
+        mp_timer->setInterval(tickTime);
+    }
     m_tick++;
     qreal progress = (m_tick* pixelsPerTick) / m_length;
     if (progress > 1)

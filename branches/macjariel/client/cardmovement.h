@@ -25,33 +25,55 @@
 
 class QWidget;
 class QTimer;
+
+namespace client
+{
 class CardWidget;
 class CardPocket;
 
 /**
+ * This class handles the animation of cards in the game. Whenever there is a need
+ * to move a card to a pocket, an instance of this class must be created. The instance
+ * itself controls its lifetime, so you only need to create it with <b>new</b> operator
+ * and leave it.
+ *
+ * \todo It may be desired to reveal yet unrevealed card sometimes. This class should
+ *       handle this.
+ *
  * @author MacJariel <MacJariel@gmail.com>
  */
 class CardMovement : public QObject
 {
 Q_OBJECT
 public:
-    CardMovement(QWidget *mainWindow, CardWidget* card, CardPocket* destination);
-    ~CardMovement();
+    /**
+     * Creates an instance of CardMovement class which starts the animation.
+     * @param mainWidget The main widget of the window.
+     * @param cardWidget The card widget that will be moved.
+     * @param destination The target pocket.
+     */
+    CardMovement(QWidget *mainWidget, CardWidget* cardWidget, CardPocket* destination);
+    virtual ~CardMovement();
 
 public slots:
     void onTimerShot();
 
 private:
+    void startAnimation();
     void finished();
 
 private:
     CardPocket* mp_dest;
-    QPoint m_origin;
-    QPoint m_destination;
-    qreal  m_length;
-    QTimer* mp_timer;
-    int    m_tick;
+    QWidget*    mp_mainWidget;
+    QPoint      m_origin;
+    QPoint      m_destination;
+    qreal       m_length;
+    QTimer*     mp_timer;
+    int         m_tick;
     CardWidget* mp_card;
+    bool        m_waiting;
+    bool        m_firstShot;
+    static int  sm_startedAnimations;
 };
-
+}
 #endif

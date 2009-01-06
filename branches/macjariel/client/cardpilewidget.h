@@ -25,7 +25,13 @@
 #include "cardwidget.h"
 #include "cardpocket.h"
 
+namespace client
+{
+
 /**
+ * The CardPileWidget presents a kind of CardPocket (the place for holding a bunch
+ * of playing cards), that keeps its cards on a pile. An example of CardPileWidget can
+ * be the deck or the graveyard.
  * @author MacJariel <MacJariel@gmail.com>
  */
 class CardPileWidget : public CardPocket
@@ -43,5 +49,5 @@ public:
 protected:
     QStack<CardWidget*> m_cards;
 };
-
+}
 #endif

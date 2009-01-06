@@ -22,6 +22,8 @@
 
 #include <QLabel>
 
+namespace client
+{
 
 /**
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
@@ -51,6 +53,6 @@ private:
     QString m_serverCardId; /* for communication with server */
     Size    m_size;
 };
-
+}
 
 #endif
