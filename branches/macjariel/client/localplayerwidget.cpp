@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "localplayerwidget.h"
 #include "cardwidget.h"
+#include "cardlist.h"
 
 using namespace client;
 
@@ -27,7 +28,11 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent)
 {
     setupUi(this);
     characterWidget->show();
-
+    mp_hand = new CardList(0, CardWidget::SIZE_NORMAL);
+    mp_table = new CardList(0, CardWidget::SIZE_SMALL);
+    verticalLayout->addWidget(mp_table);
+    verticalLayout->addStretch();
+    verticalLayout->addWidget(mp_hand);
 }
 
 

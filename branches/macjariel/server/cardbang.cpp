@@ -32,7 +32,7 @@ CardBang::~CardBang()
 
 bool CardBang::play()
 {
-
+    return 0;
 }
 
 bool CardBang::play(Player *targetPlayer)
@@ -55,6 +55,8 @@ bool CardBang::play(Player *targetPlayer)
 
 bool CardBang::play(CardAbstract* targetCard)
 {
+    Q_UNUSED(targetCard);
+    return 0;
 }
 
 void CardBang::noReaction(Player *reactingPlayer)

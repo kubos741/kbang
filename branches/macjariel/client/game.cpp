@@ -37,6 +37,7 @@ mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
 m_opponentWidgets(gameWidgets.opponentWidget), mp_localPlayerWidget(gameWidgets.localPlayerWidget),
 mp_startButton(0), m_creator(0)
 {
+    m_players[m_playerId] = mp_localPlayerWidget;
 }
 
 void Game::init()
@@ -183,7 +184,7 @@ void Game::test()
     new CardMovement(mp_layout->parentWidget(),
                      mp_deck->pop(),
                      m_opponentWidgets[2]->hand());
-
+    
 
 }
 

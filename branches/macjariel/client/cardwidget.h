@@ -32,7 +32,7 @@ class CardWidget: public QLabel
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_NORMAL, SIZE_SMALL } Size;
+    typedef enum { SIZE_BIG, SIZE_NORMAL, SIZE_SMALL } Size;
 
     CardWidget(QWidget *parent = 0);
     ~CardWidget();
@@ -47,6 +47,7 @@ public:
     static QSize smallSize();
     static QSize normalSize();
     static QSize bigSize();
+    static QSize size(const Size& size);
 
 private:
     QString m_cardClassId;  /* of Card class */

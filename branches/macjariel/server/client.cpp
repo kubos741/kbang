@@ -159,8 +159,8 @@ void Client::actionStartGame()
 void Client::playerDrawedCard(Player *player, CardAbstract *card)
 {
     StructCardMovement x;
-    x.pocketFrom = POCKET_DECK;
-    x.pocketTo   = POCKET_HAND;
+    x.pocketTypeFrom = POCKET_DECK;
+    x.pocketTypeTo   = POCKET_HAND;
     x.playerTo   = player->id();
     if (player == mp_player)
     {

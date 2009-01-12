@@ -63,6 +63,20 @@ void CardWidget::setCardSize(Size size)
     m_size = size;
 }
 
+QSize client::CardWidget::size(const Size& size)
+{
+    switch(size)
+    {
+    case SIZE_SMALL:
+        return smallSize();
+    case SIZE_NORMAL:
+        return normalSize();
+    case SIZE_BIG:
+        return bigSize();
+    }
+    return normalSize();
+}
+
 QSize CardWidget::smallSize()
 {
     //return QSize(40, 64);
@@ -101,4 +115,6 @@ void CardWidget::applyNewProperties()
         resize(smallSize());
     }
 }
+
+
 

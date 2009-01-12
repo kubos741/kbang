@@ -20,15 +20,18 @@
 #include "cardlist.h"
 #include "cardwidget.h"
 
+#include <QSize>
 
 using namespace client;
 
-CardList::CardList(QWidget *parent, const QSize& cardSize)
-: CardPocket(parent), m_cardSize(cardSize)
+CardList::CardList(QWidget *parent, const CardWidget::Size& cardSize)
+: CardPocket(parent), m_cardSize(cardSize), m_hPadding(3), m_vPadding(3)
 {
     setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
     //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QSize widgetSize(cardSize.width() * 3, cardSize.height() + 8);
+    QSize cardS = CardWidget::size(cardSize);
+    QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
+    m_moveFactor = cardS.width() / 2;
     setMinimumSize(widgetSize);
     setMaximumSize(widgetSize);
     resize(widgetSize);
@@ -40,11 +43,11 @@ CardList::~CardList()
 
 void CardList::push(CardWidget* card)
 {
-    m_cards.push_back(card);
+    card->move(newCardPosition());
     card->setParent(this);
-    card->setCardSize(CardWidget::SIZE_SMALL);
+    m_cards.push_back(card);
+    card->setCardSize(m_cardSize);
     card->applyNewProperties();
-    card->move(0,0);
     card->raise();
     card->show();
     // todo
@@ -52,7 +55,7 @@ void CardList::push(CardWidget* card)
 
 QPoint CardList::newCardPosition() const
 {
-    return QPoint(0,0);
+    return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
 }
 
 CardWidget* CardList::get(int)

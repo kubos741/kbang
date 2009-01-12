@@ -22,6 +22,8 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QList>
+#include <QQueue>
 
 class QWidget;
 class QTimer;
@@ -59,21 +61,24 @@ public slots:
     void onTimerShot();
 
 private:
-    void startAnimation();
-    void finished();
+    void start();
+    void stop();
+    void enqueue();
+    static void startNext();
 
 private:
     CardPocket* mp_dest;
     QWidget*    mp_mainWidget;
+    QTimer*     mp_timer;
     QPoint      m_origin;
     QPoint      m_destination;
     qreal       m_length;
-    QTimer*     mp_timer;
+
     int         m_tick;
     CardWidget* mp_card;
-    bool        m_waiting;
-    bool        m_firstShot;
-    static int  sm_startedAnimations;
+    bool        m_waitingForVisible;
+    
+    static QQueue<CardMovement*> sm_queue;
 };
 }
 #endif

@@ -32,7 +32,7 @@ OpponentWidget::OpponentWidget(QWidget *parent)
 
     mp_labelPlayerName->setText("");
 
-    mp_hand = new CardList(0, CardWidget::smallSize());
+    mp_hand = new CardList(0, CardWidget::SIZE_SMALL);
     horizontalLayout->addWidget(mp_hand);
 //((QBoxLayout*)layout())->addLayout(l);
 

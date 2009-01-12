@@ -93,7 +93,7 @@ void Player::appendCardToHand(CardAbstract * card)
 {
     m_cardsInHand.append(card);
     card->setOwner(this);
-    card->setPocket(POCKET_HAND);
+    card->setPocketType(POCKET_HAND);
 }
 
 

@@ -39,21 +39,21 @@ public:
     virtual ~CardAbstract();
 
     inline void setOwner(Player *owner) { mp_owner = owner; }
-    inline void setPocket(const Pocket& pocket) { m_pocket = pocket; }
+    inline void setPocketType(const PocketType& pocketType) { m_pocketType = pocketType; }
 
     inline int id() const { return m_id; }
     virtual QString type() const = 0;
     inline StructCardDetails cardDetails() const { return StructCardDetails(m_id, type()); }
     inline Player* owner() const { return mp_owner; }
-    inline Pocket  pocket() const { return m_pocket; }
+    inline PocketType pocket() const { return m_pocketType; }
 
 protected:
     Game *mp_game;
 
 private:
-    Player *mp_owner;
-    Pocket  m_pocket;
-    const int m_id;
+    Player*     mp_owner;
+    PocketType  m_pocketType;
+    const int   m_id;
 };
 
 #endif

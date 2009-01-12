@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "cardabstract.h"
 
-CardAbstract::CardAbstract(Game* game, int id): QObject(game), mp_game(game), mp_owner(0), m_pocket(POCKET_DECK), m_id(id)
+CardAbstract::CardAbstract(Game* game, int id): QObject(game), mp_game(game), mp_owner(0), m_pocketType(POCKET_DECK), m_id(id)
 {
 }
 

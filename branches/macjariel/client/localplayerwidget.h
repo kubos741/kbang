@@ -46,7 +46,6 @@ public:
     virtual void unsetPlayer();
     virtual bool isLocalPlayer() { return 0; }
 
-
 private:
     void updateWidgets();
 

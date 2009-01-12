@@ -21,12 +21,11 @@
 #define CLIENTCARDLIST_H
 
 #include <cardpocket.h>
+#include <cardwidget.h>
 
 #include <QList>
-#include <QSize>
 
 namespace client {
-class CardWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -35,7 +34,7 @@ class CardList: public CardPocket
 {
 Q_OBJECT
 public:
-    CardList(QWidget *parent, const QSize& cardSize);
+    CardList(QWidget *parent, const CardWidget::Size& cardSize);
     virtual ~CardList();
 
     virtual void push(CardWidget* card);
@@ -48,8 +47,10 @@ protected:
     QList<CardWidget*> m_cards;
 
 private:
-    QSize m_cardSize;
-    bool  m_revealed;
+    CardWidget::Size m_cardSize;
+    bool             m_revealed;
+    int              m_moveFactor;
+    int              m_hPadding, m_vPadding;
 };
 
 }

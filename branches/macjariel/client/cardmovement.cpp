@@ -30,27 +30,37 @@
 using namespace client;
 
 const int tickTime = 5;
-const double pixelsPerTick = 1;
+const double pixelsPerTick = 16;
 const int delay = 500;
-int CardMovement::sm_startedAnimations(0);
+QQueue<CardMovement*> CardMovement::sm_queue;
 
 
 CardMovement::CardMovement(QWidget *mainWidget, CardWidget* card, CardPocket* destination)
-: QObject(mainWidget), mp_dest(destination), mp_mainWidget(mainWidget), m_tick(0), mp_card(card), m_waiting(1), m_firstShot(1)
+: QObject(mainWidget), mp_dest(destination), mp_mainWidget(mainWidget),
+  mp_timer(0), m_tick(0), mp_card(card), m_waitingForVisible(1)
 {
-    mp_timer = new QTimer(this);
-    mp_timer->setInterval(tickTime);
-    connect(mp_timer, SIGNAL(timeout()),
-            this, SLOT(onTimerShot()));
-    mp_timer->start();
+    qDebug() << "Creating animation, queue size: " << sm_queue.size();
+    enqueue();
+    if (sm_queue.size() == 1)
+    {
+        start();
+    }
 }
 
 CardMovement::~CardMovement()
 {
 }
 
-void CardMovement::startAnimation()
+void CardMovement::start()
 {
+    if (mp_timer == 0)
+    {
+        mp_timer = new QTimer(this);
+        mp_timer->setInterval(tickTime);
+        connect(mp_timer, SIGNAL(timeout()),
+                this, SLOT(onTimerShot()));
+        mp_timer->start();
+    }
     if (!mp_dest->isVisible() || !mp_card->isVisible()) return;
     if (mp_card->parent() != parent())
     {
@@ -64,41 +74,45 @@ void CardMovement::startAnimation()
     m_destination = mp_dest->mapTo(mp_mainWidget, mp_dest->newCardPosition());
     m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) +
                     pow(m_destination.y() - m_origin.y(), 2));
-    mp_timer = new QTimer(this);
-    mp_timer->setInterval(tickTime + sm_startedAnimations * delay);
-    sm_startedAnimations++;
-    m_waiting = 0;
+    m_waitingForVisible = 0;
 }
 
 void CardMovement::onTimerShot()
 {
-    if (m_waiting)
+    if (m_waitingForVisible)
     {
-        startAnimation();
+        start();
         return;
-    }
-    if (m_firstShot)
-    {
-        m_firstShot = 0;
-        sm_startedAnimations--;
-        mp_timer->setInterval(tickTime);
     }
     m_tick++;
     qreal progress = (m_tick* pixelsPerTick) / m_length;
     if (progress > 1)
     {
-        finished();
+        stop();
         return;
     }
     QPoint pos = m_origin + (m_destination - m_origin) * progress;
     mp_card->move(pos);
 }
 
-void CardMovement::finished()
+void CardMovement::stop()
 {
     mp_timer->stop();
     mp_timer->deleteLater();
     mp_dest->push(mp_card);
+    if (sm_queue.size() != 0 && sm_queue.head() == this) sm_queue.dequeue();
     deleteLater();
+    startNext();
 }
 
+void client::CardMovement::enqueue()
+{
+    sm_queue.enqueue(this);
+}
+
+void client::CardMovement::startNext()
+{
+    qDebug() << "Starting next...";
+    if (sm_queue.size() == 0) return;
+    sm_queue.head()->start();
+}
