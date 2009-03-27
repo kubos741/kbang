@@ -30,13 +30,13 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
             this, SLOT(animateCard()));
 
     mp_backCard = new CardWidget(this);
-    mp_backCard->setCardSize(CardWidget::SIZE_SMALL);
+    mp_backCard->setSize(CardWidget::SIZE_SMALL);
     mp_backCard->setCardClass("back-bullets");
     mp_backCard->applyNewProperties();
     mp_backCard->move(0,0);
 
     mp_characterCard = new CardWidget(this);
-    mp_characterCard->setCardSize(CardWidget::SIZE_SMALL);
+    mp_characterCard->setSize(CardWidget::SIZE_SMALL);
     mp_characterCard->applyNewProperties();
     mp_characterCard->hide();
     mp_characterCard->move(0,0);

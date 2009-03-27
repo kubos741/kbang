@@ -31,7 +31,7 @@ bool CardPlayable::play()
 {
     // TODO: remove from player hands
     // owner()->removeCardFromHand(this);
-    mp_game->appendPlayedCard(this);
+    //mp_game->appendPlayedCard(this);
     setPocketType(POCKET_PLAYED);
     return 1;
 }

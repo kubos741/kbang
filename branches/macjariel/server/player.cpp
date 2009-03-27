@@ -21,22 +21,30 @@
 #include "game.h"
 #include "client.h"
 #include "cards.h"
+#include "playerctrl.h"
 
-Player::Player(int id, const QString& name, const QString& password, Game* game):
-QObject(game),
-m_id(id),
-m_name(name),
-m_password(password),
-mp_game(game)
+
+Player::Player(Game* game,
+               int id,
+               const QString& name,
+               const QString& password,
+               AbstractPlayerController* abstractPlayerController):
+        QObject(game),
+        m_id(id),
+        m_name(name),
+        m_password(password),
+        mp_game(game),
+        m_publicPlayerView(this),
+        m_privatePlayerView(this)
 {
     //    mp_client->mp_player = this;
     //    m_id = mp_game->appendNewPlayer(this);
+    mp_playerCtrl = new PlayerCtrl(this, abstractPlayerController);
 }
 
-
-Player::~Player()
+PlayerCtrl* Player::playerCtrl() const
 {
-
+    return mp_playerCtrl;
 }
 
 const int Player::id() const
@@ -49,22 +57,12 @@ QString Player::name() const
     return m_name;
 }
 
-void Player::startGame()
-{
-    if (mp_game->creatorId() != m_id) return; // TODO: error to client
-    mp_game->startGame();
-}
-
-void Player::leaveGame()
-{
-    Q_ASSERT(mp_game != 0);
-    mp_game->removePlayer(m_id);
-}
-
+/*
 void Player::sendMessage(const QString& message)
 {
     mp_game->sendMessage(this, message);
 }
+*/
 
 StructPlayer Player::structPlayer(bool returnPrivateInfo)
 {
@@ -95,6 +93,21 @@ void Player::appendCardToHand(CardAbstract * card)
     card->setOwner(this);
     card->setPocketType(POCKET_HAND);
 }
+
+
+
+
+const PublicPlayerView& Player::publicView() const
+{
+    return m_publicPlayerView;
+}
+
+const PrivatePlayerView& Player::privateView() const
+{
+    return m_privatePlayerView;
+}
+
+
 
 
 

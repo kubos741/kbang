@@ -41,6 +41,10 @@ MainWindow::MainWindow():
     mp_game(0)
 {
     setupUi(this);
+    if (centralWidget() == 0) {
+        setCentralWidget(mp_centralWidget);
+    }
+
     Card::loadDefaultRuleset();
 
     createActions();
@@ -48,7 +52,6 @@ MainWindow::MainWindow():
     createStatusBar();
     createWidgets();
     updateActions();
-
 
     connect(&m_serverConnection, SIGNAL(statusChanged()),
             this, SLOT(serverConnectionStatusChanged()));
@@ -225,7 +228,7 @@ void MainWindow::createWidgets()
     mp_localPlayerWidget = new LocalPlayerWidget(this);
     mp_layout->addWidget(mp_localPlayerWidget, 3, 1, 1, 2);
 
-    Ui::MainWindow::centralWidget->setLayout(mp_layout);
+    mp_centralWidget->setLayout(mp_layout);
 }
 
 void MainWindow::leaveGame()
@@ -246,7 +249,7 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
 
         Q_ASSERT(mp_game == 0);
         GameWidgets x(mp_layout, mp_localPlayerWidget, m_opponentWidgets);
-        mp_game = new Game(this, gameId, player, &m_serverConnection, x);
+        mp_game = new Game(this, gameId, player, &m_serverConnection, x, mp_centralWidget);
         mp_game->setCreator(creator);
         mp_game->init();
         updateActions();

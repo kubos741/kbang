@@ -17,38 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PRIVATEPLAYERVIEW_H
-#define PRIVATEPLAYERVIEW_H
 
-#include <publicplayerview.h>
+#include "cardmovementparentwidget.h"
+#include <QtDebug>
+#include <QPaintEvent>
+#include <QPainter>
 
-/**
- *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class PrivatePlayerView: public PublicPlayerView
+namespace client
 {
-friend class Player;
-private:
-    PrivatePlayerView(Player* player);
-    virtual ~PrivatePlayerView();
 
-public:
-    /**
-     * Returns the role of the player. The valid role
-     * is returned even if the player is still alive
-     * and is not sheriff.
-     */
-    virtual int role() const
-    {
-        // TODO
-        return 0;
+/*
+void CardMovementParentWidget::addCardMovement(QPointer<CardMovement> cardMovement)
+{
+    m_movementsList.append(cardMovement);
+}
+
+
+
+void CardMovementParentWidget::paintEvent(QPaintEvent *event)
+{
+    QWidget::paintEvent(event);
+    QPainter painter(this);
+    QMutableListIterator<QPointer<CardMovement> > it(m_movementsList);
+    while(it.hasNext()) {
+        QPointer<CardMovement> cardMovement = it.next();
+        if (cardMovement.isNull()) {
+            it.remove();
+            continue;
+        }
+
+        QRect rect = cardMovement->cardRect();
+        qDebug() << "Drawing " << rect;
+        QRect region = event->region().intersect(rect).boundingRect();
+        painter.fillRect(region, QBrush(QColor(255,255,255,128)));
     }
+}
+*/
 
-    virtual StructPlayer structPlayer() const;
-
-
-    // implement method cardsInHand
-};
-
-#endif
+}

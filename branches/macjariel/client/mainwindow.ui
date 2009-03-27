@@ -1,7 +1,11 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,15 +13,16 @@
     <height>596</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <property name="autoFillBackground" >
+  <property name="autoFillBackground">
    <bool>false</bool>
   </property>
-  <property name="styleSheet" >
-   <string notr="true" >QWidget#centralWidget {
-	background-image: url(:/misc/gfx/misc/background.png)
+  <property name="styleSheet">
+   <string notr="true">#mp_centralWidget {
+/*	background-image: url(:/misc/gfx/misc/background.png)*/
+	background-color: rgb(1, 127, 53);
 }
 
 QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(0, 170, 0), stop:1 darkgreen); }
@@ -26,91 +31,98 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
 
 </string>
   </property>
-  <widget class="QWidget" name="centralWidget" >
-   <property name="autoFillBackground" >
+  <widget class="client::CardMovementParentWidget" name="mp_centralWidget">
+   <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <property name="styleSheet" >
-    <string notr="true" />
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
   </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>730</width>
-     <height>28</height>
+     <height>24</height>
     </rect>
    </property>
-   <property name="autoFillBackground" >
+   <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <widget class="QMenu" name="menuGame" >
-    <property name="title" >
+   <widget class="QMenu" name="menuGame">
+    <property name="title">
      <string>&amp;Game</string>
     </property>
-    <addaction name="mp_actionConnectToServer" />
-    <addaction name="mp_actionDisconnectFromServer" />
-    <addaction name="separator" />
-    <addaction name="actionCreateGame" />
-    <addaction name="mp_actionJoinGame" />
-    <addaction name="mp_actionLeaveGame" />
-    <addaction name="mp_actionExit" />
+    <addaction name="mp_actionConnectToServer"/>
+    <addaction name="mp_actionDisconnectFromServer"/>
+    <addaction name="separator"/>
+    <addaction name="actionCreateGame"/>
+    <addaction name="mp_actionJoinGame"/>
+    <addaction name="mp_actionLeaveGame"/>
+    <addaction name="mp_actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionConfigure_Profile" />
+    <addaction name="actionConfigure_Profile"/>
    </widget>
-   <addaction name="menuGame" />
-   <addaction name="menuTools" />
+   <addaction name="menuGame"/>
+   <addaction name="menuTools"/>
   </widget>
-  <widget class="QStatusBar" name="mp_statusbar" />
-  <action name="mp_actionConnectToServer" >
-   <property name="icon" >
-    <iconset resource="client.qrc" >
+  <widget class="QStatusBar" name="mp_statusbar"/>
+  <action name="mp_actionConnectToServer">
+   <property name="icon">
+    <iconset resource="client.qrc">
      <normaloff>:/icons/gfx/icons/icon-connect.svg</normaloff>:/icons/gfx/icons/icon-connect.svg</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Connect to Server</string>
    </property>
   </action>
-  <action name="mp_actionExit" >
-   <property name="text" >
+  <action name="mp_actionExit">
+   <property name="text">
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="mp_actionDisconnectFromServer" >
-   <property name="text" >
+  <action name="mp_actionDisconnectFromServer">
+   <property name="text">
     <string>&amp;Disconnect from Server</string>
    </property>
   </action>
-  <action name="mp_actionJoinGame" >
-   <property name="text" >
+  <action name="mp_actionJoinGame">
+   <property name="text">
     <string>&amp;Join Game</string>
    </property>
   </action>
-  <action name="mp_actionLeaveGame" >
-   <property name="text" >
+  <action name="mp_actionLeaveGame">
+   <property name="text">
     <string>&amp;Leave Game</string>
    </property>
   </action>
-  <action name="actionConfigure_Profile" >
-   <property name="text" >
+  <action name="actionConfigure_Profile">
+   <property name="text">
     <string>Configure Profile</string>
    </property>
   </action>
-  <action name="actionCreateGame" >
-   <property name="text" >
+  <action name="actionCreateGame">
+   <property name="text">
     <string>C&amp;reate Game</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>client::CardMovementParentWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">cardmovementparentwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
-  <include location="client.qrc" />
-  <include location="cards.qrc" />
+  <include location="client.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -119,11 +131,11 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>399</x>
      <y>328</y>
     </hint>

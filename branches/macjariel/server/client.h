@@ -21,57 +21,68 @@
 #define CLIENT_H
 
 #include "parser/parser.h"
-
-#include "player.h"
-#include "cards.h"
+#include "playerctrl.h"
+#include "abstractplayercontroller.h"
 
 #include <QObject>
-#include <QPair>
+#include <QPointer>
 
-
-class GameServer;
 class QTcpSocket;
 
 
 /**
- * NOTE: There cannot be a client with id = 0.
+ * The client class provides a adaptor between the parser and the player
+ * control. The remote client sends requests that are handled and provided
+ * by the Parser class and this class uses these requests to control the player
+ * through the PlayerCtrl interface.
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject
+class Client : public QObject, public AbstractPlayerController
 {
 Q_OBJECT
 public:
-    Client(GameServer* parent, int clientId, QTcpSocket* socket);
+    /**
+     * Constructs the client object.
+     * \param parent The parent QObject.
+     * \param id The client id.
+     * \param socket The opened QTcpSocket to the client.
+     */
+    Client(QObject* parent, int id, QTcpSocket* socket);
     virtual ~Client();
 
-    inline int id() const;
-
-signals:
-    void disconnected(int clientId);
+    /**
+     * Returns the id of the client.
+     * \note The id = 0 is reserved and cannot be used.
+     */
+    int id() const;
 
 
 public slots: // These slots are connected to parser
-    void actionCreateGame(const StructGame& game, const StructPlayer& player);
-    void actionJoinGame(int gameId, const StructPlayer& player);
-    void actionLeaveGame();
-    void actionStartGame();
+    void onActionCreateGame(const StructGame& structGame, const StructPlayer& structPlayer);
+    void onActionJoinGame(int gameId, const StructPlayer& structPlayer);
+    void onActionLeaveGame();
+    void onActionStartGame();
+    void onQueryServerInfo(QueryResult result);
+    void onQueryGame(int gameId, QueryResult result);
+    void onQueryGameList(QueryResult result);
 
-public slots: // These slots are connected to player/game
-    void leavingGame(int gameId, const StructPlayer& player);
-    void playerDrawedCard(Player*, CardAbstract*);
+public: /* The AbstractPlayerController interface */
+    virtual void onIncomingMessage(int playerId, const QString& playerName, const QString& message);
+    virtual void onPlayerJoinedGame(int playerId, const StructPlayer& playerStruct);
+    virtual void onPlayerLeavedGame(int playerId);
+    virtual void onGameStarted(const StructGame& structGame, const StructPlayerList& structPlayerList);
+    virtual void onPlayerDrawedCard(int playerId, const CardAbstract*);
 
 private:
-    void joinGame(Game*, const StructPlayer&);
+    bool isInGame() const;
+
+
 
 private:
     const int           m_id;
     Parser*             mp_parser;
-    Player*             mp_player;
-
-    void connectPlayer();
-    void disconnectPlayer();
-
+    PlayerCtrl*         mp_playerCtrl;
 };
 
 #endif

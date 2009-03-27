@@ -38,102 +38,72 @@ class QXmlStreamWriter;
 class GameServer: public QObject
 {
     Q_OBJECT;
+public:
+    /**
+     * This method returns reference to the GameServer (singleton) instance.
+     */
+    static GameServer&  instance();
+
+    StructServerInfo    structServerInfo() const;
+
+    /**
+     * Creates new game and returns a pointer to it.
+     */
+    Game*               createGame(StructGame);
+
+    /**
+     * Returns a list of games (Game instances).
+     */
+    QList<Game*>        gameList();
+
+    /**
+     * Returns a pointer to the Game with given id.
+     */
+    Game*               game(int id);
+
+    /**
+     * Returns a list of clients.
+     */
+    QList<Client*>      clientList();
+
+    /**
+     * Returns a pointer to the Client with given id.
+     */
+    Client*             client(int id);
+
+    /**
+     * Tells the GameServer to listen for incoming connections.
+     * @returns false in case of error, otherwise true
+     */
+    bool                listen();
+
+    /**
+     * Prepares GameServer for exiting.
+     */
+    void                exit();
+
+public slots:
+    /**
+     * If there is a pending incoming connection, creates a new
+     * client that is serving that connection.
+     */
+    void                createClient();
+
+    /**
+     * Removes the client from the clients list.
+     */
+    void                deleteClient(int clientId);
+
+    void                queryGame(int gameId, QueryResult result);
+    void                queryGameList(QueryResult result);
+   
 private:
     GameServer();
     GameServer(GameServer&);
     GameServer& operator=(const GameServer&);
 
-public:
-    /**
-     * This method returns reference to the GameServer (singleton) instance.
-     */
-    static inline GameServer& instance()
-    {
-        if (!sm_instance) sm_instance = new GameServer();
-        return *sm_instance;
-    }
-
-    /**
-     * This method creates a new game.
-     * @returns pointer to newly created Game
-     * @see Game constructor
-     */
-    Game* createGame(StructGame);
 
 
-    /**
-     * Returns a list of games (Game instances).
-     */
-    inline QList<Game*> gameList()
-    {
-        return m_games.values();
-    }
-
-    /**
-     * Returns a pointer to the Game with
-     * given id.
-     */
-    inline Game* game(int id)
-    {
-        if (m_games.contains(id)) return m_games[id];
-        return 0;
-    }
-
-    /**
-     * Returns a list of clients.
-     */
-    inline QList<Client*> clientList()
-    {
-        return m_clients.values();
-    }
-
-    /**
-     * Returns a pointer to the Client with given id.
-     */
-    inline Client* client(int id)
-    {
-        if (m_clients.contains(id)) return m_clients[id];
-        return 0;
-    }
-
-    /**
-     * Returns name of the server.
-     */
-    inline QString name() const
-    {
-        return m_name;
-    }
-
-    /**
-     * Returns descriptive text of the server.
-     */
-    inline QString description() const
-    {
-        return m_description;
-    }
-
-    
-    /**
-     * Tells the GameServer to listen for incoming connections.
-     * @returns false in case of error, otherwise true
-     */
-    bool listen();
-
-    /**
-     * Prepares GameServer for exiting.
-     */
-    void exit();
-
-signals:
-    void aboutToQuit();
-
-public slots:
-    void createClient();
-    void deleteClient(int clientId);
-    void queryServerInfo(QueryResult result);
-    void queryGame(int gameId, QueryResult result);
-    void queryGameList(QueryResult result);
-   
 
 private:
     static GameServer*       sm_instance;
@@ -143,8 +113,7 @@ private:
     int m_nextClientId;
     int m_nextGameId;
     int m_maxClientCount; // is this necessary?
-    QString m_name;
-    QString m_description;
+    StructServerInfo    m_structServerInfo;
     TcpServer* mp_tcpServer;
 
 };

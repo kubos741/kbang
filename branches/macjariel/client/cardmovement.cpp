@@ -19,30 +19,31 @@
  ***************************************************************************/
 #include "cardmovement.h"
 
-#include <QTimer>
-#include <QWidget>
+#include <QtCore>
 #include <QtDebug>
 
 #include "cardwidget.h"
 #include "cardpocket.h"
+#include "cardmovementparentwidget.h"
 #include <math.h>
 
 using namespace client;
 
-const int tickTime = 5;
-const double pixelsPerTick = 16;
-const int delay = 500;
+
+
+const int tickTime = 20;
+const double pixelsPerTick = 24;
+//const int delay = 500;
+QBasicTimer CardMovement:: sm_timer;
 QQueue<CardMovement*> CardMovement::sm_queue;
 
 
-CardMovement::CardMovement(QWidget *mainWidget, CardWidget* card, CardPocket* destination)
-: QObject(mainWidget), mp_dest(destination), mp_mainWidget(mainWidget),
-  mp_timer(0), m_tick(0), mp_card(card), m_waitingForVisible(1)
+CardMovement::CardMovement(CardMovementParentWidget *mainWidget, CardWidget* card, CardPocket* destination, QString cardType)
+: QObject(mainWidget), mp_dest(destination), mp_mainWidget(mainWidget), m_cardType(cardType),
+  m_tick(0), mp_card(card), m_movementInitialized(0)
 {
-    qDebug() << "Creating animation, queue size: " << sm_queue.size();
     enqueue();
-    if (sm_queue.size() == 1)
-    {
+    if (sm_queue.size() == 1) {
         start();
     }
 }
@@ -53,37 +54,29 @@ CardMovement::~CardMovement()
 
 void CardMovement::start()
 {
-    if (mp_timer == 0)
-    {
-        mp_timer = new QTimer(this);
-        mp_timer->setInterval(tickTime);
-        connect(mp_timer, SIGNAL(timeout()),
-                this, SLOT(onTimerShot()));
-        mp_timer->start();
-    }
-    if (!mp_dest->isVisible() || !mp_card->isVisible()) return;
-    if (mp_card->parent() != parent())
-    {
-        QPoint pos = mp_card->mapTo(mp_mainWidget, QPoint(0,0));
-        mp_card->setParent(mp_mainWidget);
-        mp_card->move(pos);
-    }
-    mp_card->raise();
-    mp_card->show();
-    m_origin = mp_card->pos();
-    m_destination = mp_dest->mapTo(mp_mainWidget, mp_dest->newCardPosition());
-    m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) +
-                    pow(m_destination.y() - m_origin.y(), 2));
-    m_waitingForVisible = 0;
+    Q_ASSERT(sm_timer.isActive() == 0);
+    sm_timer.start(tickTime, this);
 }
 
-void CardMovement::onTimerShot()
+void CardMovement::timerEvent(QTimerEvent* event)
 {
-    if (m_waitingForVisible)
-    {
-        start();
-        return;
+    if (!m_movementInitialized) {
+        if (!mp_dest->isVisible() || !mp_card->isVisible()) return;
+        if (mp_card->parent() != parent())
+        {
+            QPoint pos = mp_card->mapTo(mp_mainWidget, QPoint(0,0));
+            mp_card->setParent(mp_mainWidget);
+            mp_card->move(pos);
+        }
+        mp_card->raise();
+        mp_card->show();
+        m_current = m_origin = mp_card->pos();
+        m_destination = mp_dest->mapTo(mp_mainWidget, mp_dest->newCardPosition());
+        m_length = sqrt(pow(m_destination.x() - m_origin.x(), 2) + pow(m_destination.y() - m_origin.y(), 2));
+        m_movementInitialized = 1;
+        mp_card->setShadowMode();
     }
+
     m_tick++;
     qreal progress = (m_tick* pixelsPerTick) / m_length;
     if (progress > 1)
@@ -91,15 +84,22 @@ void CardMovement::onTimerShot()
         stop();
         return;
     }
-    QPoint pos = m_origin + (m_destination - m_origin) * progress;
-    mp_card->move(pos);
+    m_current = m_origin + (m_destination - m_origin) * progress;
+    mp_card->move(m_current);
 }
 
 void CardMovement::stop()
 {
-    mp_timer->stop();
-    mp_timer->deleteLater();
+    sm_timer.stop();
+    if (!m_cardType.isEmpty()) {
+        mp_card->setCardClass(m_cardType);
+        mp_card->applyNewProperties();
+        //mp_card->setServerCardId
+    }
+    mp_card->unsetShadowMode();
+
     mp_dest->push(mp_card);
+
     if (sm_queue.size() != 0 && sm_queue.head() == this) sm_queue.dequeue();
     deleteLater();
     startNext();
@@ -112,7 +112,11 @@ void client::CardMovement::enqueue()
 
 void client::CardMovement::startNext()
 {
-    qDebug() << "Starting next...";
     if (sm_queue.size() == 0) return;
     sm_queue.head()->start();
+}
+
+QRect client::CardMovement::cardRect()
+{
+    return QRect(m_current, mp_card->qsize());
 }

@@ -37,11 +37,11 @@ struct StructServerInfo
 };
 
 enum GameState {
-        Invalid = 0,
-        WaitingForPlayers,
-        WaitingForCharacters,
-        Playing,
-        Finished
+        GAMESTATE_INVALID = 0,
+        GAMESTATE_WAITINGFORPLAYERS,
+        GAMESTATE_WAITINGFORCHARACTERS,
+        GAMESTATE_PLAYING,
+        GAMESTATE_FINISHED
 };
 
 enum PlayerRole {

@@ -46,7 +46,7 @@ CardWidget* DeckWidget::newCard()
 {
     CardWidget* w = new CardWidget(this);
     w->setCardClass("back-bang");
-    w->setCardSize(CardWidget::SIZE_SMALL);
+    w->setSize(CardWidget::SIZE_SMALL);
     w->applyNewProperties();
     w->raise();
     w->move(0,0);

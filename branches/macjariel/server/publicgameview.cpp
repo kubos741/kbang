@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "publicgameview.h"
 #include "game.h"
+#include "gameinfo.h"
 
 PublicGameView::PublicGameView(Game* game):
 mp_game(game)
@@ -30,23 +31,33 @@ PublicGameView::~PublicGameView()
 {
 }
 
-int PublicGameView::gameId() const
+int PublicGameView::id() const
 {
-    return mp_game->gameId();
+    return mp_game->id();
 }
 
 QString PublicGameView::name() const
 {
-    return mp_game->name();
+    return mp_game->gameInfo().name();
 }
 
 QString PublicGameView::description() const
 {
-    return mp_game->description();
+    return mp_game->gameInfo().description();
 }
 
 int PublicGameView::playersCount() const
 {
     return mp_game->playersCount();
+}
+
+StructGame PublicGameView::structGame() const
+{
+    return mp_game->gameInfo().structGame();
+}
+
+QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
+{
+    return mp_game->publicPlayerList();
 }
 

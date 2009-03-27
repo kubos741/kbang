@@ -99,9 +99,8 @@
       <designerpluginpaths/>
     </qt>
     <references>
-      <pcs>automatic_%2Fhome%2Fmacjariel%2Fdevel%2Fkbang%2Fbranches%2Fmacjariel</pcs>
-      <pcs>Gcc</pcs>
       <pcs>Qt4</pcs>
+      <pcs>automatic_%2Fhome%2Fmacjariel%2Fdevel%2Fkbang%2Fbranches%2Fmacjariel</pcs>
     </references>
     <codecompletion>
       <automaticCodeCompletion>false</automaticCodeCompletion>

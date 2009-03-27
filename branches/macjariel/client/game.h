@@ -31,7 +31,7 @@
 
 namespace client {
 
-
+class CardMovementParentWidget;
 class ServerConnection;
 
 /**
@@ -40,7 +40,7 @@ class ServerConnection;
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&);
+    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&, CardMovementParentWidget*);
 
     /* for MainWindow */
     void init();
@@ -68,6 +68,7 @@ private:
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
     bool                      m_creator;
+    CardMovementParentWidget* mp_cardMovementParentWidget;
 
 public slots:
     void opponentJoinedGame(const StructPlayer& player);

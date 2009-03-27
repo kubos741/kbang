@@ -30,100 +30,64 @@
 #include "common.h"
 #include "cards.h"
 #include "util.h"
+#include "gameexceptions.h"
 
 
-Game::Game(GameServer* parent, const StructGame& g):
-QObject(parent),
-m_gameId(g.id),
-m_name(g.name),
-m_description(g.description),
-m_creatorId(g.creatorId),
-m_minPlayers(g.minPlayers),
-m_maxPlayers(g.maxPlayers),
-m_maxObservers(g.maxSpectators),
-m_playerPassword(g.playerPassword),
-m_observerPassword(g.spectatorPassword),
-m_shufflePlayers(g.flagShufflePlayers),
-m_nextPlayerId(0),
-m_gameState(WaitingForPlayers),
-m_publicGameView(this),
-m_startable(0)
+#include "gameinfo.h"
+#include "gametable.h"
 
+
+Game::Game(GameServer* parent, const StructGame& structGame):
+    QObject(parent),
+    m_publicGameView(this),
+    m_nextPlayerId(0),
+    m_gameState(GAMESTATE_WAITINGFORPLAYERS),
+    m_startable(0)
 {
-    Q_ASSERT(!m_name.isEmpty());
-    Q_ASSERT(m_minPlayers <= m_maxPlayers);
-    Q_ASSERT(m_observerPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
+    mp_gameInfo = new GameInfo(structGame);
+    mp_gameTable = new GameTable();
 }
-
 
 Game::~Game()
 {
+    delete mp_gameInfo;
+    delete mp_gameTable;
 }
 
-
-Player* Game::createNewPlayer(StructPlayer player)
+int Game::id() const
 {
-    qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(player.id).arg(player.name)));
-    if (m_gameState != WaitingForPlayers) return 0;
-    while (!m_nextPlayerId || m_players.contains(m_nextPlayerId))
-    {
-        m_nextPlayerId++;
-    }
-    Player* newPlayer = new Player(m_nextPlayerId, player.name, player.password, this);
-    m_players[m_nextPlayerId] = newPlayer;
-    m_playerList.append(newPlayer);
-    emit playerJoinedGame(m_gameId, newPlayer->structPlayer());
-    QTimer::singleShot(1, this, SLOT(checkStartable()));
-    return newPlayer;
+    return mp_gameInfo->id();
 }
 
-void Game::removePlayer(int playerId)
+int Game::playersCount() const
 {
-    Q_ASSERT(m_players.contains(playerId));
-    qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
-    StructPlayer p = m_players[playerId]->structPlayer();
-    Player* plr = m_players[playerId];
-    m_playerList.removeAll(m_players[playerId]);
-    m_players.remove(playerId);
-    emit playerLeavedGame(m_gameId, p);
-    checkStartable();
-    plr->deleteLater();
-    // TODO: other states of game
+    return m_playerList.size();
 }
 
-
-
-
-
-QList<Player *> Game::playerList()
+int Game::spectatorsCount() const
 {
+    return 0;  /// \todo spectators
+}
+
+const GameInfo& Game::gameInfo() const
+{
+    return *mp_gameInfo;
+}
+
+const PublicGameView& Game::publicGameView() const
+{
+    return m_publicGameView;
+}
+
+QList<Player*> Game::playerList() const {
     return m_playerList;
 }
 
-void Game::sendMessage(Player* player, const QString& message)
-{
-    emit incomingMessage(player->id(), player->name(), message);
+QList<const PublicPlayerView*> Game::publicPlayerList() const {
+    return m_publicPlayerList;
 }
 
-StructGame Game::structGame() const
-{
-    StructGame r;
-    r.id = m_gameId;
-    r.creatorId = m_creatorId;
-    r.name = m_name;
-    r.description = m_description;
-    r.minPlayers = m_minPlayers;
-    r.maxPlayers = m_maxPlayers;
-    r.maxSpectators = m_maxObservers;
-    r.playerPassword = m_playerPassword;
-    r.spectatorPassword = m_observerPassword;
-    r.hasPlayerPassword = (!m_playerPassword.isNull());
-    r.hasSpectatorPassword = (!m_observerPassword.isNull());
-    r.flagShufflePlayers = m_shufflePlayers;
-    return r;
-}
-
-
+/*
 StructPlayerList Game::structPlayerList(Player* privatePlayer) const
 {
     StructPlayerList r;
@@ -133,25 +97,85 @@ StructPlayerList Game::structPlayerList(Player* privatePlayer) const
     }
     return r;
 }
+*/
 
-
-
-void Game::startGame()
+Player* Game::getPlayer(int playerId)
 {
-    if (m_gameState != WaitingForPlayers) return; /* TODO: error handling */
-    // TODO: character selection first
-    m_gameState = Playing;
-    if (m_shufflePlayers) shufflePlayers();
+    if (m_playerMap.contains(playerId))
+        return m_playerMap[playerId];
+    return 0;
+}
+
+Player* Game::createNewPlayer(StructPlayer structPlayer,
+                              AbstractPlayerController* abstractPlayerController)
+{
+    qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(structPlayer.id).arg(structPlayer.name)));
+    if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
+        throw BadGameStateException();
+    }
+    while ((m_nextPlayerId == 0) || m_playerMap.contains(m_nextPlayerId))
+    {
+        m_nextPlayerId++;
+    }
+    Player* newPlayer = new Player(this, m_nextPlayerId, structPlayer.name, structPlayer.password, abstractPlayerController);
+    m_playerMap[m_nextPlayerId] = newPlayer;
+    m_playerList.append(newPlayer);
+    m_publicPlayerList.append(&newPlayer->publicView());
+    emit playerJoinedGame(id(), newPlayer->structPlayer());
+    checkStartable();
+    return newPlayer;
+}
+
+void Game::removePlayer(Player* player)
+{
+
+    Q_ASSERT(player->game() == this);
+    int playerId = player->id();
+    Q_ASSERT(m_playerMap.contains(playerId));
+    Q_ASSERT(m_playerMap[playerId] == player);
+    qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
+    StructPlayer structPlayer = player->structPlayer();
+    m_publicPlayerList.removeAll(&player->publicView());
+    m_playerList.removeAll(player);
+    m_playerMap.remove(playerId);
+    emit playerLeavedGame(id(), structPlayer);
+    checkStartable();
+    player->deleteLater();
+    // TODO: other states of game
+}
+
+
+void Game::sendMessage(Player* player, const QString& message)
+{
+    emit incomingMessage(player->id(), player->name(), message);
+}
+
+void Game::startGame(Player* player)
+{
+    if (player->id() != mp_gameInfo->creatorId()) {
+        throw BadPlayerException(player->id());
+    }
+    if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
+        throw BadGameStateException();
+    }
+
+    // \todo: character selection first
+
+    m_gameState = GAMESTATE_PLAYING;
+
+    if (mp_gameInfo->hasShufflePlayers()) shufflePlayers();
     //setCharacters();
     setRoles();
 
+    /* \todo
     StructGame g = structGame();
     foreach(Player* p, m_playerList)
     {
         p->announceGameStarted(g, structPlayerList(p));
     }
-    generateCards();
-    dealCards();
+    */
+
+    mp_gameTable->prepareGame();
     statusChanged(m_gameState);
 
 
@@ -161,28 +185,10 @@ void Game::startGame()
 void Game::shufflePlayers()
 {
     shuffleList(m_playerList);
-}
-
-void Game::shuffleDeck()
-{
-    shuffleList(m_deck);
-}
-
-void Game::dealCards()
-{
-    int cardCount = 0, players = 0;
-    do {
-        players = 0;
-        foreach(Player* p, m_playerList)
-        {
-            if (p->initialCardCount() > cardCount)
-            {
-                drawCard(p);
-                players++;
-            }
-        }
-        cardCount++;
-    } while(players != 0);
+    m_publicPlayerList.empty();
+    foreach(Player* player, m_playerList) {
+        m_publicPlayerList.append(&player->publicView());
+    }
 }
 
 
@@ -197,7 +203,7 @@ void Game::setRoles()
     {
         pIt.peekNext()->setRole(rIt.peekNext());
         if (rIt.peekNext() == ROLE_SHERIFF)
-            m_playerOnTurnId = i;
+            mp_gameTable->setPlayerOnTurn(pIt.peekNext());
         i++;
         pIt.next(); rIt.next();
     }
@@ -222,44 +228,10 @@ QList<PlayerRole> Game::getRoleList()
     return res;
 }
 
-void Game::generateCards()
-{
-    static const int nBang = 20;
-    static const int nMissed = 20;
-    for(int i = 0; i < nBang; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardBang(this, id);
-    }
-    for(int i = 0; i < nMissed; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardMissed(this, id);
-    }
-    m_deck << m_cards.values();
-}
-
-int Game::uniqueCardId()
-{
-    int id;
-    do {
-        id = (int)random();
-    } while(m_cards.contains(id));
-    return id;
-}
 
 
 
-bool Game::isBaseTurn() const
-{
-    return m_playedCards.isEmpty();
-}
-
-Player* Game::playerOnTurn() const
-{
-    return m_playerList[m_playerOnTurnId];
-}
-
+/*
 void Game::appendPlayedCard(CardPlayable *card)
 {
     m_playedCards.append(card);
@@ -279,6 +251,7 @@ void Game::clearPlayedCards()
     }
     m_playedCards.clear();
 }
+*/
 
 int Game::getDistance(Player *fromPlayer, Player *toPlayer)
 {
@@ -294,36 +267,11 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer)
     return d;
 }
 
-void Game::drawCard(Player *p, int count)
-{
-    for(int i = 0; i < count; ++i)
-    {
-        CardAbstract* card = popCardFromDeck();
-        p->appendCardToHand(card);
-        emit playerDrawedCard(p, card);
-    }
-}
-
-CardAbstract* Game::popCardFromDeck()
-{
-    if (m_deck.isEmpty()) regenerateDeck();
-    return m_deck.takeFirst();
-}
-
-void Game::regenerateDeck()
-{
-    Q_ASSERT(m_deck.isEmpty());
-    Q_ASSERT(!m_graveyard.isEmpty());
-    m_deck << m_graveyard;
-    m_graveyard.clear();
-    m_graveyard << m_deck.takeLast();
-    shuffleList(m_graveyard);
-}
 
 void Game::checkStartable()
 {
     bool newStartable;
-    if (m_playerList.count() >= m_minPlayers && m_playerList.count() <= m_maxPlayers)
+    if (m_playerList.count() >= mp_gameInfo->minPlayers() && m_playerList.count() <= mp_gameInfo->maxPlayers())
     {
         newStartable = 1;
     }
@@ -332,7 +280,7 @@ void Game::checkStartable()
         newStartable = 0;
     }
     if (m_startable != newStartable)
-        emit startableChanged(m_gameId, newStartable);
+        emit startableChanged(id(), newStartable);
     m_startable = newStartable;
 }
 

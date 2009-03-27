@@ -18,9 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "/usr/local/src/programming/qtcreator-1.0.0/share/qtcreator/gdbmacros/gdbmacros.cpp"
+
 #include <QApplication>
 #include <QDialog>
 #include "mainwindow.h"
+
+
+
 
 using namespace client;
 

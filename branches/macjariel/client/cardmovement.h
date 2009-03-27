@@ -24,14 +24,19 @@
 #include <QPoint>
 #include <QList>
 #include <QQueue>
+#include <QRect>
+#include <QPointer>
+#include <QWidget>
+#include <QBasicTimer>
 
-class QWidget;
-class QTimer;
+
+
 
 namespace client
 {
 class CardWidget;
 class CardPocket;
+class CardMovementParentWidget;
 
 /**
  * This class handles the animation of cards in the game. Whenever there is a need
@@ -54,11 +59,17 @@ public:
      * @param cardWidget The card widget that will be moved.
      * @param destination The target pocket.
      */
-    CardMovement(QWidget *mainWidget, CardWidget* cardWidget, CardPocket* destination);
+    CardMovement(CardMovementParentWidget *mainWidget, CardWidget* cardWidget, CardPocket* destination, QString cardClass);
     virtual ~CardMovement();
 
-public slots:
-    void onTimerShot();
+    /**
+      * Returns the rectangle of the current position of the card in the animation.
+      * This method is to be called from the paintEvent of the mainWidget
+      */
+    QRect cardRect();
+
+private:
+    void timerEvent(QTimerEvent* event);
 
 private:
     void start();
@@ -68,16 +79,18 @@ private:
 
 private:
     CardPocket* mp_dest;
-    QWidget*    mp_mainWidget;
-    QTimer*     mp_timer;
+    CardMovementParentWidget*    mp_mainWidget;
     QPoint      m_origin;
+    QPoint      m_current;
     QPoint      m_destination;
+    QString     m_cardType;
     qreal       m_length;
-
     int         m_tick;
     CardWidget* mp_card;
-    bool        m_waitingForVisible;
+    bool        m_movementInitialized;
     
+    static QBasicTimer  sm_timer;
+
     static QQueue<CardMovement*> sm_queue;
 };
 }

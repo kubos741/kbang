@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by MacJariel                                       *
- *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *   echo "dmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include <QtCore>
 #include <QtDebug>
+#include <QPainter>
 
 #include "card.h"
 #include "cardwidget.h"
 
 using namespace client;
 
-CardWidget::CardWidget(QWidget* parent): QLabel(parent)
-{
-    setScaledContents(1);
 
+const QSize CardWidget::sm_qsizeSmall(60, 97);
+const QSize CardWidget::sm_qsizeNormal(100, 162);
+const QSize CardWidget::sm_qsizeBig(200, 320);
+
+CardWidget::CardWidget(QWidget* parent): QLabel(parent), m_shadowMode(0)
+{
 }
 
 CardWidget::~ CardWidget()
 {
 }
 
-QPoint CardWidget::absPos() const
+void CardWidget::paintEvent(QPaintEvent *event)
 {
-    const QWidget* w = this;
-    QPoint res;
-    while (w != 0)
-    {
-        //qDebug() << res << w->objectName() << w->metaObject()->className();
-        //res += w->mapToParent(QPoint());
-        qDebug() << w->objectName() << w->metaObject()->className() << w->geometry().topLeft();
-        w = w->parentWidget();
+    if (!m_shadowMode) {
+        QLabel::paintEvent(event);
+    } else {
+        QPainter painter(this);
+        painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
     }
-    qDebug() << res << "DONE";
-    return res;
 }
+
 void CardWidget::setCardClass(const QString& cardClassId)
 {
     m_cardClassId = cardClassId;
@@ -58,62 +59,38 @@ void CardWidget::setServerCardId(const QString& serverCardId)
     m_serverCardId = serverCardId;
 }
 
-void CardWidget::setCardSize(Size size)
+
+QSize CardWidget::qSize(Size size)
+{
+    switch(size) {
+        case SIZE_SMALL:  return sm_qsizeSmall;  break;
+        case SIZE_NORMAL: return sm_qsizeNormal; break;
+        case SIZE_BIG:    return sm_qsizeBig;    break;
+    }
+    Q_ASSERT(0);
+    return QSize(); // avoid warning
+}
+
+
+void CardWidget::setSize(Size size)
 {
     m_size = size;
+    m_qsize = qSize(size);
 }
 
-QSize client::CardWidget::size(const Size& size)
-{
-    switch(size)
-    {
-    case SIZE_SMALL:
-        return smallSize();
-    case SIZE_NORMAL:
-        return normalSize();
-    case SIZE_BIG:
-        return bigSize();
-    }
-    return normalSize();
-}
-
-QSize CardWidget::smallSize()
-{
-    //return QSize(40, 64);
-    return QSize(60, 97);
-}
-
-QSize CardWidget::normalSize()
-{
-    return QSize(60, 97);
-}
-
-QSize CardWidget::bigSize()
-{
-    return QSize(100, 162);
-}
 void CardWidget::applyNewProperties()
 {
-    /* TODO: improve performance */
+    /* TODO: spot for optimalization */
     CardPointer card = Card::findCard(m_cardClassId);
     if (card == 0)
     {
         qWarning(qPrintable(QString("Cannot find card id %1.").arg(m_cardClassId)));
         return;
     }
-    setPixmap(card->image());
-    if (m_size == SIZE_NORMAL)
-    {
-        setMinimumSize(normalSize());
-        setMaximumSize(normalSize());
-        resize(normalSize());
-    }
-    else
-    {
-        setMinimumSize(smallSize());
-        setMaximumSize(smallSize());
-        resize(smallSize());
-    }
+    setPixmap(card->image().scaled(m_qsize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    setMinimumSize(m_qsize);
+    setMaximumSize(m_qsize);
+    resize(m_qsize);
 }
 
 

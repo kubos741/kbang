@@ -18,46 +18,30 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "abstractplayerctrl.h"
-#include "player.h"
-#include "publicgameview.h"
+#ifndef CARDMOVEMENTPARENTWIDGET_H
+#define CARDMOVEMENTPARENTWIDGET_H
 
-AbstractPlayerCtrl::AbstractPlayerCtrl():
-QObject(0), mp_privatePlayerView(0), mp_publicGameView(0), mp_playerActions(0),
-m_attached(0)
+
+
+#include <QWidget>
+#include "cardmovement.h"
+
+namespace client
 {
-    qDebug() << "Creating AbstractPlayerCtrl" << this;
-}
 
-void AbstractPlayerCtrl::attachPlayer(const PrivatePlayerView* privatePlayerView,
-                                      const PublicGameView*    publicGameView,
-                                      const PlayerActions*     playerActions)
+
+class CardMovementParentWidget : public QWidget
 {
-    Q_ASSERT(m_attached == 0);
-    mp_privatePlayerView = privatePlayerView;
-    mp_publicGameView = publicGameView;
-    mp_playerActions = playerActions;
-    m_attached = 1;
+public:
+    CardMovementParentWidget(QWidget* parent = 0): QWidget(parent) {}
+    //void addCardMovement(QPointer<CardMovement> cardMovement);
+    //virtual void paintEvent (QPaintEvent *event);
+
+private:
+    QList<QPointer<CardMovement> > m_movementsList;
+
+};
+
+
 }
-
-void AbstractPlayerCtrl::detachPlayer()
-{
-    mp_privatePlayerView = 0;
-    mp_publicGameView = 0;
-    mp_playerActions = 0;
-    m_attached = 0;
-}
-
-AbstractPlayerCtrl::~ AbstractPlayerCtrl()
-{
-    qDebug() << "Destroying AbstractPlayerCtrl" << this;
-}
-
-
-
-int AbstractPlayerCtrl::gameId() const
-{
-    if (!m_attached) return 0;
-    return mp_publicGameView->gameId();
-}
-
+#endif // CARDMOVEMENTPARENTWIDGET_H

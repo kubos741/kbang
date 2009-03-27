@@ -18,75 +18,58 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef PUBLICGAMEVIEW_H
-#define PUBLICGAMEVIEW_H
+#ifndef GAMEINFO_H
+#define GAMEINFO_H
 
-#include "common.h"
 #include "parser/parserstructs.h"
 
-class Game;
-class PublicPlayerView;
 
-/**
- * The PublicGameView class provides an interface for quering public information
- * from games. The instances of this class are used by player controllers to get
- * the information about the "world around". Every game has exactly one PublicGameView
- * instance and is responsible for its lifetime.
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
-class PublicGameView {
-    friend class Game;
-private:
-    /**
-     * Constructs the PublicGameView instance. Instances can be constructed only
-     * from the Game class, which is declared as friend class.
-     */
-    PublicGameView(Game* game);
-    /**
-     * Copying PublicGameView objects is not allowed.
-     */
-    PublicGameView(const PublicGameView&);
 
-    /**
-     * Assignment into PublicGameView instances is not allowed.
-     */
-    const PublicGameView& operator=(const PublicGameView&);
-
-    ~PublicGameView();
-
+class GameInfo
+{
 public:
-    /**
-     * Returns the id of the game.
-     */
-    inline int id() const;
+    GameInfo(const StructGame& structGame);
 
-    /**
-     * Returns name of the game.
-     */
-    QString name() const;
 
-    /**
-     * Returns description of the game.
-     */
-    inline QString description() const;
+    inline int      id()                    const { return m_id; }
+    inline QString  name()                  const { return m_name; }
+    inline QString  description()           const { return m_description; }
+    inline int      minPlayers()            const { return m_minPlayers; }
+    inline int      maxPlayers()            const { return m_maxPlayers; }
+    inline int      maxSpectators()         const { return m_maxSpectators; }
+    inline bool     hasPlayerPassword()     const { return !m_playerPassword.isNull(); }
+    inline bool     hasSpectatorPassword()  const { return !m_spectatorPassword.isNull(); }
+    inline int      creatorId()             const { return m_creatorId; }
+    inline bool     hasShufflePlayers()     const { return m_shufflePlayersFlag; }
 
-    /**
-     * Returns count of players.
-     */
-    inline int playersCount() const;
+    inline bool comparePlayerPassword(const QString& password) const {
+        return password == m_playerPassword;
+    }
 
-    /**
-     * Returns the StructGame struct.
-     */
+    inline bool compareSpectatorPassword(const QString& password) const {
+        return (password == m_playerPassword || password == m_spectatorPassword);
+    }
+
     StructGame structGame() const;
 
-    /**
-     * Returns the public list of players.
-     */
-    QList<const PublicPlayerView*>  publicPlayerList() const;
+    void setCreatorId(int creatorId) {
+        m_creatorId = creatorId;
+    }
+
 
 private:
-    Game* mp_game;
+    int     m_id;
+    QString m_name;
+    QString m_description;
+    int     m_creatorId;
+    int     m_minPlayers;
+    int     m_maxPlayers;
+    int     m_maxSpectators;
+    QString m_playerPassword;
+    QString m_spectatorPassword;
+    bool    m_shufflePlayersFlag;
+
+
 };
 
-#endif
+#endif // GAMEINFO_H

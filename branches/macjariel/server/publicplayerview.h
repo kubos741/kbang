@@ -21,6 +21,7 @@
 #define PUBLICPLAYERVIEW_H
 
 #include "common.h"
+#include "parser/parserstructs.h"
 
 class Player;
 
@@ -39,6 +40,8 @@ private:
 
 
 public:
+    int id() const;
+
     inline QString name() const;
 
     inline bool isAlive() const
@@ -76,9 +79,11 @@ public:
         return 0;
     }
 
+    virtual StructPlayer structPlayer() const;
+
     // write method cardsOnTable
 
-private:
+protected:
     Player* mp_player;
 };
 

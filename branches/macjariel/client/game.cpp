@@ -31,11 +31,12 @@
 using namespace client;
 
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
-           ServerConnection* serverConnection, const GameWidgets& gameWidgets):
+           ServerConnection* serverConnection, const GameWidgets& gameWidgets,
+           CardMovementParentWidget* cardMovementParentWidget):
 QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId),
 mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
 m_opponentWidgets(gameWidgets.opponentWidget), mp_localPlayerWidget(gameWidgets.localPlayerWidget),
-mp_startButton(0), m_creator(0)
+mp_startButton(0), m_creator(0), mp_cardMovementParentWidget(cardMovementParentWidget)
 {
     m_players[m_playerId] = mp_localPlayerWidget;
 }
@@ -177,14 +178,14 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
 
 void Game::test()
 {
-
-    new CardMovement(mp_layout->parentWidget(),
+/*
+    new CardMovement(mp_cardMovementParentWidget,
                      mp_deck->pop(),
                      mp_graveyard);
-    new CardMovement(mp_layout->parentWidget(),
+    new CardMovement(mp_cardMovementParentWidget,
                      mp_deck->pop(),
                      m_opponentWidgets[2]->hand());
-    
+  */
 
 }
 
@@ -263,7 +264,9 @@ void Game::moveCard(const StructCardMovement& mov)
         qWarning("Cannot find target pocket for card movement.");
         return;
     }
-    new CardMovement(mp_layout->parentWidget(), card, dest);
+    QString cardType = mov.cardDetails.cardType;
+
+    new CardMovement(mp_cardMovementParentWidget, card, dest, cardType);
 }
 
 

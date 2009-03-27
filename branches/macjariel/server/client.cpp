@@ -18,42 +18,42 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "client.h"
-#include "gameserver.h"
-#include "game.h"
-
 #include <QTcpSocket>
+#include "client.h"
+#include "publicgameview.h"
+#include "privateplayerview.h"
+#include "cardabstract.h"
 
 
-Client::Client(GameServer *parent, int clientId, QTcpSocket *socket):
- QObject(parent), m_id(clientId), mp_player(0)
+Client::Client(QObject* parent, int id, QTcpSocket* socket):
+        QObject(parent),
+        m_id(id),
+        mp_playerCtrl(0)
 {
     Q_ASSERT(m_id != 0);
-    mp_parser = new Parser(this, socket);
     qDebug("%s:%d: Client #%d connected.", __FILE__, __LINE__, m_id);
-    connect(mp_parser, SIGNAL(terminated()),
-            this, SLOT(deleteLater()));
-    connect(mp_parser, SIGNAL(sigQueryServerInfo(QueryResult)),
-            parent, SLOT(queryServerInfo(QueryResult)));
-    connect(mp_parser, SIGNAL(sigQueryGame(int, QueryResult)),
-            parent, SLOT(queryGame(int, QueryResult)));
-    connect(mp_parser, SIGNAL(sigQueryGameList(QueryResult)),
-            parent, SLOT(queryGameList(QueryResult)));
-    connect(mp_parser, SIGNAL(sigActionCreateGame(StructGame, StructPlayer)),
-            this, SLOT(actionCreateGame(StructGame, StructPlayer)));
-    connect(mp_parser, SIGNAL(sigActionJoinGame(int, StructPlayer)),
-            this, SLOT(actionJoinGame(int, StructPlayer)));
-    connect(mp_parser, SIGNAL(sigActionLeaveGame()),
-            this, SLOT(actionLeaveGame()));
-    connect(mp_parser, SIGNAL(sigActionStartGame()),
-            this, SLOT(actionStartGame()));
-}
 
+    mp_parser = new Parser(this, socket);
+    connect(mp_parser,  SIGNAL(terminated()),
+            this,       SLOT(deleteLater()));
+    connect(mp_parser,  SIGNAL(sigQueryServerInfo(QueryResult)),
+            this,       SLOT(onQueryServerInfo(QueryResult)));
+    connect(mp_parser,  SIGNAL(sigQueryGame(int, QueryResult)),
+            this,       SLOT(onQueryGame(int, QueryResult)));
+    connect(mp_parser,  SIGNAL(sigQueryGameList(QueryResult)),
+            this,       SLOT(onQueryGameList(QueryResult)));
+    connect(mp_parser,  SIGNAL(sigActionCreateGame(StructGame, StructPlayer)),
+            this,       SLOT(actionCreateGame(StructGame, StructPlayer)));
+    connect(mp_parser,  SIGNAL(sigActionJoinGame(int, StructPlayer)),
+            this,       SLOT(actionJoinGame(int, StructPlayer)));
+    connect(mp_parser,  SIGNAL(sigActionLeaveGame()),
+            this,       SLOT(actionLeaveGame()));
+    connect(mp_parser,  SIGNAL(sigActionStartGame()),
+            this,       SLOT(onActionStartGame()));
+}
 
 Client::~Client()
 {
-    if (mp_player) actionLeaveGame(); // If client is in game, it should leave it
-    emit disconnected(m_id);
     qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_id);
 }
 
@@ -62,57 +62,57 @@ int Client::id() const
     return m_id;
 }
 
-void Client::actionCreateGame(const StructGame& game, const StructPlayer& player)
+void Client::onActionCreateGame(const StructGame& structGame, const StructPlayer& structPlayer)
 {
-    if (mp_player) return; // Already in game - do nothing
-    StructGame g = game;
-    g.creatorId = id();
-    Game* newGame = GameServer::instance().createGame(g);
-    Q_ASSERT(newGame != 0);
-    joinGame(newGame, player);
+    if (isInGame()) {
+        // TODO: respond with error
+        return;
+    }
+    mp_playerCtrl = PlayerCtrl::createGame(structGame, structPlayer);
 }
 
-void Client::actionJoinGame(int gameId, const StructPlayer& player)
+
+void Client::onActionJoinGame(int gameId, const StructPlayer& structPlayer)
 {
-    qDebug() << gameId;
-    if (mp_player) return; // TODO: Already in game - do nothing
-    Game* game = GameServer::instance().game(gameId);
-    qDebug() << game;
-    if (game == 0) return; // TODO: error
-    qDebug("actionJoinGame");
-    joinGame(game, player);
+    if (isInGame()) {
+        // TODO: respond with error
+        return;
+    }
+    mp_playerCtrl = PlayerCtrl::joinGame(gameId, structPlayer);
 }
 
+/*
 void Client::joinGame(Game* game, const StructPlayer& player)
 {
-    qDebug(qPrintable(QString("Player %1 is joining the game %2").arg(player.name).arg(game->name())));
+    qDebug(qPrintable(QString("Player %1 is joining the game with id %2").arg(player.name).arg(game->id())));
     mp_player = game->createNewPlayer(player);
     Q_ASSERT(mp_player != 0);
     connectPlayer();
-    bool creator = game->creatorId() == id();
+    bool creator = 1;// todo game->creatorId() == id();
     if (creator)
     {
         connect(mp_player->game(), SIGNAL(startableChanged(int, bool)),
                 mp_parser, SLOT(eventGameStartable(int, bool)));
     }
-    mp_parser->eventJoinGame(game->gameId(), mp_player->structPlayer(), 0, creator);
+    mp_parser->eventJoinGame(game->id(), mp_player->structPlayer(), 0, creator);
 }
+*/
 
 
-void Client::actionLeaveGame()
+void Client::onActionLeaveGame()
 {
-    if (mp_player == 0) return; // Client is not in a game
-    mp_player->leaveGame();
+    // TODO
+    //if (mp_player == 0) return; // Client is not in a game
+    //mp_player->leaveGame();
 }
 
+/*
 void Client::connectPlayer()
 {
     connect(mp_parser, SIGNAL(sigActionStartGame()),
             mp_player, SLOT(startGame()));
     connect(mp_parser, SIGNAL(sigActionMessage(const QString&)),
             mp_player, SLOT(sendMessage(const QString&)));
-    connect(mp_player->game(), SIGNAL(incomingMessage(int, const QString&, const QString&)),
-            mp_parser, SLOT(eventMessage(int, const QString&, const QString&)));
     connect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
             mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
     connect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
@@ -121,48 +121,101 @@ void Client::connectPlayer()
             this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
     connect(mp_player, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
             mp_parser, SLOT(eventStartGame(const StructGame&, const StructPlayerList&)));
+
+}
+*/
+
+
+void Client::onActionStartGame()
+{
+    if (!isInGame()) {
+        // TODO: error
+        return;
+    }
+    mp_playerCtrl->startGame();
 }
 
-void Client::disconnectPlayer()
+void Client::onQueryServerInfo(QueryResult result)
 {
-
-    disconnect(mp_player->game(), 0,
-               mp_parser, 0);
-    disconnect(mp_player->game(), 0,
-               this, 0);
+    result.sendData(PlayerCtrl::structServerInfo());
 }
 
-void Client::leavingGame(int gameId, const StructPlayer& player)
+void Client::onQueryGame(int gameId, QueryResult result)
 {
-    Q_ASSERT(mp_player);
-    if (player.id == mp_player->id())
+    try {
+        const PublicGameView& publicGameView = PlayerCtrl::publicGameView(gameId);
+        StructGame structGame = publicGameView.structGame();
+        StructPlayerList structPlayerList;
+        foreach (const PublicPlayerView* publicPlayerView, publicGameView.publicPlayerList()) {
+            structPlayerList.append(publicPlayerView->structPlayer());
+        }
+        result.sendData(structGame, structPlayerList);
+    } catch (BadGameException e) {
+        // TODO
+        //result.sendData(e);
+    }
+}
+
+void Client::onQueryGameList(QueryResult result)
+{
+    StructGameList structGameList;
+    foreach (const PublicGameView* publicGameView, PlayerCtrl::publicGameList()) {
+        structGameList.append(publicGameView->structGame());
+    }
+    result.sendData(structGameList);
+}
+
+
+
+////////////////////////////////////////////
+// The AbstractPlayerController interface //
+////////////////////////////////////////////
+
+void Client::onIncomingMessage(int playerId, const QString& playerName, const QString& message)
+{
+    mp_parser->eventMessage(playerId, playerName, message);
+}
+
+void Client::onPlayerJoinedGame(int playerId, const StructPlayer& playerStruct)
+{
+
+}
+
+void Client::onPlayerLeavedGame(int leavingPlayerId)
+{
+    Q_ASSERT(isInGame());
+    int gameId = mp_playerCtrl->publicGameView().id();
+    int playerId = mp_playerCtrl->publicPlayerView().id();
+    if (leavingPlayerId == playerId)
     {
+        // TODO
+        /*
         mp_parser->eventLeaveGame(gameId, player, 0);
         disconnectPlayer();
         mp_player = 0;
+        */
     }
     else
     {
+        // TODO
+        /*
         mp_parser->eventLeaveGame(gameId, player, 1);
+        */
     }
 }
 
-void Client::actionStartGame()
+void Client::onGameStarted(const StructGame& structGame, const StructPlayerList& structPlayerList)
 {
-    if (mp_player == 0) return;
-    if (mp_player->game()->creatorId() == id())
-    {
-        mp_player->game()->startGame();
-    }
+
 }
 
-void Client::playerDrawedCard(Player *player, CardAbstract *card)
+void Client::onPlayerDrawedCard(int playerId, const CardAbstract* card)
 {
     StructCardMovement x;
     x.pocketTypeFrom = POCKET_DECK;
     x.pocketTypeTo   = POCKET_HAND;
-    x.playerTo   = player->id();
-    if (player == mp_player)
+    x.playerTo       = playerId;
+    if (card != 0)
     {
         x.cardDetails = card->cardDetails();
     }
@@ -171,4 +224,8 @@ void Client::playerDrawedCard(Player *player, CardAbstract *card)
 
 
 
+bool Client::isInGame() const
+{
+    return (mp_playerCtrl != 0);
+}
 

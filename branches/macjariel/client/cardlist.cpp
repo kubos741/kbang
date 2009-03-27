@@ -29,7 +29,7 @@ CardList::CardList(QWidget *parent, const CardWidget::Size& cardSize)
 {
     setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
     //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QSize cardS = CardWidget::size(cardSize);
+    QSize cardS = CardWidget::qSize(cardSize);
     QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
     m_moveFactor = cardS.width() / 2;
     setMinimumSize(widgetSize);
@@ -46,7 +46,7 @@ void CardList::push(CardWidget* card)
     card->move(newCardPosition());
     card->setParent(this);
     m_cards.push_back(card);
-    card->setCardSize(m_cardSize);
+    card->setSize(m_cardSize);
     card->applyNewProperties();
     card->raise();
     card->show();

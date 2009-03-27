@@ -23,6 +23,8 @@
 #include "client.h"
 #include "common.h"
 
+#include "gameinfo.h"
+
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
 
@@ -35,10 +37,22 @@ GameServer::GameServer():
     m_maxClientCount(1)
 {
     mp_tcpServer = new TcpServer(this);
-    m_name = Config::instance().getString("network", "server_name");
-    m_description = Config::instance().getString("network", "server_description");
+    m_structServerInfo.name =
+            Config::instance().getString("network", "server_name");
+    m_structServerInfo.description =
+            Config::instance().getString("network", "server_description");
 }
 
+GameServer& GameServer::instance()
+{
+    if (!sm_instance) sm_instance = new GameServer();
+    return *sm_instance;
+}
+
+StructServerInfo GameServer::structServerInfo() const
+{
+    return m_structServerInfo;
+}
 
 Game* GameServer::createGame(StructGame x)
 {
@@ -47,6 +61,28 @@ Game* GameServer::createGame(StructGame x)
     Game* newGame = new Game(this, x);
     m_games[x.id] = newGame;
     return newGame;
+}
+
+QList<Game*> GameServer::gameList()
+{
+    return m_games.values();
+}
+
+Game* GameServer::game(int id)
+{
+    if (m_games.contains(id)) return m_games[id];
+    return 0;
+}
+
+QList<Client*> GameServer::clientList()
+{
+    return m_clients.values();
+}
+
+Client* GameServer::client(int id)
+{
+    if (m_clients.contains(id)) return m_clients[id];
+    return 0;
 }
 
 
@@ -68,24 +104,12 @@ bool GameServer::listen()
 
 void GameServer::exit()
 {
-    emit aboutToQuit();
+
 }
 
 void GameServer::createClient()
 {
     if (!mp_tcpServer->hasPendingConnections()) return;
-    /* NOTE: This is bad - client should be ALWAYS allowed
-       to connect to server (consider only querying for games
-    if (m_clients.size() >= m_maxClientCount)
-    {
-        // The aplication of the client count limit should be
-        // done in a more polite way
-        QTcpSocket* socket = mp_tcpServer->nextPendingConnection();
-        socket->disconnectFromHost();
-        return;
-    }
-    */
-
     while (!m_nextClientId || m_clients.contains(m_nextClientId)) m_nextClientId++;
     int clientId = m_nextClientId++;
     m_clients.insert(clientId, 0);
@@ -100,19 +124,12 @@ void GameServer::deleteClient(int clientId)
     m_clients.remove(clientId);
 }
 
-void GameServer::queryServerInfo(QueryResult result)
-{
-    StructServerInfo x;
-    x.name = m_name;
-    x.description = m_description;
-    result.sendData(x);
-}
-
+/*
 void GameServer::queryGame(int gameId, QueryResult result)
 {
     if (m_games.contains(gameId))
     {
-        result.sendData(m_games[gameId]->structGame(), m_games[gameId]->structPlayerList());
+        result.sendData(m_games[gameId]->gameInfo().structGame(), m_games[gameId]->structPlayerList());
     }
     else
     {
@@ -125,9 +142,9 @@ void GameServer::queryGameList(QueryResult result)
     StructGameList x;
     foreach(const Game* game, m_games.values())
     {
-        x.append(game->structGame());
+        x.append(game->gameInfo().structGame());
     }
     result.sendData(x);
 }
-
+*/
 

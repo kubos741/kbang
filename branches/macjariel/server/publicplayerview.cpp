@@ -23,6 +23,10 @@
 PublicPlayerView::PublicPlayerView(Player* player): mp_player(player)
 {
 }
+int PublicPlayerView::id() const
+{
+    return mp_player->id();
+}
 
 QString PublicPlayerView::name() const
 {
@@ -31,4 +35,9 @@ QString PublicPlayerView::name() const
 
 PublicPlayerView::~ PublicPlayerView()
 {
+}
+
+StructPlayer PublicPlayerView::structPlayer() const
+{
+    return mp_player->structPlayer(0);
 }

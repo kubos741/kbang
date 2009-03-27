@@ -31,7 +31,9 @@
 class CardAbstract;
 class CharacterCard;
 class WeaponCard;
+class PlayerCtrl;
 class Game;
+class AbstractPlayerController;
 
 /**
  * The Player class represents a kbang player. The instance of this object
@@ -47,12 +49,15 @@ public:
      * of this class on heap (with the ''new'' operator) because the lifetime of
      * this objects is managed inside.
      */
-    Player(int id, const QString& name, const QString& password, Game* game);
+    Player(Game* game, int id, const QString& name, const QString& password, AbstractPlayerController* abstractPlayerController);
     ~Player();
 
 public:
 
-    /// Getters
+    /**
+     * Returns the PlayerCtrl that allows clients to control the player.
+     */
+    PlayerCtrl* playerCtrl() const;
 
     /**
      * Returns the game id.
@@ -69,6 +74,8 @@ public:
      * belongs to.
      */
     Game* game() const;
+
+
 
     /**
      * Returns number of life-points.
@@ -103,36 +110,21 @@ public:
 
     void appendCardToHand(CardAbstract* card);
 
+    /**
+     * Removes the given card from players hand. Returns
+     * the pointer to the card removed or null pointer
+     * if the card is not in player's hand/.
+     */
+    CardAbstract* removeCardFromHand(CardAbstract* card);
 
-    //const PublicPlayerView* publicView() const;
-    //const PrivatePlayerView* privateView() const;
+
+    const PublicPlayerView&  publicView() const;
+    const PrivatePlayerView& privateView() const;
 
     //const PlayerActions* playerActions() const;
 
     inline void setRole(const PlayerRole& role) { m_role = role; }
     void announceGameStarted(const StructGame&, const StructPlayerList&);
-
-
-
-/// Commands from the controller of the player
-public slots:
-    /**
-     * If this method is called for a player that is the creator
-     * of the game and the game is in the 'waiting for players'
-     * state, then the game starts.
-     */
-    void startGame();
-
-    /**
-     * The player leaves the game. The game can handle this situation
-     * differently in different states of game.
-     */
-    void leaveGame();
-
-    /**
-     * The player sends a chat message to other players in the game.
-     */
-    void sendMessage(const QString& message);
 
 
 /// Signals from players. To be connected to slots of the controller
@@ -153,10 +145,11 @@ private:
     QString                   m_password;
     PlayerRole                m_role;
     Game*                     mp_game;
+    PlayerCtrl*               mp_playerCtrl;
 
 
-//    const PublicPlayerView    m_publicPlayerView;
-//    const PrivatePlayerView   m_privatePlayerView;
+    const PublicPlayerView    m_publicPlayerView;
+    const PrivatePlayerView   m_privatePlayerView;
 };
 
 #endif

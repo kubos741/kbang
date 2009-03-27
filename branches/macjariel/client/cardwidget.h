@@ -26,13 +26,16 @@ namespace client
 {
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel <MacJariel (at) gmail.com>
  */
 class CardWidget: public QLabel
 {
 Q_OBJECT
 public:
-    typedef enum { SIZE_BIG, SIZE_NORMAL, SIZE_SMALL } Size;
+    enum Size {
+        SIZE_SMALL, SIZE_NORMAL, SIZE_BIG
+    };
+
 
     CardWidget(QWidget *parent = 0);
     ~CardWidget();
@@ -41,18 +44,32 @@ public:
 
     void setCardClass(const QString& cardClassId);
     void setServerCardId(const QString& serverCardId);
-    void setCardSize(Size size);
+    void setSize(Size size);
     void applyNewProperties();
 
-    static QSize smallSize();
-    static QSize normalSize();
-    static QSize bigSize();
-    static QSize size(const Size& size);
+    inline void setShadowMode()    { m_shadowMode = 1; }
+    inline void unsetShadowMode()  { m_shadowMode = 0; }
+
+    inline static QSize smallSize()  { return sm_qsizeSmall;  }
+    inline static QSize normalSize() { return sm_qsizeNormal; }
+    inline static QSize bigSize()    { return sm_qsizeBig;    }
+
+    inline Size  size()  const { return m_size; }
+    inline QSize qsize() const { return m_qsize; }
+
+    static QSize qSize(Size size);
 
 private:
+    virtual void paintEvent (QPaintEvent *event);
+
+
+private:
+    const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
     QString m_cardClassId;  /* of Card class */
     QString m_serverCardId; /* for communication with server */
     Size    m_size;
+    QSize   m_qsize;
+    bool    m_shadowMode;
 };
 }
 

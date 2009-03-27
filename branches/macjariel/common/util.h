@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <QList>
+#include <QLinkedList>
 
 #define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
@@ -30,6 +31,17 @@ QString randomToken(int minLength, int maxLength);
 
 template <typename T>
 inline void shuffleList(QList<T>& list)
+{
+    int size = list.count();
+    int swapCount = size * 4;
+    while(swapCount-- != 0)
+    {
+        list.swap(random() % size, random() % size);
+    }
+}
+
+template <typename T>
+inline void shuffleList(QLinkedList<T>& list)
 {
     int size = list.count();
     int swapCount = size * 4;

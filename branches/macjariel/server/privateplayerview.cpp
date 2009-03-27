@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "privateplayerview.h"
+#include "player.h"
 
 PrivatePlayerView::PrivatePlayerView(Player* player)
  : PublicPlayerView(player)
@@ -29,4 +30,8 @@ PrivatePlayerView::~PrivatePlayerView()
 {
 }
 
+StructPlayer PrivatePlayerView::structPlayer() const
+{
+    return mp_player->structPlayer(1);
+}
 
