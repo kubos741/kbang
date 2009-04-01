@@ -31,13 +31,14 @@ class GameServer;
 class Game;
 class CardAbstract;
 class CardPlayable;
-class AbstractPlayerController;
+class GameEventHandler;
 
 class PublicPlayerView;
 
 
 class GameInfo;
 class GameTable;
+class GameCycle;
 
 /**
  * The Game class represents a bang game. It handles creating and destroying players and generates
@@ -84,6 +85,8 @@ public:
      */
     const GameInfo& gameInfo() const;
 
+    const GameCycle& gameCycle() const;
+
     const PublicGameView& publicGameView() const;
 
 
@@ -95,13 +98,7 @@ public:
 
     QList<const PublicPlayerView*>  publicPlayerList() const;
 
-    /**
-     * Returns the list of StructPlayer structures.
-     * @param privatePlayer this player will have private items included
-     * in the resulting list
-     * \note don't like it much.. a space for refactoring
-     */
-    StructPlayerList structPlayerList(Player* privatePlayer = 0) const;
+    int nextPlayerId(int currentPlayerId) const;
 
     Player* getPlayer(int playerId);
 
@@ -110,7 +107,7 @@ public:
      * returns the pointer to it. Creating players is reasonable only
      * before the game is started.
      */
-    Player* createNewPlayer(StructPlayer player, AbstractPlayerController* abstractPlayerController);
+    Player* createNewPlayer(StructPlayer player, GameEventHandler* gameEventHandler);
 
     /**
      * Removes a player from the game. This can be used in anytime and
@@ -137,11 +134,12 @@ public:
 
 /// Signals to player controllers
 signals:
+    void gameStarted();
+
     void playerJoinedGame(int gameId, const StructPlayer&);
     void playerLeavedGame(int gameId, const StructPlayer&);
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void chatMessage(int senderId, const QString& senderName, const QString& message);
-    void statusChanged(const GameState&);
     void startableChanged(int gameId, bool startable);
 
 
@@ -163,6 +161,7 @@ public:
 private:
     GameInfo*                       mp_gameInfo;
     GameTable*                      mp_gameTable;
+    GameCycle*                      mp_gameCycle;
     PublicGameView                  m_publicGameView;
     int                             m_nextPlayerId;
     QMap<int, Player*>              m_playerMap;

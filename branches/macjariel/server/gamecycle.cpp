@@ -20,7 +20,7 @@ void GameCycle::draw(int playerId)
 
     /// \todo Give player his cards
 
-    state = STATE_TURN;
+    m_state = STATE_TURN;
 }
 
 void GameCycle::checkDeck(int playerId)
@@ -33,8 +33,8 @@ void GameCycle::discard(int playerId)
 {
     checkPlayerAndState(playerId, STATE_TURN);
 
-    m_currentPlayerId = nextPlayerId(m_currentPlayerId);
-    state = STATE_DRAW;
+    m_currentPlayerId = mp_game->nextPlayerId(m_currentPlayerId);
+    m_state = STATE_DRAW;
 }
 
 

@@ -13,7 +13,7 @@ class GameTable
 {
     friend class Game;
 public:
-    GameTable();
+    GameTable(Game* game);
 
     /**
      * The player obtains certain number of cards from the deck.
@@ -59,6 +59,7 @@ private:
     void generateCards();
     void shuffleDeck();
     void dealCards();
+    void regenerateDeck();
     int  uniqueCardId();
 
     inline CardAbstract* popCardFromDeck();
@@ -79,6 +80,7 @@ protected:
 
 
 private:
+    Game*                           mp_game;
     QList<CardAbstract*>            m_deck;
     QList<CardAbstract*>            m_graveyard;
     QList<CardPlayable*>            m_playedCards;

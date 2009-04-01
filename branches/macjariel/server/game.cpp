@@ -35,6 +35,7 @@
 
 #include "gameinfo.h"
 #include "gametable.h"
+#include "gamecycle.h"
 
 
 Game::Game(GameServer* parent, const StructGame& structGame):
@@ -45,13 +46,15 @@ Game::Game(GameServer* parent, const StructGame& structGame):
     m_startable(0)
 {
     mp_gameInfo = new GameInfo(structGame);
-    mp_gameTable = new GameTable();
+    mp_gameTable = new GameTable(this);
+    mp_gameCycle = new GameCycle(this);
 }
 
 Game::~Game()
 {
     delete mp_gameInfo;
     delete mp_gameTable;
+    delete mp_gameCycle;
 }
 
 int Game::id() const
@@ -74,6 +77,11 @@ const GameInfo& Game::gameInfo() const
     return *mp_gameInfo;
 }
 
+const GameCycle& Game::gameCycle() const
+{
+    return *mp_gameCycle;
+}
+
 const PublicGameView& Game::publicGameView() const
 {
     return m_publicGameView;
@@ -85,6 +93,19 @@ QList<Player*> Game::playerList() const {
 
 QList<const PublicPlayerView*> Game::publicPlayerList() const {
     return m_publicPlayerList;
+}
+
+int Game::nextPlayerId(int currentPlayerId) const {
+    QListIterator<Player*> it(m_playerList);
+    while (it.hasNext()) {
+        if (it.next()->id() == currentPlayerId)
+            break;
+    }
+
+    /* TODO: Implement dead palyers */
+    if (!it.hasNext())
+        it.toFront();
+    return it.next()->id();
 }
 
 /*
@@ -107,7 +128,7 @@ Player* Game::getPlayer(int playerId)
 }
 
 Player* Game::createNewPlayer(StructPlayer structPlayer,
-                              AbstractPlayerController* abstractPlayerController)
+                              GameEventHandler* gameEventHandler)
 {
     qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(structPlayer.id).arg(structPlayer.name)));
     if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
@@ -117,18 +138,20 @@ Player* Game::createNewPlayer(StructPlayer structPlayer,
     {
         m_nextPlayerId++;
     }
-    Player* newPlayer = new Player(this, m_nextPlayerId, structPlayer.name, structPlayer.password, abstractPlayerController);
+    Player* newPlayer = new Player(this, m_nextPlayerId, structPlayer.name, structPlayer.password, gameEventHandler);
     m_playerMap[m_nextPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     m_publicPlayerList.append(&newPlayer->publicView());
-    emit playerJoinedGame(id(), newPlayer->structPlayer());
+
+    foreach(Player* p, m_playerList) {
+        p->gameEventHandler()->onPlayerJoinedGame(newPlayer->publicView());
+    }
     checkStartable();
     return newPlayer;
 }
 
 void Game::removePlayer(Player* player)
 {
-
     Q_ASSERT(player->game() == this);
     int playerId = player->id();
     Q_ASSERT(m_playerMap.contains(playerId));
@@ -138,16 +161,21 @@ void Game::removePlayer(Player* player)
     m_publicPlayerList.removeAll(&player->publicView());
     m_playerList.removeAll(player);
     m_playerMap.remove(playerId);
-    emit playerLeavedGame(id(), structPlayer);
+
+    player->gameEventHandler()->onPlayerExit();
+    foreach(Player* p, m_playerList) {
+        p->gameEventHandler()->onPlayerLeavedGame(player->publicView());
+    }
     checkStartable();
     player->deleteLater();
-    // TODO: other states of game
 }
 
 
 void Game::sendMessage(Player* player, const QString& message)
 {
-    emit incomingMessage(player->id(), player->name(), message);
+    foreach(Player* p, m_playerList) {
+        p->gameEventHandler()->onIncomingMessage(player->publicView(), message);
+    }
 }
 
 void Game::startGame(Player* player)
@@ -166,20 +194,16 @@ void Game::startGame(Player* player)
     if (mp_gameInfo->hasShufflePlayers()) shufflePlayers();
     //setCharacters();
     setRoles();
-
-    /* \todo
-    StructGame g = structGame();
-    foreach(Player* p, m_playerList)
-    {
-        p->announceGameStarted(g, structPlayerList(p));
-    }
-    */
-
     mp_gameTable->prepareGame();
-    statusChanged(m_gameState);
+
+    // Announce that game started
+    foreach(Player* player, m_playerList) {
+        player->gameEventHandler()->onGameStarted();
+    }
 
 
-    // TODO: start game
+
+
 }
 
 void Game::shufflePlayers()

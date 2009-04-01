@@ -30,12 +30,14 @@ CardMissed::~CardMissed()
 
 bool CardMissed::play()
 {
+/*
     if (mp_game->peakPlayedCards() != 0 &&
         mp_game->peakPlayedCards()->metaObject()->className() == "CardBang")
     {
         CardPlayable::play();
         return 1;
     }
+*/
     return 0;
 }
 

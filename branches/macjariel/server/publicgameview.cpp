@@ -60,4 +60,3 @@ QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
 {
     return mp_game->publicPlayerList();
 }
-

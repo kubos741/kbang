@@ -24,22 +24,29 @@
 #include "playerctrl.h"
 
 
+#include "gameinfo.h"
+#include "gamecycle.h"
+
+
 Player::Player(Game* game,
                int id,
                const QString& name,
                const QString& password,
-               AbstractPlayerController* abstractPlayerController):
+               GameEventHandler* gameEventHandler):
         QObject(game),
         m_id(id),
         m_name(name),
         m_password(password),
+        m_role(ROLE_UNKNOWN),
         mp_game(game),
+        mp_gameEventHandler(gameEventHandler),
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
     //    mp_client->mp_player = this;
     //    m_id = mp_game->appendNewPlayer(this);
-    mp_playerCtrl = new PlayerCtrl(this, abstractPlayerController);
+    mp_playerCtrl = new PlayerCtrl(this);
+    mp_gameEventHandler->onPlayerInit(mp_playerCtrl);
 }
 
 PlayerCtrl* Player::playerCtrl() const
@@ -73,13 +80,29 @@ StructPlayer Player::structPlayer(bool returnPrivateInfo)
     if (returnPrivateInfo)
     {
         x.role = m_role;
+    } else {
+        x.role = ROLE_UNKNOWN;
     }
     return x;
+}
+
+GameEventHandler* Player::gameEventHandler() const {
+    return mp_gameEventHandler;
 }
 
 Game* Player::game() const
 {
     return mp_game;
+}
+
+bool Player::isCreator() const
+{
+    return (mp_game->gameInfo().creatorId() == m_id);
+}
+
+bool Player::isOnTurn() const
+{
+    return (mp_game->gameCycle().currentPlayerId() == m_id);
 }
 
 void Player::modifyLifePoints(int x)
@@ -94,6 +117,10 @@ void Player::appendCardToHand(CardAbstract * card)
     card->setPocketType(POCKET_HAND);
 }
 
+CardAbstract* Player::removeCardFromHand(CardAbstract* card)
+{
+
+}
 
 
 
@@ -118,7 +145,4 @@ int Player::initialCardCount() const
     return cardCount;
 }
 
-void Player::announceGameStarted(const StructGame& game, const StructPlayerList& playerList)
-{
-    emit gameStarted(game, playerList);
-}
+

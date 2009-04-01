@@ -94,8 +94,8 @@ public slots:
      */
     void                deleteClient(int clientId);
 
-    void                queryGame(int gameId, QueryResult result);
-    void                queryGameList(QueryResult result);
+    //void                queryGame(int gameId, QueryResult result);
+    //void                queryGameList(QueryResult result);
    
 private:
     GameServer();

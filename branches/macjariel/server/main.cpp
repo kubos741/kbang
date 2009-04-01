@@ -26,13 +26,14 @@
 
 #include "parser/parserstructs.h"
 
+#include "qtc-gdbmacros/gdbmacros.cpp"
 
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     GameServer& server = GameServer::instance();
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     &app, SLOT(quit()));
+    //QObject::connect(&server, SIGNAL(aboutToQuit()),
+    //                 &app, SLOT(quit()));
     server.listen();
     StructGame x;
     x.name = "Testovaci hra";
@@ -44,8 +45,8 @@ int main(int argc, char* argv[])
     server.createGame(x);
     server.createGame(x);
     Console* console = new Console(&server, stdin, stdout);
-    QObject::connect(&server, SIGNAL(aboutToQuit()),
-                     console, SLOT(terminate()));
+    //QObject::connect(&server, SIGNAL(aboutToQuit()),
+    //                 console, SLOT(terminate()));
 
     console->start();
 //    CharacterCard::loadCharacterBank();

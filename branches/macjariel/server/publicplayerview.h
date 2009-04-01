@@ -42,7 +42,10 @@ private:
 public:
     int id() const;
 
-    inline QString name() const;
+    QString name() const;
+
+    bool isCreator() const;
+
 
     inline bool isAlive() const
     {

@@ -58,7 +58,7 @@ public:
     /**
      * Returns the id of the game.
      */
-    inline int id() const;
+    int id() const;
 
     /**
      * Returns name of the game.

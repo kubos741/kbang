@@ -1,9 +1,11 @@
 #include "gametable.h"
 #include "common.h"
-#include "cardabstract.h"
+#include "cards.h"
 #include "player.h"
+#include "util.h"
 
-GameTable::GameTable()
+GameTable::GameTable(Game* game):
+        mp_game(game)
 {
 }
 
@@ -21,7 +23,7 @@ void GameTable::drawCard(Player *p, int count)
     {
         CardAbstract* card = popCardFromDeck();
         p->appendCardToHand(card);
-        emit playerDrawedCard(p, card);
+        //emit playerDrawedCard(p, card);
     }
 }
 
@@ -33,7 +35,7 @@ void GameTable::discardCard(Player* player, CardAbstract* card)
         return;
     }
     putCardToGraveyard(card);
-    emit playerDiscardedCard(p, card);
+    //emit playerDiscardedCard(player, card);
 }
 
 void GameTable::generateCards()
@@ -43,12 +45,12 @@ void GameTable::generateCards()
     for(int i = 0; i < nBang; ++i)
     {
         int id = uniqueCardId();
-        m_cards[id] = new CardBang(this, id);
+        m_cards[id] = new CardBang(mp_game, id);
     }
     for(int i = 0; i < nMissed; ++i)
     {
         int id = uniqueCardId();
-        m_cards[id] = new CardMissed(this, id);
+        m_cards[id] = new CardMissed(mp_game, id);
     }
     m_deck << m_cards.values();
 }
@@ -58,33 +60,13 @@ void GameTable::shuffleDeck()
     shuffleList(m_deck);
 }
 
-void GameTable::drawCard(Player *p, int count)
-{
-    for(int i = 0; i < count; ++i)
-    {
-        CardAbstract* card = popCardFromDeck();
-        p->appendCardToHand(card);
-        emit playerDrawedCard(p, card);
-    }
-}
-
-CardAbstract* GameTable::popCardFromDeck()
-{
-    if (m_deck.isEmpty()) regenerateDeck();
-    return m_deck.takeFirst();
-}
-
-void GameTable::shuffleDeck()
-{
-    shuffleList(m_deck);
-}
 
 void GameTable::dealCards()
 {
     int cardCount = 0, players = 0;
     do {
         players = 0;
-        foreach(Player* p, m_playerList)
+        foreach(Player* p, mp_game->playerList())
         {
             if (p->initialCardCount() > cardCount)
             {
@@ -124,14 +106,13 @@ CardAbstract* GameTable::popCardFromDeck()
     return m_deck.takeFirst();
 }
 
-
-void GameTable::pushCardToGraveyard(CardAbstract* card)
+void GameTable::putCardToGraveyard(CardAbstract* card)
 {
     m_graveyard.push_back(card);
 }
 
 
-void setPlayerOnTurn(Player* player)
+void GameTable::setPlayerOnTurn(Player* player)
 {
     mp_playerOnTurn = player;
 }

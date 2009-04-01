@@ -36,9 +36,11 @@ class QTcpSocket;
  * by the Parser class and this class uses these requests to control the player
  * through the PlayerCtrl interface.
  *
+ * Lifetime is controled by object itself.
+ *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject, public AbstractPlayerController
+class Client : public QObject, public GameEventHandler
 {
 Q_OBJECT
 public:
@@ -67,12 +69,18 @@ public slots: // These slots are connected to parser
     void onQueryGame(int gameId, QueryResult result);
     void onQueryGameList(QueryResult result);
 
-public: /* The AbstractPlayerController interface */
-    virtual void onIncomingMessage(int playerId, const QString& playerName, const QString& message);
-    virtual void onPlayerJoinedGame(int playerId, const StructPlayer& playerStruct);
-    virtual void onPlayerLeavedGame(int playerId);
-    virtual void onGameStarted(const StructGame& structGame, const StructPlayerList& structPlayerList);
+public: /* The GameEventHandler interface */
+    virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message);
+    virtual void onPlayerInit(PlayerCtrl* playerCtrl);
+    virtual void onPlayerExit();
+    virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView);
+    virtual void onPlayerLeavedGame(const PublicPlayerView&);
+    virtual void onGameStarted();
     virtual void onPlayerDrawedCard(int playerId, const CardAbstract*);
+
+signals:
+    void disconnected(int clientId);
+
 
 private:
     bool isInGame() const;

@@ -33,7 +33,7 @@ class CharacterCard;
 class WeaponCard;
 class PlayerCtrl;
 class Game;
-class AbstractPlayerController;
+class GameEventHandler;
 
 /**
  * The Player class represents a kbang player. The instance of this object
@@ -49,8 +49,8 @@ public:
      * of this class on heap (with the ''new'' operator) because the lifetime of
      * this objects is managed inside.
      */
-    Player(Game* game, int id, const QString& name, const QString& password, AbstractPlayerController* abstractPlayerController);
-    ~Player();
+    Player(Game* game, int id, const QString& name, const QString& password, GameEventHandler* gameEventHandler);
+
 
 public:
 
@@ -74,6 +74,13 @@ public:
      * belongs to.
      */
     Game* game() const;
+
+    bool isCreator() const;
+
+    /**
+     *
+     */
+    bool isOnTurn() const;
 
 
 
@@ -108,6 +115,8 @@ public:
      */
      StructPlayer structPlayer(bool returnPrivateInfo = 0);
 
+     GameEventHandler* gameEventHandler() const;
+
     void appendCardToHand(CardAbstract* card);
 
     /**
@@ -124,16 +133,13 @@ public:
     //const PlayerActions* playerActions() const;
 
     inline void setRole(const PlayerRole& role) { m_role = role; }
-    void announceGameStarted(const StructGame&, const StructPlayerList&);
-
-
-/// Signals from players. To be connected to slots of the controller
-signals:
-    void gameStarted(const StructGame&, const StructPlayerList&);
-    void leavingGame();
 
 
 
+
+
+
+    
 private:
     int                       m_id;
     int                       m_lifePoints;
@@ -146,7 +152,7 @@ private:
     PlayerRole                m_role;
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
-
+    GameEventHandler*         mp_gameEventHandler;
 
     const PublicPlayerView    m_publicPlayerView;
     const PrivatePlayerView   m_privatePlayerView;

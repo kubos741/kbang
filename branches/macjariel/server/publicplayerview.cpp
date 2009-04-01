@@ -33,6 +33,11 @@ QString PublicPlayerView::name() const
     return mp_player->name();
 }
 
+bool PublicPlayerView::isCreator() const
+{
+    return mp_player->isCreator();
+}
+
 PublicPlayerView::~ PublicPlayerView()
 {
 }

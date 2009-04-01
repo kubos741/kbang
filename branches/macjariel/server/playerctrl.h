@@ -7,7 +7,7 @@
 #include "parser/parserstructs.h"
 
 class Player;
-class AbstractPlayerController;
+class GameEventHandler;
 class PublicGameView;
 class PublicPlayerView;
 class PrivatePlayerView;
@@ -76,21 +76,28 @@ public:
 
 
     /**
-     * Creates a new game and returns the PlayerCtrl control. This should be used
+     * Creates a new game and automatically puts the player in. This should be used
      * exclusively by nonAI client classes, as AIs typically don't create games.
+     * \note The client class gets the PlayerCtrl instance through the
+     *       GameEventHandler::onPlayerInit(PlayerCtrl*) method.
      * \param game The game structure.
      * \param player The player structure.
      */
-    static PlayerCtrl* createGame(const StructGame& game, const StructPlayer& player);
+    static void createGame(const StructGame& game, const StructPlayer& player,
+                                  GameEventHandler* gameEventHandler);
 
     /**
-     * Creates a new player and has him enter the game.
+     * Puts the player to the game.
+     * \note The client class gets the PlayerCtrl instance through the
+     *       GameEventHandler::onPlayerInit(PlayerCtrl*) method.
+     *
      * \param gameId The id of the game.
      * \param player The player structure.
      * \throws BadGameException The game does not exist.
      * \throws BadGameStateException The game has already started.
      */
-    static PlayerCtrl* joinGame(int gameId, const StructPlayer& player);
+    static void joinGame(int gameId, const StructPlayer& player,
+                                GameEventHandler* gameEventHandler);
 
     /**
      * Returns the StructServerInfo struct.
@@ -109,12 +116,12 @@ public:
 
 
 private:
-    PlayerCtrl(Player* player, AbstractPlayerController* abstractPlayerController);
+    PlayerCtrl(Player* player);
     PlayerCtrl(const PlayerCtrl&): QObject(0) {}
     PlayerCtrl& operator=(const PlayerCtrl&) { return *this; }
 
     Player*                     mp_player;
-    AbstractPlayerController*   mp_abstractPlayerController;
+
 };
 
 #endif // PLAYERCTRL_H

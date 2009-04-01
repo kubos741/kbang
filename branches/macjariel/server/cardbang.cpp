@@ -37,12 +37,13 @@ bool CardBang::play()
 
 bool CardBang::play(Player *targetPlayer)
 {
+
     /* situation check */
-    if ((mp_game->playerOnTurn() != owner()) ||
-        !mp_game->isBaseTurn()) return 0; // TODO: error handling
+//    if ((mp_game->playerOnTurn() != owner()) ||
+//        !mp_game->isBaseTurn()) return 0; // TODO: error handling
 
     /* distance check */
-    if (mp_game->getDistance(owner(), targetPlayer) > owner()->weaponRange()) return 0; // TODO: error handling
+//    if (mp_game->getDistance(owner(), targetPlayer) > owner()->weaponRange()) return 0; // TODO: error handling
 
     /* one-bang-per-turn check */
     // TODO

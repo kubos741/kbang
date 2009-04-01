@@ -7,30 +7,30 @@ GameInfo::GameInfo(const StructGame& structGame):
     m_creatorId(structGame.creatorId),
     m_minPlayers(structGame.minPlayers),
     m_maxPlayers(structGame.maxPlayers),
-    m_maxObservers(structGame.maxSpectators),
+    m_maxSpectators(structGame.maxSpectators),
     m_playerPassword(structGame.playerPassword),
-    m_observerPassword(structGame.spectatorPassword),
-    m_shufflePlayers(structGame.flagShufflePlayers)
+    m_spectatorPassword(structGame.spectatorPassword),
+    m_shufflePlayersFlag(structGame.flagShufflePlayers)
 {
     Q_ASSERT(!m_name.isEmpty());
     Q_ASSERT(m_minPlayers <= m_maxPlayers);
-    Q_ASSERT(m_observerPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
+    Q_ASSERT(m_spectatorPassword.isNull() || !m_playerPassword.isNull()); // observerPassword implies playerPassword
 }
 
 StructGame GameInfo::structGame() const
 {
     StructGame x;
-    x.id = m_gameId;
+    x.id = m_id;
     x.creatorId = m_creatorId;
     x.name = m_name;
     x.description = m_description;
     x.minPlayers = m_minPlayers;
     x.maxPlayers = m_maxPlayers;
-    x.maxSpectators = m_maxObservers;
+    x.maxSpectators = m_maxSpectators;
     x.playerPassword = m_playerPassword;
-    x.spectatorPassword = m_observerPassword;
+    x.spectatorPassword = m_spectatorPassword;
     x.hasPlayerPassword = (!m_playerPassword.isNull());
-    x.hasSpectatorPassword = (!m_observerPassword.isNull());
-    x.flagShufflePlayers = m_shufflePlayers;
-    return r;
+    x.hasSpectatorPassword = (!m_spectatorPassword.isNull());
+    x.flagShufflePlayers = m_shufflePlayersFlag;
+    return x;
 }

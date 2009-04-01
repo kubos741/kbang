@@ -6,10 +6,9 @@
 
 
 
-PlayerCtrl::PlayerCtrl(Player* player, AbstractPlayerController* abstractPlayerController):
+PlayerCtrl::PlayerCtrl(Player* player):
         QObject(player),
-        mp_player(player),
-        mp_abstractPlayerController(abstractPlayerController)
+        mp_player(player)
 {
 }
 
@@ -51,7 +50,7 @@ const PublicPlayerView& PlayerCtrl::publicPlayerView(int playerId) const
         return mp_player->publicView();
     Player* player = mp_player->game()->getPlayer(playerId);
     if (player != 0) return player->publicView();
-    throw BadPlayerException();
+    throw BadPlayerException(playerId);
 }
 
 const PrivatePlayerView& PlayerCtrl::privatePlayerView() const
@@ -66,27 +65,25 @@ const PrivatePlayerView& PlayerCtrl::privatePlayerView() const
 
 
 
-PlayerCtrl* PlayerCtrl::createGame(const StructGame& structGame,
+void PlayerCtrl::createGame(const StructGame& structGame,
                                    const StructPlayer& structPlayer,
-                                   AbstractPlayerController* abstractPlayerController)
+                                   GameEventHandler* gameEventHandler)
 {
     Game* newGame = GameServer::instance().createGame(structGame);
     Q_ASSERT(newGame != 0);
-    Player* newPlayer = newGame->createNewPlayer(structPlayer, abstractPlayerController);
+    Player* newPlayer = newGame->createNewPlayer(structPlayer, gameEventHandler);
     Q_ASSERT(newPlayer != 0);
-    return newPlayer->playerCtrl();
 }
 
-PlayerCtrl* PlayerCtrl::joinGame(int gameId,
+void PlayerCtrl::joinGame(int gameId,
                                  const StructPlayer& structPlayer,
-                                 AbstractPlayerController* abstractPlayerController)
+                                 GameEventHandler* gameEventHandler)
 {
     Game* game = GameServer::instance().game(gameId);
     if (game == 0)
         throw BadGameException();
-    Player* newPlayer = game->createNewPlayer(structPlayer, abstractPlayerController);
+    Player* newPlayer = game->createNewPlayer(structPlayer, gameEventHandler);
     Q_ASSERT(newPlayer != 0);
-    return newPlayer->playerCtrl();
 }
 
 StructServerInfo PlayerCtrl::structServerInfo()

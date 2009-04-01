@@ -24,6 +24,7 @@
 #include <QtDebug>
 
 
+
 #ifndef NO_TENGO_CONFIG_HACK
 #include "config.h"
 #endif
