@@ -83,9 +83,11 @@ public:
      * object is controlled by the Game instance, so don't
      * keep a reference for too long.
      */
-    const GameInfo& gameInfo() const;
+    GameInfo& gameInfo();
 
-    const GameCycle& gameCycle() const;
+    GameCycle& gameCycle();
+
+    GameTable& gameTable();
 
     const PublicGameView& publicGameView() const;
 
@@ -98,7 +100,7 @@ public:
 
     QList<const PublicPlayerView*>  publicPlayerList() const;
 
-    int nextPlayerId(int currentPlayerId) const;
+    Player* nextPlayer(Player* currentPlayer) const;
 
     Player* getPlayer(int playerId);
 

@@ -49,13 +49,16 @@ void CardList::push(CardWidget* card)
     card->setSize(m_cardSize);
     card->applyNewProperties();
     card->raise();
+    reorder();
     card->show();
+
     // todo
 }
 
 QPoint CardList::newCardPosition() const
 {
-    return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
+    //return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
+    return QPoint(cardX(m_cards.size()), m_vPadding);
 }
 
 CardWidget* CardList::get(int)
@@ -66,5 +69,24 @@ CardWidget* CardList::get(int)
 CardWidget* CardList::pop()
 {
     return m_cards.takeLast();
+}
+
+void CardList::reorder()
+{
+    for(int i = 0; i < m_cards.size(); ++i) {
+        m_cards[i]->move(cardX(i), m_vPadding);
+    }
+}
+
+int CardList::cardX(int i) const
+{
+    int cSize = m_cards.size() * m_moveFactor + CardWidget::qSize(m_cardSize).width();
+    if (cSize <= width() - 2 * m_hPadding) {
+        return m_hPadding + i * m_moveFactor;
+    } else {
+        int newMoveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(m_cards.size() - 1);
+        //i * NF = todoWidth - 2*hpadding - width
+        return m_hPadding + i * newMoveFactor;
+    }
 }
 

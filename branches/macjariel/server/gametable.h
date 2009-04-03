@@ -20,7 +20,7 @@ public:
      * \param player    Target player
      * \param count     The count of cards
      */
-    void drawCard(Player* player, int count = 1);
+    void drawCard(Player* player, int count = 1, bool revealCard = 0);
 
     /**
      * The player discards the specified card.
@@ -35,7 +35,15 @@ public:
     /**
      * Returns the last played card.
      */
-    CardPlayable* peakPlayedCards() const;
+    inline CardPlayable* lastPlayedCard() const {
+        return m_playedCards.last();
+    }
+
+    CardPlayable* firstPlayedCard() const {
+        return m_playedCards.first();
+    }
+
+
 
     /**
      * Returns the playedCards list.
@@ -43,6 +51,9 @@ public:
     inline QList<CardPlayable*> playedCards() const {
         return m_playedCards;
     }
+
+
+    void pushPlayedCard(CardPlayable* card);
 
     /**
      * Clears the playedCards list by appending its content
@@ -72,22 +83,12 @@ protected:
      */
     void prepareGame();
 
-    /**
-     * Sets the player on turn.
-     */
-    void setPlayerOnTurn(Player* player);
-
-
-
 private:
     Game*                           mp_game;
     QList<CardAbstract*>            m_deck;
     QList<CardAbstract*>            m_graveyard;
     QList<CardPlayable*>            m_playedCards;
     QMap<int, CardAbstract*>        m_cards;
-
-    Player*                         mp_playerOnTurn;
-
 };
 
 #endif // GAMETABLE_H

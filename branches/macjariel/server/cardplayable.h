@@ -40,7 +40,8 @@ public:
     virtual bool play(Player* targetPlayer) = 0;
     virtual bool play(CardAbstract* targetCard) = 0;
 
-    virtual void noReaction(Player* reactingPlayer) = 0;
+    virtual void respondPass() = 0;
+    virtual void respondCard(CardAbstract* targetCard) = 0;
 };
 
 #endif

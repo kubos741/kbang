@@ -19,8 +19,13 @@
  ***************************************************************************/
 #include "cardbang.h"
 #include "player.h"
+#include "gamecycle.h"
+#include "gameexceptions.h"
+#include "cardmissed.h"
 
-CardBang::CardBang(Game* game, int id): CardPlayable(game, id)
+CardBang::CardBang(Game* game, int id):
+        CardPlayable(game, id),
+        mp_attackedPlayer(0)
 {
 
 }
@@ -39,18 +44,20 @@ bool CardBang::play(Player *targetPlayer)
 {
 
     /* situation check */
-//    if ((mp_game->playerOnTurn() != owner()) ||
-//        !mp_game->isBaseTurn()) return 0; // TODO: error handling
+    if (mp_game->gameCycle().state() != GameCycle::STATE_TURN)
+        throw BadGameStateException();
+
 
     /* distance check */
-//    if (mp_game->getDistance(owner(), targetPlayer) > owner()->weaponRange()) return 0; // TODO: error handling
+    if (mp_game->getDistance(owner(), targetPlayer) > owner()->weaponRange())
+        throw BadPlayerException(targetPlayer->id()); // TODO: other exception maybe
 
     /* one-bang-per-turn check */
     // TODO
 
     CardPlayable::play();
-
-    //    mp_game->requestReaction(targetPlayer);
+    mp_game->gameCycle().requestResponse(targetPlayer);
+    mp_attackedPlayer = targetPlayer;
     return 1;
 }
 
@@ -60,9 +67,21 @@ bool CardBang::play(CardAbstract* targetCard)
     return 0;
 }
 
-void CardBang::noReaction(Player *reactingPlayer)
+void CardBang::respondPass()
 {
-    reactingPlayer->modifyLifePoints(-1);
+    Q_ASSERT(mp_attackedPlayer != 0);
+    mp_attackedPlayer->modifyLifePoints(-1); // TODO: abstract this - for abilities
+    mp_game->gameCycle().clearPlayedCards();
+}
+
+void CardBang::respondCard(CardAbstract* targetCard)
+{
+    CardMissed* cardMissed = qobject_cast<CardMissed*>(targetCard);
+    if (cardMissed != 0) {
+        mp_game->gameCycle().clearPlayedCards();
+        return;
+    }
+    throw BadCardException();
 }
 
 

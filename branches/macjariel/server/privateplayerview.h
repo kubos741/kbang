@@ -22,6 +22,7 @@
 
 #include <publicplayerview.h>
 
+
 /**
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
@@ -39,11 +40,9 @@ public:
      * is returned even if the player is still alive
      * and is not sheriff.
      */
-    virtual int role() const
-    {
-        // TODO
-        return 0;
-    }
+    virtual PlayerRole role() const;
+
+    QList<CardAbstract* > cardsInHand() const;
 
     virtual StructPlayer structPlayer() const;
 

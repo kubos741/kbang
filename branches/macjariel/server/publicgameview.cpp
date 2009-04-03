@@ -18,8 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "publicgameview.h"
+#include "publicplayerview.h"
 #include "game.h"
 #include "gameinfo.h"
+#include "player.h"
 
 PublicGameView::PublicGameView(Game* game):
 mp_game(game)
@@ -59,4 +61,15 @@ StructGame PublicGameView::structGame() const
 QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
 {
     return mp_game->publicPlayerList();
+}
+
+QList<const PublicPlayerView*> PublicGameView::neighbors(const PublicPlayerView* source, int distance) const
+{
+    QList<const PublicPlayerView*> result;
+    foreach (const PublicPlayerView* p, mp_game->publicPlayerList()) {
+        if (p->id() == source->id()) continue;
+        if (mp_game->getDistance(Player::player(source), Player::player(p)) <= distance)
+            result.append(p);
+    }
+    return result;
 }

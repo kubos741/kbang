@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "cardplayable.h"
+#include "player.h"
+#include "gametable.h"
 
 CardPlayable::CardPlayable(Game* game, int id): CardAbstract(game, id)
 {
@@ -29,10 +31,7 @@ CardPlayable::~CardPlayable()
 
 bool CardPlayable::play()
 {
-    // TODO: remove from player hands
-    // owner()->removeCardFromHand(this);
-    //mp_game->appendPlayedCard(this);
-    setPocketType(POCKET_PLAYED);
+    mp_game->gameTable().playCard(owner(), this);
     return 1;
 }
 

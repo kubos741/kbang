@@ -11,6 +11,8 @@ class GameEventHandler;
 class PublicGameView;
 class PublicPlayerView;
 class PrivatePlayerView;
+class CardAbstract;
+class CardPlayable;
 
 /**
  * This class provides the only "correct" form to
@@ -23,7 +25,7 @@ class PlayerCtrl :  QObject
 {
     Q_OBJECT;
     friend class Player;
-public:
+public slots:
     /**
      * Disconnects the player from the game, or possibly subtitutes player with
      * AI. This method should never be called by AIs
@@ -42,6 +44,20 @@ public:
      */
     void startGame();
 
+
+    /**
+     * Player draws the specified number of cards. This is how player starts it turn.
+     * \param numCards The amount of cards to draw.
+     * \param revealCard The player reveals the drawed card(s). This is necessary for
+     *        some characters to gain bonuses.
+     * The player typically draws two cards. Client class can either call drawCard once
+     * with the numCards=2 or twice with numCards=1. Moreover, in case of special characters
+     * (drawing from graveyard, from other hands, ...) the other variant becomes handy.
+     *
+     * \throws BadGameStateException It's not right time to draw cards or the card count is bad.
+     */
+    void drawCard(int numCards, bool revealCard = 0);
+
     /**
      * Finishes the player's turn.
      * \throws TooManyCardsInHandException The player must discard some cards,
@@ -57,15 +73,20 @@ public:
      * \throws BadCardException There is no card with given id in player's hand.
      * \throws BadGameStateException There is no right moment for discarding cards.
      */
-    void discardCard(int cardId);
+    void discardCard(CardAbstract* card);
+
+
 
     /**
      * Plays a card.
      */
-    void playCard(int cardId);
+    void playCard(CardPlayable* card);
+    void playCard(CardPlayable* card, const PublicPlayerView* player);
 
 
+    void pass();
 
+public:
 
 
 
@@ -98,6 +119,8 @@ public:
      */
     static void joinGame(int gameId, const StructPlayer& player,
                                 GameEventHandler* gameEventHandler);
+
+
 
     /**
      * Returns the StructServerInfo struct.

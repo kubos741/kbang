@@ -22,11 +22,17 @@
 #include "consolecommand.h"
 #include "console.h"
 #include "gameserver.h"
+#include "game.h"
+
+#include "voidai.h"
 
 
 #define CMDDEF(name) bool name(const QStringList& args, Console& console)
 #define CMDREG(name, function) cmdHash.insert(name, function)
 #define CMDALIAS(name, alias) cmdHash.insert(name, cmdHash[alias])
+#define CMD_ASSERT_ARG_CNT(cnt) if (args.size() != cnt) { console.Cout() << QString("Bad arguments count, expected %1.").arg(cnt); return 1; }
+
+
 
 QHash<QString, ConsoleCmd*> cmdHash;
 
@@ -55,11 +61,31 @@ CMDDEF(console_quit)
     return 1;
 }
 
+CMDDEF(console_create_test_player)
+{
+    CMD_ASSERT_ARG_CNT(2);
+
+    int gameId;
+    bool ok;
+    gameId = args[0].toInt(&ok);
+    if (!ok) {
+        console.Cout() << QString("Expected int as the first argument.");
+        return 1;
+    }
+    Game* game = GameServer::instance().game(gameId);
+    if (game == 0) {
+        console.Cout() << QString("The game id %1 does not exist.").arg(gameId);
+        return 1;
+    }
+    new VoidAI(gameId);
+}
+
 
 void console_register_commands()
 {
     CMDREG("help", &console_help);
     CMDREG("quit", &console_quit);
+    CMDREG("create_test_player", &console_create_test_player);
     CMDALIAS("exit", "quit");
 }
 

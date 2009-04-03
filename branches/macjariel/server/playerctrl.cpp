@@ -1,8 +1,10 @@
 #include "gameserver.h"
 #include "game.h"
+#include "gamecycle.h"
 #include "player.h"
 #include "playerctrl.h"
-#include "abstractplayercontroller.h"
+#include "gameeventhandler.h"
+
 
 
 
@@ -22,18 +24,38 @@ void PlayerCtrl::startGame()
     mp_player->game()->startGame(mp_player);
 }
 
+void PlayerCtrl::drawCard(int numCards, bool revealCard)
+{
+    mp_player->game()->gameCycle().drawCard(mp_player, numCards, revealCard);
+}
+
 void PlayerCtrl::finishTurn()
 {
-
+    mp_player->game()->gameCycle().finishTurn(mp_player);
 }
 
-void PlayerCtrl::playCard(int cardId)
+void PlayerCtrl::discardCard(CardAbstract* card)
 {
+    mp_player->game()->gameCycle().discardCard(mp_player, card);
+}
 
+void PlayerCtrl::playCard(CardPlayable* card)
+{
+    mp_player->game()->gameCycle().playCard(mp_player, card);
+}
+
+void PlayerCtrl::playCard(CardPlayable* card, const PublicPlayerView* targetPlayer)
+{
+    mp_player->game()->gameCycle().playCard(mp_player,
+                                            card,
+                                            Player::player(targetPlayer));
 }
 
 
-
+void PlayerCtrl::pass()
+{
+    mp_player->game()->gameCycle().pass(mp_player);
+}
 
 
 

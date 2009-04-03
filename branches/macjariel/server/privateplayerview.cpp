@@ -30,6 +30,16 @@ PrivatePlayerView::~PrivatePlayerView()
 {
 }
 
+PlayerRole PrivatePlayerView::role() const
+{
+    return mp_player->role();
+}
+
+QList<CardAbstract* > PrivatePlayerView::cardsInHand() const
+{
+    return mp_player->cardsInHand();
+}
+
 StructPlayer PrivatePlayerView::structPlayer() const
 {
     return mp_player->structPlayer(1);

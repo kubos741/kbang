@@ -39,7 +39,8 @@ public:
     virtual bool play(Player* targetPlayer);
     virtual bool play(CardAbstract* targetCard);
 
-    virtual void noReaction(Player*);
+    virtual void respondPass();
+    virtual void respondCard(CardAbstract* targetCard);
 
     virtual QString type() const { return "missed"; }
 };

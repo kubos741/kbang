@@ -33,6 +33,17 @@ QString PublicPlayerView::name() const
     return mp_player->name();
 }
 
+bool PublicPlayerView::isSheriff() const
+{
+    return (mp_player->role() == ROLE_SHERIFF);
+}
+
+PlayerRole PublicPlayerView::role() const
+{
+    return (mp_player->role() == ROLE_SHERIFF) ?
+            ROLE_SHERIFF : ROLE_UNKNOWN;
+}
+
 bool PublicPlayerView::isCreator() const
 {
     return mp_player->isCreator();

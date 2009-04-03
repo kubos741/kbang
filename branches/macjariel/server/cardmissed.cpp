@@ -53,7 +53,12 @@ bool CardMissed::play(CardAbstract*)
 }
 
 
-void CardMissed::noReaction(Player*)
+
+void CardMissed::respondPass()
+{
+}
+
+void CardMissed::respondCard(CardAbstract* targetCard)
 {
 }
 

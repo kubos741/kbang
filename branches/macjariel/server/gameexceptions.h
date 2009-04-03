@@ -21,6 +21,10 @@ public:
 
 class BadGameException {};
 
+class TooManyCardsInHandException {};
+
+class BadCardException {};
+
 
 
 

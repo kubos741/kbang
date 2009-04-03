@@ -84,10 +84,11 @@ public:
 
 
 
-    /**
-     * Returns number of life-points.
-     */
-    //int lifePoints() const;
+    inline int lifePoints()     const { return m_lifePoints; }
+    inline int maxLifePoints()  const { return m_maxLifePoints; }
+    inline int handSize()       const { return m_cardsInHand.size(); }
+
+    QList<CardAbstract*>    cardsInHand();
 
     /**
      * Returns the players' character.
@@ -95,10 +96,6 @@ public:
 
     //const CharacterCard& getCharacterCard() const;
 
-    /**
-     * Returns the number of cards in player's hand.
-     */
-    //int getCardsInHandCount() const
 
     inline PlayerRole role() const { return m_role; }
 
@@ -121,10 +118,9 @@ public:
 
     /**
      * Removes the given card from players hand. Returns
-     * the pointer to the card removed or null pointer
-     * if the card is not in player's hand/.
+     * true if player had that card in hand.
      */
-    CardAbstract* removeCardFromHand(CardAbstract* card);
+    bool removeCardFromHand(CardAbstract* card);
 
 
     const PublicPlayerView&  publicView() const;
@@ -132,19 +128,21 @@ public:
 
     //const PlayerActions* playerActions() const;
 
-    inline void setRole(const PlayerRole& role) { m_role = role; }
+    void setRole(const PlayerRole& role);
 
 
 
 
-
+    inline static Player* player(const PublicPlayerView* publicPlayerView) {
+        return publicPlayerView->mp_player;
+    }
 
     
 private:
     int                       m_id;
     int                       m_lifePoints;
+    int                       m_maxLifePoints;
 //    CharacterCard*            m_characterCard;
-//    PlayingCardList           m_cardsInHand;
 //    WeaponCard*               m_weaponCard;
     QList<CardAbstract*>      m_cardsInHand;
     QString                   m_name;

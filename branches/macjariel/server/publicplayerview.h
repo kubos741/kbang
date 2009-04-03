@@ -24,6 +24,7 @@
 #include "parser/parserstructs.h"
 
 class Player;
+class CardAbstract;
 
 /**
  *
@@ -53,22 +54,14 @@ public:
         return 0;
     }
 
-    inline bool isSheriff() const
-    {
-        // TODO
-        return 0;
-    }
+    bool isSheriff() const;
 
     /**
      * Returns the role of the player. In case
      * the player is still alive and is not sheriff,
      * the unknown role is returned.
      */
-    virtual int role() const
-    {
-        // TODO
-        return 0;
-    }
+    virtual PlayerRole role() const;
 
     inline int lifePoints() const
     {

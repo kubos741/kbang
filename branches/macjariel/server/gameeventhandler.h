@@ -22,11 +22,12 @@
 #define GAMEEVENTHANDLER_H
 
 #include <QString>
+#include "parser/parserstructs.h"
 
 
 class CardAbstract;
 class PublicPlayerView;
-
+class PlayerCtrl;
 
 /**
  * Abstract class that defines the interface to notify back PlayerControllers
@@ -38,6 +39,7 @@ class PublicPlayerView;
 class GameEventHandler
 {
 public:
+    //GameEventHandler();
     /**
      * This method is called when someone sends a chat message.
      * \param player The publicPlayerView of sender.
@@ -61,6 +63,8 @@ public:
 
     virtual void onPlayerLeavedGame(const PublicPlayerView&) = 0;
 
+    virtual void onGameStartabilityChanged(bool isStartable) = 0;
+    
     virtual void onGameStarted() = 0;
 
     /**
@@ -69,7 +73,18 @@ public:
      */
     virtual void onPlayerDrawedCard(int playerId, const CardAbstract* card) = 0;
 
-    virtual ~GameEventHandler() {};
+    virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card) = 0;
+
+    virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) = 0;
+
+    virtual void onPlayedCardsCleared() = 0;
+
+    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) = 0;
+
+    virtual void onActionRequest(ActionRequestType requestType) = 0;
+
+
+    virtual ~GameEventHandler() = 0;
 };
 
 

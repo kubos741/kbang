@@ -25,6 +25,7 @@
 #include "parser/parserstructs.h"
 
 class Player;
+class GameTable;
 
 /**
  * The base class for all cards that are in the desk. Character and role
@@ -33,13 +34,12 @@ class Player;
  */
 class CardAbstract: public QObject
 {
+friend class GameTable;
 Q_OBJECT
 public:
     CardAbstract(Game *game, int id);
     virtual ~CardAbstract();
 
-    inline void setOwner(Player *owner) { mp_owner = owner; }
-    inline void setPocketType(const PocketType& pocketType) { m_pocketType = pocketType; }
 
     inline int id() const { return m_id; }
     virtual QString type() const = 0;
@@ -49,6 +49,11 @@ public:
 
 protected:
     Game *mp_game;
+
+private:
+    inline void setOwner(Player *owner) { mp_owner = owner; }
+    inline void setPocketType(const PocketType& pocketType) { m_pocketType = pocketType; }
+
 
 private:
     Player*     mp_owner;

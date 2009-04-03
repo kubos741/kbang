@@ -104,30 +104,12 @@ void Client::joinGame(Game* game, const StructPlayer& player)
 
 void Client::onActionLeaveGame()
 {
-    // TODO
-    //if (mp_player == 0) return; // Client is not in a game
-    //mp_player->leaveGame();
+    if (!isInGame()) {
+        // TODO: error
+        return;
+    }
+    mp_playerCtrl->disconnect();
 }
-
-/*
-void Client::connectPlayer()
-{
-    connect(mp_parser, SIGNAL(sigActionStartGame()),
-            mp_player, SLOT(startGame()));
-    connect(mp_parser, SIGNAL(sigActionMessage(const QString&)),
-            mp_player, SLOT(sendMessage(const QString&)));
-    connect(mp_player->game(), SIGNAL(playerJoinedGame(int, const StructPlayer&)),
-            mp_parser, SLOT(eventJoinGame(int, const StructPlayer&)));
-    connect(mp_player->game(), SIGNAL(playerLeavedGame(int, const StructPlayer&)),
-            this, SLOT(leavingGame(int,const StructPlayer&)));
-    connect(mp_player->game(), SIGNAL(playerDrawedCard(Player*, CardAbstract*)),
-            this, SLOT(playerDrawedCard(Player*, CardAbstract*)));
-    connect(mp_player, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
-            mp_parser, SLOT(eventStartGame(const StructGame&, const StructPlayerList&)));
-
-}
-*/
-
 
 void Client::onActionStartGame()
 {
@@ -230,6 +212,11 @@ void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
     }
 }
 
+void Client::onGameStartabilityChanged(bool isStartable)
+{
+    mp_parser->eventGameStartable(mp_playerCtrl->publicGameView().id(), isStartable);
+}
+
 void Client::onGameStarted()
 {
     StructGame structGame = mp_playerCtrl->publicGameView().structGame();
@@ -256,6 +243,32 @@ void Client::onPlayerDrawedCard(int playerId, const CardAbstract* card)
     mp_parser->eventCardMovement(x);
 }
 
+void Client::onPlayerDiscardedCard(int playerId, const CardAbstract* card)
+{
+    qDebug() << QString("Client (%1): onPlayerDiscardedCard(%2, %3)").arg(m_id).arg(playerId).arg(card->type());
+}
+
+void Client::onPlayerPlayedCard(int playerId, const CardAbstract* card)
+{
+    qDebug() << QString("Client (%1): onPlayerPlayedCard(%2, %3)").arg(m_id).arg(playerId).arg(card->type());
+}
+
+void Client::onPlayedCardsCleared()
+{
+    qDebug() << QString("Client (%1): onCardsCleared").arg(m_id);
+}
+
+void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoints, int newLifePoints)
+{
+    qDebug() << QString("Client (%1): onLifePointsChange(%2, %3, %4)").arg(m_id).arg(player.id()).arg(oldLifePoints).arg(newLifePoints);
+}
+
+
+
+void Client::onActionRequest(ActionRequestType requestType)
+{
+    qDebug() << QString("Client (%1): onActionRequest(%2)").arg(m_id).arg(requestType);
+}
 
 
 bool Client::isInGame() const

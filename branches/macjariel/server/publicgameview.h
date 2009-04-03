@@ -24,8 +24,11 @@
 #include "common.h"
 #include "parser/parserstructs.h"
 
+#include <QList>
+
 class Game;
 class PublicPlayerView;
+class CardAbstract;
 
 /**
  * The PublicGameView class provides an interface for quering public information
@@ -84,6 +87,8 @@ public:
      * Returns the public list of players.
      */
     QList<const PublicPlayerView*>  publicPlayerList() const;
+
+    QList<const PublicPlayerView*> neighbors(const PublicPlayerView* source, int distance) const;
 
 private:
     Game* mp_game;

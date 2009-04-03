@@ -22,7 +22,7 @@
 
 #include "parser/parser.h"
 #include "playerctrl.h"
-#include "abstractplayercontroller.h"
+#include "gameeventhandler.h"
 
 #include <QObject>
 #include <QPointer>
@@ -75,8 +75,16 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerExit();
     virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView);
     virtual void onPlayerLeavedGame(const PublicPlayerView&);
+    virtual void onGameStartabilityChanged(bool isStartable);
     virtual void onGameStarted();
     virtual void onPlayerDrawedCard(int playerId, const CardAbstract*);
+    virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card);
+    virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card);
+    virtual void onPlayedCardsCleared();
+    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
+
+
+    virtual void onActionRequest(ActionRequestType requestType);
 
 signals:
     void disconnected(int clientId);

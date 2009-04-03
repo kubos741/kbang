@@ -135,6 +135,7 @@ void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerl
             writer->writeStartElement("player");
             writer->writeAttribute("id", QString::number(i.id));
             writer->writeAttribute("name", i.name);
+            writer->writeAttribute("role", PlayerRoleToString(i.role));
             writer->writeEndElement();
         }
         writer->writeEndElement();

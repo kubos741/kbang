@@ -3,6 +3,9 @@
 #include "cards.h"
 #include "player.h"
 #include "util.h"
+#include "gameeventhandler.h"
+#include "gameexceptions.h"
+
 
 GameTable::GameTable(Game* game):
         mp_game(game)
@@ -17,31 +20,60 @@ void GameTable::prepareGame() {
 
 }
 
-void GameTable::drawCard(Player *p, int count)
+void GameTable::drawCard(Player *player, int count, bool revealCard)
 {
     for(int i = 0; i < count; ++i)
     {
         CardAbstract* card = popCardFromDeck();
-        p->appendCardToHand(card);
-        //emit playerDrawedCard(p, card);
+        player->appendCardToHand(card);
+        card->setOwner(player);
+        card->setPocketType(POCKET_HAND);
+        foreach(Player* p, mp_game->playerList())
+            p->gameEventHandler()->onPlayerDrawedCard(player->id(),
+                    (p == player || revealCard) ? card : 0);
     }
 }
 
 void GameTable::discardCard(Player* player, CardAbstract* card)
 {
-    card = player->removeCardFromHand(card);
-    if (!card) {
-        qCritical() << "Cannot discard card " << card->id();
-        return;
-    }
+    if (!player->removeCardFromHand(card))
+        throw BadCardException();
     putCardToGraveyard(card);
-    //emit playerDiscardedCard(player, card);
+    card->setOwner(0);
+    card->setPocketType(POCKET_GRAVEYARD);
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayerDiscardedCard(player->id(), card);
 }
+
+void GameTable::playCard(Player* player, CardPlayable* card)
+{
+    player->removeCardFromHand(card);
+    m_playedCards.push_back(card);
+    card->setPocketType(POCKET_PLAYED);
+
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayerPlayedCard(player->id(), card);
+
+}
+
+void GameTable::clearPlayedCards()
+{
+    foreach(CardAbstract* card, m_playedCards)
+    {
+        m_graveyard << card;
+        card->setPocketType(POCKET_GRAVEYARD);
+        card->setOwner(0);
+    }
+    m_playedCards.clear();
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayedCardsCleared();
+}
+
 
 void GameTable::generateCards()
 {
-    static const int nBang = 20;
-    static const int nMissed = 20;
+    static const int nBang = 100;
+    static const int nMissed = 5;
     for(int i = 0; i < nBang; ++i)
     {
         int id = uniqueCardId();
@@ -109,10 +141,4 @@ CardAbstract* GameTable::popCardFromDeck()
 void GameTable::putCardToGraveyard(CardAbstract* card)
 {
     m_graveyard.push_back(card);
-}
-
-
-void GameTable::setPlayerOnTurn(Player* player)
-{
-    mp_playerOnTurn = player;
 }

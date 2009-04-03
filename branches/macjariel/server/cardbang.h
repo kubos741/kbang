@@ -22,6 +22,8 @@
 
 #include <cardplayable.h>
 
+class Player;
+
 /**
  * This class represents the Bang! cards.
  * @author MacJariel <MacJariel@gmail.com>
@@ -45,7 +47,11 @@ public:
 
     virtual QString type() const { return "bang"; }
 
-    virtual void noReaction(Player* reactingPlayer);
+    virtual void respondPass();
+    virtual void respondCard(CardAbstract* targetCard);
+
+private:
+    Player* mp_attackedPlayer;
 };
 
 #endif

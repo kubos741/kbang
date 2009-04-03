@@ -47,6 +47,10 @@ protected:
     QList<CardWidget*> m_cards;
 
 private:
+    void reorder();
+    int cardX(int i) const;
+
+private:
     CardWidget::Size m_cardSize;
     bool             m_revealed;
     int              m_moveFactor;

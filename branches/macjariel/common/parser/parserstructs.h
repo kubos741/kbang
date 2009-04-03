@@ -44,6 +44,13 @@ enum GameState {
         GAMESTATE_FINISHED
 };
 
+enum ActionRequestType {
+    REQUEST_DRAW,
+    REQUEST_PLAY,
+    REQUEST_RESPOND,
+    REQUEST_DISCARD
+};
+
 enum PlayerRole {
     ROLE_INVALID,
     ROLE_UNKNOWN,

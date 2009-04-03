@@ -43,6 +43,7 @@ Player::Player(Game* game,
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
+    qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(m_id).arg(m_name)));
     //    mp_client->mp_player = this;
     //    m_id = mp_game->appendNewPlayer(this);
     mp_playerCtrl = new PlayerCtrl(this);
@@ -77,7 +78,7 @@ StructPlayer Player::structPlayer(bool returnPrivateInfo)
     x.id = m_id;
     x.name = m_name;
     x.password = m_password;
-    if (returnPrivateInfo)
+    if (returnPrivateInfo || x.role == ROLE_SHERIFF)
     {
         x.role = m_role;
     } else {
@@ -102,24 +103,31 @@ bool Player::isCreator() const
 
 bool Player::isOnTurn() const
 {
-    return (mp_game->gameCycle().currentPlayerId() == m_id);
+    return (mp_game->gameCycle().currentPlayer() == this);
+}
+
+QList<CardAbstract*> Player::cardsInHand()
+{
+    return m_cardsInHand;
 }
 
 void Player::modifyLifePoints(int x)
 {
+    int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
+    foreach (Player* p, mp_game->playerList()) {
+        p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
+    }
 }
 
 void Player::appendCardToHand(CardAbstract * card)
 {
     m_cardsInHand.append(card);
-    card->setOwner(this);
-    card->setPocketType(POCKET_HAND);
 }
 
-CardAbstract* Player::removeCardFromHand(CardAbstract* card)
+bool Player::removeCardFromHand(CardAbstract* card)
 {
-
+    return m_cardsInHand.removeOne(card);
 }
 
 
@@ -134,15 +142,24 @@ const PrivatePlayerView& Player::privateView() const
     return m_privatePlayerView;
 }
 
+void Player::setRole(const PlayerRole& role)
+{
+    m_role = role;
+    if (m_role == ROLE_SHERIFF) {
+        m_maxLifePoints = 5;
+    } else {
+        m_maxLifePoints = 4;
+    }
+    // TODO: character can influence maxLifePoints
 
+    m_lifePoints = m_maxLifePoints;
+}
 
 
 
 int Player::initialCardCount() const
 {
-    int cardCount = 4;
-    if (role() == ROLE_SHERIFF) cardCount++;
-    return cardCount;
+    return m_maxLifePoints;
 }
 
 

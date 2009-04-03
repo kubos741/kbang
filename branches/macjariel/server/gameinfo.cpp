@@ -4,7 +4,7 @@ GameInfo::GameInfo(const StructGame& structGame):
     m_id(structGame.id),
     m_name(structGame.name),
     m_description(structGame.description),
-    m_creatorId(structGame.creatorId),
+    m_creatorId(0),
     m_minPlayers(structGame.minPlayers),
     m_maxPlayers(structGame.maxPlayers),
     m_maxSpectators(structGame.maxSpectators),

@@ -1,5 +1,4 @@
-HEADERS += abstractcard.h \
-    charactercard.h \
+HEADERS += charactercard.h \
     player.h \
     playingcard.h \
     weaponcard.h \
@@ -24,7 +23,8 @@ HEADERS += abstractcard.h \
     gameinfo.h \
     gametable.h \
     playerctrl.h \
-    abstractplayercontroller.h
+    gameeventhandler.h \
+    voidai.h
 SOURCES += main.cpp \
     charactercard.cpp \
     player.cpp \
@@ -48,7 +48,9 @@ SOURCES += main.cpp \
     gamecycle.cpp \
     gameinfo.cpp \
     gametable.cpp \
-    playerctrl.cpp
+    playerctrl.cpp \
+    voidai.cpp \
+    gameeventhandler.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug
