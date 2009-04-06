@@ -43,7 +43,7 @@ public:
     QPoint absPos() const;
 
     void setCardClass(const QString& cardClassId);
-    void setServerCardId(const QString& serverCardId);
+    void setCardId(int cardIs);
     void setSize(Size size);
     void applyNewProperties();
 
@@ -56,8 +56,10 @@ public:
 
     inline Size  size()  const { return m_size; }
     inline QSize qsize() const { return m_qsize; }
-
+    inline int   cardId() const { return m_cardId; }
     static QSize qSize(Size size);
+
+
 
 private:
     virtual void paintEvent (QPaintEvent *event);
@@ -66,7 +68,7 @@ private:
 private:
     const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
     QString m_cardClassId;  /* of Card class */
-    QString m_serverCardId; /* for communication with server */
+    int     m_cardId; /* for communication with server */
     Size    m_size;
     QSize   m_qsize;
     bool    m_shadowMode;

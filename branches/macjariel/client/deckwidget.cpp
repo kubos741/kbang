@@ -49,7 +49,7 @@ CardWidget* DeckWidget::newCard()
     w->setSize(CardWidget::SIZE_SMALL);
     w->applyNewProperties();
     w->raise();
-    w->move(0,0);
+    w->move(newCardPosition());
     w->show();
     return w;
 }

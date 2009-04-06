@@ -70,6 +70,12 @@ enum PocketType {
     POCKET_SELECTION
 };
 
+enum CardType {
+    CARD_UNKNOWN,
+    CARD_BANG,
+    CARD_MISSED
+};
+
 struct StructCardDetails {
     int cardId;
     QString cardType;

@@ -22,7 +22,6 @@
 
 #include <QtCore>
 
-#include "playingcard.h"
 #include "publicplayerview.h"
 #include "privateplayerview.h"
 #include "parser/parserstructs.h"

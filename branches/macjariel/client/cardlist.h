@@ -40,7 +40,7 @@ public:
     virtual void push(CardWidget* card);
     virtual QPoint newCardPosition() const;
 
-    virtual CardWidget* get(int id);
+    virtual CardWidget* take(int cardId);
     virtual CardWidget* pop();
 
 protected:

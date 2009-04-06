@@ -21,11 +21,13 @@ HEADERS += gameloop.h \
     playercharacterwidget.h \
     cardpilewidget.h \
     deckwidget.h \
-    cardmovement.h \
     cardpocket.h \
     localplayerwidget.h \
     cardlist.h \
-    cardmovementparentwidget.h
+    gameevent.h \
+    cardmovementevent.h \
+    gameeventqueue.h \
+    gameeventhandler.h
 FORMS += connecttoserverdialog.ui \
     mainwindow.ui \
     joingamedialog.ui \
@@ -52,12 +54,14 @@ SOURCES += gameloop.cpp \
     playercharacterwidget.cpp \
     cardpilewidget.cpp \
     deckwidget.cpp \
-    cardmovement.cpp \
     localplayerwidget.cpp \
     cardlist.cpp \
-    cardmovementparentwidget.cpp
+    gameevent.cpp \
+    cardmovementevent.cpp \
+    gameeventqueue.cpp \
+    gameeventhandler.cpp
 QT += network \
-      xml
+    xml
 RESOURCES += client.qrc \
     cards.qrc
 INCLUDEPATH += ../common

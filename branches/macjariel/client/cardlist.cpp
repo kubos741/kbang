@@ -20,6 +20,8 @@
 #include "cardlist.h"
 #include "cardwidget.h"
 
+#include <stdlib.h>
+
 #include <QSize>
 
 using namespace client;
@@ -61,9 +63,25 @@ QPoint CardList::newCardPosition() const
     return QPoint(cardX(m_cards.size()), m_vPadding);
 }
 
-CardWidget* CardList::get(int)
+CardWidget* CardList::take(int cardId)
 {
-    return m_cards.takeLast();
+
+    CardWidget *card = 0;
+    if (m_cards.size() == 0) {
+        qCritical("Trying to take from empty card list.");
+        return 0;
+    }
+    if (cardId != 0) {
+        foreach (card, m_cards) {
+            if (card->cardId() == cardId) {
+                m_cards.removeAll(card);
+                return card;
+            }
+        }
+        qCritical("Cannot find card id %d in CardList. Taking random card.", cardId);
+    }
+    int cardIndex = (int)random() % (int)m_cards.size();
+    return m_cards.takeAt(cardIndex);
 }
 
 CardWidget* CardList::pop()

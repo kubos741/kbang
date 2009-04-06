@@ -39,6 +39,7 @@ void VoidAI::requestWithAction()
             mp_playerCtrl->drawCard(2);
             break;
         case REQUEST_PLAY: {
+/*
             // If have bang, tries to play it
             QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().cardsInHand();
             foreach (CardAbstract* c, cards) {
@@ -53,7 +54,7 @@ void VoidAI::requestWithAction()
 
                 }
             }
-
+*/
 
 
             // Finish turn or discard random card

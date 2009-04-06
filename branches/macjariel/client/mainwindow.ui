@@ -31,7 +31,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
 
 </string>
   </property>
-  <widget class="client::CardMovementParentWidget" name="mp_centralWidget">
+  <widget class="QWidget" name="mp_centralWidget">
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
@@ -45,7 +45,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
      <x>0</x>
      <y>0</y>
      <width>730</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -113,14 +113,6 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>client::CardMovementParentWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">cardmovementparentwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="client.qrc"/>
  </resources>

@@ -21,8 +21,10 @@
 #define GAME_H
 
 #include <QObject>
+#include <QWidget>
 #include <QHash>
 #include <QList>
+#include <QQueue>
 #include <QPushButton>
 #include "parser/parserstructs.h"
 #include "common.h"
@@ -31,8 +33,8 @@
 
 namespace client {
 
-class CardMovementParentWidget;
 class ServerConnection;
+class GameEventHandler;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -40,7 +42,7 @@ class ServerConnection;
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&, CardMovementParentWidget*);
+    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&, QWidget*);
 
     /* for MainWindow */
     void init();
@@ -49,9 +51,14 @@ public:
     void setCreator(bool creator) { m_creator = creator; }
 
 
+    inline DeckWidget*     deck() const               { return mp_deck; }
+    inline CardPileWidget* graveyard() const          { return mp_graveyard; }
+    inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
+    inline QWidget*        mainWidget() const         { return mp_mainWidget; }
+
 private:
 
-    inline PlayerWidget* playerWidget(int id) { return m_players.contains(id) ? m_players[id] : 0; }
+
 
 private:
     const int m_playerId;
@@ -68,7 +75,9 @@ private:
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
     bool                      m_creator;
-    CardMovementParentWidget* mp_cardMovementParentWidget;
+    QQueue<StructCardMovement> m_cardMovementQueue;
+    QWidget*                  mp_mainWidget;
+    GameEventHandler*         mp_gameEventHandler;
 
 public slots:
     void opponentJoinedGame(const StructPlayer& player);
@@ -76,7 +85,6 @@ public slots:
     void startableChanged(int gameId, bool startable);
     void startButtonClicked();
     void gameStarted(const StructGame&, const StructPlayerList&);
-    void moveCard(const StructCardMovement&);
 
     void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
 

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "cardpilewidget.h"
+#include "cardwidget.h"
 
 using namespace client;
 
@@ -25,12 +26,14 @@ using namespace client;
  *
  * @param parent
  */
-CardPileWidget::CardPileWidget(QWidget *parent)
- : CardPocket(parent)
+CardPileWidget::CardPileWidget(QWidget *parent):
+        CardPocket(parent),
+        m_cardWidgetSize(CardWidget::SIZE_SMALL),
+        m_padding(4, 4)
 {
-    setMinimumSize(CardWidget::normalSize());
-    setMaximumSize(CardWidget::normalSize());
-    setStyleSheet("padding: 4px; background-color: rgba(0, 0, 0, 64);");
+    setMinimumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
+    setMaximumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
+    setStyleSheet("background-color: rgba(0, 0, 0, 64);");
 }
 
 
@@ -52,14 +55,14 @@ void CardPileWidget::push(CardWidget* card)
 {
     m_cards.push(card);
     card->setParent(this);
-    card->setSize(CardWidget::SIZE_SMALL);
+    card->setSize(m_cardWidgetSize);
     card->applyNewProperties();
-    card->move(0,0);
+    card->move(CardPileWidget::newCardPosition()    );
     card->raise();
     card->show();
 }
 
 QPoint CardPileWidget::newCardPosition() const
 {
-    return QPoint(0,0);
+    return QPoint(m_padding.width(), m_padding.height());
 }

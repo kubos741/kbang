@@ -245,7 +245,12 @@ void Client::onPlayerDrawedCard(int playerId, const CardAbstract* card)
 
 void Client::onPlayerDiscardedCard(int playerId, const CardAbstract* card)
 {
-    qDebug() << QString("Client (%1): onPlayerDiscardedCard(%2, %3)").arg(m_id).arg(playerId).arg(card->type());
+    StructCardMovement x;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = playerId;
+    x.cardDetails    = card->cardDetails();
+    mp_parser->eventCardMovement(x);
 }
 
 void Client::onPlayerPlayedCard(int playerId, const CardAbstract* card)

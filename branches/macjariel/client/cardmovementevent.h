@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDMOVEMENT_H
-#define CARDMOVEMENT_H
+#ifndef CARDMOVEMENTEVENT_H
+#define CARDMOVEMENTEVENT_H
 
 #include <QObject>
 #include <QPoint>
@@ -30,13 +30,14 @@
 #include <QBasicTimer>
 
 
-
+#include "parser/parserstructs.h"
+#include "gameevent.h"
 
 namespace client
 {
-class CardWidget;
+class Game;
 class CardPocket;
-class CardMovementParentWidget;
+class CardWidget;
 
 /**
  * This class handles the animation of cards in the game. Whenever there is a need
@@ -49,49 +50,40 @@ class CardMovementParentWidget;
  *
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardMovement : public QObject
+class CardMovementEvent : public GameEvent
 {
 Q_OBJECT
 public:
     /**
-     * Creates an instance of CardMovement class which starts the animation.
+     * Creates an instance of CardMovementEvent class which starts the animation.
      * @param mainWidget The main widget of the window.
      * @param cardWidget The card widget that will be moved.
      * @param destination The target pocket.
      */
-    CardMovement(CardMovementParentWidget *mainWidget, CardWidget* cardWidget, CardPocket* destination, QString cardClass);
-    virtual ~CardMovement();
-
-    /**
-      * Returns the rectangle of the current position of the card in the animation.
-      * This method is to be called from the paintEvent of the mainWidget
-      */
-    QRect cardRect();
+    CardMovementEvent(Game* game, const StructCardMovement& structCardMovement);
+    virtual ~CardMovementEvent();
+    virtual void run();
+    virtual bool isReadyRun();
+    virtual bool isRunning();
 
 private:
-    void timerEvent(QTimerEvent* event);
+    void setCardAndPocket();
+    void startTransition();
+    void timerEvent(QTimerEvent*);
+    void stopTransition();
 
 private:
-    void start();
-    void stop();
-    void enqueue();
-    static void startNext();
-
-private:
-    CardPocket* mp_dest;
-    CardMovementParentWidget*    mp_mainWidget;
-    QPoint      m_origin;
-    QPoint      m_current;
-    QPoint      m_destination;
-    QString     m_cardType;
-    qreal       m_length;
-    int         m_tick;
-    CardWidget* mp_card;
-    bool        m_movementInitialized;
-    
+    StructCardMovement  m_structCardMovement;
+    CardWidget*         mp_card;
+    CardPocket*         mp_destPocket;
+    QPoint              m_srcPos;
+    QPoint              m_currPos;
+    QPoint              m_destPos;
+    qreal               m_length;
+    int                 m_tick;
+    bool                m_isRunning;
+    bool                m_cardAndPocketIsSet;
     static QBasicTimer  sm_timer;
-
-    static QQueue<CardMovement*> sm_queue;
 };
 }
 #endif

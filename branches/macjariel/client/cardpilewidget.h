@@ -22,8 +22,12 @@
 
 #include <QWidget>
 #include <QStack>
-#include "cardwidget.h"
+#include <QSize>
+
 #include "cardpocket.h"
+#include "cardwidget.h"
+
+
 
 namespace client
 {
@@ -48,6 +52,10 @@ public:
 
 protected:
     QStack<CardWidget*> m_cards;
+
+private:
+    CardWidget::Size m_cardWidgetSize;
+    QSize            m_padding;
 };
 }
 #endif

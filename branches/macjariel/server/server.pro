@@ -1,7 +1,5 @@
 HEADERS += charactercard.h \
     player.h \
-    playingcard.h \
-    weaponcard.h \
     gameserver.h \
     game.h \
     console.h \
@@ -28,8 +26,6 @@ HEADERS += charactercard.h \
 SOURCES += main.cpp \
     charactercard.cpp \
     player.cpp \
-    weaponcard.cpp \
-    playingcard.cpp \
     gameserver.cpp \
     game.cpp \
     console.cpp \

@@ -22,8 +22,9 @@
 #include "parser/queryget.h"
 #include "localplayerwidget.h"
 #include "opponentwidget.h"
-#include "cardmovement.h"
 #include "cardlist.h"
+#include "gameeventhandler.h"
+
 
 #include <QtDebug>
 #include <QBoxLayout>
@@ -32,13 +33,14 @@ using namespace client;
 
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
            ServerConnection* serverConnection, const GameWidgets& gameWidgets,
-           CardMovementParentWidget* cardMovementParentWidget):
+           QWidget* mainWidget):
 QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId),
 mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
 m_opponentWidgets(gameWidgets.opponentWidget), mp_localPlayerWidget(gameWidgets.localPlayerWidget),
-mp_startButton(0), m_creator(0), mp_cardMovementParentWidget(cardMovementParentWidget)
+mp_startButton(0), m_creator(0), mp_mainWidget(mainWidget)
 {
     m_players[m_playerId] = mp_localPlayerWidget;
+    mp_gameEventHandler = new GameEventHandler(this);
 }
 
 void Game::init()
@@ -59,10 +61,11 @@ void Game::init()
         connect(mp_serverConnection, SIGNAL(startableChanged(int, bool)),
                 this, SLOT(startableChanged(int, bool)));
     }
+    mp_gameEventHandler->connectSlots(mp_serverConnection);
+
     connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
             this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
-    connect(mp_serverConnection, SIGNAL(eventCardMovement(const StructCardMovement&)),
-            this, SLOT(moveCard(const StructCardMovement&)));
+
 
 
     qDebug("You have entered the game!");
@@ -189,84 +192,6 @@ void Game::test()
 
 }
 
-void Game::moveCard(const StructCardMovement& mov)
-{
-    /* determine destination */
-    CardWidget* card = 0;
-    CardPocket* dest = 0;
-    PlayerWidget* srcPlayer  = playerWidget(mov.playerFrom);
-    PlayerWidget* destPlayer = playerWidget(mov.playerTo);
 
-
-    switch(mov.pocketTypeFrom)
-    {
-    case POCKET_DECK:
-        card = mp_deck->pop();
-        break;
-    case POCKET_GRAVEYARD:
-        card = mp_graveyard->pop();
-        break;
-    case POCKET_HAND:
-        if (!srcPlayer) break;
-        if (srcPlayer->isLocalPlayer())
-        {
-            // todo
-        }
-        else
-        {
-            card = srcPlayer->hand()->pop();
-        }
-        break;
-    case POCKET_TABLE:
-        if (!srcPlayer) break;
-        card = srcPlayer->table()->get(mov.cardDetails.cardId);
-        break;
-    case POCKET_PLAYED:
-        // todo
-        break;
-    case POCKET_SELECTION:
-        // todo
-        break;
-    case POCKET_INVALID:
-        break;
-    }
-
-    switch(mov.pocketTypeTo)
-    {
-    case POCKET_DECK:
-        dest = mp_deck;
-        break;
-    case POCKET_GRAVEYARD:
-        dest = mp_graveyard;
-        break;
-    case POCKET_HAND:
-        dest = destPlayer != 0 ? destPlayer->hand() : 0;
-        break;
-    case POCKET_TABLE:
-        dest = destPlayer != 0 ? destPlayer->table() : 0;
-        break;
-    case POCKET_PLAYED:
-        /// \todo Implement moveCard to POCKET_PLAYED
-        break;
-    case POCKET_SELECTION:
-        /// \todo Implement moveCard to POCKET_SELECTION
-        break;
-    case POCKET_INVALID:
-        break;
-    }
-    if (card == 0)
-    {
-        qWarning("Cannot find card for movement.");
-        return;
-    }
-    if (dest == 0)
-    {
-        qWarning("Cannot find target pocket for card movement.");
-        return;
-    }
-    QString cardType = mov.cardDetails.cardType;
-
-    new CardMovement(mp_cardMovementParentWidget, card, dest, cardType);
-}
 
 

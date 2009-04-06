@@ -31,7 +31,10 @@ const QSize CardWidget::sm_qsizeSmall(60, 97);
 const QSize CardWidget::sm_qsizeNormal(100, 162);
 const QSize CardWidget::sm_qsizeBig(200, 320);
 
-CardWidget::CardWidget(QWidget* parent): QLabel(parent), m_shadowMode(0)
+CardWidget::CardWidget(QWidget* parent):
+        QLabel(parent),
+        m_cardId(0),
+        m_shadowMode(0)
 {
 }
 
@@ -54,9 +57,9 @@ void CardWidget::setCardClass(const QString& cardClassId)
     m_cardClassId = cardClassId;
 }
 
-void CardWidget::setServerCardId(const QString& serverCardId)
+void CardWidget::setCardId(int cardId)
 {
-    m_serverCardId = serverCardId;
+    m_cardId = cardId;
 }
 
 
