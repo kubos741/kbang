@@ -27,14 +27,16 @@
 using namespace client;
 
 
-const QSize CardWidget::sm_qsizeSmall(60, 97);
-const QSize CardWidget::sm_qsizeNormal(100, 162);
+//const QSize CardWidget::sm_qsizeSmall(48, 78 );
+const QSize CardWidget::sm_qsizeSmall(50, 80);
+const QSize CardWidget::sm_qsizeNormal(70, 113);
 const QSize CardWidget::sm_qsizeBig(200, 320);
 
 CardWidget::CardWidget(QWidget* parent):
         QLabel(parent),
         m_cardId(0),
-        m_shadowMode(0)
+        m_shadowMode(0),
+        m_qsize(sm_qsizeSmall)
 {
 }
 

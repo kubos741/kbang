@@ -32,7 +32,7 @@
 #include "ioproxy.h"
 
 #define PROTOCOL_VERSION "1.0"
-#define ASSERT_SOCKET if (!mp_socket) return
+#define ASSERT_SOCKET if (!mp_socket) { qDebug("Socket is dead!"); return; }
 
 
 
@@ -376,6 +376,19 @@ void Parser::processStanza()
             emit sigEventStartGame(x, y);
             return;
         }
+        if (event->name() == "game-sync") {
+            GameSyncData gameSyncData;
+            gameSyncData.read(event);
+            emit sigEventGameSync(gameSyncData);
+            return;
+        }
+        if (event->name() == "life-points") {
+            int playerId = event->attribute("playerId").toInt();
+            int lifePoints = event->attribute("lifePoints").toInt();
+            emit sigEventLifePointsChange(playerId, lifePoints);
+            return;
+        }
+
         if (event->name() == "card-movement")
         {
             StructCardMovement x;
@@ -513,6 +526,16 @@ void Parser::eventGameFocusChange(int currentPlayerId, int requestedPlayerId)
     eventEnd();
 }
 
+void Parser::eventGameSync(const GameSyncData& gameSyncData)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    gameSyncData.write(mp_streamWriter);
+    eventEnd();
+}
+
+
+
 void Parser::eventCardMovement(const StructCardMovement& cardMovement)
 {
     ASSERT_SOCKET;
@@ -521,6 +544,16 @@ void Parser::eventCardMovement(const StructCardMovement& cardMovement)
     eventEnd();
 }
 
+void Parser::eventLifePointsChange(int playerId, int lifePoints)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("life-points");
+    mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
+    mp_streamWriter->writeAttribute("lifePoints", QString::number(lifePoints));
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
 
 
 void Parser::streamError()

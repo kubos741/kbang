@@ -19,16 +19,28 @@
  ***************************************************************************/
 #include "playercharacterwidget.h"
 
+#include <QtDebug>
+
 using namespace client;
 
-PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
- : QWidget(parent)
-{
-    mp_timer = new QTimer(this);
-    mp_timer->setInterval(10);
-    connect(mp_timer, SIGNAL(timeout()),
-            this, SLOT(animateCard()));
+QTimer PlayerCharacterWidget::sm_timer;
+int    PlayerCharacterWidget::sm_countAnimaton = 0;
 
+const int timerInterval = 20;
+
+
+PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
+ : QWidget(parent), m_lifePoints(0), m_isAnimating(0)
+{
+    setMinimumHeight(CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 2);
+}
+
+PlayerCharacterWidget::~PlayerCharacterWidget()
+{
+}
+
+void PlayerCharacterWidget::init()
+{
     mp_backCard = new CardWidget(this);
     mp_backCard->setSize(CardWidget::SIZE_SMALL);
     mp_backCard->setCardClass("back-bullets");
@@ -37,25 +49,10 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
 
     mp_characterCard = new CardWidget(this);
     mp_characterCard->setSize(CardWidget::SIZE_SMALL);
+    mp_characterCard->setCardClass("back-bang");
     mp_characterCard->applyNewProperties();
-    mp_characterCard->hide();
     mp_characterCard->move(0,0);
-
-
-    m_sizeHint = QSize(mp_backCard->width(), 2 * mp_backCard->height());
-    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     setLifePoints(5);
-}
-
-
-PlayerCharacterWidget::~PlayerCharacterWidget()
-{
-}
-
-void PlayerCharacterWidget::setCharacter(const QString& character)
-{
-    m_character = character;
-    mp_characterCard->setCardClass(character);
 }
 
 void PlayerCharacterWidget::setLifePoints(int lifePoints)
@@ -69,23 +66,43 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
 
 void PlayerCharacterWidget::lifePointsChanged()
 {
-    static int levels[6] = {0, 15, 27, 37, 49, 60};
+    static int levels[6] = {0, 19, 32, 45, 59, 71};
     m_targetY = mp_backCard->y() + levels[m_lifePoints];
-    mp_timer->start();
+    if (m_isAnimating) return;
+    m_isAnimating = 1;
+    connect(&sm_timer, SIGNAL( timeout()),
+            this,      SLOT(onTimeout()));
+
+    if (sm_countAnimaton == 0) {
+        qDebug("start timer");
+        sm_timer.start(timerInterval);
+    }
+    qDebug("sm_countAnimaton++");
+    sm_countAnimaton++;
 }
 
-void PlayerCharacterWidget::animateCard()
+void PlayerCharacterWidget::onTimeout()
 {
     if (mp_characterCard->y() < m_targetY)
     {
         mp_characterCard->move(mp_characterCard->x(), mp_characterCard->y() + 1);
+        mp_characterCard->show();
     }
-    else if (mp_characterCard->y() < m_targetY)
+    else if (mp_characterCard->y() > m_targetY)
     {
         mp_characterCard->move(mp_characterCard->x(), mp_characterCard->y() - 1);
+        mp_characterCard->show();
     }
     if (mp_characterCard->y() == m_targetY)
     {
-        mp_timer->stop();
+        sm_countAnimaton--;
+        m_isAnimating = 0;
+        qDebug("--sm_countAnimaton");
+        disconnect(&sm_timer, 0, this, 0);
+        if (sm_countAnimaton == 0) {
+            qDebug("stop timer");
+            sm_timer.stop();
+        }
+        emit animationFinished();
     }
 }

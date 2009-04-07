@@ -25,7 +25,7 @@
 
 namespace client {
 class CardList;
-
+class PlayerCharacterWidget;
 /**
  * The PlayerWidget class provides the abstraction for a widget that contains
  * a representation of player properties and state, like his name, his cards, etc.
@@ -35,22 +35,17 @@ class CardList;
 class PlayerWidget: public QWidget {
 Q_OBJECT
 public:
-    PlayerWidget(QWidget* parent): QWidget(parent), mp_hand(0), mp_table(0) {}
+    PlayerWidget(QWidget* parent): QWidget(parent) {}
     virtual ~PlayerWidget() {}
 
-    virtual void setPlayer(const StructPlayer&) = 0;
-    virtual void unsetPlayer() = 0;
+    virtual void        setPlayer(const StructPlayer&) = 0;
+    virtual void        unsetPlayer() = 0;
 
-    virtual void setActive(uint8_t progress) = 0;
-
-    inline CardList* hand()  { return mp_hand;  }
-    inline CardList* table() { return mp_table; }
-
-    virtual bool isLocalPlayer() = 0;
-
-protected:
-    CardList* mp_hand;
-    CardList* mp_table;
+    virtual void        setActive(uint8_t progress) = 0;
+    virtual CardList*   hand() = 0;
+    virtual CardList*   table() = 0;
+    virtual bool        isLocalPlayer() = 0;
+    virtual PlayerCharacterWidget* playerCharacterWidget() = 0;
 };
 }
 #endif

@@ -88,6 +88,8 @@ signals:
     void sigEventStartGame(const StructGame&, const StructPlayerList&);
     void sigEventGameStartable(int gameId, bool startable);
     void sigEventGameFocusChange(int currentPlayerId, int requestedPlayerId);
+    void sigEventGameSync(const GameSyncData&);
+    void sigEventLifePointsChange(int playerId, int lifePoints);
     void sigEventCardMovement(const StructCardMovement&);
     void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
@@ -101,7 +103,9 @@ public slots:
     void eventStartGame(const StructGame&, const StructPlayerList&);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
     void eventGameFocusChange(int currentPlayerId, int requestedPlayerId);
+    void eventGameSync(const GameSyncData&);
     void eventCardMovement(const StructCardMovement&);
+    void eventLifePointsChange(int playerId, int lifePoints);
     void eventGameStartable(int gameId, bool startable);
 
     //void resultServerInfo(const StructServerInfo&);

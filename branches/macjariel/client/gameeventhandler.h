@@ -19,6 +19,8 @@ public:
 public slots:
     void onCardMovementEvent(const StructCardMovement&);
     void onGameFocusChangeEvent(int currentPlayerId, int requestedPlayerId);
+    void onGameSyncEvent(const GameSyncData&);
+    void onLifePointsChangeEvent(int playerId, int lifePoints);
 
 private:
     Game*           mp_game;

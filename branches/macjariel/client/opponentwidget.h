@@ -28,6 +28,7 @@
 
 namespace client {
 class CardList;
+class PlayerCharacterWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -38,13 +39,20 @@ public:
     OpponentWidget(QWidget *parent);
     ~OpponentWidget();
 
+    void init();
+
     inline bool isEmpty() const { return m_id == 0; }
     inline int playerId() const { return m_id; }
     inline QString playerName() const { return m_name; }
 
+    virtual void setFromPublicData(const PublicPlayerData&);
     virtual void setPlayer(const StructPlayer&);
     virtual void unsetPlayer();
     virtual void setActive(uint8_t progress);
+
+    virtual CardList*              hand();
+    virtual CardList*              table();
+    virtual PlayerCharacterWidget* playerCharacterWidget();
 
     virtual bool isLocalPlayer() { return 0; }
 
@@ -56,6 +64,7 @@ private:
 private:
     int m_id;
     QString m_name;
+    bool    m_isSheriff;
     QString m_baseStyleSheet;
 
 };

@@ -69,14 +69,10 @@ private:
     ConnectToServerDialog* mp_connectToServerDialog;
     CreateGameDialog*      mp_createGameDialog;
     JoinGameDialog*        mp_joinGameDialog;
-    LogWidget*             mp_logWidget;
-    ChatWidget*            mp_chatWidget;
     ServerConnection       m_serverConnection;
     Game*                  mp_game;
     QLabel*                mp_labelStatusBarServerState;
-    LocalPlayerWidget*     mp_localPlayerWidget;
     QList<OpponentWidget*> m_opponentWidgets;
-    QGridLayout*           mp_layout;
 
 
 private:

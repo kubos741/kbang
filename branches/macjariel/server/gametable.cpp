@@ -15,10 +15,12 @@ GameTable::GameTable(Game* game):
 
 void GameTable::prepareGame() {
     generateCards();
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onGameSync();
     dealCards();
-
-
 }
+
+
 
 void GameTable::drawCard(Player *player, int count, bool revealCard)
 {
@@ -73,7 +75,7 @@ void GameTable::clearPlayedCards()
 void GameTable::generateCards()
 {
     static const int nBang = 100;
-    static const int nMissed = 5;
+    static const int nMissed = 30;
     for(int i = 0; i < nBang; ++i)
     {
         int id = uniqueCardId();

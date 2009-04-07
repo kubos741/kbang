@@ -88,6 +88,7 @@ public:
     inline int handSize()       const { return m_cardsInHand.size(); }
 
     QList<CardAbstract*>    cardsInHand();
+    QList<CardAbstract*>    table();
 
     /**
      * Returns the players' character.
@@ -141,9 +142,8 @@ private:
     int                       m_id;
     int                       m_lifePoints;
     int                       m_maxLifePoints;
-//    CharacterCard*            m_characterCard;
-//    WeaponCard*               m_weaponCard;
-    QList<CardAbstract*>      m_cardsInHand;
+    QList<CardAbstract*>      m_cardsInHand; /// \todo: rename m_cardsInHand -> m_hand
+    QList<CardAbstract*>      m_table;
     QString                   m_name;
     QString                   m_password;
     PlayerRole                m_role;

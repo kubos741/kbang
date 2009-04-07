@@ -42,8 +42,9 @@ public:
 
 
     inline int id() const { return m_id; }
-    virtual QString type() const = 0;
-    inline StructCardDetails cardDetails() const { return StructCardDetails(m_id, type()); }
+    virtual CardType type() const = 0;
+    virtual QString typeStr() const = 0; /// \deprecated
+    inline StructCardDetails cardDetails() const { return StructCardDetails(m_id, typeStr()); }
     inline Player* owner() const { return mp_owner; }
     inline PocketType pocket() const { return m_pocketType; }
 

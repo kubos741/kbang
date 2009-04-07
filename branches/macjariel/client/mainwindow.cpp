@@ -28,6 +28,8 @@
 #include "localplayerwidget.h"
 #include "parser/queryget.h"
 #include "game.h"
+#include "card.h"
+
 
 #include "card.h"
 
@@ -41,9 +43,6 @@ MainWindow::MainWindow():
     mp_game(0)
 {
     setupUi(this);
-    if (centralWidget() == 0) {
-        setCentralWidget(mp_centralWidget);
-    }
 
     Card::loadDefaultRuleset();
 
@@ -59,7 +58,6 @@ MainWindow::MainWindow():
             this, SLOT(playerJoinedGame(int, const StructPlayer&, bool, bool)));
     connect(&m_serverConnection, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)),
             this, SLOT(playerLeavedGame(int, const StructPlayer&, bool)));
-
 }
 
 
@@ -189,32 +187,26 @@ void MainWindow::createMenu()
 
 void MainWindow::createWidgets()
 {
-    mp_layout = new QGridLayout();
-    for(int i = 0; i < 6; ++i)
-    {
-        OpponentWidget* w = new OpponentWidget(this);
-        m_opponentWidgets.append(w);
-        switch(i)
-        {
-        case 0: mp_layout->addWidget(w, 1, 0, 2, 1); break;
-        case 1: mp_layout->addWidget(w, 0, 0, 1, 1); break;
-        case 2: mp_layout->addWidget(w, 0, 1, 1, 1); break;
-        case 3: mp_layout->addWidget(w, 0, 2, 1, 1); break;
-        case 4: mp_layout->addWidget(w, 0, 3, 1, 1); break;
-        case 5: mp_layout->addWidget(w, 1, 3, 2, 1); break;
-        }
-        mp_layout->setAlignment(w, Qt::AlignCenter);
-    }
+    m_opponentWidgets.append(mp_opponent1);
+    m_opponentWidgets.append(mp_opponent2);
+    m_opponentWidgets.append(mp_opponent3);
+    m_opponentWidgets.append(mp_opponent4);
+    m_opponentWidgets.append(mp_opponent5);
+    m_opponentWidgets.append(mp_opponent6);
 
-    mp_chatWidget = new ChatWidget();
+    int i = 0;
+    foreach (OpponentWidget* w, m_opponentWidgets) {
+        w->init();
+        w->playerCharacterWidget()->setLifePoints(i % 6);
+        i++;
+    }
+    mp_localPlayerWidget->init();
+
     connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
             &m_serverConnection, SLOT(sendChatMessage(const QString&)));
     connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
             mp_chatWidget, SLOT(incomingMessage(int, const QString&, const QString&)));
 
-    mp_layout->addWidget(mp_chatWidget, 3, 0, 1, 1);
-
-    mp_logWidget = new LogWidget();
     connect(&m_serverConnection, SIGNAL(logMessage(QString)),
             mp_logWidget, SLOT(appendLogMessage(QString)));
     connect(&m_serverConnection, SIGNAL(incomingData(const QByteArray&)),
@@ -222,13 +214,6 @@ void MainWindow::createWidgets()
     connect(&m_serverConnection, SIGNAL(outgoingData(const QByteArray&)),
             mp_logWidget, SLOT(appendOutgoingData(const QByteArray&)));
 
-
-    mp_layout->addWidget(mp_logWidget, 3, 3, 1, 1);
-
-    mp_localPlayerWidget = new LocalPlayerWidget(this);
-    mp_layout->addWidget(mp_localPlayerWidget, 3, 1, 1, 2);
-
-    mp_centralWidget->setLayout(mp_layout);
 }
 
 void MainWindow::leaveGame()
@@ -245,16 +230,13 @@ void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool o
     }
     else
     {
-        // PLAYER HAS ENTERED GAME
-
         Q_ASSERT(mp_game == 0);
-        GameWidgets x(mp_layout, mp_localPlayerWidget, m_opponentWidgets);
-        mp_game = new Game(this, gameId, player, &m_serverConnection, x, mp_centralWidget);
+        GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets);
+        mp_game = new Game(this, gameId, player, &m_serverConnection, x);
         mp_game->setCreator(creator);
         mp_game->init();
         updateActions();
     }
-
 }
 
 

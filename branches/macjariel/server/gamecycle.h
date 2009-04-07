@@ -24,7 +24,7 @@ public:
     inline  State   state()           const { return m_state; }
     inline  Player* currentPlayer()   const { return mp_currentPlayer; }
     inline  Player* requestedPlayer() const { return mp_requestedPlayer; }
-
+    inline  int     turnNumber()      const { return 0; } /// \todo turnNumber
 
     void start();
 

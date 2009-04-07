@@ -127,7 +127,7 @@ void CardMovementEvent::setCardAndPocket()
         mp_destPocket = destPlayer != 0 ? destPlayer->table() : 0;
         break;
     case POCKET_PLAYED:
-        /// \todo Implement moveCard to POCKET_PLAYED
+        mp_destPocket = mp_game->graveyard();
         break;
     case POCKET_SELECTION:
         /// \todo Implement moveCard to POCKET_SELECTION

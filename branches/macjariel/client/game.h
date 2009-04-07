@@ -42,7 +42,7 @@ class GameEventHandler;
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&, QWidget*);
+    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&);
 
     /* for MainWindow */
     void init();
@@ -58,10 +58,18 @@ public:
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline CardPileWidget* graveyard() const          { return mp_graveyard; }
     inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
+    inline LocalPlayerWidget*
+                           localPlayerWidget() const  { return mp_localPlayerWidget; }
     inline QWidget*        mainWidget() const         { return mp_mainWidget; }
 
     inline int             currentPlayerId() const    { return m_currentPlayerId; }
     inline int             requestedPlayerId() const  { return m_requestedPlayerId; }
+
+
+    inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
+
+    void assignPlayerWidget(int playerId, PlayerWidget*);
+
 
 private:
 
@@ -79,16 +87,18 @@ private:
 
 
 /*  Visual elements - provided by MainWindow */
-    QGridLayout*              mp_layout;
-    QList<OpponentWidget*>    m_opponentWidgets;
-    QHash<int, PlayerWidget*> m_players;
     LocalPlayerWidget*        mp_localPlayerWidget;
+    QList<OpponentWidget*>    m_opponentWidgets;
+    QWidget*                  mp_mainWidget;
+    QWidget*                  mp_middleWidget;
+
+    QHash<int, PlayerWidget*> m_players;
     QPushButton*              mp_startButton;
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
     bool                      m_creator;
     QQueue<StructCardMovement> m_cardMovementQueue;
-    QWidget*                  mp_mainWidget;
+
     GameEventHandler*         mp_gameEventHandler;
 
 

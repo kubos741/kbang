@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "privateplayerview.h"
 #include "player.h"
+#include "cardabstract.h"
 
 PrivatePlayerView::PrivatePlayerView(Player* player)
  : PublicPlayerView(player)
@@ -35,10 +36,25 @@ PlayerRole PrivatePlayerView::role() const
     return mp_player->role();
 }
 
-QList<CardAbstract* > PrivatePlayerView::cardsInHand() const
+QList<CardAbstract* > PrivatePlayerView::hand() const
 {
     return mp_player->cardsInHand();
 }
+
+PrivatePlayerData PrivatePlayerView::privatePlayerData() const
+{
+    PrivatePlayerData res;
+    res.id          = id();
+    res.role        = role();
+    foreach (CardAbstract* card, hand()) {
+        CardData cardData;
+        cardData.id = card->id();
+        cardData.type = card->type();
+        res.hand.append(cardData);
+    }
+    return res;
+}
+
 
 StructPlayer PrivatePlayerView::structPlayer() const
 {

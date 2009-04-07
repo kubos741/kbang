@@ -42,9 +42,19 @@ public:
     LocalPlayerWidget(QWidget* parent);
     virtual ~LocalPlayerWidget();
 
+
+
+    virtual void setFromPublicData(const PublicPlayerData&);
+    virtual void setFromPrivateData(const PrivatePlayerData&);
     virtual void setPlayer(const StructPlayer&);
     virtual void unsetPlayer();
     virtual void setActive(uint8_t progress);
+    virtual PlayerCharacterWidget* playerCharacterWidget();
+
+    void init();
+
+    virtual CardList*   hand();
+    virtual CardList*   table();
 
 
     virtual bool isLocalPlayer() { return 0; }
@@ -55,6 +65,7 @@ private:
 private:
     int     m_id;
     QString m_name;
+    bool    m_isSheriff;
     QString m_baseStyleSheet;
 };
 }

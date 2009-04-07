@@ -39,4 +39,6 @@ void GameEventQueue::onGameEventFinished(GameEvent* gameEvent)
     m_queue.dequeue()->deleteLater();
     if (!m_queue.isEmpty())
         runGameEvent();
+    else
+        qDebug("Event queue is empty!");
 }

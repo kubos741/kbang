@@ -33,11 +33,12 @@ class OpponentWidget;
 
 struct GameWidgets
 {
-    QGridLayout* layout;
+    QWidget* mainWidget;
+    QWidget* middleWidget;
     LocalPlayerWidget* localPlayerWidget;
     QList<OpponentWidget*> opponentWidget;
-    GameWidgets(QGridLayout* l, LocalPlayerWidget* p, const QList<OpponentWidget*>& o):
-        layout(l), localPlayerWidget(p), opponentWidget(o) {}
+    GameWidgets(QWidget* main, QWidget* middle, LocalPlayerWidget* p, const QList<OpponentWidget*>& o):
+        mainWidget(main), middleWidget(middle), localPlayerWidget(p), opponentWidget(o) {}
 };
 
 }

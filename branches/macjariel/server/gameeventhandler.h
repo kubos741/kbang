@@ -57,6 +57,8 @@ public:
      */
     virtual void onPlayerInit(PlayerCtrl* playerCtrl) = 0;
 
+    virtual void onGameSync() = 0;
+
     virtual void onPlayerExit() = 0;
 
     virtual void onPlayerJoinedGame(const PublicPlayerView&) = 0;

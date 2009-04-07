@@ -20,6 +20,8 @@
 #ifndef PUBLICPLAYERVIEW_H
 #define PUBLICPLAYERVIEW_H
 
+#include <QList>
+
 #include "common.h"
 #include "parser/parserstructs.h"
 
@@ -35,52 +37,28 @@ friend class Player;
 protected:
     PublicPlayerView(Player* player);
     virtual ~PublicPlayerView();
-private:
-    PublicPlayerView(const PublicPlayerView&);
-    PublicPlayerView& operator=(const PublicPlayerView&);
-
 
 public:
-    int id() const;
+    int                  id()                const;
+    QString              name()              const;
+    bool                 isCreator()         const;
+    bool                 isSheriff()         const;
+    bool                 isAlive()           const;
+    int                  lifePoints()        const;
+    int                  handSize()          const;
+    virtual PlayerRole   role()              const;
+    QList<CardAbstract*> table()             const;
+    PublicPlayerData     publicPlayerData()  const;
 
-    QString name() const;
 
-    bool isCreator() const;
-
-
-    inline bool isAlive() const
-    {
-        // TODO
-        return 0;
-    }
-
-    bool isSheriff() const;
-
-    /**
-     * Returns the role of the player. In case
-     * the player is still alive and is not sheriff,
-     * the unknown role is returned.
-     */
-    virtual PlayerRole role() const;
-
-    inline int lifePoints() const
-    {
-        // TODO
-        return 0;
-    }
-
-    inline int numCardsInHand() const
-    {
-        // TODO
-        return 0;
-    }
-
-    virtual StructPlayer structPlayer() const;
-
-    // write method cardsOnTable
+    virtual StructPlayer structPlayer() const; /// \deprecated
 
 protected:
     Player* mp_player;
+
+private:
+    PublicPlayerView(const PublicPlayerView&);
+    PublicPlayerView& operator=(const PublicPlayerView&);
 };
 
 #endif

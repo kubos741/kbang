@@ -134,9 +134,11 @@ void GameCycle::pass(Player* player)
 
 void GameCycle::requestResponse(Player* player)
 {
-    mp_requestedPlayer = player;
-    m_state = STATE_RESPONSE;
-    announceFocusChange();
+    if (mp_requestedPlayer != player && m_state != STATE_RESPONSE) {
+        mp_requestedPlayer = player;
+        m_state = STATE_RESPONSE;
+        announceFocusChange();
+    }
     sendRequest();
 }
 

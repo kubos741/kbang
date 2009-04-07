@@ -30,8 +30,10 @@ public:
     virtual bool isReadyRun();
     bool isRunning();
 
-protected:
+protected slots:
     virtual void finish();
+
+protected:
     Game* mp_game;
 
 private:

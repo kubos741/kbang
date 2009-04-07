@@ -26,21 +26,28 @@
 
 using namespace client;
 
-CardList::CardList(QWidget *parent, const CardWidget::Size& cardSize)
-: CardPocket(parent), m_cardSize(cardSize), m_hPadding(3), m_vPadding(3)
+CardList::CardList(QWidget *parent):
+        CardPocket(parent),
+        m_cardSize(CardWidget::SIZE_SMALL),
+        m_hPadding(3),
+        m_vPadding(3)
 {
     setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
-    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QSize cardS = CardWidget::qSize(cardSize);
-    QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
-    m_moveFactor = cardS.width() / 2;
-    setMinimumSize(widgetSize);
-    setMaximumSize(widgetSize);
-    resize(widgetSize);
 }
 
 CardList::~CardList()
 {
+}
+
+void CardList::setCardSize(const CardWidget::Size& cardSize)
+{
+    m_cardSize = cardSize;
+    QSize cardS = CardWidget::qSize(cardSize);
+    QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
+    m_moveFactor = cardS.width() / 2;
+    setMinimumHeight(widgetSize.height());
+    //setMaximumSize(widgetSize);
+    resize(widgetSize);
 }
 
 void CardList::push(CardWidget* card)

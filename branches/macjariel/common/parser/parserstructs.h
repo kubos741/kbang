@@ -76,6 +76,55 @@ enum CardType {
     CARD_MISSED
 };
 
+enum CharacterType {
+    CHARACTER_UNKNOWN
+};
+
+
+struct CardData {
+    int id;
+    CardType type;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct PublicPlayerData {
+    int id;
+    QString name;
+    CharacterType character;
+    int lifePoints;
+    bool isSheriff;
+    int handSize;
+    QList<CardData> table;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct PrivatePlayerData {
+    int             id;
+    PlayerRole      role;
+    QList<CardData> hand;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct GameContextData {
+    int currentPlayerId;
+    int requestedPlayerId;
+    int turnNumber;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct GameSyncData {
+    QList<PublicPlayerData> players;
+    PrivatePlayerData       localPlayer;
+    GameContextData         gameContext;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+
 struct StructCardDetails {
     int cardId;
     QString cardType;

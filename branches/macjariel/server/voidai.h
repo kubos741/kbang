@@ -15,6 +15,7 @@ public:
     virtual ~VoidAI() {}
     virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message) {}
     virtual void onPlayerInit(PlayerCtrl* playerCtrl);
+    virtual void onGameSync() {}
     virtual void onPlayerExit() {}
     virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView) {}
     virtual void onPlayerLeavedGame(const PublicPlayerView&) {}
@@ -24,7 +25,7 @@ public:
     virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card) {}
     virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) {}
     virtual void onPlayedCardsCleared() {}
-    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) {}
+    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
     virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId) {}
 
     virtual void onActionRequest(ActionRequestType requestType);

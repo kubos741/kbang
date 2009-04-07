@@ -83,6 +83,9 @@ public:
      */
     StructGame structGame() const;
 
+    GameContextData gameContextData() const;
+
+
     /**
      * Returns the public list of players.
      */

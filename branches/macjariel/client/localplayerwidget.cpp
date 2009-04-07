@@ -20,21 +20,20 @@
 #include "localplayerwidget.h"
 #include "cardwidget.h"
 #include "cardlist.h"
+#include "playercharacterwidget.h"
 
 #include <QtDebug>
 
 using namespace client;
 
-LocalPlayerWidget::LocalPlayerWidget(QWidget *parent)
- : PlayerWidget(parent), Ui::LocalPlayerWidget()
+LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
+        PlayerWidget(parent),
+        Ui::LocalPlayerWidget(),
+        m_isSheriff(0)
 {
     setupUi(this);
-    characterWidget->show();
-    mp_hand = new CardList(0, CardWidget::SIZE_NORMAL);
-    mp_table = new CardList(0, CardWidget::SIZE_SMALL);
-    verticalLayout->addWidget(mp_table);
-    verticalLayout->addStretch();
-    verticalLayout->addWidget(mp_hand);
+    mp_hand->setCardSize(CardWidget::SIZE_NORMAL);
+    mp_table->setCardSize(CardWidget::SIZE_SMALL);
     m_baseStyleSheet = mainFrame->styleSheet();
     setActive(0);
 }
@@ -43,6 +42,40 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent)
 
 LocalPlayerWidget::~LocalPlayerWidget()
 {
+}
+
+void LocalPlayerWidget::init()
+{
+    mp_characterWidget->init();
+}
+
+
+
+void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
+{
+    m_id        = publicPlayerData.id;
+    m_name      = publicPlayerData.name;
+    // mp_characterWidget->setCharacter(publicPlayerData.character);
+    //mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
+    m_isSheriff  = publicPlayerData.isSheriff;
+    foreach (const CardData& cardData, publicPlayerData.table) {
+        CardWidget* card = new CardWidget(0);
+        card->setCardId(cardData.id);
+       // card->setCardClass(cardData.type);
+        mp_table->push(card);
+    }
+}
+
+void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
+{
+    Q_ASSERT(m_id = privatePlayerData.id);
+    /// \todo Role
+    foreach (const CardData& cardData, privatePlayerData.hand) {
+        CardWidget* card = new CardWidget(0);
+        card->setCardId(cardData.id);
+        //card->setCardClass(cardData.type);
+        mp_hand->push(card);
+    }
 }
 
 void LocalPlayerWidget::setPlayer(const StructPlayer& player)
@@ -73,17 +106,27 @@ void LocalPlayerWidget::setActive(uint8_t progress)
     }
 }
 
+PlayerCharacterWidget* LocalPlayerWidget::playerCharacterWidget()
+{
+    return mp_characterWidget;
+}
 
+CardList* LocalPlayerWidget::hand()
+{
+    return mp_hand;
+}
+
+CardList* LocalPlayerWidget::table()
+{
+    return mp_table;
+}
 
 void LocalPlayerWidget::updateWidgets()
 {
-    if (m_id != 0)
-    {
-        labelPlayerName->setText(m_name);
-    }
-    else
-    {
-        labelPlayerName->setText("");
+    if (m_id != 0) {
+        mp_labelPlayerName->setText(m_name);
+    } else {
+        mp_labelPlayerName->setText("");
     }
 }
 

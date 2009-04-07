@@ -37,6 +37,10 @@ public:
     PlayerCharacterWidget(QWidget *parent = 0);
     virtual ~PlayerCharacterWidget();
 
+    void init();
+
+
+
     inline QString character() const { return m_character; }
     inline int     lifePoints() const { return m_lifePoints; }
 
@@ -51,7 +55,10 @@ private:
     void lifePointsChanged();
 
 private slots:
-    void animateCard();
+    void onTimeout();
+
+signals:
+    void animationFinished();
 
 private:
     QString m_character;
@@ -61,8 +68,12 @@ private:
     CardWidget* mp_backCard;
     CardWidget* mp_characterCard;
 
-    QTimer* mp_timer;
-    QSize m_sizeHint;
+    bool          m_isAnimating;
+
+    static QTimer sm_timer;
+    static int    sm_countAnimaton;
+    QSize         m_sizeHint;
+
 
 };
 

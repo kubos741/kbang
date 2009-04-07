@@ -111,6 +111,12 @@ QList<CardAbstract*> Player::cardsInHand()
     return m_cardsInHand;
 }
 
+QList<CardAbstract*> Player::table()
+{
+    return m_table;
+}
+
+
 void Player::modifyLifePoints(int x)
 {
     int oldLifePoints = m_lifePoints;

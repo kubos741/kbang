@@ -27,16 +27,16 @@
 
 using namespace client;
 
-OpponentWidget::OpponentWidget(QWidget *parent)
-: PlayerWidget(parent), m_id(0)
+OpponentWidget::OpponentWidget(QWidget *parent):
+        PlayerWidget(parent),
+        m_id(0),
+        m_isSheriff(0)
 {
     setupUi(this);
 
-    mp_labelPlayerName->setText("");
-
-    mp_hand = new CardList(0, CardWidget::SIZE_SMALL);
-    horizontalLayout->addWidget(mp_hand);
-
+    //mp_labelPlayerName->setText("");
+    mp_hand->setCardSize(CardWidget::SIZE_SMALL);
+    mp_table->setCardSize(CardWidget::SIZE_SMALL);
     m_baseStyleSheet = frame->styleSheet();
     setActive(0);
 
@@ -61,11 +61,33 @@ OpponentWidget::OpponentWidget(QWidget *parent)
 
 }
 
+void OpponentWidget::init()
+{
+    mp_characterWidget->init();
+}
+
 
 OpponentWidget::~OpponentWidget()
 {
 
 }
+
+void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
+{
+    m_id        = publicPlayerData.id;
+    m_name      = publicPlayerData.name;
+    // mp_characterWidget->setCharacter(publicPlayerData.character);
+    mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
+    m_isSheriff  = publicPlayerData.isSheriff;
+    foreach (const CardData& cardData, publicPlayerData.table) {
+        CardWidget* card = new CardWidget(0);
+        card->setCardId(cardData.id);
+        //card->setCardClass(cardData.type); /// \todo Naming (cardType vs cardClass vs anything else)
+        mp_table->push(card);
+    }
+    updateWidgets();
+}
+
 
 void OpponentWidget::setPlayer(const StructPlayer& player)
 {
@@ -88,7 +110,6 @@ void OpponentWidget::setActive(uint8_t progress)
     } else {
         frame->setStyleSheet(
                 m_baseStyleSheet + " QFrame#frame {"
-                "background-clip: content;"
                 "border-left-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.9, y2:0, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
                 "border-right-color: qlineargradient(spread:reflect, x1:0.1, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 64), stop:1 rgba(0, 0, 0, 0));"
                 "border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
@@ -96,8 +117,22 @@ void OpponentWidget::setActive(uint8_t progress)
     }
 }
 
+PlayerCharacterWidget* OpponentWidget::playerCharacterWidget()
+{
+    return mp_characterWidget;
+}
 
 
+
+CardList* OpponentWidget::hand()
+{
+    return mp_hand;
+}
+
+CardList* OpponentWidget::table()
+{
+    return mp_table;
+}
 
 QSize OpponentWidget::sizeHint() const
 {

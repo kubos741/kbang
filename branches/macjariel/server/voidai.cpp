@@ -39,9 +39,9 @@ void VoidAI::requestWithAction()
             mp_playerCtrl->drawCard(2);
             break;
         case REQUEST_PLAY: {
-/*
+
             // If have bang, tries to play it
-            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().cardsInHand();
+            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
             foreach (CardAbstract* c, cards) {
                 CardBang* bang = qobject_cast<CardBang*>(c);
                 if (bang == 0) continue;
@@ -54,7 +54,7 @@ void VoidAI::requestWithAction()
 
                 }
             }
-*/
+
 
 
             // Finish turn or discard random card
@@ -63,14 +63,14 @@ void VoidAI::requestWithAction()
                 return;
             } catch (TooManyCardsInHandException e) {
                 qDebug() << QString("VoidAI (%1): discarding card").arg(m_id);
-                CardAbstract* card = mp_playerCtrl->privatePlayerView().cardsInHand().first();
+                CardAbstract* card = mp_playerCtrl->privatePlayerView().hand().first();
                 mp_playerCtrl->discardCard(card);
                 return;
             }
             break;
         }
         case REQUEST_RESPOND: {
-            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().cardsInHand();
+            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
             foreach (CardAbstract* c, cards) {
                 try {
                     CardMissed* missed = qobject_cast<CardMissed*>(c);
@@ -91,13 +91,18 @@ void VoidAI::requestWithAction()
         case REQUEST_DISCARD:
             try {
                 qDebug() << QString("VoidAI (%1): discarding card").arg(m_id);
-                CardAbstract* card = mp_playerCtrl->privatePlayerView().cardsInHand().first();
+                CardAbstract* card = mp_playerCtrl->privatePlayerView().hand().first();
                 qDebug() << QString("VoidAI (%1): cards in hand: %2").arg(m_id).arg(
-                        mp_playerCtrl->privatePlayerView().cardsInHand().size());
+                        mp_playerCtrl->privatePlayerView().hand().size());
                 mp_playerCtrl->discardCard(card);
             } catch (BadGameStateException e) {
                 qDebug() << QString("VoidAI (%1): BadGameStateException").arg(m_id);
             }
             break;
     }
+}
+
+
+void VoidAI::onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints)
+{
 }

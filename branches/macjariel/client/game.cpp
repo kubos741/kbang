@@ -32,8 +32,7 @@
 using namespace client;
 
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
-           ServerConnection* serverConnection, const GameWidgets& gameWidgets,
-           QWidget* mainWidget):
+           ServerConnection* serverConnection, const GameWidgets& gameWidgets):
         QObject(parent),
         m_playerId(player.id),
         m_playerName(player.name),
@@ -41,12 +40,13 @@ Game::Game(QObject* parent, int gameId, const StructPlayer& player,
         mp_serverConnection(serverConnection),
         m_currentPlayerId(0),
         m_requestedPlayerId(0),
-        mp_layout(gameWidgets.layout),
+        mp_mainWidget(gameWidgets.mainWidget),
+        mp_middleWidget(gameWidgets.middleWidget),
         m_opponentWidgets(gameWidgets.opponentWidget),
         mp_localPlayerWidget(gameWidgets.localPlayerWidget),
         mp_startButton(0),
-        m_creator(0),
-        mp_mainWidget(mainWidget)
+        m_creator(0)
+
 {
     m_players[m_playerId] = mp_localPlayerWidget;
     mp_gameEventHandler = new GameEventHandler(this);
@@ -60,15 +60,21 @@ void Game::init()
     get->getGame(m_gameId);
     if (m_creator)
     {
-        mp_startButton = new QPushButton(0);
-        mp_layout->addWidget(mp_startButton, 1, 1, 2, 2);
-        mp_layout->setAlignment(mp_startButton, Qt::AlignCenter);
+        mp_startButton = new QPushButton(mp_middleWidget);
+
+   //     mp_middleWidget->layout()->setAlignment(mp_startButton, Qt::AlignCenter);
+        QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
         mp_startButton->setText(tr("Start game"));
         mp_startButton->setEnabled(0);
         connect(mp_startButton, SIGNAL(clicked()),
                 this, SLOT(startButtonClicked()));
         connect(mp_serverConnection, SIGNAL(startableChanged(int, bool)),
                 this, SLOT(startableChanged(int, bool)));
+                l->addStretch(1);
+        l->addWidget(mp_startButton);
+        l->addStretch(1);        
+        mp_middleWidget->setLayout(l);
+
     }
     mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
 
@@ -134,7 +140,7 @@ void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& p
         }
         else
         {
-            mp_localPlayerWidget->setPlayer(p);
+            //mp_localPlayerWidget->setPlayer(p);
         }
     }
 }
@@ -159,7 +165,7 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
         if (playerList[pI].id == m_playerId) break;
     }
     qDebug() << "player: " << pI;
-    mp_localPlayerWidget->setPlayer(playerList[pI]);
+    //mp_localPlayerWidget->setPlayer(playerList[pI]);
     foreach(OpponentWidget* w, m_opponentWidgets)
     {
         w->unsetPlayer();
@@ -184,16 +190,23 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
 
     mp_deck = new DeckWidget(0);
     mp_graveyard = new CardPileWidget(0);
+    if (mp_middleWidget->layout() != 0) {
+        delete mp_middleWidget->layout();
+    }
+
     QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
     l->addStretch(3);
     l->addWidget(mp_graveyard);
     l->addStretch(1);
     l->addWidget(mp_deck);
     l->addStretch(3);
-    mp_layout->addLayout(l, 1, 1, 2, 2);
-    mp_layout->setAlignment(l, Qt::AlignCenter);
-    test();
-    //QTimer::singleShot(10, this, SLOT(test()));
+    mp_middleWidget->setLayout(l);
+}
+
+
+void Game::assignPlayerWidget(int playerId, PlayerWidget* playerWidget)
+{
+    m_players[playerId] = playerWidget;
 }
 
 

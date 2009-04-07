@@ -17,12 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #include "publicplayerview.h"
 #include "player.h"
+#include "cardabstract.h"
 
 PublicPlayerView::PublicPlayerView(Player* player): mp_player(player)
 {
 }
+
+PublicPlayerView::~ PublicPlayerView()
+{
+}
+
 int PublicPlayerView::id() const
 {
     return mp_player->id();
@@ -33,27 +40,66 @@ QString PublicPlayerView::name() const
     return mp_player->name();
 }
 
+bool PublicPlayerView::isCreator() const
+{
+    return mp_player->isCreator();
+}
+
 bool PublicPlayerView::isSheriff() const
 {
     return (mp_player->role() == ROLE_SHERIFF);
 }
 
+bool PublicPlayerView::isAlive() const
+{
+    return 1; /// \todo player alive/dead
+}
+
+int PublicPlayerView::lifePoints() const
+{
+    return mp_player->lifePoints();
+}
+
+int PublicPlayerView::handSize() const
+{
+    return mp_player->handSize();
+}
+
+/**
+ * Returns the role of the player. In case
+ * the player is still alive and is not sheriff,
+ * the unknown role is returned.
+ */
 PlayerRole PublicPlayerView::role() const
 {
     return (mp_player->role() == ROLE_SHERIFF) ?
             ROLE_SHERIFF : ROLE_UNKNOWN;
 }
 
-bool PublicPlayerView::isCreator() const
+QList<CardAbstract*> PublicPlayerView::table() const
 {
-    return mp_player->isCreator();
-}
-
-PublicPlayerView::~ PublicPlayerView()
-{
+    return mp_player->table();
 }
 
 StructPlayer PublicPlayerView::structPlayer() const
 {
     return mp_player->structPlayer(0);
+}
+
+PublicPlayerData PublicPlayerView::publicPlayerData() const
+{
+    PublicPlayerData res;
+    res.id          = mp_player->id();
+    res.name        = mp_player->name();
+    res.character   = CHARACTER_UNKNOWN;  /// @todo: characters
+    res.lifePoints  = lifePoints();
+    res.isSheriff   = isSheriff();
+    res.handSize    = handSize();
+    foreach (CardAbstract* card, table()) {
+        CardData cardData;
+        cardData.id = card->id();
+        cardData.type = card->type();
+        res.table.append(cardData);
+    }
+    return res;
 }

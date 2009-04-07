@@ -34,7 +34,8 @@ class CardList: public CardPocket
 {
 Q_OBJECT
 public:
-    CardList(QWidget *parent, const CardWidget::Size& cardSize);
+    CardList(QWidget *parent);
+    void setCardSize(const CardWidget::Size& cardSize);
     virtual ~CardList();
 
     virtual void push(CardWidget* card);

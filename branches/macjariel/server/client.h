@@ -72,6 +72,7 @@ public slots: // These slots are connected to parser
 public: /* The GameEventHandler interface */
     virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message);
     virtual void onPlayerInit(PlayerCtrl* playerCtrl);
+    virtual void onGameSync();
     virtual void onPlayerExit();
     virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView);
     virtual void onPlayerLeavedGame(const PublicPlayerView&);
@@ -85,6 +86,10 @@ public: /* The GameEventHandler interface */
     virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId);
 
     virtual void onActionRequest(ActionRequestType requestType);
+
+
+public slots:
+    void startAI();
 
 signals:
     void disconnected(int clientId);

@@ -16,11 +16,13 @@ GameEvent::~GameEvent()
 
 void GameEvent::run()
 {
+    qDebug() << "GameEvent starting" << this;
     m_isRunning = 1;
 }
 
 void GameEvent::finish()
 {
+    qDebug() << "GameEvent finishing" << this;
     m_isRunning = 0;
     emit finished(this);
 }

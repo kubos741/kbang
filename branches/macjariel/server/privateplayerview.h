@@ -42,7 +42,9 @@ public:
      */
     virtual PlayerRole role() const;
 
-    QList<CardAbstract* > cardsInHand() const;
+    QList<CardAbstract* > hand() const;
+
+    PrivatePlayerData privatePlayerData() const;
 
     virtual StructPlayer structPlayer() const;
 

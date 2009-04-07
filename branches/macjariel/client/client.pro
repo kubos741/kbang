@@ -28,7 +28,9 @@ HEADERS += gameloop.h \
     cardmovementevent.h \
     gameeventqueue.h \
     gameeventhandler.h \
-    gamefocuschangeevent.h
+    gamefocuschangeevent.h \
+    gamesyncevent.h \
+    lifepointschangeevent.h
 FORMS += connecttoserverdialog.ui \
     mainwindow.ui \
     joingamedialog.ui \
@@ -61,7 +63,9 @@ SOURCES += gameloop.cpp \
     cardmovementevent.cpp \
     gameeventqueue.cpp \
     gameeventhandler.cpp \
-    gamefocuschangeevent.cpp
+    gamefocuschangeevent.cpp \
+    gamesyncevent.cpp \
+    lifepointschangeevent.cpp
 QT += network \
     xml
 RESOURCES += client.qrc \

@@ -70,6 +70,7 @@ bool CardBang::play(CardAbstract* targetCard)
 void CardBang::respondPass()
 {
     Q_ASSERT(mp_attackedPlayer != 0);
+    qDebug() << "RESPOND PASS";
     mp_attackedPlayer->modifyLifePoints(-1); // TODO: abstract this - for abilities
     mp_game->gameCycle().clearPlayedCards();
 }

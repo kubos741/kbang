@@ -1,3 +1,5 @@
+#include <QTimer>
+
 #include "gamefocuschangeevent.h"
 #include "game.h"
 #include "playerwidget.h"
@@ -38,6 +40,6 @@ void GameFocusChangeEvent::run()
     else
         qCritical("Bad player in GameFocusChangeEvent.");
 
-    GameEvent::finish();
+    QTimer::singleShot(10, this, SLOT(finish()));
 }
 

@@ -23,6 +23,36 @@
 #include "xmlnode.h"
 #include <QXmlStreamWriter>
 
+CharacterType StringToCharacterType(const QString& s)
+{
+    Q_UNUSED(s);
+    return CHARACTER_UNKNOWN; /// @todo: characters
+}
+
+QString CharacterTypeToString(const CharacterType& c)
+{
+    Q_UNUSED(c);
+    return ""; /// @todo: characters
+}
+
+CardType StringToCardType(const QString& s)
+{
+    if (s == "unknown")  return CARD_UNKNOWN;
+    if (s == "bang")     return CARD_BANG;
+    if (s == "missed")   return CARD_MISSED;
+    return CARD_UNKNOWN;
+}
+
+QString CardTypeToString(const CardType& c)
+{
+    switch(c) {
+    case CARD_BANG: return "bang";
+    case CARD_MISSED: return "missed";
+    case CARD_UNKNOWN: return "unknown";
+    default: NOT_REACHED();
+    }
+    return "";
+}
 
 PlayerRole StringToPlayerRole(const QString& s)
 {
@@ -45,6 +75,150 @@ QString PlayerRoleToString(const PlayerRole& r)
     NOT_REACHED();
     return "invalid";
 }
+
+
+//----------------------------------------------------------------------------
+
+
+void CardData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "card");
+    id          = node->attribute("id").toInt();
+    type    = StringToCardType(node->attribute("type"));
+}
+
+void CardData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("card");
+    writer->writeAttribute("id",        QString::number(id));
+    writer->writeAttribute("type",      CardTypeToString(type));
+    writer->writeEndElement();
+
+}
+
+void PublicPlayerData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "public-player");
+    Q_ASSERT(node->getFirstChild()->name() == "cards-table");
+    id          = node->attribute("id").toInt();
+    name        = node->attribute("name");
+    character   = StringToCharacterType(node->attribute("character"));
+    lifePoints  = node->attribute("lifePoints").toInt();
+    isSheriff   = (node->attribute("isSheriff") == "true");
+    handSize    = node->attribute("handSize").toInt();
+    XmlNode* cards = node->getFirstChild();
+    table.clear();
+    foreach(XmlNode* card, cards->getChildren()) {
+        CardData cardData;
+        cardData.read(card);
+        table.append(cardData);
+    }
+}
+
+void PublicPlayerData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("public-player");
+    writer->writeAttribute("id",                QString::number(id));
+    writer->writeAttribute("name",              name);
+    writer->writeAttribute("character",         CharacterTypeToString(character));
+    writer->writeAttribute("lifePoints",        QString::number(lifePoints));
+    writer->writeAttribute("isSheriff",         isSheriff ? "true" : "false");
+    writer->writeAttribute("handSize",          QString::number(handSize));
+    writer->writeStartElement("cards-table");
+    foreach(const CardData& cardData, table)
+        cardData.write(writer);
+    writer->writeEndElement();
+    writer->writeEndElement();
+}
+
+void PrivatePlayerData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "private-player");
+    Q_ASSERT(node->getFirstChild()->name() == "cards-hand");
+    id      = node->attribute("id").toInt();
+    role    = StringToPlayerRole(node->attribute("role"));
+    XmlNode* cards = node->getFirstChild();
+    hand.clear();
+    foreach(XmlNode* card, cards->getChildren()) {
+        CardData cardData;
+        cardData.read(card);
+        hand.append(cardData);
+    }
+}
+
+
+
+void PrivatePlayerData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("private-player");
+    writer->writeAttribute("id",                QString::number(id));
+    writer->writeAttribute("role",              PlayerRoleToString(role));
+    writer->writeStartElement("cards-hand");
+    foreach(const CardData& cardData, hand)
+        cardData.write(writer);
+    writer->writeEndElement();
+    writer->writeEndElement();
+}
+
+
+
+
+void GameContextData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "game-context");
+    currentPlayerId     = node->attribute("currentPlayerId").toInt();
+    requestedPlayerId   = node->attribute("requestedPlayerId").toInt();
+    turnNumber          = node->attribute("turnNumber").toInt();
+}
+
+void GameContextData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("game-context");
+    writer->writeAttribute("currentPlayerId",   QString::number(currentPlayerId));
+    writer->writeAttribute("requestedPlayerId", QString::number(requestedPlayerId));
+    writer->writeAttribute("turnNumber",        QString::number(turnNumber));
+    writer->writeEndElement();
+}
+
+void GameSyncData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "game-sync");
+    Q_ASSERT(node->getChildren()[0]->name() == "players");
+    players.clear();
+    foreach(XmlNode* player, node->getFirstChild()->getChildren()) {
+        PublicPlayerData publicPlayerData;
+        publicPlayerData.read(player);
+        players.append(publicPlayerData);
+    }
+    localPlayer.read(node->getChildren()[1]);
+    gameContext.read(node->getChildren()[2]);
+}
+
+void GameSyncData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("game-sync");
+
+    writer->writeStartElement("players");
+    foreach (const PublicPlayerData& p, players)
+        p.write(writer);
+    writer->writeEndElement();
+
+    localPlayer.write(writer);
+
+    gameContext.write(writer);
+
+    writer->writeEndElement();
+}
+
+
+
+
+
+
+
+
+
+
 
 
 PocketType stringToPocketType(const QString& s)

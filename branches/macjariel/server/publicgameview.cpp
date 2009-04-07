@@ -22,6 +22,7 @@
 #include "game.h"
 #include "gameinfo.h"
 #include "player.h"
+#include "gamecycle.h"
 
 PublicGameView::PublicGameView(Game* game):
 mp_game(game)
@@ -56,6 +57,14 @@ int PublicGameView::playersCount() const
 StructGame PublicGameView::structGame() const
 {
     return mp_game->gameInfo().structGame();
+}
+
+GameContextData PublicGameView::gameContextData() const
+{
+    GameContextData res;
+    res.currentPlayerId   = mp_game->gameCycle().currentPlayer()->id();
+    res.requestedPlayerId = mp_game->gameCycle().requestedPlayer()->id();
+    res.turnNumber        = mp_game->gameCycle().turnNumber();
 }
 
 QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const

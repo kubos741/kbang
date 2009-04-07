@@ -39,10 +39,13 @@ public:
     virtual bool play(Player* targetPlayer);
     virtual bool play(CardAbstract* targetCard);
 
+    virtual CardType type() const { return CARD_MISSED; }
+    virtual QString typeStr() const { return "missed"; } /// \deprecated
+
+
     virtual void respondPass();
     virtual void respondCard(CardAbstract* targetCard);
 
-    virtual QString type() const { return "missed"; }
 };
 
 #endif

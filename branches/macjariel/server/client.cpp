@@ -24,6 +24,7 @@
 #include "privateplayerview.h"
 #include "cardabstract.h"
 
+#include "voidai.h"
 
 Client::Client(QObject* parent, int id, QTcpSocket* socket):
         QObject(parent),
@@ -152,6 +153,16 @@ void Client::onQueryGameList(QueryResult result)
 
 
 
+void Client::startAI() {
+    int id = mp_playerCtrl->publicGameView().id();
+    new VoidAI(id);
+    new VoidAI(id);
+    new VoidAI(id);
+    new VoidAI(id);
+
+}
+
+
 ////////////////////////////////////////////
 // The AbstractPlayerController interface //
 ////////////////////////////////////////////
@@ -167,6 +178,8 @@ void Client::onPlayerInit(PlayerCtrl* playerCtrl)
 {
     mp_playerCtrl = playerCtrl;
     /* SOME CACHING POSSIBLE HERE */
+
+
 }
 
 void Client::onPlayerExit()
@@ -174,6 +187,18 @@ void Client::onPlayerExit()
     mp_playerCtrl = 0;
     /* IF CACHING, UNCACHE ASAP */
 }
+
+
+void Client::onGameSync()
+{
+    GameSyncData gameSyncData;
+    foreach (const PublicPlayerView* p, mp_playerCtrl->publicGameView().publicPlayerList())
+        gameSyncData.players.append(p->publicPlayerData());
+    gameSyncData.localPlayer = mp_playerCtrl->privatePlayerView().privatePlayerData();
+    gameSyncData.gameContext = mp_playerCtrl->publicGameView().gameContextData();
+    mp_parser->eventGameSync(gameSyncData);
+}
+
 
 void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
 {
@@ -184,12 +209,14 @@ void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
     if (playerId == mp_playerCtrl->privatePlayerView().id()) {
         structPlayer = mp_playerCtrl->privatePlayerView().structPlayer();
         isOther = 0;
+        QTimer::singleShot(500, this, SLOT(startAI()));
     } else {
         structPlayer = mp_playerCtrl->publicPlayerView(playerId).structPlayer();
         isOther = 1;
     }
     bool isCreator = mp_playerCtrl->privatePlayerView().isCreator();
     mp_parser->eventJoinGame(gameId, structPlayer, isOther, isCreator);
+
 }
 
 void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
@@ -255,26 +282,29 @@ void Client::onPlayerDiscardedCard(int playerId, const CardAbstract* card)
 
 void Client::onPlayerPlayedCard(int playerId, const CardAbstract* card)
 {
-    qDebug() << QString("Client (%1): onPlayerPlayedCard(%2, %3)").arg(m_id).arg(playerId).arg(card->type());
+    StructCardMovement x;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_PLAYED;
+    x.playerFrom     = playerId;
+    x.cardDetails    = card->cardDetails();
+    mp_parser->eventCardMovement(x);
 }
 
 void Client::onPlayedCardsCleared()
 {
-    qDebug() << QString("Client (%1): onCardsCleared").arg(m_id);
 }
 
 void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoints, int newLifePoints)
 {
-    qDebug() << QString("Client (%1): onLifePointsChange(%2, %3, %4)").arg(m_id).arg(player.id()).arg(oldLifePoints).arg(newLifePoints);
+    qDebug() << "TRYING TO SEND LIFEPOINTS";
+    mp_parser->eventLifePointsChange(player.id(), newLifePoints);
+    qDebug() << "DONE TRYING TO SEND LIFEPOINTS";
 }
 
 void Client::onGameFocusChange(int currentPlayerId, int requestedPlayerId)
 {
     mp_parser->eventGameFocusChange(currentPlayerId, requestedPlayerId);
 }
-
-
-
 
 void Client::onActionRequest(ActionRequestType requestType)
 {
