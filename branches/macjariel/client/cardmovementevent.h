@@ -64,7 +64,6 @@ public:
     virtual ~CardMovementEvent();
     virtual void run();
     virtual bool isReadyRun();
-    virtual bool isRunning();
 
 private:
     void setCardAndPocket();
@@ -81,7 +80,6 @@ private:
     QPoint              m_destPos;
     qreal               m_length;
     int                 m_tick;
-    bool                m_isRunning;
     bool                m_cardAndPocketIsSet;
     static QBasicTimer  sm_timer;
 };

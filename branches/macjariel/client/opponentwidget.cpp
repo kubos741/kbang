@@ -21,6 +21,8 @@
 #include "cardwidget.h"
 #include "cardlist.h"
 
+#include <QtDebug>
+
 #include "cardpilewidget.h"
 
 using namespace client;
@@ -34,6 +36,12 @@ OpponentWidget::OpponentWidget(QWidget *parent)
 
     mp_hand = new CardList(0, CardWidget::SIZE_SMALL);
     horizontalLayout->addWidget(mp_hand);
+
+    m_baseStyleSheet = frame->styleSheet();
+    setActive(0);
+
+
+
 //((QBoxLayout*)layout())->addLayout(l);
 
     /*
@@ -71,6 +79,24 @@ void OpponentWidget::unsetPlayer()
     m_id = 0;
     updateWidgets();
 }
+
+void OpponentWidget::setActive(uint8_t progress)
+{
+    qDebug() << m_baseStyleSheet;
+    if (progress == 0) {
+        frame->setStyleSheet(m_baseStyleSheet);
+    } else {
+        frame->setStyleSheet(
+                m_baseStyleSheet + " QFrame#frame {"
+                "background-clip: content;"
+                "border-left-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.9, y2:0, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
+                "border-right-color: qlineargradient(spread:reflect, x1:0.1, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 64), stop:1 rgba(0, 0, 0, 0));"
+                "border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
+                "border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:0, y2:0.1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64))""}");
+    }
+}
+
+
 
 
 QSize OpponentWidget::sizeHint() const

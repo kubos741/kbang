@@ -88,6 +88,7 @@ private:
     void    checkPlayerAndState(Player* player, State state);
     void    startTurn(Player* player);
     int     needDiscard(Player* player);
+    void    announceFocusChange();
 };
 
 #endif // GAMECYCLE_H

@@ -41,6 +41,8 @@ public:
     virtual void setPlayer(const StructPlayer&) = 0;
     virtual void unsetPlayer() = 0;
 
+    virtual void setActive(uint8_t progress) = 0;
+
     inline CardList* hand()  { return mp_hand;  }
     inline CardList* table() { return mp_table; }
 

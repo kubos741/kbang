@@ -24,8 +24,10 @@ void GameCycle::start()
 
 void GameCycle::startTurn(Player* player)
 {
+
     mp_currentPlayer = mp_requestedPlayer = player;
     m_state = STATE_DRAW;
+    announceFocusChange();
     m_drawCardCount = 0;
     m_drawCardMax = 2;
     sendRequest();
@@ -134,6 +136,7 @@ void GameCycle::requestResponse(Player* player)
 {
     mp_requestedPlayer = player;
     m_state = STATE_RESPONSE;
+    announceFocusChange();
     sendRequest();
 }
 
@@ -141,6 +144,7 @@ void GameCycle::clearPlayedCards()
 {
     mp_requestedPlayer = mp_currentPlayer;
     m_state = STATE_TURN;
+    announceFocusChange();
     mp_game->gameTable().clearPlayedCards();
     sendRequest();
 }
@@ -183,4 +187,11 @@ int GameCycle::needDiscard(Player* player)
     int lifePoints = player->lifePoints();
     int handSize = player->handSize();
     return lifePoints > handSize ? 0 : handSize - lifePoints;
+}
+
+void GameCycle::announceFocusChange()
+{
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onGameFocusChange(mp_currentPlayer->id(), mp_requestedPlayer->id());
+
 }

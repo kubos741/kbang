@@ -4,6 +4,7 @@
 #include "game.h"
 
 #include "cardmovementevent.h"
+#include "gamefocuschangeevent.h"
 
 using namespace client;
 
@@ -16,11 +17,18 @@ GameEventHandler::GameEventHandler(Game* game):
 
 void GameEventHandler::connectSlots(QObject* signalEmitter)
 {
-    connect(signalEmitter,      SIGNAL(eventCardMovement(const StructCardMovement&)),
+    connect(signalEmitter,      SIGNAL(sigEventCardMovement(const StructCardMovement&)),
             this,               SLOT(onCardMovementEvent(const StructCardMovement&)));
+    connect(signalEmitter,      SIGNAL(sigEventGameFocusChange(int, int)),
+            this,               SLOT(onGameFocusChangeEvent(int,int)));
 }
 
 void GameEventHandler::onCardMovementEvent(const StructCardMovement& structCardMovement)
 {
     mp_queue->add(new CardMovementEvent(mp_game, structCardMovement));
+}
+
+void GameEventHandler::onGameFocusChangeEvent(int currentPlayerId, int requestedPlayerId)
+{
+    mp_queue->add(new GameFocusChangeEvent(mp_game, currentPlayerId, requestedPlayerId));
 }

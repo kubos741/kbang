@@ -42,7 +42,6 @@ CardMovementEvent::CardMovementEvent(Game* game, const StructCardMovement& struc
         mp_card(0),
         mp_destPocket(0),
         m_tick(0),
-        m_isRunning(0),
         m_cardAndPocketIsSet(0)
 {
 }
@@ -58,18 +57,12 @@ bool CardMovementEvent::isReadyRun()
     return (mp_card->isVisible() && mp_destPocket->isVisible());
 }
 
-bool CardMovementEvent::isRunning()
-{
-    return m_isRunning;
-}
-
-
-
 void CardMovementEvent::run()
 {
     if (!m_cardAndPocketIsSet)
         setCardAndPocket();
     startTransition();
+    GameEvent::run();
 }
 
 void CardMovementEvent::setCardAndPocket()
@@ -164,8 +157,6 @@ void CardMovementEvent::startTransition()
     Q_ASSERT(mp_card->isVisible());
     Q_ASSERT(!sm_timer.isActive());
 
-    m_isRunning = 1;
-
     if (mp_card->parent() != mp_game->mainWidget())
     {
         QPoint pos = mp_card->mapTo(mp_game->mainWidget(), QPoint(0,0));
@@ -203,6 +194,5 @@ void CardMovementEvent::stopTransition()
     }
     mp_card->unsetShadowMode();
     mp_destPocket->push(mp_card);
-    m_isRunning = 0;
-    emit finished(this);
+    GameEvent::finish();
 }

@@ -34,10 +34,19 @@ using namespace client;
 Game::Game(QObject* parent, int gameId, const StructPlayer& player,
            ServerConnection* serverConnection, const GameWidgets& gameWidgets,
            QWidget* mainWidget):
-QObject(parent), m_playerId(player.id), m_playerName(player.name), m_gameId(gameId),
-mp_serverConnection(serverConnection), mp_layout(gameWidgets.layout),
-m_opponentWidgets(gameWidgets.opponentWidget), mp_localPlayerWidget(gameWidgets.localPlayerWidget),
-mp_startButton(0), m_creator(0), mp_mainWidget(mainWidget)
+        QObject(parent),
+        m_playerId(player.id),
+        m_playerName(player.name),
+        m_gameId(gameId),
+        mp_serverConnection(serverConnection),
+        m_currentPlayerId(0),
+        m_requestedPlayerId(0),
+        mp_layout(gameWidgets.layout),
+        m_opponentWidgets(gameWidgets.opponentWidget),
+        mp_localPlayerWidget(gameWidgets.localPlayerWidget),
+        mp_startButton(0),
+        m_creator(0),
+        mp_mainWidget(mainWidget)
 {
     m_players[m_playerId] = mp_localPlayerWidget;
     mp_gameEventHandler = new GameEventHandler(this);
@@ -61,7 +70,7 @@ void Game::init()
         connect(mp_serverConnection, SIGNAL(startableChanged(int, bool)),
                 this, SLOT(startableChanged(int, bool)));
     }
-    mp_gameEventHandler->connectSlots(mp_serverConnection);
+    mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
 
     connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
             this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
@@ -78,6 +87,15 @@ Game::~Game()
 
 }
 
+void Game::setCurrentPlayerId(int currentPlayerId)
+{
+    m_currentPlayerId = currentPlayerId;
+}
+
+void Game::setRequestedPlayerId(int requestedPlayerId)
+{
+    m_requestedPlayerId = requestedPlayerId;
+}
 
 void Game::opponentJoinedGame(const StructPlayer& player)
 {

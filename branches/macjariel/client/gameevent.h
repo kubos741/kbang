@@ -26,12 +26,16 @@ public:
      */
     GameEvent(Game* game);
     virtual ~GameEvent();
-    virtual void run() = 0;
+    virtual void run();
     virtual bool isReadyRun();
-    virtual bool isRunning() = 0;
+    bool isRunning();
 
 protected:
+    virtual void finish();
     Game* mp_game;
+
+private:
+    bool m_isRunning;
 
 signals:
     void finished(GameEvent*);

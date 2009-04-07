@@ -48,6 +48,8 @@ public:
     QString serverName() const;
     QString hostName() const;
 
+    QObject* parser() const;
+
 public slots:
     void connectToServer(QString serverHost, int serverPort);
     void disconnectFromServer();
@@ -57,6 +59,7 @@ public slots:
     void leaveGame();
     void startGame();
     void sendChatMessage(const QString& message);
+
 
 
 

@@ -50,11 +50,18 @@ public:
 
     void setCreator(bool creator) { m_creator = creator; }
 
+    void setCurrentPlayerId(int currentPlayerId);
+    void setRequestedPlayerId(int requestedPlayerId);
+
+
 
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline CardPileWidget* graveyard() const          { return mp_graveyard; }
     inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
     inline QWidget*        mainWidget() const         { return mp_mainWidget; }
+
+    inline int             currentPlayerId() const    { return m_currentPlayerId; }
+    inline int             requestedPlayerId() const  { return m_requestedPlayerId; }
 
 private:
 
@@ -65,6 +72,11 @@ private:
     const QString m_playerName;
     const int m_gameId;
     ServerConnection* mp_serverConnection;
+
+    int m_currentPlayerId;
+    int m_requestedPlayerId;
+
+
 
 /*  Visual elements - provided by MainWindow */
     QGridLayout*              mp_layout;
@@ -78,6 +90,9 @@ private:
     QQueue<StructCardMovement> m_cardMovementQueue;
     QWidget*                  mp_mainWidget;
     GameEventHandler*         mp_gameEventHandler;
+
+
+
 
 public slots:
     void opponentJoinedGame(const StructPlayer& player);

@@ -391,7 +391,11 @@ void Parser::processStanza()
             QString senderName = event->attribute("senderName");
             emit sigEventMessage(senderId, senderName, messageNode->text());
         }
-
+        if (event->name() == "game-focus") {
+            int currentPlayerId   = event->attribute("currentPlayerId").toInt();
+            int requestedPlayerId = event->attribute("requestedPlayerId").toInt();
+            emit sigEventGameFocusChange(currentPlayerId, requestedPlayerId);
+        }
     }
 
 
@@ -494,6 +498,17 @@ void Parser::eventMessage(int senderId, const QString& senderName, const QString
     mp_streamWriter->writeAttribute("senderId", QString::number(senderId));
     mp_streamWriter->writeAttribute("senderName", senderName);
     mp_streamWriter->writeCharacters(message);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventGameFocusChange(int currentPlayerId, int requestedPlayerId)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("game-focus");
+    mp_streamWriter->writeAttribute("currentPlayerId", QString::number(currentPlayerId));
+    mp_streamWriter->writeAttribute("requestedPlayerId", QString::number(requestedPlayerId));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }

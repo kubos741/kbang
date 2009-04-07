@@ -44,6 +44,7 @@ public:
 
     virtual void setPlayer(const StructPlayer&);
     virtual void unsetPlayer();
+    virtual void setActive(uint8_t progress);
 
     virtual bool isLocalPlayer() { return 0; }
 
@@ -55,6 +56,7 @@ private:
 private:
     int m_id;
     QString m_name;
+    QString m_baseStyleSheet;
 
 };
 }

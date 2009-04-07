@@ -268,6 +268,12 @@ void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoint
     qDebug() << QString("Client (%1): onLifePointsChange(%2, %3, %4)").arg(m_id).arg(player.id()).arg(oldLifePoints).arg(newLifePoints);
 }
 
+void Client::onGameFocusChange(int currentPlayerId, int requestedPlayerId)
+{
+    mp_parser->eventGameFocusChange(currentPlayerId, requestedPlayerId);
+}
+
+
 
 
 void Client::onActionRequest(ActionRequestType requestType)

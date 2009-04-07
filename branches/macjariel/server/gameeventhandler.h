@@ -79,6 +79,7 @@ public:
 
     virtual void onPlayedCardsCleared() = 0;
 
+    virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId) = 0;
 
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) = 0;
 

@@ -18,6 +18,7 @@ public:
 
 public slots:
     void onCardMovementEvent(const StructCardMovement&);
+    void onGameFocusChangeEvent(int currentPlayerId, int requestedPlayerId);
 
 private:
     Game*           mp_game;

@@ -25,7 +25,7 @@ public:
     virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) {}
     virtual void onPlayedCardsCleared() {}
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) {}
-
+    virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId) {}
 
     virtual void onActionRequest(ActionRequestType requestType);
 

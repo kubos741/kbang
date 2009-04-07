@@ -189,6 +189,10 @@ QString ServerConnection::hostName() const
     return m_serverHost;
 }
 
+QObject* ServerConnection::parser() const
+{
+    return mp_parser;
+}
 
 
 

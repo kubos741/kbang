@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>LocalPlayerWidget</class>
- <widget class="QWidget" name="LocalPlayerWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="LocalPlayerWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,121 +10,112 @@
     <height>334</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>0</width>
     <height>0</height>
    </size>
   </property>
-  <property name="baseSize" >
+  <property name="baseSize">
    <size>
     <width>0</width>
     <height>0</height>
    </size>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
     <number>0</number>
    </property>
-   <item row="0" column="0" >
-    <widget class="QFrame" name="mainFrame" >
-     <property name="minimumSize" >
+   <item row="0" column="0">
+    <widget class="QFrame" name="mainFrame">
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>0</height>
       </size>
      </property>
-     <property name="styleSheet" >
-      <string notr="true" >QFrame#mainFrame
-	{
-
+     <property name="styleSheet">
+      <string notr="true">QFrame#mainFrame
+{
 	background-color: rgba(0,0,0,32);
-	background-clip: content;
-
-	border: 5px solid black;
-	border-left-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.9, y2:0, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));
-	border-right-color: qlineargradient(spread:reflect, x1:0.1, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 64), stop:1 rgba(0, 0, 0, 0));
-
-	border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));
-	border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:0, y2:0.1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64))
-
+	border: 5px solid rgba(0,0,0,0);
 }
 
 </string>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="lineWidth" >
+     <property name="lineWidth">
       <number>2</number>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" >
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QGridLayout" name="gridLayout_2" >
-        <item rowspan="2" row="0" column="0" >
-         <widget class="client::PlayerCharacterWidget" native="1" name="characterWidget" />
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0" rowspan="2">
+         <widget class="client::PlayerCharacterWidget" name="characterWidget" native="true"/>
         </item>
-        <item row="0" column="1" >
-         <widget class="client::CardWidget" native="1" name="roleWidget" />
+        <item row="0" column="1">
+         <widget class="client::CardWidget" name="roleWidget" native="true"/>
         </item>
-        <item row="1" column="1" >
-         <widget class="QLabel" name="label" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+        <item row="1" column="1">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize" >
+          <property name="minimumSize">
            <size>
             <width>48</width>
             <height>48</height>
            </size>
           </property>
-          <property name="maximumSize" >
+          <property name="maximumSize">
            <size>
             <width>64</width>
             <height>64</height>
            </size>
           </property>
-          <property name="styleSheet" >
-           <string notr="true" >background-color: rgba(0, 0, 0, 64);
+          <property name="styleSheet">
+           <string notr="true">background-color: rgba(0, 0, 0, 64);
 color: white;</string>
           </property>
-          <property name="text" >
+          <property name="text">
            <string>TODO</string>
           </property>
-          <property name="textFormat" >
+          <property name="textFormat">
            <enum>Qt::LogText</enum>
           </property>
-          <property name="alignment" >
+          <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2" >
-         <widget class="QLabel" name="labelPlayerName" >
-          <property name="font" >
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="labelPlayerName">
+          <property name="font">
            <font>
             <pointsize>12</pointsize>
            </font>
           </property>
-          <property name="styleSheet" >
-           <string notr="true" >color: white;</string>
+          <property name="styleSheet">
+           <string notr="true">color: white;</string>
           </property>
-          <property name="text" >
+          <property name="text">
            <string>PLAYERNAME</string>
           </property>
-          <property name="scaledContents" >
+          <property name="scaledContents">
            <bool>false</bool>
           </property>
          </widget>
@@ -131,7 +123,7 @@ color: white;</string>
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" />
+       <layout class="QVBoxLayout" name="verticalLayout"/>
       </item>
      </layout>
     </widget>
@@ -152,8 +144,6 @@ color: white;</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="client.qrc" />
- </resources>
+ <resources/>
  <connections/>
 </ui>

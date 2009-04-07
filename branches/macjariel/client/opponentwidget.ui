@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>OpponentWidget</class>
- <widget class="QWidget" name="OpponentWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="OpponentWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,58 +10,58 @@
     <height>220</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>220</width>
     <height>220</height>
    </size>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Opponent Widget</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
     <number>0</number>
    </property>
-   <item row="0" column="0" >
-    <widget class="QFrame" name="frame" >
-     <property name="styleSheet" >
-      <string notr="true" >QFrame#frame {
+   <item row="0" column="0">
+    <widget class="QFrame" name="frame">
+     <property name="styleSheet">
+      <string notr="true">QFrame#frame {
 	background-color: rgba(0, 0, 0, 64);
-	border: 0px solid navy;
+	border: 5px solid rgba(0, 0, 0, 0);
 }</string>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="lineWidth" >
+     <property name="lineWidth">
       <number>2</number>
      </property>
-     <property name="midLineWidth" >
+     <property name="midLineWidth">
       <number>0</number>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="mp_labelPlayerName" >
-        <property name="styleSheet" >
-         <string notr="true" >background-color: rgba(0, 0, 0, 0);</string>
+       <widget class="QLabel" name="mp_labelPlayerName">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>{PLAYERNAME}</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" />
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
       </item>
      </layout>
     </widget>
