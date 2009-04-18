@@ -65,6 +65,12 @@ public slots: // These slots are connected to parser
     void onActionJoinGame(int gameId, const StructPlayer& structPlayer);
     void onActionLeaveGame();
     void onActionStartGame();
+    void onActionDrawCard(int numCards, bool revealCard);
+    void onActionPlayCard(const ActionPlayCardData&);
+    void onActionEndTurn();
+    void onActionPass();
+    void onActionDiscard(int cardId);
+
     void onQueryServerInfo(QueryResult result);
     void onQueryGame(int gameId, QueryResult result);
     void onQueryGameList(QueryResult result);
@@ -81,9 +87,10 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerDrawedCard(int playerId, const CardAbstract*);
     virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card);
     virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card);
+    virtual void onPlayerPlayedOnTable(int playerId, const CardAbstract* card);
     virtual void onPlayedCardsCleared();
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
-    virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId);
+    virtual void onGameContextChange(const GameContextData&);
 
     virtual void onActionRequest(ActionRequestType requestType);
 

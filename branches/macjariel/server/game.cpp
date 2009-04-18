@@ -199,11 +199,10 @@ void Game::startGame(Player* player)
         throw BadGameStateException();
     }
 
-    // \todo: character selection first
-
     m_gameState = GAMESTATE_PLAYING;
 
-    if (mp_gameInfo->hasShufflePlayers()) shufflePlayers();
+    if (mp_gameInfo->hasShufflePlayers())
+        shufflePlayers();
     //setCharacters();
     setRoles();
 
@@ -219,7 +218,7 @@ void Game::startGame(Player* player)
 void Game::shufflePlayers()
 {
     shuffleList(m_playerList);
-    m_publicPlayerList.empty();
+    m_publicPlayerList.clear();
     foreach(Player* player, m_playerList) {
         m_publicPlayerList.append(&player->publicView());
     }

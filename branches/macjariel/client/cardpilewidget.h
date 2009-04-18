@@ -29,6 +29,8 @@
 
 
 
+
+
 namespace client
 {
 
@@ -52,10 +54,10 @@ public:
 
 protected:
     QStack<CardWidget*> m_cards;
+    CardWidget::Size m_cardWidgetSize;
 
 private:
-    CardWidget::Size m_cardWidgetSize;
-    QSize            m_padding;
+    QSize            m_padding;   
 };
 }
 #endif

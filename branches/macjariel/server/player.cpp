@@ -40,6 +40,7 @@ Player::Player(Game* game,
         m_role(ROLE_UNKNOWN),
         mp_game(game),
         mp_gameEventHandler(gameEventHandler),
+        m_lastBangTurn(-1),
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
@@ -57,7 +58,7 @@ PlayerCtrl* Player::playerCtrl() const
 
 const int Player::id() const
 {
-    return m_id;
+    return (this != 0) ? m_id : 0;
 }
 
 QString Player::name() const
@@ -116,11 +117,28 @@ QList<CardAbstract*> Player::table()
     return m_table;
 }
 
+bool Player::hasDuplicateOnTable(CardAbstract* card)
+{
+    foreach(CardAbstract* c, m_table) {
+        if (card->type() == c->type())
+            return 1;
+    }
+    return 0;
+}
 
 void Player::modifyLifePoints(int x)
 {
     int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
+    if (m_lifePoints > m_maxLifePoints)
+        m_lifePoints = m_maxLifePoints;
+
+    if (m_lifePoints < 0)
+        m_lifePoints = 0;
+
+    if (oldLifePoints == m_lifePoints)
+        return;
+
     foreach (Player* p, mp_game->playerList()) {
         p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
     }
@@ -131,11 +149,20 @@ void Player::appendCardToHand(CardAbstract * card)
     m_cardsInHand.append(card);
 }
 
+void Player::appendCardToTable(CardAbstract* card)
+{
+    m_table.append(card);
+}
+
 bool Player::removeCardFromHand(CardAbstract* card)
 {
     return m_cardsInHand.removeOne(card);
 }
 
+bool Player::removeCardFromTable(CardAbstract* card)
+{
+    return m_table.removeOne(card);
+}
 
 
 const PublicPlayerView& Player::publicView() const
@@ -162,10 +189,21 @@ void Player::setRole(const PlayerRole& role)
 }
 
 
+void Player::onBangPlayed()
+{
+    m_lastBangTurn = mp_game->gameCycle().turnNumber();
+}
+
+bool Player::canPlayBang()
+{
+    return (m_lastBangTurn != mp_game->gameCycle().turnNumber());
+}
 
 int Player::initialCardCount() const
 {
     return m_maxLifePoints;
 }
+
+
 
 

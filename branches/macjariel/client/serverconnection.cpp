@@ -119,6 +119,47 @@ void ServerConnection::sendChatMessage(const QString& message)
     mp_parser->actionMessage(message);
 }
 
+void ServerConnection::drawCard(int numCards, bool revealCard)
+{
+    mp_parser->actionDrawCard(numCards, revealCard);
+}
+
+void ServerConnection::playCard(int cardId)
+{
+    ActionPlayCardData actionPlayCardData;
+    actionPlayCardData.playedCardId = cardId;
+    actionPlayCardData.type = ActionPlayCardData::PLAYCARD_SIMPLE;
+    mp_parser->actionPlayCard(actionPlayCardData);
+}
+
+void ServerConnection::playCardWithPlayer(int cardId, int playerId)
+{
+    ActionPlayCardData actionPlayCardData;
+    actionPlayCardData.playedCardId = cardId;
+    actionPlayCardData.type = ActionPlayCardData::PLAYCARD_PLAYER;
+    actionPlayCardData.targetPlayerId = playerId;
+    mp_parser->actionPlayCard(actionPlayCardData);
+}
+
+
+void ServerConnection::endTurn()
+{
+    mp_parser->actionEndTurn();
+}
+
+void ServerConnection::pass()
+{
+    mp_parser->actionPass();
+}
+
+void ServerConnection::discardCard(int cardId)
+{
+    mp_parser->actionDiscard(cardId);
+}
+
+
+
+
 QueryGet* ServerConnection::queryGet()
 {
     Q_ASSERT(mp_parser != 0);

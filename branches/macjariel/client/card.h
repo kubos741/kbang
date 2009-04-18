@@ -82,10 +82,7 @@ public:
 
 public: /* static */
     static void loadDefaultRuleset();  ///< Loads default ruleset. To be replaced with ruleset manager.
-    inline static const CardPointer findCard(const QString& id) ///< Looks up a card by its identifier.
-    {
-        return (sm_cards.contains(id) ? sm_cards[id] : 0);
-    }
+    static const CardPointer findCard(const QString& id); ///< Looks up a card by its identifier.
 
 private:
     QString m_id;

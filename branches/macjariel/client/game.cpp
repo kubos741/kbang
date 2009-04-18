@@ -45,10 +45,16 @@ Game::Game(QObject* parent, int gameId, const StructPlayer& player,
         m_opponentWidgets(gameWidgets.opponentWidget),
         mp_localPlayerWidget(gameWidgets.localPlayerWidget),
         mp_startButton(0),
-        m_creator(0)
+        m_creator(0),
+        m_cardWidgetFactory(this),
+        m_gameObjectClickHandler(this)
 
 {
     m_players[m_playerId] = mp_localPlayerWidget;
+    mp_localPlayerWidget->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
+    foreach(OpponentWidget* w, m_opponentWidgets) {
+        w->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
+    }
     mp_gameEventHandler = new GameEventHandler(this);
 }
 
@@ -103,28 +109,34 @@ void Game::setRequestedPlayerId(int requestedPlayerId)
     m_requestedPlayerId = requestedPlayerId;
 }
 
+void Game::setGamePlayState(const GamePlayState& gamePlayState)
+{
+    m_gamePlayState = gamePlayState;
+}
+
 void Game::opponentJoinedGame(const StructPlayer& player)
 {
-    qDebug() << player.id;
-    qDebug() << player.name;
-    for(int i = 0; i < m_opponentWidgets.count(); ++i)
+    int i;
+    for(i = 0; i < m_opponentWidgets.count(); ++i)
     {
         OpponentWidget* w = m_opponentWidgets[i];
-        if (w->isEmpty())
-        {
+        if (w->isVoid()) {
             w->setPlayer(player);
             m_players[player.id] = w;
             break;
         }
     }
-    qDebug(qPrintable(QString("Player %1 has entered the game!").arg(player.name)));
+    if (i == m_opponentWidgets.count()) {
+        qCritical("Too many players connected to the game.");
+    }
+    qDebug(qPrintable(QString("[Game]   Player '%1' entered the game!").arg(player.name)));
 }
 
 void Game::opponentLeavedGame(const StructPlayer& player)
 {
     if (m_players.contains(player.id))
     {
-        m_players[player.id]->unsetPlayer();
+        m_players[player.id]->clear();
         m_players.remove(player.id);
     }
 }
@@ -140,7 +152,7 @@ void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& p
         }
         else
         {
-            //mp_localPlayerWidget->setPlayer(p);
+            mp_localPlayerWidget->setPlayer(p);
         }
     }
 }
@@ -159,6 +171,7 @@ void Game::startButtonClicked()
 
 void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
 {
+    /*
     int pI;
     for(pI = 0; pI < playerList.count(); pI++)
     {
@@ -168,7 +181,7 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
     //mp_localPlayerWidget->setPlayer(playerList[pI]);
     foreach(OpponentWidget* w, m_opponentWidgets)
     {
-        w->unsetPlayer();
+        w->clear();
     }
     for (int i = pI + 1; i < playerList.count(); ++i)
     {
@@ -181,7 +194,7 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
         int pos = i - pI + 6;
         m_players[playerList[i].id] = m_opponentWidgets[pos];
         m_opponentWidgets[pos]->setPlayer(playerList[i]);
-    }
+    }*/
     if (mp_startButton)
     {
         mp_startButton->hide();
@@ -189,7 +202,9 @@ void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
     }
 
     mp_deck = new DeckWidget(0);
+    mp_deck->init(&m_cardWidgetFactory);
     mp_graveyard = new CardPileWidget(0);
+    mp_graveyard->setPocketType(POCKET_GRAVEYARD);
     if (mp_middleWidget->layout() != 0) {
         delete mp_middleWidget->layout();
     }

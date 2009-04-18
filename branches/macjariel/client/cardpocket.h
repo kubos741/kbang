@@ -23,6 +23,8 @@
 #include <QFrame>
 #include <QPoint>
 
+#include "parser/parserstructs.h"
+
 namespace client
 {
 class CardWidget;
@@ -34,11 +36,19 @@ class CardPocket : public QFrame
 {
 Q_OBJECT
 public:
-    CardPocket(QWidget *parent): QFrame(parent) {}
+    CardPocket(QWidget *parent);
+    virtual ~CardPocket();
     virtual QPoint newCardPosition() const = 0;
-    virtual void push(CardWidget*) = 0;
+    virtual void push(CardWidget*);
+    void setPocketType(const PocketType&);
+    void setOwnerId(int);
+
 signals:
     void newCardPositionChanged(const QPoint&);
+
+protected:
+    PocketType m_pocketType;
+    int        m_ownerId;
 };
 }
 #endif

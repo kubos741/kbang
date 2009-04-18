@@ -20,9 +20,13 @@
 #include <QtCore>
 #include <QtDebug>
 #include <QPainter>
+#include <QMouseEvent>
+
 
 #include "card.h"
 #include "cardwidget.h"
+#include "cardactionswidget.h"
+#include "gameobjectclickhandler.h"
 
 using namespace client;
 
@@ -32,22 +36,40 @@ const QSize CardWidget::sm_qsizeSmall(50, 80);
 const QSize CardWidget::sm_qsizeNormal(70, 113);
 const QSize CardWidget::sm_qsizeBig(200, 320);
 
+//const QSize  margins(10,10);
+//const QPoint padding(5,5);
+
 CardWidget::CardWidget(QWidget* parent):
         QLabel(parent),
         m_cardId(0),
         m_shadowMode(0),
-        m_qsize(sm_qsizeSmall)
+        m_hasHighlight(0),
+        m_qsize(sm_qsizeSmall),
+        mp_gameObjectClickHandler(0),
+        m_pocketType(POCKET_INVALID),
+        m_ownerId(0)
 {
+    show();
 }
 
 CardWidget::~ CardWidget()
 {
 }
 
+void CardWidget::setGameObjectClickHandler(GameObjectClickHandler* gameObjectClickHandler)
+{
+    mp_gameObjectClickHandler = gameObjectClickHandler;
+}
+
 void CardWidget::paintEvent(QPaintEvent *event)
 {
     if (!m_shadowMode) {
         QLabel::paintEvent(event);
+        if (m_hasHighlight) {
+            QPainter painter(this);
+
+            painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
+        }
     } else {
         QPainter painter(this);
         painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
@@ -98,5 +120,26 @@ void CardWidget::applyNewProperties()
     resize(m_qsize);
 }
 
+void CardWidget::setPocketType(const PocketType& pocketType)
+{
+    m_pocketType = pocketType;
+}
+
+void CardWidget::setOwnerId(int ownerId)
+{
+    m_ownerId = ownerId;
+}
+
+void CardWidget::setHighlight(bool hasHighlight)
+{
+    m_hasHighlight = hasHighlight;
+    update();
+}
+
+void CardWidget::mousePressEvent(QMouseEvent *ev)
+{
+    if (mp_gameObjectClickHandler)
+        mp_gameObjectClickHandler->onCardClicked(this);
+}
 
 

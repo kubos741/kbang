@@ -24,83 +24,66 @@
 #include <QtDebug>
 
 #include "cardpilewidget.h"
+#include "cardwidgetfactory.h"
 
 using namespace client;
 
 OpponentWidget::OpponentWidget(QWidget *parent):
         PlayerWidget(parent),
-        m_id(0),
-        m_isSheriff(0)
+        mp_sheriffBadge(0)
 {
     setupUi(this);
 
-    //mp_labelPlayerName->setText("");
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
+    mp_hand->setPocketType(POCKET_HAND);
+    mp_hand->setOwnerId(id());
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
+    mp_table->setPocketType(POCKET_TABLE);
+    mp_table->setOwnerId(id());
+
     m_baseStyleSheet = frame->styleSheet();
     setActive(0);
-
-
-
-//((QBoxLayout*)layout())->addLayout(l);
-
-    /*
-    QBoxLayout* l = new QBoxLayout(QBoxLayout::TopToBottom);
-    //l->addWidget(mp_table);
-    l->addWidget(x);
-    tableSpace->setLayout(l);
-    tableSpace->show();
-    mp_table->show();
-    */
-
-    //    mp_labelPlayerName->setText(player.name);
-    //m_id = player.id;
-
-    //frame->setFrameStyle(QFrame::Box |  QFrame::Plain);
-    //frame->setLineWidth(1);
-
+    updateWidgets();
 }
-
-void OpponentWidget::init()
-{
-    mp_characterWidget->init();
-}
-
 
 OpponentWidget::~OpponentWidget()
 {
+}
 
+void OpponentWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
+{
+    PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
+    mp_characterWidget->init(mp_cardWidgetFactory);
 }
 
 void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
-    m_id        = publicPlayerData.id;
-    m_name      = publicPlayerData.name;
-    // mp_characterWidget->setCharacter(publicPlayerData.character);
+    setId(publicPlayerData.id);
+    setName(publicPlayerData.name);
+    //mp_characterWidget->setCharacter(publicPlayerData.character);
     mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
-    m_isSheriff  = publicPlayerData.isSheriff;
+    setSheriff(publicPlayerData.isSheriff);
+    // Set cards on table
+    /* TODO
     foreach (const CardData& cardData, publicPlayerData.table) {
-        CardWidget* card = new CardWidget(0);
+        CardWidget* card = mp_cardWidgetFactory->createBackCard();
         card->setCardId(cardData.id);
-        //card->setCardClass(cardData.type); /// \todo Naming (cardType vs cardClass vs anything else)
+        card->setCardClass(cardData.type); /// \todo Naming (cardType vs cardClass vs anything else)
         mp_table->push(card);
     }
+    */
+    mp_hand->setOwnerId(id());
+    mp_table->setOwnerId(id());
     updateWidgets();
 }
 
-
-void OpponentWidget::setPlayer(const StructPlayer& player)
+void OpponentWidget::clear()
 {
-    m_id = player.id;
-    m_name = player.name;
+    setId(0);
+    setName("");
     updateWidgets();
 }
 
-void OpponentWidget::unsetPlayer()
-{
-    m_id = 0;
-    updateWidgets();
-}
 
 void OpponentWidget::setActive(uint8_t progress)
 {
@@ -117,39 +100,37 @@ void OpponentWidget::setActive(uint8_t progress)
     }
 }
 
-PlayerCharacterWidget* OpponentWidget::playerCharacterWidget()
-{
-    return mp_characterWidget;
-}
-
-
-
-CardList* OpponentWidget::hand()
-{
-    return mp_hand;
-}
-
-CardList* OpponentWidget::table()
-{
-    return mp_table;
-}
-
 QSize OpponentWidget::sizeHint() const
 {
     return QWidget::sizeHint();
     //    return QSize(220, 220);
 }
 
-
-
 void OpponentWidget::updateWidgets()
 {
-    if (isEmpty())
-    {
+    if (isVoid()) {
         mp_labelPlayerName->setText("");
-    }
-    else
-    {
-        mp_labelPlayerName->setText(m_name);
+        mp_characterWidget->hide();
+    } else {
+        mp_labelPlayerName->setText(name());
+        mp_characterWidget->show();
+        if (isSheriff()) {
+            //if (m_sheriffBadgePixmap.isNull())
+            m_sheriffBadgePixmap.load(":/misc/gfx/misc/sheriff-badge.png");
+            Q_ASSERT(!m_sheriffBadgePixmap.isNull());
+            if (mp_sheriffBadge == 0) {
+                qDebug() << "CREATING THAT SHIT";
+                mp_sheriffBadge = new QLabel(this);
+                mp_sheriffBadge->setPixmap(m_sheriffBadgePixmap.scaled(48, 48, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+                mp_sheriffBadge->resize(48, 48);
+            }
+            qDebug() << "moving to: " << width() - mp_sheriffBadge->width();
+            mp_sheriffBadge->move(width() - mp_sheriffBadge->width(), 0);
+            mp_sheriffBadge->show();
+            //mp_sheriffBadge->setText("ADS");
+        } else {
+            if (mp_sheriffBadge != 0)
+                mp_sheriffBadge->hide();
+        }
     }
 }

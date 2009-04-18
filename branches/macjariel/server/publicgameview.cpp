@@ -61,15 +61,19 @@ StructGame PublicGameView::structGame() const
 
 GameContextData PublicGameView::gameContextData() const
 {
-    GameContextData res;
-    res.currentPlayerId   = mp_game->gameCycle().currentPlayer()->id();
-    res.requestedPlayerId = mp_game->gameCycle().requestedPlayer()->id();
-    res.turnNumber        = mp_game->gameCycle().turnNumber();
+    return mp_game->gameCycle().gameContextData();
 }
 
 QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
 {
     return mp_game->publicPlayerList();
+}
+
+const PublicPlayerView* PublicGameView::publicPlayerView(int playerId) const
+{
+    Player* player = mp_game->getPlayer(playerId);
+    if (player == 0) return 0;
+    return &player->publicView();
 }
 
 QList<const PublicPlayerView*> PublicGameView::neighbors(const PublicPlayerView* source, int distance) const

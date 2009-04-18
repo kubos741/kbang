@@ -58,6 +58,16 @@ void GameTable::playCard(Player* player, CardPlayable* card)
 
 }
 
+void GameTable::playOnTable(Player* player, CardPlayable* card)
+{
+    player->removeCardFromHand(card);
+    player->appendCardToTable(card);
+    card->setPocketType(POCKET_TABLE);
+
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayerPlayedOnTable(player->id(), card);
+}
+
 void GameTable::clearPlayedCards()
 {
     foreach(CardAbstract* card, m_playedCards)
@@ -76,6 +86,8 @@ void GameTable::generateCards()
 {
     static const int nBang = 100;
     static const int nMissed = 30;
+    static const int nBeer = 50;
+    static const int nMustang = 20;
     for(int i = 0; i < nBang; ++i)
     {
         int id = uniqueCardId();
@@ -86,6 +98,18 @@ void GameTable::generateCards()
         int id = uniqueCardId();
         m_cards[id] = new CardMissed(mp_game, id);
     }
+    for(int i = 0; i < nBeer; ++i)
+    {
+        int id = uniqueCardId();
+        m_cards[id] = new CardBeer(mp_game, id);
+    }
+    for(int i = 0; i < nMustang; ++i)
+    {
+        int id = uniqueCardId();
+        m_cards[id] = new CardMustang(mp_game, id);
+    }
+
+
     m_deck << m_cards.values();
 }
 

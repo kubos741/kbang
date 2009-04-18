@@ -26,6 +26,9 @@
 namespace client {
 class CardList;
 class PlayerCharacterWidget;
+class CardWidgetFactory;
+class GameObjectClickHandler;
+
 /**
  * The PlayerWidget class provides the abstraction for a widget that contains
  * a representation of player properties and state, like his name, his cards, etc.
@@ -35,17 +38,42 @@ class PlayerCharacterWidget;
 class PlayerWidget: public QWidget {
 Q_OBJECT
 public:
-    PlayerWidget(QWidget* parent): QWidget(parent) {}
+    PlayerWidget(QWidget* parent);
     virtual ~PlayerWidget() {}
 
-    virtual void        setPlayer(const StructPlayer&) = 0;
-    virtual void        unsetPlayer() = 0;
+    inline int      id()        const { return m_id; }
+    inline QString  name()      const { return m_name; }
+    inline bool     isSheriff() const { return m_isSheriff; }
+    inline bool     isVoid()    const { return (m_id == 0); }
 
-    virtual void        setActive(uint8_t progress) = 0;
-    virtual CardList*   hand() = 0;
-    virtual CardList*   table() = 0;
-    virtual bool        isLocalPlayer() = 0;
-    virtual PlayerCharacterWidget* playerCharacterWidget() = 0;
+    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
+
+    void setPlayer(const StructPlayer&);
+    virtual void setFromPublicData(const PublicPlayerData&) = 0;
+    virtual void clear() = 0;
+
+    virtual CardList* hand() = 0;
+    virtual CardList* table() = 0;
+    virtual PlayerCharacterWidget* characterWidget() = 0;
+
+    virtual bool isLocalPlayer() = 0;
+    virtual void setActive(uint8_t progress) = 0;
+
+protected:
+    void setId(int id);
+    void setName(const QString& name);
+    void setSheriff(bool isSheriff);
+
+    void mousePressEvent(QMouseEvent *ev);
+
+    GameObjectClickHandler* mp_gameObjectClickHandler;
+    CardWidgetFactory*      mp_cardWidgetFactory;
+
+private:
+    int         m_id;
+    QString     m_name;
+    bool        m_isSheriff;
+
 };
 }
 #endif

@@ -46,7 +46,15 @@ void Card::loadDefaultRuleset()
 
     new Card("bang",        "Bang!",    CT_PLAYING, ":/cards/gfx/cards/bang.png");
     new Card("missed",      "Mancato",  CT_PLAYING, ":/cards/gfx/cards/missed.png");
+    new Card("beer",        "Beer",     CT_PLAYING, ":/cards/gfx/cards/beer.png");
+    new Card("mustang",     "Mustang",  CT_PLAYING, ":/cards/gfx/cards/mustang.png");
 
     new Card("back-bullets","Bullets",  CT_BACK,    ":/cards/gfx/cards/back-bullets.png");
     new Card("back-bang",   "Back",     CT_BACK,    ":/cards/gfx/cards/back-bang.png");
+}
+
+const CardPointer Card::findCard(const QString& id)
+{
+    qDebug() << "findCard: " << id;
+    return (sm_cards.contains(id) ? sm_cards[id] : 0);
 }

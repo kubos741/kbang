@@ -34,6 +34,10 @@ using namespace client;
 const int       tickTime        = 20;
 const double    pixelsPerTick   = 24;
 
+// DEBUG FAST VALUES
+//const int       tickTime        = 10;
+//const double    pixelsPerTick   = 100;
+
 QBasicTimer CardMovementEvent:: sm_timer;
 
 CardMovementEvent::CardMovementEvent(Game* game, const StructCardMovement& structCardMovement):

@@ -1,8 +1,10 @@
 <RCC>
-  <qresource prefix="cards" >
-    <file>gfx/cards/missed.png</file>
-    <file>gfx/cards/bang.png</file>
-    <file>gfx/cards/back-bullets.png</file>
-    <file>gfx/cards/back-bang.png</file>
-  </qresource>
+    <qresource prefix="/cards" >
+        <file>gfx/cards/missed.png</file>
+        <file>gfx/cards/bang.png</file>
+        <file>gfx/cards/back-bullets.png</file>
+        <file>gfx/cards/back-bang.png</file>
+        <file>gfx/cards/beer.png</file>
+        <file>gfx/cards/mustang.png</file>
+    </qresource>
 </RCC>

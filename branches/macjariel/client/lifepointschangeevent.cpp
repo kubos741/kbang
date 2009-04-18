@@ -20,12 +20,12 @@ void LifePointsChangeEvent::run()
 {
     qDebug() << "LifePointsChangeEvent::run()";
     if (m_lifePoints < 0 || m_lifePoints > 5 ||
-        mp_game->playerWidget(m_playerId)->playerCharacterWidget()->lifePoints() == m_lifePoints) {
+        mp_game->playerWidget(m_playerId)->characterWidget()->lifePoints() == m_lifePoints) {
         qDebug() << "invalid lifepoint change";
         QTimer::singleShot(10, this, SLOT(finish()));
         return;
     }
-    connect(mp_game->playerWidget(m_playerId)->playerCharacterWidget(), SIGNAL(animationFinished()),
-            this,                                                       SLOT(finish()));
-    mp_game->playerWidget(m_playerId)->playerCharacterWidget()->setLifePoints(m_lifePoints);
+    connect(mp_game->playerWidget(m_playerId)->characterWidget(), SIGNAL(animationFinished()),
+            this,                                                  SLOT(finish()));
+    mp_game->playerWidget(m_playerId)->characterWidget()->setLifePoints(m_lifePoints);
 }

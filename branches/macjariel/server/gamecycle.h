@@ -1,6 +1,8 @@
 #ifndef GAMECYCLE_H
 #define GAMECYCLE_H
 
+#include "parser/parserstructs.h"
+
 
 class Game;
 class Player;
@@ -11,20 +13,19 @@ class CardPlayable;
 class GameCycle
 {
 public:
-    enum State {
-        STATE_INVALID = 0,
-        STATE_DRAW,
-        STATE_TURN,
-        STATE_RESPONSE,
-        STATE_DISCARD
-    };
-
     GameCycle(Game* game);
 
-    inline  State   state()           const { return m_state; }
-    inline  Player* currentPlayer()   const { return mp_currentPlayer; }
-    inline  Player* requestedPlayer() const { return mp_requestedPlayer; }
-    inline  int     turnNumber()      const { return 0; } /// \todo turnNumber
+    inline  GamePlayState   gamePlayState()   const { return m_state; }
+    inline  Player*         currentPlayer()   const { return mp_currentPlayer; }
+    inline  Player*         requestedPlayer() const { return mp_requestedPlayer; }
+    inline  int             turnNumber()      const { return m_turnNum; }
+
+    inline bool isDraw()     const { return m_state == GAMEPLAYSTATE_DRAW; }
+    inline bool isTurn()     const { return m_state == GAMEPLAYSTATE_TURN; }
+    inline bool isResponse() const { return m_state == GAMEPLAYSTATE_RESPONSE; }
+    inline bool isDiscard()  const { return m_state == GAMEPLAYSTATE_DISCARD; }
+
+    GameContextData gameContextData() const;
 
     void start();
 
@@ -75,20 +76,21 @@ public:
     void clearPlayedCards();
 
 private:
-    Game*   mp_game;
-    State   m_state;
-    Player* mp_currentPlayer;
-    Player* mp_requestedPlayer;
+    Game*           mp_game;
+    GamePlayState   m_state;
+    Player*         mp_currentPlayer;
+    Player*         mp_requestedPlayer;
 
     int     m_drawCardCount;
     int     m_drawCardMax;
+    int     m_turnNum;
 
 private:
     void    sendRequest();
-    void    checkPlayerAndState(Player* player, State state);
+    void    checkPlayerAndState(Player* player, GamePlayState state);
     void    startTurn(Player* player);
     int     needDiscard(Player* player);
-    void    announceFocusChange();
+    void    announceContextChange();
 };
 
 #endif // GAMECYCLE_H

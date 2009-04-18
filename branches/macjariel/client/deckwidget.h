@@ -27,6 +27,7 @@
 #include <cardpilewidget.h>
 
 namespace client {
+class CardWidgetFactory;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -38,11 +39,16 @@ public:
     DeckWidget(QWidget *parent = 0);
     ~DeckWidget();
 
+    void init(CardWidgetFactory*);
+
     virtual CardWidget* pop();
     virtual void push(CardWidget* card);
 
+
+
 private:
     CardWidget* newCard();
+    CardWidgetFactory* mp_cardWidgetFactory;
 };
 }
 #endif

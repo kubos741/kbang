@@ -17,9 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "playercharacterwidget.h"
 
 #include <QtDebug>
+#include "playercharacterwidget.h"
+#include "cardwidgetfactory.h"
+
 
 using namespace client;
 
@@ -29,30 +31,33 @@ int    PlayerCharacterWidget::sm_countAnimaton = 0;
 const int timerInterval = 20;
 
 
-PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent)
- : QWidget(parent), m_lifePoints(0), m_isAnimating(0)
+PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
+        QWidget(parent),
+        m_lifePoints(0),
+        m_isAnimating(0),
+        mp_cardWidgetFactory(0)
 {
-    setMinimumHeight(CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 2);
+        QSize widgetSize(CardWidget::qSize(CardWidget::SIZE_SMALL).width(),
+                         CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 1.9);
+        setMinimumSize(widgetSize);
+        setMaximumSize(widgetSize);
 }
 
 PlayerCharacterWidget::~PlayerCharacterWidget()
 {
 }
 
-void PlayerCharacterWidget::init()
+void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
 {
-    mp_backCard = new CardWidget(this);
-    mp_backCard->setSize(CardWidget::SIZE_SMALL);
-    mp_backCard->setCardClass("back-bullets");
+    mp_backCard = cardWidgetFactory->createBulletsCard(this);
     mp_backCard->applyNewProperties();
     mp_backCard->move(0,0);
+    mp_backCard->show();
 
-    mp_characterCard = new CardWidget(this);
-    mp_characterCard->setSize(CardWidget::SIZE_SMALL);
-    mp_characterCard->setCardClass("back-bang");
+    mp_characterCard = cardWidgetFactory->createBackCard(this);
     mp_characterCard->applyNewProperties();
     mp_characterCard->move(0,0);
-    setLifePoints(5);
+    mp_characterCard->show();
 }
 
 void PlayerCharacterWidget::setLifePoints(int lifePoints)

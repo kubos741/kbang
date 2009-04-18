@@ -22,7 +22,9 @@ HEADERS += charactercard.h \
     gametable.h \
     playerctrl.h \
     gameeventhandler.h \
-    voidai.h
+    voidai.h \
+    cardbeer.h \
+    cardmustang.h
 SOURCES += main.cpp \
     charactercard.cpp \
     player.cpp \
@@ -46,7 +48,9 @@ SOURCES += main.cpp \
     gametable.cpp \
     playerctrl.cpp \
     voidai.cpp \
-    gameeventhandler.cpp
+    gameeventhandler.cpp \
+    cardbeer.cpp \
+    cardmustang.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

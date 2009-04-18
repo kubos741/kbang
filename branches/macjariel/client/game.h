@@ -31,10 +31,14 @@
 #include "deckwidget.h"
 #include "playerwidget.h"
 
+#include "cardwidgetfactory.h"
+#include "gameobjectclickhandler.h"
+
 namespace client {
 
 class ServerConnection;
 class GameEventHandler;
+
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -52,8 +56,7 @@ public:
 
     void setCurrentPlayerId(int currentPlayerId);
     void setRequestedPlayerId(int requestedPlayerId);
-
-
+    void setGamePlayState(const GamePlayState&);
 
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline CardPileWidget* graveyard() const          { return mp_graveyard; }
@@ -65,11 +68,17 @@ public:
     inline int             currentPlayerId() const    { return m_currentPlayerId; }
     inline int             requestedPlayerId() const  { return m_requestedPlayerId; }
 
+    inline bool            isAbleToRequest() const    { return m_requestedPlayerId == m_playerId; }
+
+    inline int playerId() const { return m_playerId; }
 
     inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
 
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
+    inline GameObjectClickHandler* cardWidgetClickHandler() { return &m_gameObjectClickHandler; }
+
+    inline ServerConnection* serverConnection() { return mp_serverConnection; }
 
 private:
 
@@ -83,7 +92,7 @@ private:
 
     int m_currentPlayerId;
     int m_requestedPlayerId;
-
+    GamePlayState m_gamePlayState;
 
 
 /*  Visual elements - provided by MainWindow */
@@ -100,7 +109,8 @@ private:
     QQueue<StructCardMovement> m_cardMovementQueue;
 
     GameEventHandler*         mp_gameEventHandler;
-
+    CardWidgetFactory         m_cardWidgetFactory;
+    GameObjectClickHandler    m_gameObjectClickHandler;
 
 
 

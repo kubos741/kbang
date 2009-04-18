@@ -42,30 +42,28 @@ public:
     LocalPlayerWidget(QWidget* parent);
     virtual ~LocalPlayerWidget();
 
-
+    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
 
     virtual void setFromPublicData(const PublicPlayerData&);
     virtual void setFromPrivateData(const PrivatePlayerData&);
-    virtual void setPlayer(const StructPlayer&);
-    virtual void unsetPlayer();
+    virtual void clear();
+
     virtual void setActive(uint8_t progress);
-    virtual PlayerCharacterWidget* playerCharacterWidget();
 
-    void init();
+    virtual CardList*               hand()            { return mp_hand; }
+    virtual CardList*               table()           { return mp_table; }
+    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
+    virtual bool                    isLocalPlayer()   { return 1; }
 
-    virtual CardList*   hand();
-    virtual CardList*   table();
-
-
-    virtual bool isLocalPlayer() { return 0; }
-
-private:
-    void updateWidgets();
+private slots:
+    void onEndTurnClicked();
+    void onPassClicked();
+    void onDiscardClicked();
 
 private:
-    int     m_id;
-    QString m_name;
-    bool    m_isSheriff;
+    void    updateWidgets();
+
+private:
     QString m_baseStyleSheet;
 };
 }

@@ -23,6 +23,8 @@
 #include "publicgameview.h"
 #include "privateplayerview.h"
 #include "cardabstract.h"
+#include "cardplayable.h"
+#include "parser/parserstructs.h"
 
 #include "voidai.h"
 
@@ -51,6 +53,17 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
             this,       SLOT(onActionLeaveGame()));
     connect(mp_parser,  SIGNAL(sigActionStartGame()),
             this,       SLOT(onActionStartGame()));
+    connect(mp_parser,  SIGNAL(sigActionDrawCard(int,bool)),
+            this,       SLOT(onActionDrawCard(int,bool)));
+    connect(mp_parser,  SIGNAL(sigActionPlayCard(const ActionPlayCardData&)),
+            this,       SLOT(onActionPlayCard(const ActionPlayCardData&)));
+    connect(mp_parser,  SIGNAL(sigActionEndTurn()),
+            this,       SLOT(onActionEndTurn()));
+    connect(mp_parser,  SIGNAL(sigActionPass()),
+            this,       SLOT(onActionPass()));
+    connect(mp_parser,  SIGNAL(sigActionDiscard(int)),
+            this,       SLOT(onActionDiscard(int)));
+
 }
 
 Client::~Client()
@@ -120,6 +133,107 @@ void Client::onActionStartGame()
     }
     mp_playerCtrl->startGame();
 }
+
+void Client::onActionDrawCard(int numCards, bool revealCard)
+{
+    try {
+        mp_playerCtrl->drawCard(numCards, revealCard);
+    } catch (BadGameStateException e) {
+        qDebug() << "Cannot draw card now - the gamestate now is:";
+        qDebug() << "current player: " << mp_playerCtrl->publicGameView().gameContextData().currentPlayerId;
+        qDebug() << "requested player: " << mp_playerCtrl->publicGameView().gameContextData().requestedPlayerId;
+        switch (mp_playerCtrl->publicGameView().gameContextData().gamePlayState)
+        {
+            case GAMEPLAYSTATE_DRAW: qDebug() << "DRAW"; break;
+            case GAMEPLAYSTATE_DISCARD: qDebug() << "DISCARD"; break;
+            case GAMEPLAYSTATE_TURN: qDebug() << "TURN"; break;
+        }
+    }
+}
+
+
+
+
+void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
+{
+    qDebug("[CLIENT]   onActionPlayCard");
+    CardAbstract* playedCard = mp_playerCtrl->privatePlayerView().card(actionPlayCardData.playedCardId);
+    if (playedCard == 0) {
+        qDebug(qPrintable(QString("[CLIENT]   Card '%1' not found!").arg(actionPlayCardData.playedCardId)));
+        // @todo feedback
+        return;
+    }
+    CardPlayable* playableCard = qobject_cast<CardPlayable*>(playedCard);
+    if (playableCard == 0) {
+        qDebug(qPrintable(QString("[CLIENT]   Card '%1' not playable!").arg(actionPlayCardData.playedCardId)));
+        // @todo feedback
+        return;
+    }
+    try {
+        switch (actionPlayCardData.type) {
+        case ActionPlayCardData::PLAYCARD_SIMPLE:
+            mp_playerCtrl->playCard(playableCard);
+            break;
+        case ActionPlayCardData::PLAYCARD_PLAYER: {
+                const PublicPlayerView* targetPlayer = mp_playerCtrl->publicGameView().publicPlayerView(actionPlayCardData.targetPlayerId);
+                if (targetPlayer == 0) {
+                    qDebug(qPrintable(QString("[CLIENT]   Target player '%1' not exist!").arg(actionPlayCardData.targetPlayerId)));
+                    // @todo feedback
+                    return;
+                }
+                mp_playerCtrl->playCard(playableCard, targetPlayer);
+            } break;
+        case ActionPlayCardData::PLAYCARD_CARD:
+            qDebug("[CLIENT]   PLAYCARD_CARD not implemented yet.");
+            break;
+        case ActionPlayCardData::PLAYCARD_HAND:
+            qDebug("[CLIENT]   PLAYCARD_HAND not implemented yet.");
+            break;
+        }
+    } catch (OneBangPerTurnException e) {
+        qDebug("[CLIENT]    OneBangPerTurnException");
+    } catch (BadGameStateException e) {
+        qDebug("[CLIENT]    BadGameStateException");
+    } catch (BadCardException e) {
+        qDebug("[CLIENT]    BadCardException");
+    }
+
+}
+
+void Client::onActionEndTurn()
+{
+    try {
+        mp_playerCtrl->finishTurn();
+    } catch (BadGameStateException e) {
+        qDebug("Cannot end turn now.");
+    } catch (TooManyCardsInHandException e) {
+        qDebug("[CLIENT]    TooManyCardsInHandException");
+    }
+}
+
+void Client::onActionPass()
+{
+    try {
+        mp_playerCtrl->pass();
+    } catch (BadGameStateException e) {
+        qDebug("Cannot pass now.");
+    }
+}
+
+void Client::onActionDiscard(int cardId)
+{
+    try {
+        CardAbstract* card = mp_playerCtrl->privatePlayerView().card(cardId);
+        if (card == 0) {
+            qDebug("Cannot discard unknown card.");
+            return;
+        }
+        mp_playerCtrl->discardCard(card);
+    } catch (BadGameStateException e) {
+        qDebug("Cannot discard now.");
+    }
+}
+
 
 void Client::onQueryServerInfo(QueryResult result)
 {
@@ -290,6 +404,17 @@ void Client::onPlayerPlayedCard(int playerId, const CardAbstract* card)
     mp_parser->eventCardMovement(x);
 }
 
+void Client::onPlayerPlayedOnTable(int playerId, const CardAbstract* card)
+{
+    StructCardMovement x;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_TABLE;
+    x.playerFrom     = playerId;
+    x.playerTo       = playerId;
+    x.cardDetails    = card->cardDetails();
+    mp_parser->eventCardMovement(x);
+}
+
 void Client::onPlayedCardsCleared()
 {
 }
@@ -301,9 +426,9 @@ void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoint
     qDebug() << "DONE TRYING TO SEND LIFEPOINTS";
 }
 
-void Client::onGameFocusChange(int currentPlayerId, int requestedPlayerId)
+void Client::onGameContextChange(const GameContextData& gameContextData)
 {
-    mp_parser->eventGameFocusChange(currentPlayerId, requestedPlayerId);
+    mp_parser->eventGameContextChange(gameContextData);
 }
 
 void Client::onActionRequest(ActionRequestType requestType)

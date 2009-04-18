@@ -28,7 +28,7 @@ using namespace client;
  */
 CardPileWidget::CardPileWidget(QWidget *parent):
         CardPocket(parent),
-        m_cardWidgetSize(CardWidget::SIZE_SMALL),
+        m_cardWidgetSize(CardWidget::SIZE_NORMAL),
         m_padding(4, 4)
 {
     setMinimumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
@@ -53,11 +53,12 @@ CardWidget* CardPileWidget::pop()
 
 void CardPileWidget::push(CardWidget* card)
 {
+    CardPocket::push(card);
     m_cards.push(card);
     card->setParent(this);
     card->setSize(m_cardWidgetSize);
     card->applyNewProperties();
-    card->move(CardPileWidget::newCardPosition()    );
+    card->move(CardPileWidget::newCardPosition());
     card->raise();
     card->show();
 }

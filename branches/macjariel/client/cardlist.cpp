@@ -45,13 +45,14 @@ void CardList::setCardSize(const CardWidget::Size& cardSize)
     QSize cardS = CardWidget::qSize(cardSize);
     QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
     m_moveFactor = cardS.width() / 2;
-    setMinimumHeight(widgetSize.height());
-    //setMaximumSize(widgetSize);
-    resize(widgetSize);
+    setMinimumWidth(cardS.width() * 3);
+    setMinimumHeight(cardS.height() + 2 * m_vPadding);
+    updateGeometry();
 }
 
 void CardList::push(CardWidget* card)
 {
+    CardPocket::push(card);
     card->move(newCardPosition());
     card->setParent(this);
     m_cards.push_back(card);
@@ -60,8 +61,6 @@ void CardList::push(CardWidget* card)
     card->raise();
     reorder();
     card->show();
-
-    // todo
 }
 
 QPoint CardList::newCardPosition() const

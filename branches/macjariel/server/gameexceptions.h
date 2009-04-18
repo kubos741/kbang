@@ -13,11 +13,10 @@ private:
 };
 
 
-class BadGameStateException
-{
-public:
-    BadGameStateException() {}
-};
+class BadGameStateException {};
+
+class OneBangPerTurnException: public BadGameStateException {};
+class TwoSameOnTableException: public BadGameStateException {};
 
 class BadGameException {};
 
@@ -25,7 +24,7 @@ class TooManyCardsInHandException {};
 
 class BadCardException {};
 
-
+class BadUsageException {};
 
 
 

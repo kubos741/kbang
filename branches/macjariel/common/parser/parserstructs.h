@@ -73,11 +73,30 @@ enum PocketType {
 enum CardType {
     CARD_UNKNOWN,
     CARD_BANG,
-    CARD_MISSED
+    CARD_MISSED,
+    CARD_BEER,
+    CARD_MUSTANG
 };
 
 enum CharacterType {
     CHARACTER_UNKNOWN
+};
+
+struct ActionPlayCardData {
+    int playedCardId;
+    enum {
+        PLAYCARD_SIMPLE,    // card is played solo
+        PLAYCARD_PLAYER,    // card is played with target player
+        PLAYCARD_CARD,      // card is played with target (revealed) card
+        PLAYCARD_HAND       // card is played with target (unrevealed) card in opponent hands
+    } type;
+    union {
+        int targetPlayerId;
+        int targetCardId;
+        int targetHandId;
+    };
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
 };
 
 
@@ -108,10 +127,20 @@ struct PrivatePlayerData {
     void write(QXmlStreamWriter*) const;
 };
 
+enum GamePlayState {
+    GAMEPLAYSTATE_INVALID = 0,
+    GAMEPLAYSTATE_DRAW,
+    GAMEPLAYSTATE_TURN,
+    GAMEPLAYSTATE_RESPONSE,
+    GAMEPLAYSTATE_DISCARD
+};
+
 struct GameContextData {
-    int currentPlayerId;
-    int requestedPlayerId;
-    int turnNumber;
+    int             currentPlayerId;
+    int             requestedPlayerId;
+    int             turnNumber;
+    GamePlayState   gamePlayState;
+
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };

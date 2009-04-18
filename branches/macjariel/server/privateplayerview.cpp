@@ -20,6 +20,7 @@
 #include "privateplayerview.h"
 #include "player.h"
 #include "cardabstract.h"
+#include "gametable.h"
 
 PrivatePlayerView::PrivatePlayerView(Player* player)
  : PublicPlayerView(player)
@@ -61,3 +62,12 @@ StructPlayer PrivatePlayerView::structPlayer() const
     return mp_player->structPlayer(1);
 }
 
+CardAbstract* PrivatePlayerView::card(int cardId) const
+{
+    CardAbstract* res = mp_player->game()->gameTable().card(cardId);
+    if (res == 0 || res->owner() == mp_player)
+        return res;
+    if (res->pocket() == POCKET_HAND || res->pocket() == POCKET_DECK)
+        return 0;
+    return res;
+}

@@ -33,6 +33,10 @@ void VoidAI::onActionRequest(ActionRequestType requestType)
 void VoidAI::requestWithAction()
 {
     qDebug() << QString("VoidAI (%1): onActionRequest(%2)").arg(m_id).arg(m_requestType);
+    if (mp_playerCtrl->publicGameView().gameContextData().requestedPlayerId != mp_playerCtrl->privatePlayerView().id()) {
+        QString("VoidAI (%1): Not requested!");
+        return;
+    }
     switch(m_requestType) {
         case REQUEST_DRAW:
             // Drawing two cards
@@ -41,21 +45,25 @@ void VoidAI::requestWithAction()
         case REQUEST_PLAY: {
 
             // If have bang, tries to play it
-            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
-            foreach (CardAbstract* c, cards) {
-                CardBang* bang = qobject_cast<CardBang*>(c);
-                if (bang == 0) continue;
+            try {
+                QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
+                foreach (CardAbstract* c, cards) {
+                    CardBang* bang = qobject_cast<CardBang*>(c);
+                    if (bang == 0) continue;
 
-                QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().neighbors(
-                            &mp_playerCtrl->privatePlayerView(), 1);
-                foreach (const PublicPlayerView* p, players) {
-                    mp_playerCtrl->playCard(bang, p);
-                    return;
+                    QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().neighbors(
+                                &mp_playerCtrl->privatePlayerView(), 1);
+                    foreach (const PublicPlayerView* p, players) {
+                        mp_playerCtrl->playCard(bang, p);
+                        return;
 
+                    }
                 }
+            } catch (OneBangPerTurnException e) {
+                qDebug() << "VoidAI: One bang per turn!";
+            } catch (BadPlayerException e) {
+                qDebug() << "VoidAI: Bad player exception!";
             }
-
-
 
             // Finish turn or discard random card
             try {

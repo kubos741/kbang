@@ -32,6 +32,8 @@ public:
      */
     void playCard(Player* p, CardPlayable* card);
 
+    void playOnTable(Player* p, CardPlayable* card);
+
     /**
      * Returns the last played card.
      */
@@ -43,6 +45,9 @@ public:
         return m_playedCards.first();
     }
 
+    CardAbstract* card(int cardId) const {
+        return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
+    }
 
 
     /**

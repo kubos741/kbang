@@ -79,14 +79,15 @@ public:
 
     virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) = 0;
 
+    virtual void onPlayerPlayedOnTable(int playerId, const CardAbstract* card) = 0;
+
     virtual void onPlayedCardsCleared() = 0;
 
-    virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId) = 0;
+    virtual void onGameContextChange(const GameContextData&) = 0;
 
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) = 0;
 
     virtual void onActionRequest(ActionRequestType requestType) = 0;
-
 
     virtual ~GameEventHandler() {};
 };

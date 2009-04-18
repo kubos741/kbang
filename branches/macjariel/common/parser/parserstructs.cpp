@@ -77,7 +77,68 @@ QString PlayerRoleToString(const PlayerRole& r)
 }
 
 
+GamePlayState StringToGamePlayState(const QString& s)
+{
+    if (s == "draw")     return GAMEPLAYSTATE_DRAW;
+    if (s == "turn")     return GAMEPLAYSTATE_TURN;
+    if (s == "response") return GAMEPLAYSTATE_RESPONSE;
+    if (s == "discard")  return GAMEPLAYSTATE_DISCARD;
+    return GAMEPLAYSTATE_INVALID;
+}
+
+QString GamePlayStateToString(const GamePlayState& s)
+{
+    if (s == GAMEPLAYSTATE_DRAW)     return "draw";
+    if (s == GAMEPLAYSTATE_TURN)     return "turn";
+    if (s == GAMEPLAYSTATE_RESPONSE) return "response";
+    if (s == GAMEPLAYSTATE_DISCARD)  return "discard";
+    if (s == GAMEPLAYSTATE_INVALID)  return "invalid";
+    NOT_REACHED();
+    return "invalid";
+}
+
 //----------------------------------------------------------------------------
+
+
+void ActionPlayCardData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "play-card");
+    playedCardId = node->attribute("id").toInt();
+    if (!node->attribute("target-player-id").isNull()) {
+        type = PLAYCARD_PLAYER;
+        targetPlayerId = node->attribute("target-player-id").toInt();
+    } else if (!node->attribute("target-card-id").isNull()) {
+        type = PLAYCARD_CARD;
+        targetCardId = node->attribute("target-card-id").toInt();
+    } else if (!node->attribute("target-hand-id").isNull()) {
+        type = PLAYCARD_HAND;
+        targetHandId = node->attribute("target-hand-id").toInt();
+    } else {
+        type = PLAYCARD_SIMPLE;
+    }
+}
+
+void ActionPlayCardData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("play-card");
+    writer->writeAttribute("id", QString::number(playedCardId));
+    switch(type) {
+    case PLAYCARD_SIMPLE:
+        break;
+    case PLAYCARD_PLAYER:
+        writer->writeAttribute("target-player-id", QString::number(targetPlayerId));
+        break;
+    case PLAYCARD_CARD:
+        writer->writeAttribute("target-card-id", QString::number(targetCardId));
+        break;
+    case PLAYCARD_HAND:
+        writer->writeAttribute("target-hand-id", QString::number(targetHandId));
+        break;
+    }
+    writer->writeEndElement();
+}
+
+
 
 
 void CardData::read(XmlNode* node)
@@ -169,6 +230,7 @@ void GameContextData::read(XmlNode* node)
     currentPlayerId     = node->attribute("currentPlayerId").toInt();
     requestedPlayerId   = node->attribute("requestedPlayerId").toInt();
     turnNumber          = node->attribute("turnNumber").toInt();
+    gamePlayState       = StringToGamePlayState(node->attribute("gamePlayState"));
 }
 
 void GameContextData::write(QXmlStreamWriter* writer) const
@@ -177,6 +239,7 @@ void GameContextData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("currentPlayerId",   QString::number(currentPlayerId));
     writer->writeAttribute("requestedPlayerId", QString::number(requestedPlayerId));
     writer->writeAttribute("turnNumber",        QString::number(turnNumber));
+    writer->writeAttribute("gamePlayState",     GamePlayStateToString(gamePlayState));
     writer->writeEndElement();
 }
 

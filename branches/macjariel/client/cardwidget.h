@@ -21,9 +21,13 @@
 #define CARDWIDGET_H
 
 #include <QLabel>
+#include "parser/parserstructs.h"
 
 namespace client
 {
+
+class CardWidgetFactory;
+class GameObjectClickHandler;
 
 /**
  * @author MacJariel <MacJariel (at) gmail.com>
@@ -36,11 +40,12 @@ public:
         SIZE_SMALL, SIZE_NORMAL, SIZE_BIG
     };
 
-
     CardWidget(QWidget *parent = 0);
     ~CardWidget();
 
     QPoint absPos() const;
+    void setGameObjectClickHandler(GameObjectClickHandler*);
+
 
     void setCardClass(const QString& cardClassId);
     void setCardId(int cardIs);
@@ -50,19 +55,32 @@ public:
     inline void setShadowMode()    { m_shadowMode = 1; }
     inline void unsetShadowMode()  { m_shadowMode = 0; }
 
+    void setPocketType(const PocketType&);
+    void setOwnerId(int ownerId);
+    void setHighlight(bool highlight);
+
     inline static QSize smallSize()  { return sm_qsizeSmall;  }
     inline static QSize normalSize() { return sm_qsizeNormal; }
     inline static QSize bigSize()    { return sm_qsizeBig;    }
 
     inline Size  size()  const { return m_size; }
     inline QSize qsize() const { return m_qsize; }
+    QString cardClass()  const { return m_cardClassId; }
     inline int   cardId() const { return m_cardId; }
+    inline bool  hasHighlight() const { return m_hasHighlight; }
     static QSize qSize(Size size);
 
+    inline PocketType pocketType() const { return m_pocketType; }
+    inline int        ownerId()    const { return m_ownerId; }
+
+
+protected:
+    void mousePressEvent(QMouseEvent *ev);
 
 
 private:
     virtual void paintEvent (QPaintEvent *event);
+
 
 
 private:
@@ -72,6 +90,11 @@ private:
     Size    m_size;
     QSize   m_qsize;
     bool    m_shadowMode;
+    bool    m_hasHighlight;
+    GameObjectClickHandler* mp_gameObjectClickHandler;
+
+    PocketType m_pocketType;
+    int        m_ownerId;
 };
 }
 

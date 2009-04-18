@@ -21,6 +21,9 @@
 #include "cardwidget.h"
 #include "cardlist.h"
 #include "playercharacterwidget.h"
+#include "cardwidgetfactory.h"
+#include "gameobjectclickhandler.h"
+
 
 #include <QtDebug>
 
@@ -28,66 +31,78 @@ using namespace client;
 
 LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
         PlayerWidget(parent),
-        Ui::LocalPlayerWidget(),
-        m_isSheriff(0)
+        Ui::LocalPlayerWidget()
 {
     setupUi(this);
     mp_hand->setCardSize(CardWidget::SIZE_NORMAL);
+    mp_hand->setPocketType(POCKET_HAND);
+    mp_hand->setOwnerId(id());
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
+    mp_table->setPocketType(POCKET_TABLE);
+    mp_table->setOwnerId(id());
     m_baseStyleSheet = mainFrame->styleSheet();
     setActive(0);
+    updateWidgets();
+
+    connect(mp_buttonEndTurn, SIGNAL(clicked()),
+            this,             SLOT(onEndTurnClicked()));
+    connect(mp_buttonPass,    SIGNAL(clicked()),
+            this,             SLOT(onPassClicked()));
+    connect(mp_buttonDiscard, SIGNAL(clicked()),
+            this,             SLOT(onDiscardClicked()));
 }
-
-
 
 LocalPlayerWidget::~LocalPlayerWidget()
 {
 }
 
-void LocalPlayerWidget::init()
+void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
 {
-    mp_characterWidget->init();
+    PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
+    mp_characterWidget->init(mp_cardWidgetFactory);
 }
-
-
 
 void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
-    m_id        = publicPlayerData.id;
-    m_name      = publicPlayerData.name;
-    // mp_characterWidget->setCharacter(publicPlayerData.character);
-    //mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
-    m_isSheriff  = publicPlayerData.isSheriff;
+    setId(publicPlayerData.id);
+    setName(publicPlayerData.name);
+    //mp_characterWidget->setCharacter(publicPlayerData.character);
+    mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
+    setSheriff(publicPlayerData.isSheriff);
+    // Set cards on table
+    /* TODO
     foreach (const CardData& cardData, publicPlayerData.table) {
-        CardWidget* card = new CardWidget(0);
+        CardWidget* card = mp_cardWidgetFactory->createBackCard();
         card->setCardId(cardData.id);
        // card->setCardClass(cardData.type);
         mp_table->push(card);
     }
+    */
+    mp_hand->setOwnerId(id());
+    mp_table->setOwnerId(id());
+    updateWidgets();
 }
 
 void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
 {
-    Q_ASSERT(m_id = privatePlayerData.id);
+    Q_ASSERT(id() == privatePlayerData.id);
     /// \todo Role
+    // Set cards in hand
+    /* TODO
     foreach (const CardData& cardData, privatePlayerData.hand) {
         CardWidget* card = new CardWidget(0);
         card->setCardId(cardData.id);
-        //card->setCardClass(cardData.type);
+        //card->setCardClass(cardData.type); //TODO
         mp_hand->push(card);
     }
-}
-
-void LocalPlayerWidget::setPlayer(const StructPlayer& player)
-{
-    m_id = player.id;
-    m_name = player.name;
+    */
     updateWidgets();
 }
 
-void LocalPlayerWidget::unsetPlayer()
+void LocalPlayerWidget::clear()
 {
-    m_id = 0;
+    setId(0);
+    setName("");
     updateWidgets();
 }
 
@@ -106,27 +121,32 @@ void LocalPlayerWidget::setActive(uint8_t progress)
     }
 }
 
-PlayerCharacterWidget* LocalPlayerWidget::playerCharacterWidget()
+
+void LocalPlayerWidget::onEndTurnClicked()
 {
-    return mp_characterWidget;
+    mp_gameObjectClickHandler->onEndTurnClicked();
 }
 
-CardList* LocalPlayerWidget::hand()
+void LocalPlayerWidget::onPassClicked()
 {
-    return mp_hand;
+    mp_gameObjectClickHandler->onPassClicked();
 }
 
-CardList* LocalPlayerWidget::table()
+void LocalPlayerWidget::onDiscardClicked()
 {
-    return mp_table;
+    mp_gameObjectClickHandler->setDiscardMode(mp_buttonDiscard->isChecked());
 }
+
+
 
 void LocalPlayerWidget::updateWidgets()
 {
-    if (m_id != 0) {
-        mp_labelPlayerName->setText(m_name);
-    } else {
+    if (isVoid()) {
         mp_labelPlayerName->setText("");
+        //mp_characterWidget->hide();
+    } else {
+        mp_labelPlayerName->setText(name());
+        mp_characterWidget->show();
     }
 }
 

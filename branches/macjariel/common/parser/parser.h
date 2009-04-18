@@ -75,6 +75,11 @@ public slots:
     void actionLeaveGame();
     void actionStartGame();
     void actionMessage(const QString& message);
+    void actionDrawCard(int numCards, bool revealCard);
+    void actionPlayCard(const ActionPlayCardData&);
+    void actionEndTurn();
+    void actionPass();
+    void actionDiscard(int cardId);
 
 
 
@@ -87,7 +92,7 @@ signals:
     void sigEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
     void sigEventStartGame(const StructGame&, const StructPlayerList&);
     void sigEventGameStartable(int gameId, bool startable);
-    void sigEventGameFocusChange(int currentPlayerId, int requestedPlayerId);
+    void sigEventGameContextChange(const GameContextData&);
     void sigEventGameSync(const GameSyncData&);
     void sigEventLifePointsChange(int playerId, int lifePoints);
     void sigEventCardMovement(const StructCardMovement&);
@@ -102,7 +107,7 @@ public slots:
     void eventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
     void eventStartGame(const StructGame&, const StructPlayerList&);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
-    void eventGameFocusChange(int currentPlayerId, int requestedPlayerId);
+    void eventGameContextChange(const GameContextData&);
     void eventGameSync(const GameSyncData&);
     void eventCardMovement(const StructCardMovement&);
     void eventLifePointsChange(int playerId, int lifePoints);
@@ -127,6 +132,11 @@ signals:
     void sigActionLeaveGame();
     void sigActionStartGame();
     void sigActionMessage(const QString& message);
+    void sigActionDrawCard(int numCards, bool revealCard);
+    void sigActionPlayCard(const ActionPlayCardData&);
+    void sigActionEndTurn();
+    void sigActionPass();
+    void sigActionDiscard(int cardId);
 
 
 signals:

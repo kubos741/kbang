@@ -28,6 +28,7 @@
 namespace client {
 
 /**
+ * @todo Rename to CharacterWidget
  * @author MacJariel <MacJariel@gmail.com>
  */
 class PlayerCharacterWidget: public QWidget
@@ -37,7 +38,7 @@ public:
     PlayerCharacterWidget(QWidget *parent = 0);
     virtual ~PlayerCharacterWidget();
 
-    void init();
+    void init(CardWidgetFactory* cardWidgetFactory);
 
 
 
@@ -49,7 +50,7 @@ public:
     void setLifePoints(int lifePoints);
     void unset();
 
-    virtual QSize sizeHint() const { return m_sizeHint; }
+    //virtual QSize sizeHint() const { return m_sizeHint; }
 
 private:
     void lifePointsChanged();
@@ -72,9 +73,9 @@ private:
 
     static QTimer sm_timer;
     static int    sm_countAnimaton;
-    QSize         m_sizeHint;
+    //QSize         m_sizeHint;
 
-
+    CardWidgetFactory*  mp_cardWidgetFactory;
 };
 
 }

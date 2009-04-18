@@ -91,6 +91,8 @@ public:
      */
     QList<const PublicPlayerView*>  publicPlayerList() const;
 
+    const PublicPlayerView* publicPlayerView(int playerId) const;
+
     QList<const PublicPlayerView*> neighbors(const PublicPlayerView* source, int distance) const;
 
 private:

@@ -90,6 +90,9 @@ public:
     QList<CardAbstract*>    cardsInHand();
     QList<CardAbstract*>    table();
 
+    bool hasDuplicateOnTable(CardAbstract* card);
+
+
     /**
      * Returns the players' character.
      */
@@ -115,13 +118,13 @@ public:
      GameEventHandler* gameEventHandler() const;
 
     void appendCardToHand(CardAbstract* card);
-
+    void appendCardToTable(CardAbstract* card);
     /**
      * Removes the given card from players hand. Returns
      * true if player had that card in hand.
      */
     bool removeCardFromHand(CardAbstract* card);
-
+    bool removeCardFromTable(CardAbstract* card);
 
     const PublicPlayerView&  publicView() const;
     const PrivatePlayerView& privateView() const;
@@ -131,7 +134,8 @@ public:
     void setRole(const PlayerRole& role);
 
 
-
+    void onBangPlayed();
+    bool canPlayBang();
 
     inline static Player* player(const PublicPlayerView* publicPlayerView) {
         return publicPlayerView->mp_player;
@@ -150,6 +154,8 @@ private:
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
     GameEventHandler*         mp_gameEventHandler;
+
+    int                       m_lastBangTurn;
 
     const PublicPlayerView    m_publicPlayerView;
     const PrivatePlayerView   m_privatePlayerView;

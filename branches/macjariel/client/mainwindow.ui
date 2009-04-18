@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>967</height>
+    <width>639</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -38,15 +38,21 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     <string notr="true" />
    </property>
    <layout class="QGridLayout" name="gridLayout" >
+    <property name="spacing" >
+     <number>0</number>
+    </property>
     <item row="0" column="0" >
      <layout class="QHBoxLayout" name="horizontalLayout_5" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_6" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
@@ -58,24 +64,40 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_5" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_5" >
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Preferred</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>25</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent2" />
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent2" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -83,17 +105,20 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     </item>
     <item row="0" column="1" >
      <layout class="QHBoxLayout" name="horizontalLayout_6" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_7" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>15</width>
+          <width>10</width>
           <height>15</height>
          </size>
         </property>
@@ -101,8 +126,24 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_6" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent3" />
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent3" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_6" >
@@ -110,12 +151,12 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Preferred</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>25</height>
            </size>
           </property>
          </spacer>
@@ -130,12 +171,12 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="sizeType" >
-       <enum>QSizePolicy::Minimum</enum>
+       <enum>QSizePolicy::Maximum</enum>
       </property>
       <property name="sizeHint" stdset="0" >
        <size>
-        <width>15</width>
-        <height>15</height>
+        <width>50</width>
+        <height>20</height>
        </size>
       </property>
      </spacer>
@@ -145,7 +186,20 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7" >
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent4" />
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent4" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_7" >
@@ -158,7 +212,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>25</height>
            </size>
           </property>
          </spacer>
@@ -171,11 +225,11 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>15</width>
+          <width>10</width>
           <height>15</height>
          </size>
         </property>
@@ -185,8 +239,14 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     </item>
     <item row="0" column="4" >
      <layout class="QHBoxLayout" name="horizontalLayout_4" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_4" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_4" >
           <property name="orientation" >
@@ -198,13 +258,26 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>25</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent5" />
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent5" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -236,7 +309,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Preferred</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
@@ -247,7 +320,20 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent1" />
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent1" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -257,12 +343,12 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>15</width>
-          <height>1</height>
+          <width>50</width>
+          <height>15</height>
          </size>
         </property>
        </spacer>
@@ -271,10 +357,13 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     </item>
     <item row="1" column="1" colspan="3" >
      <layout class="QVBoxLayout" name="verticalLayout_10" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <widget class="QWidget" native="1" name="mp_middleWidget" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -301,17 +390,20 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     </item>
     <item row="1" column="4" >
      <layout class="QHBoxLayout" name="horizontalLayout_2" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_3" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>15</width>
+          <width>50</width>
           <height>15</height>
          </size>
         </property>
@@ -319,12 +411,61 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_8" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_8" >
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>15</width>
+            <height>15</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="client::OpponentWidget" native="1" name="mp_opponent6" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0" colspan="5" >
+     <layout class="QHBoxLayout" name="horizontalLayout_8" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="verticalSpacer" >
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
            <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0" >
@@ -336,62 +477,74 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" native="1" name="mp_opponent6" />
+         <widget class="client::ChatWidget" native="1" name="mp_chatWidget" />
         </item>
        </layout>
       </item>
-     </layout>
-    </item>
-    <item row="2" column="0" >
-     <layout class="QVBoxLayout" name="verticalLayout_2" >
       <item>
-       <spacer name="verticalSpacer" >
-        <property name="orientation" >
-         <enum>Qt::Vertical</enum>
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <property name="spacing" >
+         <number>0</number>
         </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="client::ChatWidget" native="1" name="mp_chatWidget" />
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="1" colspan="3" >
-     <layout class="QHBoxLayout" name="horizontalLayout" >
-      <item>
-       <spacer name="horizontalSpacer" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3" >
         <item>
-         <widget class="client::LocalPlayerWidget" native="1" name="mp_localPlayerWidget" />
+         <spacer name="horizontalSpacer" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>15</width>
+            <height>15</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
-         <spacer name="verticalSpacer_2" >
+         <layout class="QVBoxLayout" name="verticalLayout_3" >
+          <property name="spacing" >
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="client::LocalPlayerWidget" native="1" name="mp_localPlayerWidget" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2" >
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+            <property name="sizeHint" stdset="0" >
+             <size>
+              <width>15</width>
+              <height>15</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2" >
           <property name="orientation" >
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeType" >
            <enum>QSizePolicy::Minimum</enum>
@@ -407,43 +560,30 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
        </layout>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
+       <layout class="QVBoxLayout" name="verticalLayout" >
+        <property name="spacing" >
+         <number>0</number>
         </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="4" >
-     <layout class="QVBoxLayout" name="verticalLayout" >
-      <item>
-       <spacer name="verticalSpacer_3" >
-        <property name="orientation" >
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="client::LogWidget" native="1" name="mp_logWidget" />
+        <item>
+         <spacer name="verticalSpacer_3" >
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>15</width>
+            <height>15</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="client::LogWidget" native="1" name="mp_logWidget" />
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -454,7 +594,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
+     <width>639</width>
      <height>24</height>
     </rect>
    </property>

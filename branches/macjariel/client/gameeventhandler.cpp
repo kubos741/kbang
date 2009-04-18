@@ -4,7 +4,7 @@
 #include "game.h"
 
 #include "cardmovementevent.h"
-#include "gamefocuschangeevent.h"
+#include "gamecontextchangeevent.h"
 #include "gamesyncevent.h"
 #include "lifepointschangeevent.h"
 
@@ -21,8 +21,8 @@ void GameEventHandler::connectSlots(QObject* signalEmitter)
 {
     connect(signalEmitter,      SIGNAL(sigEventCardMovement(const StructCardMovement&)),
             this,               SLOT(onCardMovementEvent(const StructCardMovement&)));
-    connect(signalEmitter,      SIGNAL(sigEventGameFocusChange(int, int)),
-            this,               SLOT(onGameFocusChangeEvent(int,int)));
+    connect(signalEmitter,      SIGNAL(sigEventGameContextChange(const GameContextData&)),
+            this,               SLOT(onGameContextChangeEvent(const GameContextData&)));
     connect(signalEmitter,      SIGNAL(sigEventGameSync(const GameSyncData&)),
             this,               SLOT(onGameSyncEvent(const GameSyncData&)));
     connect(signalEmitter,      SIGNAL(sigEventLifePointsChange(int, int)),
@@ -35,10 +35,10 @@ void GameEventHandler::onCardMovementEvent(const StructCardMovement& structCardM
     mp_queue->add(new CardMovementEvent(mp_game, structCardMovement));
 }
 
-void GameEventHandler::onGameFocusChangeEvent(int currentPlayerId, int requestedPlayerId)
+void GameEventHandler::onGameContextChangeEvent(const GameContextData& gameContextData)
 {
-    qDebug() << "FocusChangeEvent";
-    mp_queue->add(new GameFocusChangeEvent(mp_game, currentPlayerId, requestedPlayerId));
+    qDebug() << "ContextChangeEvent";
+    mp_queue->add(new GameContextChangeEvent(mp_game, gameContextData));
 }
 
 void GameEventHandler::onGameSyncEvent(const GameSyncData& gameSyncData)

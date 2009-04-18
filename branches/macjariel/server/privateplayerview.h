@@ -22,6 +22,8 @@
 
 #include <publicplayerview.h>
 
+class CardAbstract;
+
 
 /**
  *
@@ -47,6 +49,8 @@ public:
     PrivatePlayerData privatePlayerData() const;
 
     virtual StructPlayer structPlayer() const;
+
+    CardAbstract* card(int cardId) const;
 
 
     // implement method cardsInHand

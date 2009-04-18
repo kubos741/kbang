@@ -330,6 +330,32 @@ void Parser::processStanza()
             XmlNode* messageNode = action->getFirstChild();
             if (!messageNode || !messageNode->isTextElement()) return;
             emit sigActionMessage(messageNode->text());
+            return;
+        }
+        if (action->name() == "draw-card") {
+            int numCards = action->attribute("num-cards").toInt();
+            bool revealCard = (action->attribute("reveal-card") == "true");
+            emit  sigActionDrawCard(numCards, revealCard);
+            return;
+        }
+        if (action->name() == "play-card") {
+            ActionPlayCardData actionPlayCardData;
+            actionPlayCardData.read(action);
+            emit sigActionPlayCard(actionPlayCardData);
+            return;
+        }
+        if (action->name() == "end-turn") {
+            emit sigActionEndTurn();
+            return;
+        }
+        if (action->name() == "pass") {
+            emit sigActionPass();
+            return;
+        }
+        if (action->name() == "discard-card") {
+            int cardId = action->attribute("id").toInt();
+            emit sigActionDiscard(cardId);
+            return;
         }
     }
 
@@ -404,10 +430,10 @@ void Parser::processStanza()
             QString senderName = event->attribute("senderName");
             emit sigEventMessage(senderId, senderName, messageNode->text());
         }
-        if (event->name() == "game-focus") {
-            int currentPlayerId   = event->attribute("currentPlayerId").toInt();
-            int requestedPlayerId = event->attribute("requestedPlayerId").toInt();
-            emit sigEventGameFocusChange(currentPlayerId, requestedPlayerId);
+        if (event->name() == "game-context") {
+            GameContextData gameContextData;
+            gameContextData.read(event);
+            emit sigEventGameContextChange(gameContextData);
         }
     }
 
@@ -515,14 +541,11 @@ void Parser::eventMessage(int senderId, const QString& senderName, const QString
     eventEnd();
 }
 
-void Parser::eventGameFocusChange(int currentPlayerId, int requestedPlayerId)
+void Parser::eventGameContextChange(const GameContextData& gameContextData)
 {
     ASSERT_SOCKET;
     eventStart();
-    mp_streamWriter->writeStartElement("game-focus");
-    mp_streamWriter->writeAttribute("currentPlayerId", QString::number(currentPlayerId));
-    mp_streamWriter->writeAttribute("requestedPlayerId", QString::number(requestedPlayerId));
-    mp_streamWriter->writeEndElement();
+    gameContextData.write(mp_streamWriter);
     eventEnd();
 }
 
@@ -613,6 +636,54 @@ void Parser::actionMessage(const QString& message)
     mp_streamWriter->writeEndElement();
     actionEnd();
 }
+
+void Parser::actionDrawCard(int numCards, bool revealCard)
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeStartElement("draw-card");
+    mp_streamWriter->writeAttribute("num-cards", QString::number(numCards));
+    mp_streamWriter->writeAttribute("reveal-card", revealCard ? "true" : "false");
+    mp_streamWriter->writeEndElement();
+    actionEnd();
+}
+
+void Parser::actionPlayCard(const ActionPlayCardData& actionPlayCardData)
+{
+    ASSERT_SOCKET;
+    actionStart();
+    actionPlayCardData.write(mp_streamWriter);
+    actionEnd();
+}
+
+void Parser::actionEndTurn()
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeEmptyElement("end-turn");
+    actionEnd();
+}
+
+void Parser::actionPass()
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeEmptyElement("pass");
+    actionEnd();
+}
+
+void Parser::actionDiscard(int cardId)
+{
+    ASSERT_SOCKET;
+    actionStart();
+    mp_streamWriter->writeStartElement("discard-card");
+    mp_streamWriter->writeAttribute("id", QString::number(cardId));
+    mp_streamWriter->writeEndElement();
+    actionEnd();
+
+}
+
+
 
 void Parser::terminate()
 {

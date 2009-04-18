@@ -18,17 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "deckwidget.h"
+#include "cardwidgetfactory.h"
 
 using namespace client;
 
-DeckWidget::DeckWidget(QWidget *parent)
- : CardPileWidget(parent)
+DeckWidget::DeckWidget(QWidget *parent):
+        CardPileWidget(parent),
+        mp_cardWidgetFactory(0)
 {
-    m_cards.push(newCard());
+    setPocketType(POCKET_DECK);
 }
 
 DeckWidget::~DeckWidget()
 {
+}
+
+void DeckWidget::init(CardWidgetFactory* cardWidgetFactory)
+{
+    mp_cardWidgetFactory = cardWidgetFactory;
+    m_cards.push(newCard());
 }
 
 CardWidget* DeckWidget::pop()
@@ -44,12 +52,15 @@ void DeckWidget::push(CardWidget* card)
 
 CardWidget* DeckWidget::newCard()
 {
-    CardWidget* w = new CardWidget(this);
-    w->setCardClass("back-bang");
-    w->setSize(CardWidget::SIZE_SMALL);
+    Q_ASSERT(mp_cardWidgetFactory != 0);
+    CardWidget* w = mp_cardWidgetFactory->createBackCard(this);
+    w->setSize(m_cardWidgetSize);
     w->applyNewProperties();
     w->raise();
     w->move(newCardPosition());
     w->show();
+    w->setOwnerId(0);
+    w->setPocketType(POCKET_DECK);
     return w;
 }
+

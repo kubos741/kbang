@@ -39,34 +39,29 @@ public:
     OpponentWidget(QWidget *parent);
     ~OpponentWidget();
 
-    void init();
-
-    inline bool isEmpty() const { return m_id == 0; }
-    inline int playerId() const { return m_id; }
-    inline QString playerName() const { return m_name; }
+    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
 
     virtual void setFromPublicData(const PublicPlayerData&);
-    virtual void setPlayer(const StructPlayer&);
-    virtual void unsetPlayer();
+    virtual void clear();
+
     virtual void setActive(uint8_t progress);
 
-    virtual CardList*              hand();
-    virtual CardList*              table();
-    virtual PlayerCharacterWidget* playerCharacterWidget();
+    virtual CardList*               hand()            { return mp_hand; }
+    virtual CardList*               table()           { return mp_table; }
+    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
+    virtual bool                    isLocalPlayer()   { return 0; }
+    virtual QSize                   sizeHint() const;
 
-    virtual bool isLocalPlayer() { return 0; }
 
-    virtual QSize sizeHint() const;
 
 private:
     void updateWidgets();
+    void setSeriff(bool isSheriff);
 
 private:
-    int m_id;
-    QString m_name;
-    bool    m_isSheriff;
     QString m_baseStyleSheet;
-
+    QPixmap m_sheriffBadgePixmap;
+    QLabel* mp_sheriffBadge;
 };
 }
 #endif

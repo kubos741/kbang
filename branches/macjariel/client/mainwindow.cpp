@@ -194,14 +194,6 @@ void MainWindow::createWidgets()
     m_opponentWidgets.append(mp_opponent5);
     m_opponentWidgets.append(mp_opponent6);
 
-    int i = 0;
-    foreach (OpponentWidget* w, m_opponentWidgets) {
-        w->init();
-        w->playerCharacterWidget()->setLifePoints(i % 6);
-        i++;
-    }
-    mp_localPlayerWidget->init();
-
     connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
             &m_serverConnection, SLOT(sendChatMessage(const QString&)));
     connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),

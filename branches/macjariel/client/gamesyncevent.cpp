@@ -20,6 +20,7 @@ GameSyncEvent::~GameSyncEvent()
 void GameSyncEvent::run()
 {
     int index = 0;
+    Q_ASSERT(m_gameSyncData.players.size() <= 7);
     while (index < m_gameSyncData.players.size() &&
            m_gameSyncData.players[index].id != m_gameSyncData.localPlayer.id)
         ++index;
@@ -39,6 +40,7 @@ void GameSyncEvent::run()
         index++;
         opponentIndex++;
     }
+    int firstUnusedOpponentIndex = opponentIndex;
 
     index = localPlayerIndex - 1;
     opponentIndex = 5;
@@ -47,6 +49,10 @@ void GameSyncEvent::run()
         mp_game->assignPlayerWidget(m_gameSyncData.players[index].id, mp_game->opponentWidget(opponentIndex));
         index--;
         opponentIndex--;
+    }
+    int lastUnusedOpponentIndex = opponentIndex;
+    for (int i = firstUnusedOpponentIndex; i <= lastUnusedOpponentIndex; ++i) {
+        mp_game->opponentWidget(i)->clear();
     }
 
     /// \todo Make sure unused opponentWidgets are clear

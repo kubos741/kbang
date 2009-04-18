@@ -61,6 +61,15 @@ public slots:
     void sendChatMessage(const QString& message);
 
 
+    void drawCard(int numCards = 1, bool revealCard = 0);
+    void playCard(int cardId);
+    void playCardWithPlayer(int cardId, int playerId);
+
+    void endTurn();
+    void pass();
+    void discardCard(int cardId);
+
+
 
 
 private slots:

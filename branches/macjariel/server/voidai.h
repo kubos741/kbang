@@ -24,9 +24,10 @@ public:
     virtual void onPlayerDrawedCard(int playerId, const CardAbstract*) {}
     virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card) {}
     virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) {}
+    virtual void onPlayerPlayedOnTable(int playerId, const CardAbstract* card) {}
     virtual void onPlayedCardsCleared() {}
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
-    virtual void onGameFocusChange(int currentPlayerId, int requestedPlayerId) {}
+    virtual void onGameContextChange(const GameContextData&) {}
 
     virtual void onActionRequest(ActionRequestType requestType);
 

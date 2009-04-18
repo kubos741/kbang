@@ -22,6 +22,8 @@
 #include "gamecycle.h"
 #include "gameexceptions.h"
 #include "cardmissed.h"
+#include "cardbeer.h"
+#include "gametable.h"
 
 CardBang::CardBang(Game* game, int id):
         CardPlayable(game, id),
@@ -37,6 +39,7 @@ CardBang::~CardBang()
 
 bool CardBang::play()
 {
+    throw BadUsageException();
     return 0;
 }
 
@@ -44,7 +47,7 @@ bool CardBang::play(Player *targetPlayer)
 {
 
     /* situation check */
-    if (mp_game->gameCycle().state() != GameCycle::STATE_TURN)
+    if (!mp_game->gameCycle().isTurn())
         throw BadGameStateException();
 
 
@@ -53,8 +56,10 @@ bool CardBang::play(Player *targetPlayer)
         throw BadPlayerException(targetPlayer->id()); // TODO: other exception maybe
 
     /* one-bang-per-turn check */
-    // TODO
+    if (!owner()->canPlayBang())
+        throw OneBangPerTurnException();
 
+    owner()->onBangPlayed();
     CardPlayable::play();
     mp_game->gameCycle().requestResponse(targetPlayer);
     mp_attackedPlayer = targetPlayer;
@@ -64,6 +69,7 @@ bool CardBang::play(Player *targetPlayer)
 bool CardBang::play(CardAbstract* targetCard)
 {
     Q_UNUSED(targetCard);
+    throw BadUsageException();
     return 0;
 }
 
@@ -79,6 +85,16 @@ void CardBang::respondCard(CardAbstract* targetCard)
 {
     CardMissed* cardMissed = qobject_cast<CardMissed*>(targetCard);
     if (cardMissed != 0) {
+        mp_game->gameTable().playCard(targetCard->owner(), cardMissed);
+        mp_game->gameCycle().clearPlayedCards();
+        return;
+    }
+    CardBeer* cardBeer = qobject_cast<CardBeer*>(targetCard);
+    if (cardBeer != 0 && mp_attackedPlayer->lifePoints() == 1) {
+        mp_attackedPlayer->modifyLifePoints(-1);
+        mp_game->gameCycle().clearPlayedCards();
+        mp_game->gameTable().playCard(targetCard->owner(), cardBeer);
+        mp_attackedPlayer->modifyLifePoints(1);
         mp_game->gameCycle().clearPlayedCards();
         return;
     }

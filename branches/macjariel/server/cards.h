@@ -23,5 +23,7 @@
 
 #include "cardbang.h"
 #include "cardmissed.h"
+#include "cardbeer.h"
+#include "cardmustang.h"
 
 #endif
