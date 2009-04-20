@@ -417,7 +417,7 @@ void Parser::processStanza()
 
         if (event->name() == "card-movement")
         {
-            StructCardMovement x;
+            CardMovementData x;
             x.read(event);
             emit sigEventCardMovement(x);
             return;
@@ -559,7 +559,7 @@ void Parser::eventGameSync(const GameSyncData& gameSyncData)
 
 
 
-void Parser::eventCardMovement(const StructCardMovement& cardMovement)
+void Parser::eventCardMovement(const CardMovementData& cardMovement)
 {
     ASSERT_SOCKET;
     eventStart();

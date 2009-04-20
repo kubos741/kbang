@@ -40,10 +40,10 @@ Game::Game(QObject* parent, int gameId, const StructPlayer& player,
         mp_serverConnection(serverConnection),
         m_currentPlayerId(0),
         m_requestedPlayerId(0),
+        mp_localPlayerWidget(gameWidgets.localPlayerWidget),
+        m_opponentWidgets(gameWidgets.opponentWidget),
         mp_mainWidget(gameWidgets.mainWidget),
         mp_middleWidget(gameWidgets.middleWidget),
-        m_opponentWidgets(gameWidgets.opponentWidget),
-        mp_localPlayerWidget(gameWidgets.localPlayerWidget),
         mp_startButton(0),
         m_creator(0),
         m_cardWidgetFactory(this),
@@ -86,11 +86,7 @@ void Game::init()
 
     connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
             this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
-
-
-
     qDebug("You have entered the game!");
-
 }
 
 
@@ -169,7 +165,7 @@ void Game::startButtonClicked()
     mp_serverConnection->startGame();
 }
 
-void Game::gameStarted(const StructGame&, const StructPlayerList& playerList)
+void Game::gameStarted(const StructGame&, const StructPlayerList&)
 {
     /*
     int pI;

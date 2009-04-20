@@ -27,7 +27,7 @@
 #include "parser/parserstructs.h"
 
 
-class CardAbstract;
+class PlayingCard;
 class CharacterCard;
 class WeaponCard;
 class PlayerCtrl;
@@ -35,8 +35,23 @@ class Game;
 class GameEventHandler;
 
 /**
- * The Player class represents a kbang player. The instance of this object
- * is created when a client joins a game and it lives as long as the game exists.
+ * The Player class represents a Bang! player. The players are created by the Game
+ * instance by calling CreateNewPlayer and are destroyed at the end of the game,
+ * or before the game starts (typically when the client leaves the game before it
+ * starts).
+ * Note, that Players cannot be destroyed during the game, thus the disconnection
+ * of a client leads either to the premature end of the game, or the current client
+ * is replaced with another controller, for example an AI controller or another client.
+ *
+ * The Player class holds all important player's data, including the player's cards,
+ * life points, role, character, etc. Every player has also an unique id (that is also
+ * used in network communication with clients).
+ *
+ * The players can be controlled by controllers. A player controller is a class that
+ * implements the GameEventHandler interface and acquires the PlayerCtrl instance. A
+ * basic controller is the Client class that forms an adapter between remote clients
+ * and player controller API.
+ *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
 class Player : public QObject
@@ -44,117 +59,172 @@ class Player : public QObject
     Q_OBJECT;
 public:
     /**
-     * Creates a new instance of Player class. You should always create instances
-     * of this class on heap (with the ''new'' operator) because the lifetime of
-     * this objects is managed inside.
+     * Constructs new player and uses gameEventHandler as the controller. The construction
+     * of Player objects is the Game class responsibility and other way of creating Players
+     * than using Game::createNewPlayer() is not recommended.
+     * @param game      the game where the new player is created.
+     * @param id        the player's id. It's Game's responsibility to set this unique.
+     * @param name      the name of the player
+     * @param password  the password for reconnecting into player
+     * @param handler   the gameEventHandler, that will control the player
      */
-    Player(Game* game, int id, const QString& name, const QString& password, GameEventHandler* gameEventHandler);
+    Player(Game* game, int id, const QString& name, const QString& password, GameEventHandler* handler);
 
+    typedef QList<PlayingCard*> CardList;
 
-public:
+  /////////////
+ // GETTERS //
+/////////////
 
     /**
-     * Returns the PlayerCtrl that allows clients to control the player.
+     * Returns the id of the player. Zero value is reserved and interpreted
+     * as an invalid player.
      */
-    PlayerCtrl* playerCtrl() const;
+    inline int                  id()               const { return this ? m_id : 0;     }
+    inline PlayerCtrl*          playerCtrl()       const { return mp_playerCtrl;       }
+    inline QString              name()             const { return m_name;              }
+    inline QString              password()         const { return m_password;          }
+    inline Game*                game()             const { return mp_game;             }
+    inline int                  lifePoints()       const { return m_lifePoints;        }
+    inline int                  maxLifePoints()    const { return m_maxLifePoints;     }
+    inline int                  initialCardCount() const { return m_maxLifePoints;     }
+    inline int                  handSize()         const { return m_hand.size();       }
+    inline CardList             hand()             const { return m_hand;              }
+    inline CardList             table()            const { return m_table;             }
+    inline CardList             selection()        const { return m_selection;         }
+    inline PlayerRole           role()             const { return m_role;              }
+    inline bool                 isAlive()          const { return m_isAlive;           }
+    inline int                  weaponRange()      const { return m_weaponRange;       }
+    inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
+
+    inline const PublicPlayerView&  publicView()   const { return m_publicPlayerView;  }
+    inline const PrivatePlayerView& privateView()  const { return m_privatePlayerView; }
+
 
     /**
-     * Returns the game id.
+     * Returns the distance-in modificator. The player is seen by all other
+     * players at a distance increased by the amount returned.
      */
-    const int id() const;
+    inline int distanceIn() const { return m_distanceIn; }
 
     /**
-     * Returns the name of the game.
+     * Returns the distance-out modificator. The player sees all other
+     * players at a distance decreased by the amount returned.
      */
-    QString name() const;
+    inline int distanceOut() const { return m_distanceOut; }
 
     /**
-     * Returns the pointer to the game, which the player
-     * belongs to.
+     * Returns true, if the player is the creator of the game.
      */
-    Game* game() const;
-
     bool isCreator() const;
 
     /**
-     *
+     * Returns true, if the player is on turn.
      */
     bool isOnTurn() const;
 
-
-
-    inline int lifePoints()     const { return m_lifePoints; }
-    inline int maxLifePoints()  const { return m_maxLifePoints; }
-    inline int handSize()       const { return m_cardsInHand.size(); }
-
-    QList<CardAbstract*>    cardsInHand();
-    QList<CardAbstract*>    table();
-
-    bool hasDuplicateOnTable(CardAbstract* card);
-
+    /**
+     * Returns true, if the player is requested.
+     */
+    bool isRequested() const;
 
     /**
-     * Returns the players' character.
+     * Returns true, if the player already has the identical card
+     * face up in front of him. This is used to support the
+     * "no player can ever have two identical cards face up in
+     * front of him" rule.
+     * @param card The card that is looked for
      */
-
-    //const CharacterCard& getCharacterCard() const;
-
-
-    inline PlayerRole role() const { return m_role; }
-
-    int initialCardCount() const;
-
-    int weaponRange() const { return 1; } // TODO
-
-    void modifyLifePoints(int x);
+    bool hasIdenticalCardOnTable(PlayingCard* card) const;
 
     /**
-     * Returns the player struct.
-     * @param returnPrivateInfo include private items if set to true
-     * (defaults to false)
+     * Returns true, if player can play Bang!. That holds unless the player
+     * has already played Bang! in this turn, if player has "Volcanic" on
+     * his table, or if player's character is Willy the Kid.
+     * @see void Player::onBangPlayed()
      */
-     StructPlayer structPlayer(bool returnPrivateInfo = 0);
+    bool canPlayBang() const;
 
-     GameEventHandler* gameEventHandler() const;
+  ///////////////
+ // MODIFIERS //
+///////////////
 
-    void appendCardToHand(CardAbstract* card);
-    void appendCardToTable(CardAbstract* card);
     /**
-     * Removes the given card from players hand. Returns
-     * true if player had that card in hand.
+     * Modifies the life points of player by adding it with the argument.
+     * In case of life points going out of range, the method sets the
+     * minimal or maximal value.
+     * If the life points really changed, the method invokes the
+     * LifePointsChange event.
+     * @param preventDeath set to true to prevent dying (used by instantly
+     *                     played beer)
      */
-    bool removeCardFromHand(CardAbstract* card);
-    bool removeCardFromTable(CardAbstract* card);
+    void modifyLifePoints(int lifePoints, bool preventDeath = 0);
+    void modifyDistanceIn(int delta);
+    void modifyDistanceOut(int delta);
+    void setWeaponRange(int weaponRange);
+    void setAlive(bool isAlive);
+    void appendCardToHand(PlayingCard* card);
+    void appendCardToTable(PlayingCard* card);
+    void appendCardToSelection(PlayingCard* card);
 
-    const PublicPlayerView&  publicView() const;
-    const PrivatePlayerView& privateView() const;
+    /**
+     * Removes the given card from player's hand. Returns
+     * true if player has this card in his hand.
+     */
+    bool removeCardFromHand(PlayingCard* card);
 
-    //const PlayerActions* playerActions() const;
+    /**
+     * Removes the given card from player's table. Returns
+     * true if player has this card in his table.
+     */
+    bool removeCardFromTable(PlayingCard* card);
+
+    bool removeCardFromSelection(PlayingCard* card);
 
     void setRole(const PlayerRole& role);
 
-
+    /**
+     * This method needs to be called after the Bang! card was played.
+     * This is necessary to implement the one-bang-per-turn rule.
+     * @see bool Player::canPlayBang()
+     */
     void onBangPlayed();
-    bool canPlayBang();
 
+  ////////////////
+ // DEPRECATED //
+////////////////
+    // StructPlayer structPlayer(bool returnPrivateInfo = 0);
+
+
+  ////////////
+ // STATIC //
+////////////
+
+    /**
+     * Converts a PublicPlayerView to its Player instance.
+     */
     inline static Player* player(const PublicPlayerView* publicPlayerView) {
         return publicPlayerView->mp_player;
     }
 
-    
 private:
     int                       m_id;
     int                       m_lifePoints;
     int                       m_maxLifePoints;
-    QList<CardAbstract*>      m_cardsInHand; /// \todo: rename m_cardsInHand -> m_hand
-    QList<CardAbstract*>      m_table;
+    QList<PlayingCard*>       m_hand;
+    QList<PlayingCard*>       m_table;
+    QList<PlayingCard*>       m_selection;
     QString                   m_name;
     QString                   m_password;
     PlayerRole                m_role;
+    bool                      m_isAlive;
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
     GameEventHandler*         mp_gameEventHandler;
 
+    int                       m_weaponRange;
+    int                       m_distanceIn;
+    int                       m_distanceOut;
     int                       m_lastBangTurn;
 
     const PublicPlayerView    m_publicPlayerView;

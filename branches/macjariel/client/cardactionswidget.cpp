@@ -17,7 +17,7 @@ CardActionsWidget::CardActionsWidget(QWidget* parent, CardWidget* cardWidget):
     move(500,500);
 }
 
-void CardActionsWidget::paintEvent(QPaintEvent *event)
+void CardActionsWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);

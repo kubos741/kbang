@@ -71,7 +71,7 @@ QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
 
 const PublicPlayerView* PublicGameView::publicPlayerView(int playerId) const
 {
-    Player* player = mp_game->getPlayer(playerId);
+    Player* player = mp_game->player(playerId);
     if (player == 0) return 0;
     return &player->publicView();
 }

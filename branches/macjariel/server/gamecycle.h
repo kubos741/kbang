@@ -6,8 +6,8 @@
 
 class Game;
 class Player;
-class CardAbstract;
-class CardPlayable;
+class PlayingCard;
+class ReactionCard;
 
 
 class GameCycle
@@ -60,26 +60,23 @@ public:
 
     /* Methods accessible from TURN phase */
     // + seznam karet
-    void discardCard(Player* player, CardAbstract* card);
+    void discardCard(Player* player, PlayingCard* card);
 
 
-    void playCard(Player* player, CardPlayable* card);
-    void playCard(Player* player, CardPlayable* card, Player* targetPlayer);
-
-
-    /* Methods accessible from RESPONSE phase */
-    // nechcu reagovat kartou
+    void playCard(Player* player, PlayingCard* card);
+    void playCard(Player* player, PlayingCard* card, Player* targetPlayer);
     void pass(Player* player);
 
 
-    void requestResponse(Player* player);
-    void clearPlayedCards();
+    void setResponseMode(ReactionCard* reactionCard, Player* requestedPlayer);
+    void unsetResponseMode();
 
 private:
     Game*           mp_game;
     GamePlayState   m_state;
     Player*         mp_currentPlayer;
     Player*         mp_requestedPlayer;
+    ReactionCard*   mp_reactionCard;
 
     int     m_drawCardCount;
     int     m_drawCardMax;

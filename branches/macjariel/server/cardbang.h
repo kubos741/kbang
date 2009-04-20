@@ -20,7 +20,7 @@
 #ifndef CARDBANG_H
 #define CARDBANG_H
 
-#include <cardplayable.h>
+#include "reactioncard.h"
 
 class Player;
 
@@ -28,28 +28,16 @@ class Player;
  * This class represents the Bang! cards.
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardBang: public CardPlayable
+class CardBang: public ReactionCard
 {
 Q_OBJECT
 public:
-    CardBang(Game* game, int id);
+    CardBang(Game *game, int id, CardSuit, CardRank);
     ~CardBang();
 
-    /**
-     * Bang! card can be played without specifying target player only in
-     * certain situations:
-     *   * player is in Duel                    (NIY)
-     *   * player responds to Indians card      (NIY)
-     */
-    virtual bool play();
-    virtual bool play(Player* targetPlayer);
-    virtual bool play(CardAbstract* targetCard);
-
-    virtual CardType type() const { return CARD_BANG; }
-    virtual QString typeStr() const { return "bang"; } /// \deprecated
-
+    virtual void play(Player* targetPlayer);
     virtual void respondPass();
-    virtual void respondCard(CardAbstract* targetCard);
+    virtual void respondCard(PlayingCard* targetCard);
 
 private:
     Player* mp_attackedPlayer;

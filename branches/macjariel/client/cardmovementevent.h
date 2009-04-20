@@ -60,7 +60,7 @@ public:
      * @param cardWidget The card widget that will be moved.
      * @param destination The target pocket.
      */
-    CardMovementEvent(Game* game, const StructCardMovement& structCardMovement);
+    CardMovementEvent(Game* game, const CardMovementData& cardMovementData);
     virtual ~CardMovementEvent();
     virtual void run();
     virtual bool isReadyRun();
@@ -72,7 +72,7 @@ private:
     void stopTransition();
 
 private:
-    StructCardMovement  m_structCardMovement;
+    CardMovementData    m_cardMovementData;
     CardWidget*         mp_card;
     CardPocket*         mp_destPocket;
     QPoint              m_srcPos;

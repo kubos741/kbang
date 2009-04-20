@@ -39,15 +39,17 @@ const QSize CardWidget::sm_qsizeBig(200, 320);
 //const QSize  margins(10,10);
 //const QPoint padding(5,5);
 
-CardWidget::CardWidget(QWidget* parent):
+CardWidget::CardWidget(QWidget* parent, Card::Type cardType):
         QLabel(parent),
-        m_cardId(0),
+        m_cardType(cardType),
+        m_pocket(POCKET_INVALID),
+        m_ownerId(0),
+        m_playerRole(ROLE_UNKNOWN),
+        m_characterType(CHARACTER_UNKNOWN),
+        m_qsize(sm_qsizeSmall),
         m_shadowMode(0),
         m_hasHighlight(0),
-        m_qsize(sm_qsizeSmall),
-        mp_gameObjectClickHandler(0),
-        m_pocketType(POCKET_INVALID),
-        m_ownerId(0)
+        mp_gameObjectClickHandler(0)
 {
     show();
 }
@@ -59,6 +61,52 @@ CardWidget::~ CardWidget()
 void CardWidget::setGameObjectClickHandler(GameObjectClickHandler* gameObjectClickHandler)
 {
     mp_gameObjectClickHandler = gameObjectClickHandler;
+}
+
+void CardWidget::setType(Card::Type cardType)
+{
+    m_cardType = cardType;
+}
+
+void CardWidget::setCardData(const CardData& cardData)
+{
+    m_cardData = cardData;
+}
+
+void CardWidget::setSize(Size size)
+{
+    m_size = size;
+    m_qsize = qSize(size);
+}
+
+void CardWidget::validate()
+{
+    const Card* card;
+    switch(m_cardType) {
+        case Card::Playing:
+        card = Card::findPlayingCard(m_cardData.type);
+        break;
+    case Card::Role:
+        card = Card::findRoleCard(m_playerRole);
+        break;
+    case Card::Character:
+        card = Card::findCharacterCard(m_characterType);
+        break;
+    }
+
+    if (card == 0) {
+        qWarning("Cannot look-up the card!");
+        return;
+    }
+
+    if (card->image().isNull()) {
+        qWarning(qPrintable(QString("Card '%1' has null pixmap.").arg(card->name())));
+    }
+
+    setPixmap(card->image().scaled(m_qsize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    setMinimumSize(m_qsize);
+    setMaximumSize(m_qsize);
+    resize(m_qsize);
 }
 
 void CardWidget::paintEvent(QPaintEvent *event)
@@ -76,15 +124,8 @@ void CardWidget::paintEvent(QPaintEvent *event)
     }
 }
 
-void CardWidget::setCardClass(const QString& cardClassId)
-{
-    m_cardClassId = cardClassId;
-}
 
-void CardWidget::setCardId(int cardId)
-{
-    m_cardId = cardId;
-}
+
 
 
 QSize CardWidget::qSize(Size size)
@@ -99,35 +140,26 @@ QSize CardWidget::qSize(Size size)
 }
 
 
-void CardWidget::setSize(Size size)
-{
-    m_size = size;
-    m_qsize = qSize(size);
-}
 
-void CardWidget::applyNewProperties()
-{
-    /* TODO: spot for optimalization */
-    CardPointer card = Card::findCard(m_cardClassId);
-    if (card == 0)
-    {
-        qWarning(qPrintable(QString("Cannot find card id %1.").arg(m_cardClassId)));
-        return;
-    }
-    setPixmap(card->image().scaled(m_qsize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-    setMinimumSize(m_qsize);
-    setMaximumSize(m_qsize);
-    resize(m_qsize);
-}
 
-void CardWidget::setPocketType(const PocketType& pocketType)
+void CardWidget::setPocketType(const PocketType& pocket)
 {
-    m_pocketType = pocketType;
+    m_pocket = pocket;
 }
 
 void CardWidget::setOwnerId(int ownerId)
 {
     m_ownerId = ownerId;
+}
+
+void CardWidget::setPlayerRole(PlayerRole playerRole)
+{
+    m_playerRole = playerRole;
+}
+
+void CardWidget::setCharacterType(CharacterType characterType)
+{
+    m_characterType = characterType;
 }
 
 void CardWidget::setHighlight(bool hasHighlight)
@@ -136,7 +168,7 @@ void CardWidget::setHighlight(bool hasHighlight)
     update();
 }
 
-void CardWidget::mousePressEvent(QMouseEvent *ev)
+void CardWidget::mousePressEvent(QMouseEvent*)
 {
     if (mp_gameObjectClickHandler)
         mp_gameObjectClickHandler->onCardClicked(this);

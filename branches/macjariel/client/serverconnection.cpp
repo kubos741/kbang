@@ -211,8 +211,8 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(outgoingData(const QByteArray&)));
     connect(mp_parser, SIGNAL(sigEventStartGame(const StructGame&, const StructPlayerList&)),
             this, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)));
-    connect(mp_parser, SIGNAL(sigEventCardMovement(const StructCardMovement&)),
-            this, SIGNAL(eventCardMovement(const StructCardMovement&)));
+    connect(mp_parser, SIGNAL(sigEventCardMovement(const CardMovementData&)),
+            this, SIGNAL(eventCardMovement(const CardMovementData&)));
 }
 
 bool ServerConnection::isConnected() const

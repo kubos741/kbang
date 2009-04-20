@@ -20,32 +20,17 @@
 #ifndef CARDMISSED_H
 #define CARDMISSED_H
 
-#include <cardplayable.h>
+#include "playingcard.h"
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardMissed : public CardPlayable
+class CardMissed : public PlayingCard
 {
 Q_OBJECT
 public:
-    CardMissed(Game *game, int id);
+    CardMissed(Game *game, int id, CardSuit, CardRank);
     ~CardMissed();
-
-    /**
-     * This card can be played only as a reaction to Bang! or Gatling.
-     */
-    virtual bool play();
-    virtual bool play(Player* targetPlayer);
-    virtual bool play(CardAbstract* targetCard);
-
-    virtual CardType type() const { return CARD_MISSED; }
-    virtual QString typeStr() const { return "missed"; } /// \deprecated
-
-
-    virtual void respondPass();
-    virtual void respondCard(CardAbstract* targetCard);
-
 };
 
 #endif

@@ -18,7 +18,6 @@ LifePointsChangeEvent::~LifePointsChangeEvent()
 
 void LifePointsChangeEvent::run()
 {
-    qDebug() << "LifePointsChangeEvent::run()";
     if (m_lifePoints < 0 || m_lifePoints > 5 ||
         mp_game->playerWidget(m_playerId)->characterWidget()->lifePoints() == m_lifePoints) {
         qDebug() << "invalid lifepoint change";

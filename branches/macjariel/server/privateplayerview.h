@@ -22,7 +22,7 @@
 
 #include <publicplayerview.h>
 
-class CardAbstract;
+class PlayingCard;
 
 
 /**
@@ -44,13 +44,15 @@ public:
      */
     virtual PlayerRole role() const;
 
-    QList<CardAbstract* > hand() const;
+    QString password() const;
+
+    QList<PlayingCard* > hand() const;
 
     PrivatePlayerData privatePlayerData() const;
 
     virtual StructPlayer structPlayer() const;
 
-    CardAbstract* card(int cardId) const;
+    PlayingCard* card(int cardId) const;
 
 
     // implement method cardsInHand

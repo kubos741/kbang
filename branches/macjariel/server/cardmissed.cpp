@@ -19,46 +19,12 @@
  ***************************************************************************/
 #include "cardmissed.h"
 
-CardMissed::CardMissed(Game *game, int id): CardPlayable(game, id)
+CardMissed::CardMissed(Game* game, int id, CardSuit cardSuit, CardRank cardRank):
+        PlayingCard(game, id, CARD_MISSED, cardSuit, cardRank)
 {
 }
-
 
 CardMissed::~CardMissed()
-{
-}
-
-bool CardMissed::play()
-{
-/*
-    if (mp_game->peakPlayedCards() != 0 &&
-        mp_game->peakPlayedCards()->metaObject()->className() == "CardBang")
-    {
-        CardPlayable::play();
-        return 1;
-    }
-*/
-    return 0;
-}
-
-bool CardMissed::play(Player*)
-{
-    return 0;
-}
-
-
-bool CardMissed::play(CardAbstract*)
-{
-    return 0;
-}
-
-
-
-void CardMissed::respondPass()
-{
-}
-
-void CardMissed::respondCard(CardAbstract* targetCard)
 {
 }
 

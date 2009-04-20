@@ -49,7 +49,7 @@ protected:
 
 private:
     void reorder();
-    int cardX(int i) const;
+    int cardX(int i, bool newCard = 0) const;
 
 private:
     CardWidget::Size m_cardSize;

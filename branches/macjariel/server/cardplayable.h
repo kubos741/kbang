@@ -20,7 +20,7 @@
 #ifndef CARDPLAYABLE_H
 #define CARDPLAYABLE_H
 
-#include <cardabstract.h>
+#include "playingcard.h"
 
 /**
  * This is an abstract class for all cards that can be played, which means
@@ -29,7 +29,7 @@
  * card.
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardPlayable: public CardAbstract
+class CardPlayable: public PlayingCard
 {
 Q_OBJECT
 public:
@@ -38,10 +38,10 @@ public:
 
     virtual bool play();
     virtual bool play(Player* targetPlayer) = 0;
-    virtual bool play(CardAbstract* targetCard) = 0;
+    virtual bool play(PlayingCard* targetCard) = 0;
 
     virtual void respondPass() = 0;
-    virtual void respondCard(CardAbstract* targetCard) = 0;
+    virtual void respondCard(PlayingCard* targetCard) = 0;
 };
 
 #endif

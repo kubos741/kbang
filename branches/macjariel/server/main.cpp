@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "gameserver.h"
-#include "charactercard.h"
 #include "console.h"
 #include "common.h"
 #include <QCoreApplication>

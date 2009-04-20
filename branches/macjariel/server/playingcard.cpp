@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by MacJariel                                       *
- *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   * 
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,44 +17,62 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "charactercard.h"
+#include "playingcard.h"
+#include "gametable.h"
+#include "game.h"
+#include "gameexceptions.h"
 
-
-//CharacterCardList CharacterCard::sm_characterBank;
-
-CharacterCard::CharacterCard()
-        : AbstractCard()
+PlayingCard::PlayingCard(Game *game, int id, PlayingCardType type, CardSuit suit, CardRank rank):
+        QObject(game),
+        m_id(id),
+        m_type(type),
+        m_suit(suit),
+        m_rank(rank),
+        mp_owner(0),
+        m_pocket(POCKET_DECK),
+        mp_game(game)
 {
 }
 
-
-CharacterCard::~CharacterCard()
+PlayingCard::~PlayingCard()
 {
 }
 
-CharacterCardList CharacterCard::getCharacterCards()
+CardData PlayingCard::cardData() const
 {
-    CharacterCardList list;
-    CharacterCard* card;
-    card = new CharacterCard();
-    card->setName("Bart Cassidy");
-    card->m_maxLifePoints = 4;
-    list.append(card);
-
-    card = new CharacterCard();
-    card->setName("Black Jack");
-    card->m_maxLifePoints = 4;
-    list.append(card);
-
-    card = new CharacterCard();
-    card->setName("Calamity Janet");
-    card->m_maxLifePoints = 4;
-    list.append(card);
-
-    card = new CharacterCard();
-    card->setName("El Gringo");
-    card->m_maxLifePoints = 4;
-    list.append(card);
-    return list;
+    CardData result;
+    result.id = id();
+    result.type = type();
+    result.suit = suit();
+    result.rank = rank();
+    return result;
 }
 
+
+void PlayingCard::play()
+{
+   throw BadUsageException();
+}
+
+void PlayingCard::play(Player* targetPlayer)
+{
+    Q_UNUSED(targetPlayer);
+    throw BadUsageException();
+}
+
+void PlayingCard::play(PlayingCard* targetCard)
+{
+    Q_UNUSED(targetCard);
+    throw BadUsageException();
+}
+
+
+GameTable* PlayingCard::gameTable() const
+{
+    return &mp_game->gameTable();
+}
+
+void PlayingCard::setType(PlayingCardType type)
+{
+    m_type = type;
+}

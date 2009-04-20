@@ -24,6 +24,7 @@
 #include "cardbang.h"
 #include "cardmissed.h"
 #include "cardbeer.h"
-#include "cardmustang.h"
+#include "cardhorse.h"
+#include "weaponcard.h"
 
 #endif

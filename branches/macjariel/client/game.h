@@ -106,7 +106,7 @@ private:
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
     bool                      m_creator;
-    QQueue<StructCardMovement> m_cardMovementQueue;
+    QQueue<CardMovementData> m_cardMovementQueue;
 
     GameEventHandler*         mp_gameEventHandler;
     CardWidgetFactory         m_cardWidgetFactory;

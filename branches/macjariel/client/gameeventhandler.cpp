@@ -19,8 +19,8 @@ GameEventHandler::GameEventHandler(Game* game):
 
 void GameEventHandler::connectSlots(QObject* signalEmitter)
 {
-    connect(signalEmitter,      SIGNAL(sigEventCardMovement(const StructCardMovement&)),
-            this,               SLOT(onCardMovementEvent(const StructCardMovement&)));
+    connect(signalEmitter,      SIGNAL(sigEventCardMovement(const CardMovementData&)),
+            this,               SLOT(onCardMovementEvent(const CardMovementData&)));
     connect(signalEmitter,      SIGNAL(sigEventGameContextChange(const GameContextData&)),
             this,               SLOT(onGameContextChangeEvent(const GameContextData&)));
     connect(signalEmitter,      SIGNAL(sigEventGameSync(const GameSyncData&)),
@@ -29,27 +29,23 @@ void GameEventHandler::connectSlots(QObject* signalEmitter)
             this,               SLOT(onLifePointsChangeEvent(int, int)));
 }
 
-void GameEventHandler::onCardMovementEvent(const StructCardMovement& structCardMovement)
+void GameEventHandler::onCardMovementEvent(const CardMovementData& cardMovementData)
 {
-    qDebug() << "CardMovementEvent";
-    mp_queue->add(new CardMovementEvent(mp_game, structCardMovement));
+    mp_queue->add(new CardMovementEvent(mp_game, cardMovementData));
 }
 
 void GameEventHandler::onGameContextChangeEvent(const GameContextData& gameContextData)
 {
-    qDebug() << "ContextChangeEvent";
     mp_queue->add(new GameContextChangeEvent(mp_game, gameContextData));
 }
 
 void GameEventHandler::onGameSyncEvent(const GameSyncData& gameSyncData)
 {
-    qDebug() << "GameSyncEvent";
     mp_queue->add(new GameSyncEvent(mp_game, gameSyncData));
 }
 
 void GameEventHandler::onLifePointsChangeEvent(int playerId, int lifePoints)
 {
-    qDebug() << "LifePointsChangeEvent";
     mp_queue->add(new LifePointsChangeEvent(mp_game, playerId, lifePoints));
 }
 

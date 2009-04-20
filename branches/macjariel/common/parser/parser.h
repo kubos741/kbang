@@ -95,7 +95,7 @@ signals:
     void sigEventGameContextChange(const GameContextData&);
     void sigEventGameSync(const GameSyncData&);
     void sigEventLifePointsChange(int playerId, int lifePoints);
-    void sigEventCardMovement(const StructCardMovement&);
+    void sigEventCardMovement(const CardMovementData&);
     void sigEventMessage(int senderId, const QString& senderName, const QString& message);
 
 
@@ -109,7 +109,7 @@ public slots:
     void eventMessage(int senderId, const QString& senderName, const QString& message);
     void eventGameContextChange(const GameContextData&);
     void eventGameSync(const GameSyncData&);
-    void eventCardMovement(const StructCardMovement&);
+    void eventCardMovement(const CardMovementData&);
     void eventLifePointsChange(int playerId, int lifePoints);
     void eventGameStartable(int gameId, bool startable);
 

@@ -1,5 +1,4 @@
-HEADERS += charactercard.h \
-    player.h \
+HEADERS += player.h \
     gameserver.h \
     game.h \
     console.h \
@@ -11,8 +10,10 @@ HEADERS += charactercard.h \
     publicgameview.h \
     publicplayerview.h \
     privateplayerview.h \
-    cardabstract.h \
-    cardplayable.h \
+    playingcard.h \
+    reactioncard.h \
+    tablecard.h \
+    weaponcard.h \
     cardbang.h \
     cardmissed.h \
     cards.h \
@@ -24,9 +25,9 @@ HEADERS += charactercard.h \
     gameeventhandler.h \
     voidai.h \
     cardbeer.h \
-    cardmustang.h
+    cardhorse.h \
+    cardfactory.h
 SOURCES += main.cpp \
-    charactercard.cpp \
     player.cpp \
     gameserver.cpp \
     game.cpp \
@@ -39,8 +40,10 @@ SOURCES += main.cpp \
     publicgameview.cpp \
     publicplayerview.cpp \
     privateplayerview.cpp \
-    cardabstract.cpp \
-    cardplayable.cpp \
+    playingcard.cpp \
+    reactioncard.cpp \
+    tablecard.cpp \
+    weaponcard.cpp \
     cardbang.cpp \
     cardmissed.cpp \
     gamecycle.cpp \
@@ -50,7 +53,8 @@ SOURCES += main.cpp \
     voidai.cpp \
     gameeventhandler.cpp \
     cardbeer.cpp \
-    cardmustang.cpp
+    cardhorse.cpp \
+    cardfactory.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

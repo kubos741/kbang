@@ -108,7 +108,7 @@ signals:
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     void startableChanged(int gameId, bool startable);
     void gameStarted(const StructGame&, const StructPlayerList&);
-    void eventCardMovement(const StructCardMovement&);
+    void eventCardMovement(const CardMovementData&);
 
 
 };

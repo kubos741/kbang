@@ -18,6 +18,11 @@ class BadGameStateException {};
 class OneBangPerTurnException: public BadGameStateException {};
 class TwoSameOnTableException: public BadGameStateException {};
 
+
+class BadTargetPlayerException: public BadGameStateException {};
+class PlayerOutOfRangeException: public BadTargetPlayerException {};
+
+
 class BadGameException {};
 
 class TooManyCardsInHandException {};

@@ -19,8 +19,9 @@
  ***************************************************************************/
 #include "privateplayerview.h"
 #include "player.h"
-#include "cardabstract.h"
+#include "playingcard.h"
 #include "gametable.h"
+#include "game.h"
 
 PrivatePlayerView::PrivatePlayerView(Player* player)
  : PublicPlayerView(player)
@@ -37,9 +38,14 @@ PlayerRole PrivatePlayerView::role() const
     return mp_player->role();
 }
 
-QList<CardAbstract* > PrivatePlayerView::hand() const
+QString PrivatePlayerView::password() const
 {
-    return mp_player->cardsInHand();
+    return mp_player->password();
+}
+
+QList<PlayingCard* > PrivatePlayerView::hand() const
+{
+    return mp_player->hand();
 }
 
 PrivatePlayerData PrivatePlayerView::privatePlayerData() const
@@ -47,7 +53,7 @@ PrivatePlayerData PrivatePlayerView::privatePlayerData() const
     PrivatePlayerData res;
     res.id          = id();
     res.role        = role();
-    foreach (CardAbstract* card, hand()) {
+    foreach (PlayingCard* card, hand()) {
         CardData cardData;
         cardData.id = card->id();
         cardData.type = card->type();
@@ -59,12 +65,15 @@ PrivatePlayerData PrivatePlayerView::privatePlayerData() const
 
 StructPlayer PrivatePlayerView::structPlayer() const
 {
-    return mp_player->structPlayer(1);
+    StructPlayer x = PublicPlayerView::structPlayer();
+    x.password = password();
+    x.role     = role();
+    return x;
 }
 
-CardAbstract* PrivatePlayerView::card(int cardId) const
+PlayingCard* PrivatePlayerView::card(int cardId) const
 {
-    CardAbstract* res = mp_player->game()->gameTable().card(cardId);
+    PlayingCard* res = mp_player->game()->gameTable().card(cardId);
     if (res == 0 || res->owner() == mp_player)
         return res;
     if (res->pocket() == POCKET_HAND || res->pocket() == POCKET_DECK)

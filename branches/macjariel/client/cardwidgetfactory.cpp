@@ -10,29 +10,22 @@ CardWidgetFactory::CardWidgetFactory(Game* game):
 {
 }
 
-CardWidget* CardWidgetFactory::createBulletsCard(QWidget* parent)
-{
-    CardWidget* cardWidget = createCardWidget(parent);
-    cardWidget->setSize(CardWidget::SIZE_SMALL);
-    cardWidget->setCardClass("back-bullets");
-    return cardWidget;
-}
 
-CardWidget* CardWidgetFactory::createBackCard(QWidget* parent)
+CardWidget* CardWidgetFactory::createPlayingCard(QWidget* parent)
 {
-    CardWidget* cardWidget = createCardWidget(parent);
-    cardWidget->setSize(CardWidget::SIZE_SMALL);
-    cardWidget->setCardClass("back-bang");
-    return cardWidget;
-}
-
-CardWidget* CardWidgetFactory::createCardWidget(QWidget* parent)
-{
-    CardWidget* cardWidget = new CardWidget(parent);
+    CardWidget* cardWidget = new CardWidget(parent, Card::Playing);
     registerCard(cardWidget);
     return cardWidget;
 }
 
+CardWidget* CardWidgetFactory::createCharacterCard(QWidget* parent, CharacterType characterType)
+{
+    CardWidget* cardWidget = new CardWidget(parent, Card::Character);
+    registerCard(cardWidget);
+    cardWidget->setCharacterType(characterType);
+    cardWidget->setSize(CardWidget::SIZE_SMALL);
+    return cardWidget;
+}
 
 void CardWidgetFactory::registerCard(CardWidget* cardWidget)
 {

@@ -21,15 +21,13 @@
 #include "player.h"
 #include "gamecycle.h"
 #include "gameexceptions.h"
-#include "cardmissed.h"
-#include "cardbeer.h"
 #include "gametable.h"
+#include "game.h"
 
-CardBang::CardBang(Game* game, int id):
-        CardPlayable(game, id),
+CardBang::CardBang(Game* game, int id, CardSuit cardSuit, CardRank cardRank):
+        ReactionCard(game, id, CARD_BANG, cardSuit, cardRank),
         mp_attackedPlayer(0)
 {
-
 }
 
 
@@ -37,66 +35,47 @@ CardBang::~CardBang()
 {
 }
 
-bool CardBang::play()
+void CardBang::play(Player *targetPlayer)
 {
-    throw BadUsageException();
-    return 0;
-}
-
-bool CardBang::play(Player *targetPlayer)
-{
-
-    /* situation check */
-    if (!mp_game->gameCycle().isTurn())
-        throw BadGameStateException();
-
-
     /* distance check */
-    if (mp_game->getDistance(owner(), targetPlayer) > owner()->weaponRange())
-        throw BadPlayerException(targetPlayer->id()); // TODO: other exception maybe
+    if (game()->getDistance(owner(), targetPlayer) > owner()->weaponRange())
+        throw PlayerOutOfRangeException();
 
     /* one-bang-per-turn check */
     if (!owner()->canPlayBang())
         throw OneBangPerTurnException();
 
     owner()->onBangPlayed();
-    CardPlayable::play();
-    mp_game->gameCycle().requestResponse(targetPlayer);
+    gameTable()->playCard(this);
+    game()->gameCycle().setResponseMode(this, targetPlayer);
     mp_attackedPlayer = targetPlayer;
-    return 1;
-}
-
-bool CardBang::play(CardAbstract* targetCard)
-{
-    Q_UNUSED(targetCard);
-    throw BadUsageException();
-    return 0;
 }
 
 void CardBang::respondPass()
 {
     Q_ASSERT(mp_attackedPlayer != 0);
-    qDebug() << "RESPOND PASS";
-    mp_attackedPlayer->modifyLifePoints(-1); // TODO: abstract this - for abilities
-    mp_game->gameCycle().clearPlayedCards();
+    /// @todo announce pass
+    mp_attackedPlayer->modifyLifePoints(-1);
+    game()->gameCycle().unsetResponseMode();
 }
 
-void CardBang::respondCard(CardAbstract* targetCard)
+void CardBang::respondCard(PlayingCard* targetCard)
 {
-    CardMissed* cardMissed = qobject_cast<CardMissed*>(targetCard);
-    if (cardMissed != 0) {
-        mp_game->gameTable().playCard(targetCard->owner(), cardMissed);
-        mp_game->gameCycle().clearPlayedCards();
+    switch(targetCard->type()) {
+    case CARD_MISSED:
+        gameTable()->playCard(targetCard);
+        game()->gameCycle().unsetResponseMode();
         return;
-    }
-    CardBeer* cardBeer = qobject_cast<CardBeer*>(targetCard);
-    if (cardBeer != 0 && mp_attackedPlayer->lifePoints() == 1) {
-        mp_attackedPlayer->modifyLifePoints(-1);
-        mp_game->gameCycle().clearPlayedCards();
-        mp_game->gameTable().playCard(targetCard->owner(), cardBeer);
-        mp_attackedPlayer->modifyLifePoints(1);
-        mp_game->gameCycle().clearPlayedCards();
+    case CARD_BEER:
+        if (mp_attackedPlayer->lifePoints() == 1) {
+            mp_attackedPlayer->modifyLifePoints(-1);
+            gameTable()->playCard(targetCard);
+            mp_attackedPlayer->modifyLifePoints(1);
+            game()->gameCycle().unsetResponseMode();
+        }
         return;
+    default:
+        break;
     }
     throw BadCardException();
 }

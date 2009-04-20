@@ -18,7 +18,6 @@ GameContextChangeEvent::~GameContextChangeEvent()
 
 void GameContextChangeEvent::run()
 {
-    qDebug() << "GameContextChangeEvent";
     GameEvent::run();
     PlayerWidget* currentPlayer = mp_game->playerWidget(mp_game->currentPlayerId());
     PlayerWidget* requestedPlayer = mp_game->playerWidget(mp_game->requestedPlayerId());
@@ -31,8 +30,6 @@ void GameContextChangeEvent::run()
 
     currentPlayer = mp_game->playerWidget(m_gameContextData.currentPlayerId);
     requestedPlayer = mp_game->playerWidget(m_gameContextData.requestedPlayerId);
-
-
 
     if (requestedPlayer)
         requestedPlayer->setActive(255);

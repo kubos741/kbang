@@ -24,6 +24,7 @@
 #include "common.h"
 
 #include "gameinfo.h"
+#include "cardfactory.h"
 
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
@@ -41,6 +42,12 @@ GameServer::GameServer():
             Config::instance().getString("network", "server_name");
     m_structServerInfo.description =
             Config::instance().getString("network", "server_description");
+    mp_cardFactory = new CardFactory();
+}
+
+GameServer::~GameServer()
+{
+    delete mp_cardFactory;
 }
 
 GameServer& GameServer::instance()
@@ -61,6 +68,12 @@ Game* GameServer::createGame(StructGame x)
     Game* newGame = new Game(this, x);
     m_games[x.id] = newGame;
     return newGame;
+}
+
+void GameServer::removeGame(Game* game)
+{
+    m_games.remove(game->id());
+    game->deleteLater();
 }
 
 QList<Game*> GameServer::gameList()

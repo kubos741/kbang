@@ -22,6 +22,7 @@
 
 #include <QLabel>
 #include "parser/parserstructs.h"
+#include "card.h"
 
 namespace client
 {
@@ -40,61 +41,65 @@ public:
         SIZE_SMALL, SIZE_NORMAL, SIZE_BIG
     };
 
-    CardWidget(QWidget *parent = 0);
+    CardWidget(QWidget *parent, Card::Type cardType = Card::Playing);
     ~CardWidget();
 
-    QPoint absPos() const;
+    inline Card::Type       type()       const { return m_cardType; }
+    inline const CardData&  cardData()   const { return m_cardData; }
+    inline PocketType       pocketType()     const { return m_pocket; }
+    inline int              ownerId()    const { return m_ownerId; }
+
     void setGameObjectClickHandler(GameObjectClickHandler*);
 
+    void setType(Card::Type);
 
-    void setCardClass(const QString& cardClassId);
-    void setCardId(int cardIs);
+    void setCardData(const CardData&);
+    void setPocketType(const PocketType&);
+    void setOwnerId(int ownerId);
+
+    void setPlayerRole(PlayerRole);
+    void setCharacterType(CharacterType);
+
     void setSize(Size size);
-    void applyNewProperties();
+    void validate();
 
     inline void setShadowMode()    { m_shadowMode = 1; }
     inline void unsetShadowMode()  { m_shadowMode = 0; }
 
-    void setPocketType(const PocketType&);
-    void setOwnerId(int ownerId);
     void setHighlight(bool highlight);
+
+
+    inline Size  size()  const { return m_size; }
+    inline QSize qsize() const { return m_qsize; }
+    inline bool  hasHighlight() const { return m_hasHighlight; }
+
 
     inline static QSize smallSize()  { return sm_qsizeSmall;  }
     inline static QSize normalSize() { return sm_qsizeNormal; }
     inline static QSize bigSize()    { return sm_qsizeBig;    }
-
-    inline Size  size()  const { return m_size; }
-    inline QSize qsize() const { return m_qsize; }
-    QString cardClass()  const { return m_cardClassId; }
-    inline int   cardId() const { return m_cardId; }
-    inline bool  hasHighlight() const { return m_hasHighlight; }
     static QSize qSize(Size size);
-
-    inline PocketType pocketType() const { return m_pocketType; }
-    inline int        ownerId()    const { return m_ownerId; }
-
 
 protected:
     void mousePressEvent(QMouseEvent *ev);
 
-
 private:
     virtual void paintEvent (QPaintEvent *event);
 
+    Card::Type    m_cardType;
 
+    CardData      m_cardData;
+    PocketType    m_pocket;
+    int           m_ownerId;
+    PlayerRole    m_playerRole;
+    CharacterType m_characterType;
 
-private:
-    const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
-    QString m_cardClassId;  /* of Card class */
-    int     m_cardId; /* for communication with server */
-    Size    m_size;
-    QSize   m_qsize;
-    bool    m_shadowMode;
-    bool    m_hasHighlight;
+    Size        m_size;
+    QSize       m_qsize;
+    bool        m_shadowMode;
+    bool        m_hasHighlight;
     GameObjectClickHandler* mp_gameObjectClickHandler;
 
-    PocketType m_pocketType;
-    int        m_ownerId;
+    const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
 };
 }
 

@@ -4,7 +4,7 @@
 #include "game.h"
 #include "player.h"
 #include "gameeventhandler.h"
-#include "cards.h"
+#include "reactioncard.h"
 #include <QDebug>
 
 GameCycle::GameCycle(Game* game):
@@ -35,6 +35,7 @@ void GameCycle::start()
     qDebug("Starting game cycle.");
     m_turnNum = 0;
     startTurn(player);
+    sendRequest();
 }
 
 void GameCycle::startTurn(Player* player)
@@ -47,7 +48,6 @@ void GameCycle::startTurn(Player* player)
     announceContextChange();
     m_drawCardCount = 0;
     m_drawCardMax = 2;
-    sendRequest();
 }
 
 void GameCycle::drawCard(Player* player, int numCards, bool revealCard)
@@ -87,9 +87,10 @@ void GameCycle::finishTurn(Player* player)
         throw TooManyCardsInHandException();
 
     startTurn(mp_game->nextPlayer(mp_currentPlayer));
+    sendRequest();
 }
 
-void GameCycle::discardCard(Player* player, CardAbstract* card)
+void GameCycle::discardCard(Player* player, PlayingCard* card)
 {
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
@@ -100,18 +101,15 @@ void GameCycle::discardCard(Player* player, CardAbstract* card)
     if (needDiscard(player) == 0)
         throw BadGameStateException();
 
-    mp_game->gameTable().discardCard(player, card);
+    mp_game->gameTable().playerDiscardCard(card);
     m_state = GAMEPLAYSTATE_DISCARD;
 
     if (needDiscard(player) == 0)
         startTurn(mp_game->nextPlayer(mp_currentPlayer));
-    else
-        sendRequest();
-
-
+    sendRequest();
 }
 
-void GameCycle::playCard(Player* player, CardPlayable* card)
+void GameCycle::playCard(Player* player, PlayingCard* card)
 {
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
@@ -119,22 +117,27 @@ void GameCycle::playCard(Player* player, CardPlayable* card)
     if (m_state == GAMEPLAYSTATE_DRAW || m_state == GAMEPLAYSTATE_DISCARD)
         throw BadGameStateException();
 
-    if (m_state == GAMEPLAYSTATE_TURN)
+    if (m_state == GAMEPLAYSTATE_TURN) {
         card->play();
-    else
-        mp_game->gameTable().firstPlayedCard()->respondCard(card);
+    } else {
+        mp_reactionCard->respondCard(card);
+    }
+    sendRequest();
 }
 
-
-void GameCycle::playCard(Player* player, CardPlayable* card, Player* targetPlayer)
+void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer)
 {
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
+
+    if (!targetPlayer->isAlive())
+        throw BadTargetPlayerException();
 
     if (m_state == GAMEPLAYSTATE_DRAW || m_state == GAMEPLAYSTATE_DISCARD)
         throw BadGameStateException();
 
     card->play(targetPlayer);
+    sendRequest();
 }
 
 void GameCycle::pass(Player* player)
@@ -145,32 +148,38 @@ void GameCycle::pass(Player* player)
     if (m_state != GAMEPLAYSTATE_RESPONSE)
         throw BadGameStateException();
 
-    mp_game->gameTable().firstPlayedCard()->respondPass();
+    mp_reactionCard->respondPass();
+    sendRequest();
 }
 
 
-void GameCycle::requestResponse(Player* player)
+void GameCycle::setResponseMode(ReactionCard* reactionCard, Player* player)
 {
-    if (mp_requestedPlayer != player && m_state != GAMEPLAYSTATE_RESPONSE) {
+    mp_reactionCard = reactionCard;
+    if (mp_requestedPlayer != player || m_state != GAMEPLAYSTATE_RESPONSE) {
         mp_requestedPlayer = player;
         m_state = GAMEPLAYSTATE_RESPONSE;
         announceContextChange();
     }
-    sendRequest();
 }
 
-void GameCycle::clearPlayedCards()
+
+void GameCycle::unsetResponseMode()
 {
+    mp_reactionCard = 0;
     mp_requestedPlayer = mp_currentPlayer;
     m_state = GAMEPLAYSTATE_TURN;
     announceContextChange();
-    mp_game->gameTable().clearPlayedCards();
-    sendRequest();
 }
 
 
 void GameCycle::sendRequest()
 {
+    if (!mp_requestedPlayer->isAlive()) {
+        Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
+        startTurn(mp_game->nextPlayer(mp_currentPlayer));
+    }
+
     ActionRequestType requestType;
     switch(m_state) {
         case GAMEPLAYSTATE_DRAW:
@@ -189,6 +198,7 @@ void GameCycle::sendRequest()
             NOT_REACHED();
     }
     qDebug(qPrintable(QString("GameCycle: sendRequest to #%1 (%2)").arg(mp_requestedPlayer->id()).arg(mp_requestedPlayer->name())));
+
     mp_requestedPlayer->gameEventHandler()->onActionRequest(requestType);
 }
 

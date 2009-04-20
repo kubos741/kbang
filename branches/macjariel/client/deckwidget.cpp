@@ -53,9 +53,9 @@ void DeckWidget::push(CardWidget* card)
 CardWidget* DeckWidget::newCard()
 {
     Q_ASSERT(mp_cardWidgetFactory != 0);
-    CardWidget* w = mp_cardWidgetFactory->createBackCard(this);
+    CardWidget* w = mp_cardWidgetFactory->createPlayingCard(this);
     w->setSize(m_cardWidgetSize);
-    w->applyNewProperties();
+    w->validate();
     w->raise();
     w->move(newCardPosition());
     w->show();

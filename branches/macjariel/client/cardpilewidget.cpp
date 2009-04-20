@@ -57,7 +57,7 @@ void CardPileWidget::push(CardWidget* card)
     m_cards.push(card);
     card->setParent(this);
     card->setSize(m_cardWidgetSize);
-    card->applyNewProperties();
+    card->validate();
     card->move(CardPileWidget::newCardPosition());
     card->raise();
     card->show();

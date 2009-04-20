@@ -11,8 +11,7 @@ class GameEventHandler;
 class PublicGameView;
 class PublicPlayerView;
 class PrivatePlayerView;
-class CardAbstract;
-class CardPlayable;
+class PlayingCard;
 
 /**
  * This class provides the only "correct" form to
@@ -73,15 +72,15 @@ public slots:
      * \throws BadCardException There is no card with given id in player's hand.
      * \throws BadGameStateException There is no right moment for discarding cards.
      */
-    void discardCard(CardAbstract* card);
+    void discardCard(PlayingCard* card);
 
 
 
     /**
      * Plays a card.
      */
-    void playCard(CardPlayable* card);
-    void playCard(CardPlayable* card, const PublicPlayerView* player);
+    void playCard(PlayingCard* card);
+    void playCard(PlayingCard* card, const PublicPlayerView* player);
 
 
     void pass();

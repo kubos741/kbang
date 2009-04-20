@@ -70,13 +70,56 @@ enum PocketType {
     POCKET_SELECTION
 };
 
-enum CardType {
+enum PlayingCardType {
     CARD_UNKNOWN,
-    CARD_BANG,
-    CARD_MISSED,
-    CARD_BEER,
-    CARD_MUSTANG
+
+    // TEMPORARY CARDS
+    CARD_BANG,          // playWithPlayer, respond
+    CARD_MISSED,        // respond (playWithPlayer for character)
+    CARD_BEER,          // play, respond(last lifepoint)
+    CARD_SALOON,        // play
+    CARD_WELLSFARGO,    // play
+    CARD_DILIGENZA,     // play
+    CARD_GENERALSTORE,  // play
+    CARD_PANIC,         // playWithPlayer (hand), playWithCard
+    CARD_CATBALOU,      // playWithPlayer (hand), playWithCard
+    CARD_INDIANS,       // play
+    CARD_DUEL,          // play
+    CARD_GATLING,       // play
+
+    // PERMANENT CARDS
+    CARD_MUSTANG,       // play
+    CARD_APPALOSSA,     // play
+    CARD_BARREL,        // play, use
+    CARD_DYNAMITE,      // play, use
+    CARD_JAIL,          // play, use
+
+    // WEAPONS
+    CARD_VOLCANIC,      // play
+    CARD_SCHOFIELD,     // play
+    CARD_REMINGTON,     // play
+    CARD_CARABINE,      // play
+    CARD_WINCHESTER     // play
 };
+
+enum CardSuit {
+    SUIT_SPADES,
+    SUIT_HEARTS,
+    SUIT_DIAMONDS,
+    SUIT_CLUBS
+};
+
+
+/**
+ * Represents the rank of a card. Numeral ranks are represented with the
+ * corresponding number, others are represented by following values:
+ *  * jack  = 11,
+ *  * queen = 12,
+ *  * king  = 13,
+ *  * ace   = 14
+ * This represention allows convenient comparing.
+ */
+typedef int CardRank;
 
 enum CharacterType {
     CHARACTER_UNKNOWN
@@ -101,8 +144,13 @@ struct ActionPlayCardData {
 
 
 struct CardData {
-    int id;
-    CardType type;
+    int             id;
+    PlayingCardType type;
+    CardSuit        suit;
+    CardRank        rank;
+
+    CardData(): id(0), type(CARD_UNKNOWN) {}
+
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };
@@ -154,20 +202,12 @@ struct GameSyncData {
 };
 
 
-struct StructCardDetails {
-    int cardId;
-    QString cardType;
-    StructCardDetails(): cardId(0) {}
-    StructCardDetails(int i, const QString& t): cardId(i), cardType(t) {}
-};
-
-struct StructCardMovement {
+struct CardMovementData {
     PocketType        pocketTypeFrom;
     PocketType        pocketTypeTo;
     int               playerFrom;
     int               playerTo;
-    StructCardDetails cardDetails;
-    StructCardMovement(): playerFrom(0), playerTo(0) {}
+    CardData          card;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };

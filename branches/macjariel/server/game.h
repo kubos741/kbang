@@ -29,7 +29,7 @@ class Client;
 class Player;
 class GameServer;
 class Game;
-class CardAbstract;
+class PlayingCard;
 class CardPlayable;
 class GameEventHandler;
 
@@ -41,8 +41,17 @@ class GameTable;
 class GameCycle;
 
 /**
- * The Game class represents a bang game. It handles creating and destroying players and generates
- * signals about global events in game.
+ * The Game class represents a bang game. Because there is a lot
+ * of stuff to handle, the Game class delegates the problems
+ * to its parts rather than managing everything itself.
+ *
+ * The list of tasks that are managed directly by this class includes
+ * creating and removing players, starting and finishing games and
+ * sending messages. The Game class also takes care about the list
+ * of players in game (including its order) and provides "next player"
+ * and "distance between players" capabilities. Finally it contains
+ * the getters for its component objects.
+ *
  * @author MacJariel <macjariel@users.sourceforge.net>
  */
 class Game: public QObject
@@ -60,119 +69,121 @@ public:
     Game(GameServer* parent, const StructGame& structGame);
     ~Game();
 
+  /////////////
+ // GETTERS //
+/////////////
+
     /**
-     * Returns the id of the game. The id is a non-zero integral value.
+     * Returns the id of the game. Zero value is reserved and interpreted
+     * as an invalid game.
      */
     int id() const;
 
     /**
-     * Returns the count of (currently alive) players in the game.
-     * In the "before game" state returns the count of all players.
+     * Returns the count of players in the game.
      */
-    int playersCount() const;
+    inline int playersCount() const { return m_playerList.size(); }
 
     /**
      * Returns the count of spectators in the game.
      */
-    int spectatorsCount() const;
+    inline int spectatorsCount() const { return 0; } /// @todo Spectators
 
-    /**
-     * Returns the GameInfo object, that contains information
-     * about the game.
-     * \note Remember, that the lifetime of the returned
-     * object is controlled by the Game instance, so don't
-     * keep a reference for too long.
-     */
-    GameInfo& gameInfo();
+    inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
+    inline GameCycle& gameCycle() { return *mp_gameCycle; }
+    inline GameTable& gameTable() { return *mp_gameTable; }
 
-    GameCycle& gameCycle();
-
-    GameTable& gameTable();
-
-    const PublicGameView& publicGameView() const;
+    inline const PublicGameView& publicGameView() const
+                                  { return m_publicGameView; }
 
 
     /**
-     * Returns the list of players. The order determines the
-     * order around the table.
+     * Returns the list of players, respecting the order
+     * of players sitting around the table.
      */
-    QList<Player*>                  playerList() const;
+    QList<Player*> playerList() const { return m_playerList; }
 
-    QList<const PublicPlayerView*>  publicPlayerList() const;
+    /**
+     * This method is provided for convenience.
+     * @see Game::playerList()
+     */
+    QList<const PublicPlayerView*> publicPlayerList() const
+        { return m_publicPlayerList; }
 
-    Player* nextPlayer(Player* currentPlayer) const;
+    /**
+     * Looks up and returns the Player according to its id.
+     * Returns 0 if player doesn't exist.
+     */
+    Player* player(int playerId);
 
-    Player* getPlayer(int playerId);
+    /**
+     * Returns the first player that succeeds the currentPlayer
+     * and is alive.
+     */
+    Player* nextPlayer(Player* currentPlayer);
+
+    /**
+     * Returns the distance from one player to another. The effect
+     * of "horse" cards is considered and therefore this function
+     * does not have to be symmetric and generally getDistance(A,B) !=
+     * getDistance(B,A).
+     */
+    int getDistance(Player* fromPlayer, Player* toPlayer) const;
+
+
+  ///////////////
+ // MODIFIERS //
+///////////////
 
     /**
      * Creates a new player, adds him into the list of players and
      * returns the pointer to it. Creating players is reasonable only
      * before the game is started.
      */
-    Player* createNewPlayer(StructPlayer player, GameEventHandler* gameEventHandler);
+    Player* createPlayer(StructPlayer player, GameEventHandler* gameEventHandler);
 
     /**
-     * Removes a player from the game. This can be used in anytime and
-     * the game should recover ftom it.
+     * Removes a player from the game. Removing players is reasonable only
+     * before the game is started.
      */
     void removePlayer(Player* player);
 
+
+    void buryPlayer(Player* player);
+
     /**
      * Tries to start the game.
-     * \param player The game is started only if specified player is creator. Otherwise
-     *               throws BadPlayerException. If player is null, no condition is tested.
+     * @param player The player that tries to start the game, can be 0 to skip
+     *               the creator testing.
+     * @throws BadPlayerException player is not the game creator
+     * @throws BadGameStateException game cannot be started now
      */
     void startGame(Player* player);
 
     /**
-     * Returns the distance from one player to another. The effect
-     * of "horse" cards is considered and therefore this function
-     * does not have to be symmetric. Generally getDistance(A,B) !=
-     * getDistance(B,A).
+     * Sends a chat message by name of player.
      */
-    int getDistance(Player* fromPlayer, Player* toPlayer);
-
     void sendMessage(Player* player, const QString& message);
 
-/// Signals to player controllers
-signals:
-    void gameStarted();
-
-    void playerJoinedGame(int gameId, const StructPlayer&);
-    void playerLeavedGame(int gameId, const StructPlayer&);
-    void incomingMessage(int senderId, const QString& senderName, const QString& message);
-    void chatMessage(int senderId, const QString& senderName, const QString& message);
-    void startableChanged(int gameId, bool startable);
-
-
-
-private slots:
-    void checkStartable();
 private:
-
+    void checkStartable();
     void shufflePlayers();
     void setRoles();
-    void dealCards();
-
-    int uniqueCardId();
     QList<PlayerRole> getRoleList();
-
-public:
 
 
 private:
-    GameInfo*                       mp_gameInfo;
-    GameTable*                      mp_gameTable;
-    GameCycle*                      mp_gameCycle;
-    PublicGameView                  m_publicGameView;
-    int                             m_nextPlayerId;
-    QMap<int, Player*>              m_playerMap;
-    QList<Player*>                  m_playerList;
-    QList<const PublicPlayerView*>  m_publicPlayerList;
-    int                             m_currentPlayerIndex;
-    GameState                       m_gameState;
-
-    bool                            m_startable;
+    GameInfo*           mp_gameInfo;
+    GameTable*          mp_gameTable;
+    GameCycle*          mp_gameCycle;
+    PublicGameView      m_publicGameView;
+    int                 m_nextUnusedPlayerId;
+    QMap<int, Player*>  m_playerMap;
+    QList<Player*>      m_playerList;
+    GameState           m_gameState;
+    bool                m_startable;
+    QList<const PublicPlayerView*>
+                        m_publicPlayerList;
 };
 
 #endif

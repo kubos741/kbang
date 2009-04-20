@@ -35,21 +35,80 @@ QString CharacterTypeToString(const CharacterType& c)
     return ""; /// @todo: characters
 }
 
-CardType StringToCardType(const QString& s)
+CardSuit StringToCardSuit(const QString& s)
 {
-    if (s == "unknown")  return CARD_UNKNOWN;
-    if (s == "bang")     return CARD_BANG;
-    if (s == "missed")   return CARD_MISSED;
+    if (s == "spades")      return SUIT_SPADES;
+    if (s == "hearts")      return SUIT_HEARTS;
+    if (s == "diamonds")    return SUIT_DIAMONDS;
+    if (s == "clubs")       return SUIT_CLUBS;
+    qWarning(qPrintable(QString("Invalid suit: %1").arg(s)));
+    return SUIT_SPADES;
+}
+
+QString CardSuitToString(const CardSuit& suit)
+{
+    switch(suit) {
+        case SUIT_SPADES:   return "spades";
+        case SUIT_HEARTS:   return "hearts";
+        case SUIT_DIAMONDS: return "diamonds";
+        case SUIT_CLUBS:    return "clubs";
+    }
+    return "";
+}
+
+PlayingCardType StringToPlayingCardType(const QString& s)
+{
+    if (s == "bang")             return CARD_BANG;
+    if (s == "missed")           return CARD_MISSED;
+    if (s == "beer")             return CARD_BEER;
+    if (s == "saloon")           return CARD_SALOON;
+    if (s == "wellsfargo")       return CARD_WELLSFARGO;
+    if (s == "diligenza")        return CARD_DILIGENZA;
+    if (s == "generalstore")     return CARD_GENERALSTORE;
+    if (s == "panic")            return CARD_PANIC;
+    if (s == "catbalou")         return CARD_CATBALOU;
+    if (s == "indians")          return CARD_INDIANS;
+    if (s == "duel")             return CARD_DUEL;
+    if (s == "gatling")          return CARD_GATLING;
+    if (s == "mustang")          return CARD_MUSTANG;
+    if (s == "appalossa")        return CARD_APPALOSSA;
+    if (s == "barrel")           return CARD_BARREL;
+    if (s == "dynamite")         return CARD_DYNAMITE;
+    if (s == "jail")             return CARD_JAIL;
+    if (s == "volcanic")         return CARD_VOLCANIC;
+    if (s == "schofield")        return CARD_SCHOFIELD;
+    if (s == "remington")        return CARD_REMINGTON;
+    if (s == "carabine")         return CARD_CARABINE;
+    if (s == "winchester")       return CARD_WINCHESTER;
     return CARD_UNKNOWN;
 }
 
-QString CardTypeToString(const CardType& c)
+QString PlayingCardTypeToString(const PlayingCardType& c)
 {
     switch(c) {
-    case CARD_BANG: return "bang";
-    case CARD_MISSED: return "missed";
-    case CARD_UNKNOWN: return "unknown";
-    default: NOT_REACHED();
+        case CARD_BANG:           return "bang";
+        case CARD_MISSED:         return "missed";
+        case CARD_BEER:           return "beer";
+        case CARD_SALOON:         return "saloon";
+        case CARD_WELLSFARGO:     return "wellsfargo";
+        case CARD_DILIGENZA:      return "diligenza";
+        case CARD_GENERALSTORE:   return "generalstore";
+        case CARD_PANIC:          return "panic";
+        case CARD_CATBALOU:       return "catbalou";
+        case CARD_INDIANS:        return "indians";
+        case CARD_DUEL:           return "duel";
+        case CARD_GATLING:        return "gatling";
+        case CARD_MUSTANG:        return "mustang";
+        case CARD_APPALOSSA:      return "appalossa";
+        case CARD_BARREL:         return "barrel";
+        case CARD_DYNAMITE:       return "dynamite";
+        case CARD_JAIL:           return "jail";
+        case CARD_VOLCANIC:       return "volcanic";
+        case CARD_SCHOFIELD:      return "schofield";
+        case CARD_REMINGTON:      return "remington";
+        case CARD_CARABINE:       return "carabine";
+        case CARD_WINCHESTER:     return "winchester";
+        case CARD_UNKNOWN:        return "";
     }
     return "";
 }
@@ -145,16 +204,19 @@ void CardData::read(XmlNode* node)
 {
     Q_ASSERT(node->name() == "card");
     id          = node->attribute("id").toInt();
-    type    = StringToCardType(node->attribute("type"));
+    type        = StringToPlayingCardType(node->attribute("type"));
+    suit        = StringToCardSuit(node->attribute("suit"));
+    rank        = node->attribute("rank").toInt();
 }
 
 void CardData::write(QXmlStreamWriter* writer) const
 {
     writer->writeStartElement("card");
     writer->writeAttribute("id",        QString::number(id));
-    writer->writeAttribute("type",      CardTypeToString(type));
+    writer->writeAttribute("type",      PlayingCardTypeToString(type));
+    writer->writeAttribute("suit",      CardSuitToString(suit));
+    writer->writeAttribute("rank",      QString::number(rank));
     writer->writeEndElement();
-
 }
 
 void PublicPlayerData::read(XmlNode* node)
@@ -272,17 +334,6 @@ void GameSyncData::write(QXmlStreamWriter* writer) const
 
     writer->writeEndElement();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 PocketType stringToPocketType(const QString& s)
 {
@@ -405,30 +456,32 @@ void StructPlayer::write(QXmlStreamWriter* writer, bool writePassword) const
     writer->writeEndElement();
 }
 
-void StructCardMovement::read(XmlNode* node)
+void CardMovementData::read(XmlNode* node)
 {
     pocketTypeFrom = stringToPocketType(node->attribute("pocketTypeFrom"));
     pocketTypeTo   = stringToPocketType(node->attribute("pocketTypeTo"));
     playerFrom     = node->attribute("playerFrom").toInt();
     playerTo       = node->attribute("playerTo").toInt();
-    cardDetails.cardId   = node->attribute("cardId").toInt();
-    cardDetails.cardType = node->attribute("cardType");
+    if (node->getFirstChild() && node->getFirstChild()->name() == "card") {
+        card.read(node->getFirstChild());
+    }
 }
 
-void StructCardMovement::write(QXmlStreamWriter* writer) const
+void CardMovementData::write(QXmlStreamWriter* writer) const
 {
     writer->writeStartElement("card-movement");
     writer->writeAttribute("pocketTypeFrom", pocketTypeToString(pocketTypeFrom));
     writer->writeAttribute("pocketTypeTo", pocketTypeToString(pocketTypeTo));
+
     if (playerFrom != 0)
         writer->writeAttribute("playerFrom", QString::number(playerFrom));
+
     if (playerTo != 0)
         writer->writeAttribute("playerTo", QString::number(playerTo));
-    if (cardDetails.cardId != 0)
-    {
-        writer->writeAttribute("cardId", QString::number(cardDetails.cardId));
-        writer->writeAttribute("cardType", cardDetails.cardType);
-    }
+
+    if (card.id != 0)
+        card.write(writer);
+
     writer->writeEndElement();
 }
 

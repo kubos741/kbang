@@ -24,10 +24,11 @@
 #include <QString>
 #include <QPixmap>
 
+#include "parser/parserstructs.h"
+#include "util.h"
+
 namespace client
 {
-class Card;
-typedef Card* CardPointer;
 
 /**
  * This class is a type of a card in Bang! game. The whole set of Card instances
@@ -52,15 +53,13 @@ typedef Card* CardPointer;
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Card
+class Card: private NonCopyable
 {
 public:
-
     typedef enum {
-        CT_CHARACTER, /**< Character card (Susy Lafayete, etc.) */
-        CT_ROLE,      /**< Role card (Sheriff, etc.) */
-        CT_PLAYING,   /**< Playing card (Bang!, etc.) */
-        CT_BACK       /**< Back of a card (back of a playing card, back of a character card (bullets), etc.) */
+        Character, /**< Character card (Susy Lafayete, etc.) */
+        Role,      /**< Role card (Sheriff, etc.) */
+        Playing    /**< Playing card (Bang!, etc.) */
     } Type;
 
 private:
@@ -70,27 +69,34 @@ private:
      * @param name The localized card name (should be used with QObject::tr).
      * @param image The filename of the image, as used in QPixmap constructor.
      */
-    Card(const QString& id, const QString& name, Type type, const QString& imageFileName);
-    Card(const Card&);                    ///< Copy constructor is private.
-    const Card& operator=(const Card&);   ///< Assignment operator is private.
+     Card(const QString& name, PlayingCardType, const QString& imageFileName);
+     Card(const QString& name, PlayerRole, const QString& imageFileName);
+     Card(const QString& name, CharacterType, const QString& imageFileName);
 
 public:
-    inline QString id()    { return m_id;    } ///< Returns unique indentifier.
-    inline QString name()  { return m_name;  } ///< Returns card name.
-    inline Type    type()  { return m_type;  } ///< Returns card type. @see Card::Type
-    inline QPixmap image() { return m_image; } ///< Returns image pixmap.
+    inline QString name()  const { return m_name;  } ///< Returns card name.
+    inline Type    type()  const { return m_type;  } ///< Returns card type. @see Card::Type
+    inline QPixmap image() const { return m_image; } ///< Returns image pixmap.
 
 public: /* static */
     static void loadDefaultRuleset();  ///< Loads default ruleset. To be replaced with ruleset manager.
-    static const CardPointer findCard(const QString& id); ///< Looks up a card by its identifier.
+
+    static const Card* findPlayingCard(PlayingCardType);
+    static const Card* findRoleCard(PlayerRole);
+    static const Card* findCharacterCard(CharacterType);
 
 private:
+    void loadPixmap();
+
     QString m_id;
     QString m_name;
     Type    m_type;
     QPixmap m_image;
     QString m_imageFileName;
-    static QMap<QString, CardPointer> sm_cards;
+
+    static QMap<PlayingCardType, Card*> sm_playingCards;
+    static QMap<PlayerRole,      Card*> sm_roleCards;
+    static QMap<CharacterType,   Card*> sm_characterCards;
 };
 }
 #endif

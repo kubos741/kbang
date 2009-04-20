@@ -17,49 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDABSTRACT_H
-#define CARDABSTRACT_H
+#ifndef REACTIONCARD_H
+#define REACTIONCARD_H
 
-#include <QObject>
-#include "game.h"
+#include "playingcard.h"
 #include "parser/parserstructs.h"
 
-class Player;
-class GameTable;
-
 /**
- * The base class for all cards that are in the desk. Character and role
- * cards are not included.
+ * The ReactionCard is the base class for all playing cards, that, when are played,
+ * require a reaction of (an)other player(s). This, for example, includes Bang!, Indians,
+ * General Store, etc.
+ *
+ * When the card is played, it can register itself at GameCycle and request gamecycle for
+ * a responce from a player. The responce can be either using a card or passing (doing nothing).
+ * Thus the ReactionCard childs need to implement these methods:
+ *  * virtual void respondPass();
+ *  * virtual void respondCard(ReactionCard* targetCard);
+ *
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardAbstract: public QObject
+class ReactionCard: public PlayingCard
 {
-friend class GameTable;
 Q_OBJECT
 public:
-    CardAbstract(Game *game, int id);
-    virtual ~CardAbstract();
+    ReactionCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
+    virtual ~ReactionCard();
 
-
-    inline int id() const { return m_id; }
-    virtual CardType type() const = 0;
-    virtual QString typeStr() const = 0; /// \deprecated
-    inline StructCardDetails cardDetails() const { return StructCardDetails(m_id, typeStr()); }
-    inline Player* owner() const { return mp_owner; }
-    inline PocketType pocket() const { return m_pocketType; }
-
-protected:
-    Game *mp_game;
-
-private:
-    inline void setOwner(Player *owner) { mp_owner = owner; }
-    inline void setPocketType(const PocketType& pocketType) { m_pocketType = pocketType; }
-
-
-private:
-    Player*     mp_owner;
-    PocketType  m_pocketType;
-    const int   m_id;
+    virtual void respondPass() = 0;
+    virtual void respondCard(PlayingCard* targetCard) = 0;
 };
 
 #endif

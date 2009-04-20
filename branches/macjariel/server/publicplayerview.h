@@ -26,7 +26,7 @@
 #include "parser/parserstructs.h"
 
 class Player;
-class CardAbstract;
+class PlayingCard;
 
 /**
  *
@@ -47,7 +47,7 @@ public:
     int                  lifePoints()        const;
     int                  handSize()          const;
     virtual PlayerRole   role()              const;
-    QList<CardAbstract*> table()             const;
+    QList<PlayingCard*> table()             const;
     PublicPlayerData     publicPlayerData()  const;
 
 

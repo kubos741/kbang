@@ -2,6 +2,7 @@
 #define CARDWIDGETFACTORY_H
 
 #include "util.h"
+#include "parser/parserstructs.h"
 
 class QWidget;
 
@@ -15,9 +16,9 @@ class CardWidgetFactory: private NonCopyable
 {
 friend class Game;
 public:
-    CardWidget* createBulletsCard(QWidget* parent = 0);
-    //CardWidget* createCharacterCard(QWidget* parent = 0); /// \todo Characters
-    CardWidget* createBackCard(QWidget* parent = 0);
+
+    CardWidget* createPlayingCard(QWidget* parent);
+    CardWidget* createCharacterCard(QWidget* parent, CharacterType = CHARACTER_UNKNOWN);
 
     void registerCard(CardWidget* cardWidget);
 

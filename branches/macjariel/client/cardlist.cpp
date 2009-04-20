@@ -44,8 +44,8 @@ void CardList::setCardSize(const CardWidget::Size& cardSize)
     m_cardSize = cardSize;
     QSize cardS = CardWidget::qSize(cardSize);
     QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
-    m_moveFactor = cardS.width() / 2;
-    setMinimumWidth(cardS.width() * 3);
+    m_moveFactor = cardS.width() / 2 + cardS.width() / 5;
+    setMinimumWidth((int)(cardS.width() * 3.5));
     setMinimumHeight(cardS.height() + 2 * m_vPadding);
     updateGeometry();
 }
@@ -57,7 +57,7 @@ void CardList::push(CardWidget* card)
     card->setParent(this);
     m_cards.push_back(card);
     card->setSize(m_cardSize);
-    card->applyNewProperties();
+    card->validate();
     card->raise();
     reorder();
     card->show();
@@ -66,20 +66,19 @@ void CardList::push(CardWidget* card)
 QPoint CardList::newCardPosition() const
 {
     //return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
-    return QPoint(cardX(m_cards.size()), m_vPadding);
+    return QPoint(cardX(m_cards.size(), 1), m_vPadding);
 }
+
 
 CardWidget* CardList::take(int cardId)
 {
-
-    CardWidget *card = 0;
     if (m_cards.size() == 0) {
         qCritical("Trying to take from empty card list.");
         return 0;
     }
     if (cardId != 0) {
-        foreach (card, m_cards) {
-            if (card->cardId() == cardId) {
+        foreach (CardWidget* card, m_cards) {
+            if (card->cardData().id == cardId) {
                 m_cards.removeAll(card);
                 return card;
             }
@@ -87,12 +86,16 @@ CardWidget* CardList::take(int cardId)
         qCritical("Cannot find card id %d in CardList. Taking random card.", cardId);
     }
     int cardIndex = (int)random() % (int)m_cards.size();
-    return m_cards.takeAt(cardIndex);
+    CardWidget* res = m_cards.takeAt(cardIndex);
+    reorder();
+    return res;
 }
 
 CardWidget* CardList::pop()
 {
-    return m_cards.takeLast();
+    CardWidget* res = m_cards.takeLast();
+    reorder();
+    return res;
 }
 
 void CardList::reorder()
@@ -102,13 +105,31 @@ void CardList::reorder()
     }
 }
 
-int CardList::cardX(int i) const
+/*
+int CardList::cardX(int i, bool newCard) const
 {
-    int cSize = m_cards.size() * m_moveFactor + CardWidget::qSize(m_cardSize).width();
+    int cardCount = m_cards.size();
+    if (newCard)
+        cardCount++;
+    int moveFactor;
+    if (m_cards.size() >= 2)
+        moveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
+    else
+        moveFactor = m_moveFactor;
+    return m_hPadding + i * moveFactor;
+}
+*/
+
+int CardList::cardX(int i, bool newCard) const
+{
+    int cardCount = m_cards.size();
+    if (newCard)
+        cardCount++;
+    int cSize = cardCount * m_moveFactor + CardWidget::qSize(m_cardSize).width();
     if (cSize <= width() - 2 * m_hPadding) {
         return m_hPadding + i * m_moveFactor;
     } else {
-        int newMoveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(m_cards.size() - 1);
+        int newMoveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
         //i * NF = todoWidth - 2*hpadding - width
         return m_hPadding + i * newMoveFactor;
     }

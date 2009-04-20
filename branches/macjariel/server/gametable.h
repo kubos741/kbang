@@ -3,10 +3,11 @@
 
 #include <QtCore>
 
-class CardAbstract;
-class CardPlayable;
+class PlayingCard;
+class TableCard;
 class Player;
 class Game;
+class CardFactory;
 
 
 class GameTable
@@ -23,77 +24,44 @@ public:
     void drawCard(Player* player, int count = 1, bool revealCard = 0);
 
     /**
-     * The player discards the specified card.
+     * The player discards the specified card. The card can be in the player's
+     * hand, table or selection.
      */
-    void discardCard(Player* p, CardAbstract* card);
+    void playerDiscardCard(PlayingCard* card);
 
     /**
      * Player moves a card from his hand/table to the playedCards list.
      */
-    void playCard(Player* p, CardPlayable* card);
+    void playCard(PlayingCard* card);
 
-    void playOnTable(Player* p, CardPlayable* card);
+    void playOnTable(TableCard* card, Player* targetPlayer = 0);
 
-    /**
-     * Returns the last played card.
-     */
-    inline CardPlayable* lastPlayedCard() const {
-        return m_playedCards.last();
-    }
-
-    CardPlayable* firstPlayedCard() const {
-        return m_playedCards.first();
-    }
-
-    CardAbstract* card(int cardId) const {
+    PlayingCard* card(int cardId) const {
         return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
     }
 
-
-    /**
-     * Returns the playedCards list.
-     */
-    inline QList<CardPlayable*> playedCards() const {
-        return m_playedCards;
-    }
-
-
-    void pushPlayedCard(CardPlayable* card);
-
-    /**
-     * Clears the playedCards list by appending its content
-     * to the graveyard.
-     */
-    void clearPlayedCards();
-
-
-signals:
-    void playerDrawedCard(Player* player, CardAbstract* card);
-    void playerDiscardedCard(Player* player, CardAbstract* card);
-
 private:
-    void generateCards();
+    void generateCards(CardFactory*);
     void shuffleDeck();
     void dealCards();
     void regenerateDeck();
-    int  uniqueCardId();
 
-    inline CardAbstract* popCardFromDeck();
-    inline void putCardToGraveyard(CardAbstract* card);
+    inline PlayingCard* popCardFromDeck();
+    inline void putCardToGraveyard(PlayingCard* card);
 
 
 protected:
    /**
      * Prepares the game.
      */
-    void prepareGame();
+    void prepareGame(CardFactory*);
 
 private:
-    Game*                           mp_game;
-    QList<CardAbstract*>            m_deck;
-    QList<CardAbstract*>            m_graveyard;
-    QList<CardPlayable*>            m_playedCards;
-    QMap<int, CardAbstract*>        m_cards;
+    Game*                          mp_game;
+    QList<PlayingCard*>            m_deck;
+    QList<PlayingCard*>            m_graveyard;
+    QList<PlayingCard*>            m_selection;
+    QMap<int, PlayingCard*>        m_cards;
 };
 
 #endif // GAMETABLE_H

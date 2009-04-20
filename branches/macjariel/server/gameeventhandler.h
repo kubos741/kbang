@@ -25,7 +25,7 @@
 #include "parser/parserstructs.h"
 
 
-class CardAbstract;
+class PlayingCard;
 class PublicPlayerView;
 class PlayerCtrl;
 
@@ -73,13 +73,13 @@ public:
      * This method is called when a player draws a card. If the controlled player draws a card, the
      * card attribute points to that card, otherwise card is null.
      */
-    virtual void onPlayerDrawedCard(int playerId, const CardAbstract* card) = 0;
+    virtual void onPlayerDrawedCard(int playerId, const PlayingCard* card) = 0;
 
-    virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card) = 0;
+    virtual void onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card) = 0;
 
-    virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) = 0;
+    virtual void onPlayerPlayedCard(int playerId, const PlayingCard* card) = 0;
 
-    virtual void onPlayerPlayedOnTable(int playerId, const CardAbstract* card) = 0;
+    virtual void onPlayerPlayedOnTable(int playerId, const PlayingCard* card) = 0;
 
     virtual void onPlayedCardsCleared() = 0;
 

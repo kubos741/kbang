@@ -17,34 +17,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CHARACTERCARD_H
-#define CHARACTERCARD_H
+#include "weaponcard.h"
+#include "gameexceptions.h"
+#include "player.h"
+#include "gametable.h"
 
-#include <QList>
-#include <abstractcard.h>
-
-class CharacterCard;
-typedef QList<CharacterCard *> CharacterCardList;
-
-/**
- * @author MacJariel <macjariel@users.sourceforge.net>
- */
-class CharacterCard : public AbstractCard
+WeaponCard::WeaponCard(Game *game, int id, int range, CardSuit suit, CardRank rank):
+        TableCard(game, id, CARD_UNKNOWN, suit, rank),
+        m_range(range)
 {
+    switch(m_range) {
+    case 1:
+        setType(CARD_VOLCANIC);
+        break;
+    case 2:
+        setType(CARD_SCHOFIELD);
+        break;
+    case 3:
+        setType(CARD_REMINGTON);
+        break;
+    case 4:
+        setType(CARD_CARABINE);
+        break;
+    case 5:
+        setType(CARD_WINCHESTER);
+        break;
+    }
+}
 
-public:
-    CharacterCard();
+WeaponCard::~WeaponCard()
+{
+}
 
-    ~CharacterCard();
+void WeaponCard::play()
+{
+    if (this->pocket() != POCKET_HAND)
+        throw BadUsageException();
 
-    static CharacterCardList getCharacterCards();
+    foreach(PlayingCard* card, owner()->table()) {
+        WeaponCard* weaponCard = qobject_cast<WeaponCard*>(card);
+        if (weaponCard == 0)
+            continue;
+        if (weaponCard->type() == type())
+            throw TwoSameOnTableException();
+        gameTable()->playerDiscardCard(weaponCard);
+    }
+    gameTable()->playOnTable(this);
+}
 
-private:
-    //    static CharacterCardList sm_characterBank;
-    int m_maxLifePoints;
-};
+void WeaponCard::registerPlayer(Player* player)
+{
+    player->setWeaponRange(m_range);
+    /// @todo implement Volcanic
+}
+
+void WeaponCard::unregisterPlayer(Player* player)
+{
+    player->setWeaponRange(1);
+}
 
 
-
-
-#endif

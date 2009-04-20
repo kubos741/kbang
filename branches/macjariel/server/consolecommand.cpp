@@ -78,6 +78,7 @@ CMDDEF(console_create_test_player)
         return 1;
     }
     new VoidAI(gameId);
+    return 0;
 }
 
 

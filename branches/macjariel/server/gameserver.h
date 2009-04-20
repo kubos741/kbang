@@ -23,11 +23,13 @@
 #include <QtCore>
 #include "parser/parser.h"
 #include "parser/parserstructs.h"
+#include "util.h"
 
 class Game;
 class Client;
 class TcpServer;
 class QXmlStreamWriter;
+class CardFactory;
 
 /**
  * The GameServer class is a singleton class that represent the state of the whole
@@ -35,7 +37,7 @@ class QXmlStreamWriter;
  * attributes of the server such as the server name, description, etc.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class GameServer: public QObject
+class GameServer: public QObject, private NonCopyable
 {
     Q_OBJECT;
 public:
@@ -50,6 +52,7 @@ public:
      * Creates new game and returns a pointer to it.
      */
     Game*               createGame(StructGame);
+    void                removeGame(Game*);
 
     /**
      * Returns a list of games (Game instances).
@@ -70,6 +73,8 @@ public:
      * Returns a pointer to the Client with given id.
      */
     Client*             client(int id);
+
+    CardFactory* cardFactory() const { return mp_cardFactory; }
 
     /**
      * Tells the GameServer to listen for incoming connections.
@@ -99,8 +104,7 @@ public slots:
    
 private:
     GameServer();
-    GameServer(GameServer&);
-    GameServer& operator=(const GameServer&);
+    ~GameServer();
 
 
 
@@ -115,6 +119,7 @@ private:
     int m_maxClientCount; // is this necessary?
     StructServerInfo    m_structServerInfo;
     TcpServer* mp_tcpServer;
+    CardFactory* mp_cardFactory;
 
 };
 

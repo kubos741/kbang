@@ -38,64 +38,20 @@ Player::Player(Game* game,
         m_name(name),
         m_password(password),
         m_role(ROLE_UNKNOWN),
+        m_isAlive(1),
         mp_game(game),
         mp_gameEventHandler(gameEventHandler),
+        m_weaponRange(1),
+        m_distanceIn(0),
+        m_distanceOut(0),
         m_lastBangTurn(-1),
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
-    qDebug(qPrintable(QString("Creating new player #%1 (%2).").arg(m_id).arg(m_name)));
-    //    mp_client->mp_player = this;
-    //    m_id = mp_game->appendNewPlayer(this);
     mp_playerCtrl = new PlayerCtrl(this);
     mp_gameEventHandler->onPlayerInit(mp_playerCtrl);
 }
 
-PlayerCtrl* Player::playerCtrl() const
-{
-    return mp_playerCtrl;
-}
-
-const int Player::id() const
-{
-    return (this != 0) ? m_id : 0;
-}
-
-QString Player::name() const
-{
-    return m_name;
-}
-
-/*
-void Player::sendMessage(const QString& message)
-{
-    mp_game->sendMessage(this, message);
-}
-*/
-
-StructPlayer Player::structPlayer(bool returnPrivateInfo)
-{
-    StructPlayer x;
-    x.id = m_id;
-    x.name = m_name;
-    x.password = m_password;
-    if (returnPrivateInfo || x.role == ROLE_SHERIFF)
-    {
-        x.role = m_role;
-    } else {
-        x.role = ROLE_UNKNOWN;
-    }
-    return x;
-}
-
-GameEventHandler* Player::gameEventHandler() const {
-    return mp_gameEventHandler;
-}
-
-Game* Player::game() const
-{
-    return mp_game;
-}
 
 bool Player::isCreator() const
 {
@@ -107,26 +63,26 @@ bool Player::isOnTurn() const
     return (mp_game->gameCycle().currentPlayer() == this);
 }
 
-QList<CardAbstract*> Player::cardsInHand()
+bool Player::isRequested() const
 {
-    return m_cardsInHand;
+    return (mp_game->gameCycle().requestedPlayer() == this);
 }
 
-QList<CardAbstract*> Player::table()
+bool Player::hasIdenticalCardOnTable(PlayingCard* card) const
 {
-    return m_table;
-}
-
-bool Player::hasDuplicateOnTable(CardAbstract* card)
-{
-    foreach(CardAbstract* c, m_table) {
+    foreach(PlayingCard* c, m_table) {
         if (card->type() == c->type())
             return 1;
     }
     return 0;
 }
 
-void Player::modifyLifePoints(int x)
+bool Player::canPlayBang() const
+{
+    return (m_lastBangTurn != mp_game->gameCycle().turnNumber());
+}
+
+void Player::modifyLifePoints(int x, bool preventDeath)
 {
     int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
@@ -142,37 +98,61 @@ void Player::modifyLifePoints(int x)
     foreach (Player* p, mp_game->playerList()) {
         p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
     }
+    if (m_lifePoints == 0 && !preventDeath) {
+        mp_game->buryPlayer(this);
+    }
 }
 
-void Player::appendCardToHand(CardAbstract * card)
+void Player::modifyDistanceIn(int delta)
 {
-    m_cardsInHand.append(card);
+    m_distanceIn += delta;
+    // todo - tell game to invalidate cache
 }
 
-void Player::appendCardToTable(CardAbstract* card)
+void Player::modifyDistanceOut(int delta)
+{
+    m_distanceOut += delta;
+    // todo - tell game to invalidate cache
+}
+
+void Player::setWeaponRange(int weaponRange)
+{
+    m_weaponRange = weaponRange;
+}
+
+void Player::setAlive(bool isAlive)
+{
+    m_isAlive = isAlive;
+}
+
+void Player::appendCardToHand(PlayingCard * card)
+{
+    m_hand.append(card);
+}
+
+void Player::appendCardToTable(PlayingCard* card)
 {
     m_table.append(card);
 }
 
-bool Player::removeCardFromHand(CardAbstract* card)
+void Player::appendCardToSelection(PlayingCard* card)
 {
-    return m_cardsInHand.removeOne(card);
+    m_selection.append(card);
 }
 
-bool Player::removeCardFromTable(CardAbstract* card)
+bool Player::removeCardFromHand(PlayingCard* card)
+{
+    return m_hand.removeOne(card);
+}
+
+bool Player::removeCardFromTable(PlayingCard* card)
 {
     return m_table.removeOne(card);
 }
 
-
-const PublicPlayerView& Player::publicView() const
+bool Player::removeCardFromSelection(PlayingCard* card)
 {
-    return m_publicPlayerView;
-}
-
-const PrivatePlayerView& Player::privateView() const
-{
-    return m_privatePlayerView;
+    return m_selection.removeOne(card);
 }
 
 void Player::setRole(const PlayerRole& role)
@@ -185,7 +165,10 @@ void Player::setRole(const PlayerRole& role)
     }
     // TODO: character can influence maxLifePoints
 
+
     m_lifePoints = m_maxLifePoints;
+    if (!isCreator())
+        m_lifePoints = 1;
 }
 
 
@@ -194,15 +177,23 @@ void Player::onBangPlayed()
     m_lastBangTurn = mp_game->gameCycle().turnNumber();
 }
 
-bool Player::canPlayBang()
-{
-    return (m_lastBangTurn != mp_game->gameCycle().turnNumber());
-}
 
-int Player::initialCardCount() const
+/*-- DEPRECATED
+StructPlayer Player::structPlayer(bool returnPrivateInfo)
 {
-    return m_maxLifePoints;
+    StructPlayer x;
+    x.id = m_id;
+    x.name = m_name;
+    x.password = m_password;
+    if (returnPrivateInfo || x.role == ROLE_SHERIFF)
+    {
+        x.role = m_role;
+    } else {
+        x.role = ROLE_UNKNOWN;
+    }
+    return x;
 }
+*/
 
 
 

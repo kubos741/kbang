@@ -38,7 +38,7 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
         mp_cardWidgetFactory(0)
 {
         QSize widgetSize(CardWidget::qSize(CardWidget::SIZE_SMALL).width(),
-                         CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 1.9);
+                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 1.9));
         setMinimumSize(widgetSize);
         setMaximumSize(widgetSize);
 }
@@ -49,13 +49,13 @@ PlayerCharacterWidget::~PlayerCharacterWidget()
 
 void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
 {
-    mp_backCard = cardWidgetFactory->createBulletsCard(this);
-    mp_backCard->applyNewProperties();
+    mp_backCard = cardWidgetFactory->createCharacterCard(this);
+    mp_backCard->validate();
     mp_backCard->move(0,0);
     mp_backCard->show();
 
-    mp_characterCard = cardWidgetFactory->createBackCard(this);
-    mp_characterCard->applyNewProperties();
+    mp_characterCard = cardWidgetFactory->createCharacterCard(this);
+    mp_characterCard->validate();
     mp_characterCard->move(0,0);
     mp_characterCard->show();
 }
@@ -79,10 +79,8 @@ void PlayerCharacterWidget::lifePointsChanged()
             this,      SLOT(onTimeout()));
 
     if (sm_countAnimaton == 0) {
-        qDebug("start timer");
         sm_timer.start(timerInterval);
     }
-    qDebug("sm_countAnimaton++");
     sm_countAnimaton++;
 }
 
@@ -102,10 +100,8 @@ void PlayerCharacterWidget::onTimeout()
     {
         sm_countAnimaton--;
         m_isAnimating = 0;
-        qDebug("--sm_countAnimaton");
         disconnect(&sm_timer, 0, this, 0);
         if (sm_countAnimaton == 0) {
-            qDebug("stop timer");
             sm_timer.stop();
         }
         emit animationFinished();

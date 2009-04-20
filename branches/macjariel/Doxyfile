@@ -43,7 +43,7 @@ SUBGROUPING            = YES
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = NO
 EXTRACT_LOCAL_CLASSES  = YES
@@ -100,7 +100,7 @@ FILTER_SOURCE_FILES    = NO
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
 SOURCE_BROWSER         = YES
-INLINE_SOURCES         = NO
+INLINE_SOURCES         = YES
 STRIP_CODE_COMMENTS    = YES
 REFERENCED_BY_RELATION = YES
 REFERENCES_RELATION    = YES

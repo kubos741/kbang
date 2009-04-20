@@ -28,7 +28,7 @@
 
 class Game;
 class PublicPlayerView;
-class CardAbstract;
+class PlayingCard;
 
 /**
  * The PublicGameView class provides an interface for quering public information

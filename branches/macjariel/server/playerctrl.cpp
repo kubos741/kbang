@@ -34,17 +34,17 @@ void PlayerCtrl::finishTurn()
     mp_player->game()->gameCycle().finishTurn(mp_player);
 }
 
-void PlayerCtrl::discardCard(CardAbstract* card)
+void PlayerCtrl::discardCard(PlayingCard* card)
 {
     mp_player->game()->gameCycle().discardCard(mp_player, card);
 }
 
-void PlayerCtrl::playCard(CardPlayable* card)
+void PlayerCtrl::playCard(PlayingCard* card)
 {
     mp_player->game()->gameCycle().playCard(mp_player, card);
 }
 
-void PlayerCtrl::playCard(CardPlayable* card, const PublicPlayerView* targetPlayer)
+void PlayerCtrl::playCard(PlayingCard* card, const PublicPlayerView* targetPlayer)
 {
     mp_player->game()->gameCycle().playCard(mp_player,
                                             card,
@@ -70,7 +70,7 @@ const PublicPlayerView& PlayerCtrl::publicPlayerView(int playerId) const
 {
     if (playerId == 0)
         return mp_player->publicView();
-    Player* player = mp_player->game()->getPlayer(playerId);
+    Player* player = mp_player->game()->player(playerId);
     if (player != 0) return player->publicView();
     throw BadPlayerException(playerId);
 }
@@ -93,7 +93,7 @@ void PlayerCtrl::createGame(const StructGame& structGame,
 {
     Game* newGame = GameServer::instance().createGame(structGame);
     Q_ASSERT(newGame != 0);
-    Player* newPlayer = newGame->createNewPlayer(structPlayer, gameEventHandler);
+    Player* newPlayer = newGame->createPlayer(structPlayer, gameEventHandler);
     Q_ASSERT(newPlayer != 0);
 }
 
@@ -104,7 +104,7 @@ void PlayerCtrl::joinGame(int gameId,
     Game* game = GameServer::instance().game(gameId);
     if (game == 0)
         throw BadGameException();
-    Player* newPlayer = game->createNewPlayer(structPlayer, gameEventHandler);
+    Player* newPlayer = game->createPlayer(structPlayer, gameEventHandler);
     Q_ASSERT(newPlayer != 0);
 }
 

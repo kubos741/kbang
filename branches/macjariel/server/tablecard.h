@@ -17,16 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "cardabstract.h"
+#ifndef TABLECARD_H
+#define TABLECARD_H
 
-CardAbstract::CardAbstract(Game* game, int id): QObject(game), mp_game(game), mp_owner(0), m_pocketType(POCKET_DECK), m_id(id)
+#include "playingcard.h"
+#include "parser/parserstructs.h"
+
+class Player;
+class GameTable;
+
+/**
+ * The TableCard is the base class for all playing cards, that can be put in front of a
+ * player. In Bang! it represents the blue cards. This class provides no extra public
+ * methods, but declares two important methods: reigsterPlayer and unregisterPlayer.
+ *
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class TableCard: public PlayingCard
 {
-}
+friend class GameTable;
+Q_OBJECT;
+public:
+    TableCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
+    virtual ~TableCard();
 
-CardAbstract::~CardAbstract()
-{
-}
+protected:
+    /**
+     * This method is called (by GameTable) when the card is
+     * put on the player's table.
+     */
+    virtual void registerPlayer(Player*) {};
 
+    /**
+     * This method is called (by GameTable) when the card is
+     * removed from the player's table.
+     */
+    virtual void unregisterPlayer(Player*) {};
+};
 
-
-
+#endif

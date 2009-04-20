@@ -20,7 +20,7 @@
 
 #include "publicplayerview.h"
 #include "player.h"
-#include "cardabstract.h"
+#include "playingcard.h"
 
 PublicPlayerView::PublicPlayerView(Player* player): mp_player(player)
 {
@@ -76,14 +76,19 @@ PlayerRole PublicPlayerView::role() const
             ROLE_SHERIFF : ROLE_UNKNOWN;
 }
 
-QList<CardAbstract*> PublicPlayerView::table() const
+QList<PlayingCard*> PublicPlayerView::table() const
 {
     return mp_player->table();
 }
 
 StructPlayer PublicPlayerView::structPlayer() const
 {
-    return mp_player->structPlayer(0);
+    StructPlayer x;
+    x.id = id();
+    x.name = name();
+    x.password = "";
+    x.role = role();
+    return x;
 }
 
 PublicPlayerData PublicPlayerView::publicPlayerData() const
@@ -95,7 +100,7 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     res.lifePoints  = lifePoints();
     res.isSheriff   = isSheriff();
     res.handSize    = handSize();
-    foreach (CardAbstract* card, table()) {
+    foreach (PlayingCard* card, table()) {
         CardData cardData;
         cardData.id = card->id();
         cardData.type = card->type();

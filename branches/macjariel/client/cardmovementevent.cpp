@@ -40,9 +40,9 @@ const double    pixelsPerTick   = 24;
 
 QBasicTimer CardMovementEvent:: sm_timer;
 
-CardMovementEvent::CardMovementEvent(Game* game, const StructCardMovement& structCardMovement):
+CardMovementEvent::CardMovementEvent(Game* game, const CardMovementData& cardMovementData):
         GameEvent(game),
-        m_structCardMovement(structCardMovement),
+        m_cardMovementData(cardMovementData),
         mp_card(0),
         mp_destPocket(0),
         m_tick(0),
@@ -71,10 +71,10 @@ void CardMovementEvent::run()
 
 void CardMovementEvent::setCardAndPocket()
 {
-    PlayerWidget* srcPlayer  = mp_game->playerWidget(m_structCardMovement.playerFrom);
-    PlayerWidget* destPlayer = mp_game->playerWidget(m_structCardMovement.playerTo);
+    PlayerWidget* srcPlayer  = mp_game->playerWidget(m_cardMovementData.playerFrom);
+    PlayerWidget* destPlayer = mp_game->playerWidget(m_cardMovementData.playerTo);
 
-    switch(m_structCardMovement.pocketTypeFrom)
+    switch(m_cardMovementData.pocketTypeFrom)
     {
     case POCKET_DECK:
         mp_card = mp_game->deck()->pop();
@@ -87,24 +87,23 @@ void CardMovementEvent::setCardAndPocket()
             qCritical("Invalid card movement from POCKET_HAND (unknown player).");
             break;
         }
-        if (srcPlayer->isLocalPlayer() && m_structCardMovement.cardDetails.cardId == 0) {
+        if (srcPlayer->isLocalPlayer() && m_cardMovementData.card.id == 0) {
             qCritical("Invalid card movement from POCKET_HAND (unknown card).");
             break;
         }
         mp_card = srcPlayer->hand()->take(srcPlayer->isLocalPlayer() ?
-                                          m_structCardMovement.cardDetails.cardId :
-                                          0);
+                                          m_cardMovementData.card.id : 0);
         break;
     case POCKET_TABLE:
         if (!srcPlayer) {
             qCritical("Invalid card movement from POCKET_TABLE (unknown player).");
             break;
         }
-        if (m_structCardMovement.cardDetails.cardId == 0) {
+        if (m_cardMovementData.card.id == 0) {
             qCritical("Invalid card movement from POCKET_TABLE (unknown card).");
             break;
         }
-        mp_card = srcPlayer->table()->take(m_structCardMovement.cardDetails.cardId);
+        mp_card = srcPlayer->table()->take(m_cardMovementData.card.id);
         break;
     case POCKET_PLAYED:
         // todo
@@ -116,7 +115,7 @@ void CardMovementEvent::setCardAndPocket()
         break;
     }
 
-    switch(m_structCardMovement.pocketTypeTo)
+    switch(m_cardMovementData.pocketTypeTo)
     {
     case POCKET_DECK:
         mp_destPocket = mp_game->deck();
@@ -149,8 +148,6 @@ void CardMovementEvent::setCardAndPocket()
         qCritical("Cannot find target pocket for card movement.");
         return;
     }
-    if (m_structCardMovement.cardDetails.cardId != 0)
-        mp_card->setCardId(m_structCardMovement.cardDetails.cardId);
     m_cardAndPocketIsSet = 1;
 }
 
@@ -191,11 +188,8 @@ void CardMovementEvent::timerEvent(QTimerEvent*)
 void CardMovementEvent::stopTransition()
 {
     sm_timer.stop();
-    if (!m_structCardMovement.cardDetails.cardType.isEmpty()) {
-        mp_card->setCardId(m_structCardMovement.cardDetails.cardId);
-        mp_card->setCardClass(m_structCardMovement.cardDetails.cardType);
-        mp_card->applyNewProperties();
-    }
+    mp_card->setCardData(m_cardMovementData.card);
+    mp_card->validate();
     mp_card->unsetShadowMode();
     mp_destPocket->push(mp_card);
     GameEvent::finish();

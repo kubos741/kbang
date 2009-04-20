@@ -1,5 +1,6 @@
 #include "voidai.h"
 #include "playerctrl.h"
+#include "publicgameview.h"
 #include "privateplayerview.h"
 #include "cards.h"
 
@@ -37,6 +38,7 @@ void VoidAI::requestWithAction()
         QString("VoidAI (%1): Not requested!");
         return;
     }
+    QList<PlayingCard*> hand = mp_playerCtrl->privatePlayerView().hand();
     switch(m_requestType) {
         case REQUEST_DRAW:
             // Drawing two cards
@@ -44,10 +46,25 @@ void VoidAI::requestWithAction()
             break;
         case REQUEST_PLAY: {
 
+            // Try to use blue cards:
+            foreach (PlayingCard* card, hand) {
+                try {
+                    switch(card->type()) {
+                        case CARD_APPALOSSA:
+                        case CARD_MUSTANG:
+                            mp_playerCtrl->playCard(card);
+                            return;
+                        default:
+                            break;
+                    }
+                } catch (BadGameStateException e)  {
+                }
+            }
+
             // If have bang, tries to play it
             try {
-                QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
-                foreach (CardAbstract* c, cards) {
+
+                foreach (PlayingCard* c, hand) {
                     CardBang* bang = qobject_cast<CardBang*>(c);
                     if (bang == 0) continue;
 
@@ -71,15 +88,15 @@ void VoidAI::requestWithAction()
                 return;
             } catch (TooManyCardsInHandException e) {
                 qDebug() << QString("VoidAI (%1): discarding card").arg(m_id);
-                CardAbstract* card = mp_playerCtrl->privatePlayerView().hand().first();
+                PlayingCard* card = mp_playerCtrl->privatePlayerView().hand().first();
                 mp_playerCtrl->discardCard(card);
                 return;
             }
             break;
         }
         case REQUEST_RESPOND: {
-            QList<CardAbstract*> cards = mp_playerCtrl->privatePlayerView().hand();
-            foreach (CardAbstract* c, cards) {
+            QList<PlayingCard*> cards = mp_playerCtrl->privatePlayerView().hand();
+            foreach (PlayingCard* c, cards) {
                 try {
                     CardMissed* missed = qobject_cast<CardMissed*>(c);
                     if (missed == 0) continue;
@@ -99,7 +116,7 @@ void VoidAI::requestWithAction()
         case REQUEST_DISCARD:
             try {
                 qDebug() << QString("VoidAI (%1): discarding card").arg(m_id);
-                CardAbstract* card = mp_playerCtrl->privatePlayerView().hand().first();
+                PlayingCard* card = mp_playerCtrl->privatePlayerView().hand().first();
                 qDebug() << QString("VoidAI (%1): cards in hand: %2").arg(m_id).arg(
                         mp_playerCtrl->privatePlayerView().hand().size());
                 mp_playerCtrl->discardCard(card);
@@ -108,9 +125,4 @@ void VoidAI::requestWithAction()
             }
             break;
     }
-}
-
-
-void VoidAI::onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints)
-{
 }

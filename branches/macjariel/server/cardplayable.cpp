@@ -21,7 +21,7 @@
 #include "player.h"
 #include "gametable.h"
 
-CardPlayable::CardPlayable(Game* game, int id): CardAbstract(game, id)
+CardPlayable::CardPlayable(Game* game, int id): PlayingCard(game, id)
 {
 }
 

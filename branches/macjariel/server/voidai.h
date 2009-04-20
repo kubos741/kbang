@@ -13,23 +13,23 @@ Q_OBJECT;
 public:
     VoidAI(int gameId);
     virtual ~VoidAI() {}
-    virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message) {}
-    virtual void onPlayerInit(PlayerCtrl* playerCtrl);
+    virtual void onIncomingMessage(const PublicPlayerView&, const QString&) {}
+    virtual void onPlayerInit(PlayerCtrl*);
     virtual void onGameSync() {}
     virtual void onPlayerExit() {}
-    virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView) {}
+    virtual void onPlayerJoinedGame(const PublicPlayerView&) {}
     virtual void onPlayerLeavedGame(const PublicPlayerView&) {}
-    virtual void onGameStartabilityChanged(bool isStartable) {}
+    virtual void onGameStartabilityChanged(bool isStartable) { Q_UNUSED(isStartable); }
     virtual void onGameStarted() {}
-    virtual void onPlayerDrawedCard(int playerId, const CardAbstract*) {}
-    virtual void onPlayerDiscardedCard(int playerId, const CardAbstract* card) {}
-    virtual void onPlayerPlayedCard(int playerId, const CardAbstract* card) {}
-    virtual void onPlayerPlayedOnTable(int playerId, const CardAbstract* card) {}
+    virtual void onPlayerDrawedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
+    virtual void onPlayerDiscardedCard(int playerId, PocketType, const PlayingCard*) { Q_UNUSED(playerId); }
+    virtual void onPlayerPlayedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
+    virtual void onPlayerPlayedOnTable(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
     virtual void onPlayedCardsCleared() {}
-    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
+    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints)
+                { Q_UNUSED(oldLifePoints); Q_UNUSED(newLifePoints);}
     virtual void onGameContextChange(const GameContextData&) {}
-
-    virtual void onActionRequest(ActionRequestType requestType);
+    virtual void onActionRequest(ActionRequestType);
 
 public slots:
     void requestWithAction();

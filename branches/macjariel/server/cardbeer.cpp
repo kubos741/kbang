@@ -1,11 +1,9 @@
 #include "cardbeer.h"
-#include "gameexceptions.h"
-#include "util.h"
 #include "player.h"
-#include "gamecycle.h"
+#include "gametable.h"
 
-CardBeer::CardBeer(Game* game, int id):
-        CardPlayable(game, id)
+CardBeer::CardBeer(Game* game, int id, CardSuit cardSuit, CardRank cardRank):
+        PlayingCard(game, id, CARD_BEER, cardSuit, cardRank)
 {
 }
 
@@ -13,29 +11,8 @@ CardBeer::~CardBeer()
 {
 }
 
-bool CardBeer::play()
+void CardBeer::play()
 {
-    CardPlayable::play();
+    gameTable()->playCard(this);
     owner()->modifyLifePoints(1);
-    mp_game->gameCycle().clearPlayedCards();
-}
-
-bool CardBeer::play(Player* targetPlayer)
-{
-    throw BadUsageException();
-}
-
-bool CardBeer::play(CardAbstract* targetCard)
-{
-    throw BadUsageException();
-}
-
-void CardBeer::respondPass()
-{
-    NOT_REACHED();
-}
-
-void CardBeer::respondCard(CardAbstract*)
-{
-    NOT_REACHED();
 }

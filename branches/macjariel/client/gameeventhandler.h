@@ -17,7 +17,7 @@ public:
     void connectSlots(QObject* signalEmitter);
 
 public slots:
-    void onCardMovementEvent(const StructCardMovement&);
+    void onCardMovementEvent(const CardMovementData&);
     void onGameContextChangeEvent(const GameContextData&);
     void onGameSyncEvent(const GameSyncData&);
     void onLifePointsChangeEvent(int playerId, int lifePoints);

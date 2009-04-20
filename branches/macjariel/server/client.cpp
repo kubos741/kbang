@@ -22,8 +22,7 @@
 #include "client.h"
 #include "publicgameview.h"
 #include "privateplayerview.h"
-#include "cardabstract.h"
-#include "cardplayable.h"
+#include "playingcard.h"
 #include "parser/parserstructs.h"
 
 #include "voidai.h"
@@ -142,12 +141,14 @@ void Client::onActionDrawCard(int numCards, bool revealCard)
         qDebug() << "Cannot draw card now - the gamestate now is:";
         qDebug() << "current player: " << mp_playerCtrl->publicGameView().gameContextData().currentPlayerId;
         qDebug() << "requested player: " << mp_playerCtrl->publicGameView().gameContextData().requestedPlayerId;
+        /*
         switch (mp_playerCtrl->publicGameView().gameContextData().gamePlayState)
         {
             case GAMEPLAYSTATE_DRAW: qDebug() << "DRAW"; break;
             case GAMEPLAYSTATE_DISCARD: qDebug() << "DISCARD"; break;
             case GAMEPLAYSTATE_TURN: qDebug() << "TURN"; break;
         }
+        */
     }
 }
 
@@ -157,22 +158,16 @@ void Client::onActionDrawCard(int numCards, bool revealCard)
 void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
 {
     qDebug("[CLIENT]   onActionPlayCard");
-    CardAbstract* playedCard = mp_playerCtrl->privatePlayerView().card(actionPlayCardData.playedCardId);
+    PlayingCard* playedCard = mp_playerCtrl->privatePlayerView().card(actionPlayCardData.playedCardId);
     if (playedCard == 0) {
         qDebug(qPrintable(QString("[CLIENT]   Card '%1' not found!").arg(actionPlayCardData.playedCardId)));
-        // @todo feedback
-        return;
-    }
-    CardPlayable* playableCard = qobject_cast<CardPlayable*>(playedCard);
-    if (playableCard == 0) {
-        qDebug(qPrintable(QString("[CLIENT]   Card '%1' not playable!").arg(actionPlayCardData.playedCardId)));
         // @todo feedback
         return;
     }
     try {
         switch (actionPlayCardData.type) {
         case ActionPlayCardData::PLAYCARD_SIMPLE:
-            mp_playerCtrl->playCard(playableCard);
+            mp_playerCtrl->playCard(playedCard);
             break;
         case ActionPlayCardData::PLAYCARD_PLAYER: {
                 const PublicPlayerView* targetPlayer = mp_playerCtrl->publicGameView().publicPlayerView(actionPlayCardData.targetPlayerId);
@@ -181,7 +176,7 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
                     // @todo feedback
                     return;
                 }
-                mp_playerCtrl->playCard(playableCard, targetPlayer);
+                mp_playerCtrl->playCard(playedCard, targetPlayer);
             } break;
         case ActionPlayCardData::PLAYCARD_CARD:
             qDebug("[CLIENT]   PLAYCARD_CARD not implemented yet.");
@@ -223,7 +218,7 @@ void Client::onActionPass()
 void Client::onActionDiscard(int cardId)
 {
     try {
-        CardAbstract* card = mp_playerCtrl->privatePlayerView().card(cardId);
+        PlayingCard* card = mp_playerCtrl->privatePlayerView().card(cardId);
         if (card == 0) {
             qDebug("Cannot discard unknown card.");
             return;
@@ -299,6 +294,8 @@ void Client::onPlayerInit(PlayerCtrl* playerCtrl)
 void Client::onPlayerExit()
 {
     mp_playerCtrl = 0;
+    //mp_parser->eventLeaveGame(gameId, player, 0);
+    // tell client to leave game
     /* IF CACHING, UNCACHE ASAP */
 }
 
@@ -338,17 +335,7 @@ void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
     Q_ASSERT(isInGame());
     int gameId = mp_playerCtrl->publicGameView().id();
     int playerId = mp_playerCtrl->publicPlayerView().id();
-    if (leavingPlayer.id() == playerId)
-    {
-        // TODO
-        /*
-        mp_parser->eventLeaveGame(gameId, player, 0);
-        disconnectPlayer();
-        mp_player = 0;
-        */
-    }
-    else
-    {
+    if (leavingPlayer.id() != playerId) {
         mp_parser->eventLeaveGame(gameId, leavingPlayer.structPlayer(), 1);
     }
 }
@@ -371,47 +358,46 @@ void Client::onGameStarted()
     mp_parser->eventStartGame(structGame, structPlayerList);
 }
 
-void Client::onPlayerDrawedCard(int playerId, const CardAbstract* card)
+void Client::onPlayerDrawedCard(int playerId, const PlayingCard* card)
 {
-    StructCardMovement x;
+    CardMovementData x;
     x.pocketTypeFrom = POCKET_DECK;
     x.pocketTypeTo   = POCKET_HAND;
     x.playerTo       = playerId;
-    if (card != 0)
-    {
-        x.cardDetails = card->cardDetails();
+    if (card != 0) {
+        x.card = card->cardData();
     }
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerDiscardedCard(int playerId, const CardAbstract* card)
+void Client::onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card)
 {
-    StructCardMovement x;
+    CardMovementData x;
+    x.pocketTypeFrom = pocket;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = playerId;
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerPlayedCard(int playerId, const PlayingCard* card)
+{
+    CardMovementData x;
     x.pocketTypeFrom = POCKET_HAND;
     x.pocketTypeTo   = POCKET_GRAVEYARD;
     x.playerFrom     = playerId;
-    x.cardDetails    = card->cardDetails();
+    x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerPlayedCard(int playerId, const CardAbstract* card)
+void Client::onPlayerPlayedOnTable(int playerId, const PlayingCard* card)
 {
-    StructCardMovement x;
-    x.pocketTypeFrom = POCKET_HAND;
-    x.pocketTypeTo   = POCKET_PLAYED;
-    x.playerFrom     = playerId;
-    x.cardDetails    = card->cardDetails();
-    mp_parser->eventCardMovement(x);
-}
-
-void Client::onPlayerPlayedOnTable(int playerId, const CardAbstract* card)
-{
-    StructCardMovement x;
+    CardMovementData x;
     x.pocketTypeFrom = POCKET_HAND;
     x.pocketTypeTo   = POCKET_TABLE;
     x.playerFrom     = playerId;
     x.playerTo       = playerId;
-    x.cardDetails    = card->cardDetails();
+    x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
@@ -421,9 +407,8 @@ void Client::onPlayedCardsCleared()
 
 void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoints, int newLifePoints)
 {
-    qDebug() << "TRYING TO SEND LIFEPOINTS";
+    Q_UNUSED(oldLifePoints);
     mp_parser->eventLifePointsChange(player.id(), newLifePoints);
-    qDebug() << "DONE TRYING TO SEND LIFEPOINTS";
 }
 
 void Client::onGameContextChange(const GameContextData& gameContextData)

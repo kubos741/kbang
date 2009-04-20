@@ -41,7 +41,7 @@
 Game::Game(GameServer* parent, const StructGame& structGame):
     QObject(parent),
     m_publicGameView(this),
-    m_nextPlayerId(0),
+    m_nextUnusedPlayerId(0),
     m_gameState(GAMESTATE_WAITINGFORPLAYERS),
     m_startable(0)
 {
@@ -62,94 +62,80 @@ int Game::id() const
     return mp_gameInfo->id();
 }
 
-int Game::playersCount() const
-{
-    return m_playerList.size();
-}
-
-int Game::spectatorsCount() const
-{
-    return 0;  /// \todo spectators
-}
-
-GameInfo& Game::gameInfo()
-{
-    return *mp_gameInfo;
-}
-
-GameCycle& Game::gameCycle()
-{
-    return *mp_gameCycle;
-}
-
-GameTable& Game::gameTable()
-{
-    return *mp_gameTable;
-}
-
-const PublicGameView& Game::publicGameView() const
-{
-    return m_publicGameView;
-}
-
-QList<Player*> Game::playerList() const {
-    return m_playerList;
-}
-
-QList<const PublicPlayerView*> Game::publicPlayerList() const {
-    return m_publicPlayerList;
-}
-
-Player* Game::nextPlayer(Player* currentPlayer) const {
-    QListIterator<Player*> it(m_playerList);
-    while (it.hasNext()) {
-        if (it.next() == currentPlayer)
-            break;
-    }
-
-    /* TODO: Implement dead palyers */
-    if (!it.hasNext())
-        it.toFront();
-    return it.next();
-}
-
-/*
-StructPlayerList Game::structPlayerList(Player* privatePlayer) const
-{
-    StructPlayerList r;
-    foreach(Player* i, m_playerList)
-    {
-        r.append(i->structPlayer(privatePlayer == i));
-    }
-    return r;
-}
-*/
-
-Player* Game::getPlayer(int playerId)
+Player* Game::player(int playerId)
 {
     if (m_playerMap.contains(playerId))
         return m_playerMap[playerId];
     return 0;
 }
 
-Player* Game::createNewPlayer(StructPlayer structPlayer,
+Player* Game::nextPlayer(Player* currentPlayer) {
+    QListIterator<Player*> it(m_playerList);
+    if (!it.findNext(currentPlayer))
+        return 0;
+    // Now the it points right after the currentPlayer
+
+    // If the currentPlayer is last in list, rewind
+    if (!it.hasNext())
+        it.toFront();
+
+    while (!it.peekNext()->isAlive()) {
+        // @invariant: the player after the iterator is dead
+        it.next();
+        if (!it.hasNext())
+            it.toFront();
+    }
+    // The player after the iterator is the first alive player
+    // after the currentPlayer
+    return it.next();
+}
+
+int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
+{
+    static int infiniteDistance = 99;
+    if (!fromPlayer->isAlive() || !toPlayer->isAlive())
+        return infiniteDistance;
+
+    int fromIndex = m_playerList.indexOf(fromPlayer);
+    int toIndex   = m_playerList.indexOf(toPlayer);
+    if (fromIndex == -1 || toIndex == -1)
+        return infiniteDistance;
+
+    int upIndex   = fromIndex;
+    int downIndex = fromIndex;
+    int baseDistance = 0;
+    while (upIndex != toIndex && downIndex != toIndex) {
+        upIndex++;
+        if (upIndex == m_playerList.size()) upIndex = 0;
+        downIndex--;
+        if (downIndex == -1)
+            downIndex = m_playerList.size() - 1;
+        baseDistance++;
+    }
+
+    baseDistance -= fromPlayer->distanceOut();
+    baseDistance += toPlayer->distanceIn();
+    return baseDistance;
+}
+
+Player* Game::createPlayer(StructPlayer structPlayer,
                               GameEventHandler* gameEventHandler)
 {
     if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
         throw BadGameStateException();
     }
-    while ((m_nextPlayerId == 0) || m_playerMap.contains(m_nextPlayerId))
+    while ((m_nextUnusedPlayerId == 0) || m_playerMap.contains(m_nextUnusedPlayerId))
     {
-        m_nextPlayerId++;
+        m_nextUnusedPlayerId++;
     }
-    Player* newPlayer = new Player(this, m_nextPlayerId, structPlayer.name, structPlayer.password, gameEventHandler);
-    m_playerMap[m_nextPlayerId] = newPlayer;
+    Player* newPlayer = new Player(this, m_nextUnusedPlayerId, structPlayer.name, structPlayer.password, gameEventHandler);
+    m_playerMap[m_nextUnusedPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     m_publicPlayerList.append(&newPlayer->publicView());
 
     // The first connected player is the creator and can start the game
     if (mp_gameInfo->creatorId() == 0) {
-        mp_gameInfo->setCreatorId(m_nextPlayerId);
+        mp_gameInfo->setCreatorId(m_nextUnusedPlayerId);
     }
 
     foreach(Player* p, m_playerList) {
@@ -169,7 +155,14 @@ void Game::removePlayer(Player* player)
     Q_ASSERT(m_playerMap.contains(playerId));
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
-    StructPlayer structPlayer = player->structPlayer();
+
+    if (player->isCreator() && m_gameState == GAMESTATE_WAITINGFORPLAYERS) {
+        foreach(Player* p, m_playerList) {
+            p->gameEventHandler()->onPlayerExit();
+        }
+        GameServer::instance().removeGame(this);
+        return;
+    }
     m_publicPlayerList.removeAll(&player->publicView());
     m_playerList.removeAll(player);
     m_playerMap.remove(playerId);
@@ -182,12 +175,21 @@ void Game::removePlayer(Player* player)
     player->deleteLater();
 }
 
-
-void Game::sendMessage(Player* player, const QString& message)
+void Game::buryPlayer(Player* player)
 {
-    foreach(Player* p, m_playerList) {
-        p->gameEventHandler()->onIncomingMessage(player->publicView(), message);
-    }
+    Q_ASSERT(player->lifePoints() == 0);
+    Q_ASSERT(player->isAlive());
+    player->setAlive(0);
+
+    foreach(PlayingCard* card, player->hand())
+        gameTable().playerDiscardCard(card);
+
+    foreach(PlayingCard* card, player->table())
+        gameTable().playerDiscardCard(card);
+
+    /// @todo
+
+    /// announce decease to family members :)
 }
 
 void Game::startGame(Player* player)
@@ -198,9 +200,10 @@ void Game::startGame(Player* player)
     if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
         throw BadGameStateException();
     }
-
+    if (!m_startable) {
+        throw BadGameStateException();
+    }
     m_gameState = GAMESTATE_PLAYING;
-
     if (mp_gameInfo->hasShufflePlayers())
         shufflePlayers();
     //setCharacters();
@@ -210,9 +213,33 @@ void Game::startGame(Player* player)
     foreach(Player* player, m_playerList) {
         player->gameEventHandler()->onGameStarted();
     }
-
-    mp_gameTable->prepareGame();
+    mp_gameTable->prepareGame(GameServer::instance().cardFactory());
     mp_gameCycle->start();
+}
+
+
+void Game::sendMessage(Player* player, const QString& message)
+{
+    foreach(Player* p, m_playerList) {
+        p->gameEventHandler()->onIncomingMessage(player->publicView(), message);
+    }
+}
+
+
+
+
+
+void Game::checkStartable()
+{
+    bool newStartable;
+    if (m_playerList.count() >= mp_gameInfo->minPlayers() &&
+            m_playerList.count() <= mp_gameInfo->maxPlayers())
+        newStartable = 1;
+    else
+        newStartable = 0;
+    if (m_startable != newStartable)
+        m_playerMap[mp_gameInfo->creatorId()]->gameEventHandler()->onGameStartabilityChanged(newStartable);
+    m_startable = newStartable;
 }
 
 void Game::shufflePlayers()
@@ -223,7 +250,6 @@ void Game::shufflePlayers()
         m_publicPlayerList.append(&player->publicView());
     }
 }
-
 
 void Game::setRoles()
 {
@@ -258,59 +284,3 @@ QList<PlayerRole> Game::getRoleList()
     }
     return res;
 }
-
-
-
-
-/*
-void Game::appendPlayedCard(CardPlayable *card)
-{
-    m_playedCards.append(card);
-}
-
-CardPlayable* Game::peakPlayedCards() const
-{
-    if (m_playedCards.isEmpty()) return 0;
-    return m_playedCards.last();
-}
-
-void Game::clearPlayedCards()
-{
-    foreach(CardAbstract* card, m_playedCards)
-    {
-        m_graveyard << card;
-    }
-    m_playedCards.clear();
-}
-*/
-
-int Game::getDistance(Player *fromPlayer, Player *toPlayer)
-{
-    int i = m_playerList.indexOf(fromPlayer);
-    int j = m_playerList.indexOf(toPlayer);
-    if (i == -1 || j == -1) return -1;
-    int d = (i - j > 0) ? i - j : j - i;
-    if (d > (m_playerList.size() / 2))
-    {
-        d = m_playerList.size() - d;
-    }
-    // TODO: NOW ADD EFFECTS OF HORSES
-    return d;
-}
-
-
-void Game::checkStartable()
-{
-    bool newStartable;
-    if (m_playerList.count() >= mp_gameInfo->minPlayers() &&
-            m_playerList.count() <= mp_gameInfo->maxPlayers())
-        newStartable = 1;
-    else
-        newStartable = 0;
-    if (m_startable != newStartable)
-        m_playerMap[mp_gameInfo->creatorId()]->gameEventHandler()->onGameStartabilityChanged(newStartable);
-    m_startable = newStartable;
-}
-
-
-

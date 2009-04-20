@@ -30,9 +30,6 @@
 #include "game.h"
 #include "card.h"
 
-
-#include "card.h"
-
 using namespace client;
 
 MainWindow::MainWindow():

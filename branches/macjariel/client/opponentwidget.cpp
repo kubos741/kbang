@@ -87,7 +87,6 @@ void OpponentWidget::clear()
 
 void OpponentWidget::setActive(uint8_t progress)
 {
-    qDebug() << m_baseStyleSheet;
     if (progress == 0) {
         frame->setStyleSheet(m_baseStyleSheet);
     } else {
@@ -119,12 +118,10 @@ void OpponentWidget::updateWidgets()
             m_sheriffBadgePixmap.load(":/misc/gfx/misc/sheriff-badge.png");
             Q_ASSERT(!m_sheriffBadgePixmap.isNull());
             if (mp_sheriffBadge == 0) {
-                qDebug() << "CREATING THAT SHIT";
                 mp_sheriffBadge = new QLabel(this);
                 mp_sheriffBadge->setPixmap(m_sheriffBadgePixmap.scaled(48, 48, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
                 mp_sheriffBadge->resize(48, 48);
             }
-            qDebug() << "moving to: " << width() - mp_sheriffBadge->width();
             mp_sheriffBadge->move(width() - mp_sheriffBadge->width(), 0);
             mp_sheriffBadge->show();
             //mp_sheriffBadge->setText("ADS");

@@ -5,7 +5,9 @@
 #include "util.h"
 #include "gameeventhandler.h"
 #include "gameexceptions.h"
-
+#include "game.h"
+#include "tablecard.h"
+#include "cardfactory.h"
 
 GameTable::GameTable(Game* game):
         mp_game(game)
@@ -13,8 +15,8 @@ GameTable::GameTable(Game* game):
 }
 
 
-void GameTable::prepareGame() {
-    generateCards();
+void GameTable::prepareGame(CardFactory* cardFactory) {
+    generateCards(cardFactory);
     foreach(Player* p, mp_game->playerList())
         p->gameEventHandler()->onGameSync();
     dealCards();
@@ -26,90 +28,67 @@ void GameTable::drawCard(Player *player, int count, bool revealCard)
 {
     for(int i = 0; i < count; ++i)
     {
-        CardAbstract* card = popCardFromDeck();
+        PlayingCard* card = popCardFromDeck();
         player->appendCardToHand(card);
         card->setOwner(player);
-        card->setPocketType(POCKET_HAND);
+        card->setPocket(POCKET_HAND);
         foreach(Player* p, mp_game->playerList())
             p->gameEventHandler()->onPlayerDrawedCard(player->id(),
                     (p == player || revealCard) ? card : 0);
     }
 }
 
-void GameTable::discardCard(Player* player, CardAbstract* card)
+void GameTable::playerDiscardCard(PlayingCard* card)
 {
-    if (!player->removeCardFromHand(card))
-        throw BadCardException();
-    putCardToGraveyard(card);
+    Player* owner = card->owner();
+    if (card->pocket() == POCKET_HAND) {
+        owner->removeCardFromHand(card);
+    } else if (card->pocket() == POCKET_TABLE) {
+        owner->removeCardFromTable(card);
+    } else if (card->pocket() == POCKET_SELECTION && card->owner() != 0) {
+        owner->removeCardFromSelection(card);
+    } else {
+        NOT_REACHED();
+    }
+    m_graveyard.push_back(card);
+    int ownerId         = owner->id();
+    PocketType pocket   = card->pocket();
     card->setOwner(0);
-    card->setPocketType(POCKET_GRAVEYARD);
+    card->setPocket(POCKET_GRAVEYARD);
     foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerDiscardedCard(player->id(), card);
+        p->gameEventHandler()->onPlayerDiscardedCard(ownerId, pocket, card);
 }
 
-void GameTable::playCard(Player* player, CardPlayable* card)
+void GameTable::playCard(PlayingCard* card)
 {
-    player->removeCardFromHand(card);
-    m_playedCards.push_back(card);
-    card->setPocketType(POCKET_PLAYED);
+    Player* owner = card->owner();
+    owner->removeCardFromHand(card);
+    m_graveyard.push_back(card);
+    card->setPocket(POCKET_GRAVEYARD);
 
     foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerPlayedCard(player->id(), card);
-
+        p->gameEventHandler()->onPlayerPlayedCard(owner->id(), card);
 }
 
-void GameTable::playOnTable(Player* player, CardPlayable* card)
+void GameTable::playOnTable(TableCard* card, Player* targetPlayer)
 {
-    player->removeCardFromHand(card);
-    player->appendCardToTable(card);
-    card->setPocketType(POCKET_TABLE);
+    Player* owner = card->owner();
+    if (targetPlayer == 0)
+        targetPlayer = owner;
+    owner->removeCardFromHand(card);
+    targetPlayer->appendCardToTable(card);
+    card->setOwner(targetPlayer);
+    card->setPocket(POCKET_TABLE);
+    card->registerPlayer(targetPlayer);
 
     foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerPlayedOnTable(player->id(), card);
+        p->gameEventHandler()->onPlayerPlayedOnTable(owner->id(), card);
+        // TODO - onPlayerPlayedOnTable(player, card, targetPlayer)
 }
 
-void GameTable::clearPlayedCards()
+void GameTable::generateCards(CardFactory* cardFactory)
 {
-    foreach(CardAbstract* card, m_playedCards)
-    {
-        m_graveyard << card;
-        card->setPocketType(POCKET_GRAVEYARD);
-        card->setOwner(0);
-    }
-    m_playedCards.clear();
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayedCardsCleared();
-}
-
-
-void GameTable::generateCards()
-{
-    static const int nBang = 100;
-    static const int nMissed = 30;
-    static const int nBeer = 50;
-    static const int nMustang = 20;
-    for(int i = 0; i < nBang; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardBang(mp_game, id);
-    }
-    for(int i = 0; i < nMissed; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardMissed(mp_game, id);
-    }
-    for(int i = 0; i < nBeer; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardBeer(mp_game, id);
-    }
-    for(int i = 0; i < nMustang; ++i)
-    {
-        int id = uniqueCardId();
-        m_cards[id] = new CardMustang(mp_game, id);
-    }
-
-
+    m_cards = cardFactory->generateCards(mp_game);
     m_deck << m_cards.values();
 }
 
@@ -146,25 +125,10 @@ void GameTable::regenerateDeck()
     shuffleList(m_graveyard);
 }
 
-
-
-
-int GameTable::uniqueCardId()
-{
-    int cardId;
-    do {
-        cardId = (int)random();
-    } while(m_cards.contains(cardId));
-    return cardId;
-}
-
-CardAbstract* GameTable::popCardFromDeck()
+PlayingCard* GameTable::popCardFromDeck()
 {
     if (m_deck.isEmpty()) regenerateDeck();
     return m_deck.takeFirst();
 }
 
-void GameTable::putCardToGraveyard(CardAbstract* card)
-{
-    m_graveyard.push_back(card);
-}
+
