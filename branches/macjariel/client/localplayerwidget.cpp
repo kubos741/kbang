@@ -31,9 +31,11 @@ using namespace client;
 
 LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
         PlayerWidget(parent),
-        Ui::LocalPlayerWidget()
+        Ui::LocalPlayerWidget(),
+        m_role(ROLE_UNKNOWN)
 {
     setupUi(this);
+    mp_roleCardWidget->setType(Card::Role);
     mp_hand->setCardSize(CardWidget::SIZE_NORMAL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
@@ -50,6 +52,7 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
             this,             SLOT(onPassClicked()));
     connect(mp_buttonDiscard, SIGNAL(clicked()),
             this,             SLOT(onDiscardClicked()));
+
 }
 
 LocalPlayerWidget::~LocalPlayerWidget()
@@ -86,7 +89,9 @@ void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerDa
 void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
 {
     Q_ASSERT(id() == privatePlayerData.id);
-    /// \todo Role
+    m_role = privatePlayerData.role;
+
+
     // Set cards in hand
     /* TODO
     foreach (const CardData& cardData, privatePlayerData.hand) {
@@ -148,6 +153,8 @@ void LocalPlayerWidget::updateWidgets()
         mp_labelPlayerName->setText(name());
         mp_characterWidget->show();
     }
+    mp_roleCardWidget->setPlayerRole(m_role);
+    mp_roleCardWidget->validate();
 }
 
 

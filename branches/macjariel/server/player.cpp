@@ -167,8 +167,8 @@ void Player::setRole(const PlayerRole& role)
 
 
     m_lifePoints = m_maxLifePoints;
-    if (!isCreator())
-        m_lifePoints = 1;
+//    if (!isCreator())
+//        m_lifePoints = 1;
 }
 
 

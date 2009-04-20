@@ -71,7 +71,7 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
 
 void PlayerCharacterWidget::lifePointsChanged()
 {
-    static int levels[6] = {0, 19, 32, 45, 59, 71};
+    static int levels[6] = {0, 20, 33, 48, 63, 74};
     m_targetY = mp_backCard->y() + levels[m_lifePoints];
     if (m_isAnimating) return;
     m_isAnimating = 1;

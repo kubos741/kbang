@@ -175,6 +175,9 @@ void GameCycle::unsetResponseMode()
 
 void GameCycle::sendRequest()
 {
+    if (mp_game->isFinished())
+        return;
+
     if (!mp_requestedPlayer->isAlive()) {
         Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
         startTurn(mp_game->nextPlayer(mp_currentPlayer));

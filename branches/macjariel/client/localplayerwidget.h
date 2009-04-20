@@ -54,6 +54,7 @@ public:
     virtual CardList*               table()           { return mp_table; }
     virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
     virtual bool                    isLocalPlayer()   { return 1; }
+    PlayerRole                      role()            { return m_role; }
 
 private slots:
     void onEndTurnClicked();
@@ -65,6 +66,7 @@ private:
 
 private:
     QString m_baseStyleSheet;
+    PlayerRole m_role;
 };
 }
 #endif

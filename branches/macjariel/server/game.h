@@ -96,6 +96,7 @@ public:
     inline const PublicGameView& publicGameView() const
                                   { return m_publicGameView; }
 
+    bool isFinished() const { return m_state == StateFinished; }
 
     /**
      * Returns the list of players, respecting the order
@@ -148,8 +149,10 @@ public:
      */
     void removePlayer(Player* player);
 
-
     void buryPlayer(Player* player);
+
+    void winningSituation(PlayerRole winners);
+
 
     /**
      * Tries to start the game.
@@ -173,6 +176,12 @@ private:
 
 
 private:
+    enum {
+        StateWaitingForPlayers,
+        StatePlaying,
+        StateFinished
+    } m_state;
+
     GameInfo*           mp_gameInfo;
     GameTable*          mp_gameTable;
     GameCycle*          mp_gameCycle;
@@ -180,10 +189,12 @@ private:
     int                 m_nextUnusedPlayerId;
     QMap<int, Player*>  m_playerMap;
     QList<Player*>      m_playerList;
-    GameState           m_gameState;
     bool                m_startable;
     QList<const PublicPlayerView*>
                         m_publicPlayerList;
+    int                 m_goodGuysCount;
+    int                 m_outlawsCount;
+    int                 m_renegadesCount;
 };
 
 #endif

@@ -75,8 +75,7 @@ SOURCES += gameloop.cpp \
     cardpocket.cpp
 QT += network \
     xml
-RESOURCES += client.qrc \
-    cards.qrc
+RESOURCES += client.qrc 
 INCLUDEPATH += ../common
 LIBS += ../common/libcommon.a
 TARGETDEPS += ../common/libcommon.a

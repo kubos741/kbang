@@ -320,7 +320,8 @@ void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
     if (playerId == mp_playerCtrl->privatePlayerView().id()) {
         structPlayer = mp_playerCtrl->privatePlayerView().structPlayer();
         isOther = 0;
-        QTimer::singleShot(500, this, SLOT(startAI()));
+        if (mp_playerCtrl->privatePlayerView().isCreator())
+            QTimer::singleShot(500, this, SLOT(startAI()));
     } else {
         structPlayer = mp_playerCtrl->publicPlayerView(playerId).structPlayer();
         isOther = 1;

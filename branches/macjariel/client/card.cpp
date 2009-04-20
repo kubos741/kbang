@@ -70,30 +70,32 @@ Card::Card(const QString& name, CharacterType character, const QString& imageFil
 
 void Card::loadDefaultRuleset()
 {
-    new Card("Bang!",       CARD_BANG,       ":/cards/gfx/cards/bang.png");
-    new Card("Mancato",     CARD_MISSED,     ":/cards/gfx/cards/missed.png");
-    new Card("Birra",       CARD_BEER,       ":/cards/gfx/cards/beer.png");
-    new Card("Mustang",     CARD_MUSTANG,    ":/cards/gfx/cards/mustang.png");
-    new Card("Appaloosa",   CARD_APPALOSSA,  ":/cards/gfx/cards/appaloosa.png");
-    new Card("Barrel",      CARD_BARREL,     ":/cards/gfx/cards/barrel.png");
+    new Card("Bang!",       CARD_BANG,       "gfx/cards/bang.png");
+    new Card("Mancato",     CARD_MISSED,     "gfx/cards/missed.png");
+    new Card("Birra",       CARD_BEER,       "gfx/cards/beer.png");
+    new Card("Mustang",     CARD_MUSTANG,    "gfx/cards/mustang.png");
+    new Card("Appaloosa",   CARD_APPALOSSA,  "gfx/cards/appaloosa.png");
+    new Card("Barrel",      CARD_BARREL,     "gfx/cards/barrel.png");
 
-    new Card("Volcanic",    CARD_VOLCANIC,   ":/cards/gfx/cards/volcanic.png");
-    new Card("Schofield",   CARD_SCHOFIELD,  ":/cards/gfx/cards/schofield.png");
-    new Card("Winchester",  CARD_WINCHESTER, ":/cards/gfx/cards/winchester.png");
-    new Card("Remington",   CARD_REMINGTON,  ":/cards/gfx/cards/remington.png");
-    new Card("Carabine",    CARD_CARABINE,   ":/cards/gfx/cards/carabine.png");
-
-
+    new Card("Volcanic",    CARD_VOLCANIC,   "gfx/cards/volcanic.png");
+    new Card("Schofield",   CARD_SCHOFIELD,  "gfx/cards/schofield.png");
+    new Card("Winchester",  CARD_WINCHESTER, "gfx/cards/winchester.png");
+    new Card("Remington",   CARD_REMINGTON,  "gfx/cards/remington.png");
+    new Card("Carabine",    CARD_CARABINE,   "gfx/cards/carabine.png");
 
 
-    new Card("",         CARD_UNKNOWN, ":/cards/gfx/cards/back-bang.png");
 
-    new Card("Sheriff",  ROLE_SHERIFF,    "");
-    new Card("Renegade", ROLE_RENEGADE,   "");
-    new Card("Outlaw",   ROLE_OUTLAW,     "");
-    new Card("Deputy",   ROLE_DEPUTY,     "");
 
-    new Card("Back Bullets", CHARACTER_UNKNOWN,    ":/cards/gfx/cards/back-bullets.png");
+
+    new Card("",         CARD_UNKNOWN, "gfx/cards/back-playing.png");
+
+    new Card("Sheriff",  ROLE_SHERIFF,    "gfx/cards/sheriff.png");
+    new Card("Renegade", ROLE_RENEGADE,   "gfx/cards/renegade.png");
+    new Card("Outlaw",   ROLE_OUTLAW,     "gfx/cards/outlaw.png");
+    new Card("Deputy",   ROLE_DEPUTY,     "gfx/cards/deputy.png");
+    new Card("",         ROLE_UNKNOWN,    "gfx/cards/back-role.png");
+
+    new Card("",         CHARACTER_UNKNOWN,    "gfx/cards/back-character.png");
     }
 
 

@@ -104,7 +104,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="client::CardWidget" native="1" name="roleWidget" />
+             <widget class="client::CardWidget" native="1" name="mp_roleCardWidget" />
             </item>
             <item>
              <spacer name="horizontalSpacer_3" >

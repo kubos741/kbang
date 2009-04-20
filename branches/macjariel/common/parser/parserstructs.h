@@ -36,13 +36,6 @@ struct StructServerInfo
     static QString elementName;
 };
 
-enum GameState {
-        GAMESTATE_INVALID = 0,
-        GAMESTATE_WAITINGFORPLAYERS,
-        GAMESTATE_WAITINGFORCHARACTERS,
-        GAMESTATE_PLAYING,
-        GAMESTATE_FINISHED
-};
 
 enum ActionRequestType {
     REQUEST_DRAW,

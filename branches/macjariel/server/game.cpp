@@ -40,9 +40,9 @@
 
 Game::Game(GameServer* parent, const StructGame& structGame):
     QObject(parent),
+    m_state(StateWaitingForPlayers),
     m_publicGameView(this),
     m_nextUnusedPlayerId(0),
-    m_gameState(GAMESTATE_WAITINGFORPLAYERS),
     m_startable(0)
 {
     mp_gameInfo = new GameInfo(structGame);
@@ -121,7 +121,7 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
 Player* Game::createPlayer(StructPlayer structPlayer,
                               GameEventHandler* gameEventHandler)
 {
-    if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
+    if (m_state != StateWaitingForPlayers) {
         throw BadGameStateException();
     }
     while ((m_nextUnusedPlayerId == 0) || m_playerMap.contains(m_nextUnusedPlayerId))
@@ -156,7 +156,7 @@ void Game::removePlayer(Player* player)
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
 
-    if (player->isCreator() && m_gameState == GAMESTATE_WAITINGFORPLAYERS) {
+    if (player->isCreator() && m_state == StateWaitingForPlayers) {
         foreach(Player* p, m_playerList) {
             p->gameEventHandler()->onPlayerExit();
         }
@@ -190,6 +190,41 @@ void Game::buryPlayer(Player* player)
     /// @todo
 
     /// announce decease to family members :)
+
+    switch(player->role()) {
+        case ROLE_SHERIFF:
+        case ROLE_DEPUTY:
+            m_goodGuysCount--;
+            break;
+        case ROLE_OUTLAW:
+            m_outlawsCount--;
+            break;
+        case ROLE_RENEGADE:
+            m_renegadesCount--;
+            break;
+        default:
+            NOT_REACHED();
+    }
+
+
+
+    /// game winning condition check
+    if (player->role() == ROLE_SHERIFF) {
+        if (m_outlawsCount > 0 || m_goodGuysCount > 0)
+            winningSituation(ROLE_OUTLAW);
+        else
+            winningSituation(ROLE_RENEGADE);
+    } else {
+        if (m_outlawsCount == 0 && m_renegadesCount == 0)
+            winningSituation(ROLE_SHERIFF);
+    }
+}
+
+void Game::winningSituation(PlayerRole winners)
+{
+    m_state = StateFinished;
+
+    /// @todo: announce game over
 }
 
 void Game::startGame(Player* player)
@@ -197,13 +232,13 @@ void Game::startGame(Player* player)
     if (player->id() != mp_gameInfo->creatorId()) {
         throw BadPlayerException(player->id());
     }
-    if (m_gameState != GAMESTATE_WAITINGFORPLAYERS) {
+    if (m_state != StateWaitingForPlayers) {
         throw BadGameStateException();
     }
     if (!m_startable) {
         throw BadGameStateException();
     }
-    m_gameState = GAMESTATE_PLAYING;
+    m_state = StatePlaying;
     if (mp_gameInfo->hasShufflePlayers())
         shufflePlayers();
     //setCharacters();
@@ -258,9 +293,24 @@ void Game::setRoles()
     QListIterator<Player*> pIt(m_playerList);
     QListIterator<PlayerRole> rIt(roles);
     int i = 0;
+    m_goodGuysCount = m_outlawsCount = m_renegadesCount = 0;
     while(pIt.hasNext() && rIt.hasNext())
     {
         pIt.peekNext()->setRole(rIt.peekNext());
+        switch(rIt.peekNext()) {
+            case ROLE_SHERIFF:
+            case ROLE_DEPUTY:
+                m_goodGuysCount++;
+                break;
+            case ROLE_OUTLAW:
+                m_outlawsCount++;
+                break;
+            case ROLE_RENEGADE:
+                m_renegadesCount++;
+                break;
+            default:
+                NOT_REACHED();
+        }
         i++;
         pIt.next(); rIt.next();
     }

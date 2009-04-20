@@ -80,6 +80,7 @@ CardWidget* CardList::take(int cardId)
         foreach (CardWidget* card, m_cards) {
             if (card->cardData().id == cardId) {
                 m_cards.removeAll(card);
+                reorder();
                 return card;
             }
         }
