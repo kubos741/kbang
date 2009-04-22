@@ -50,6 +50,7 @@ public:
 
     void setPlayer(const StructPlayer&);
     virtual void setFromPublicData(const PublicPlayerData&) = 0;
+    virtual void dieAndRevealRole(const PlayerRole& role) = 0;
     virtual void clear() = 0;
 
     virtual CardList* hand() = 0;

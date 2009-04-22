@@ -27,6 +27,15 @@ CardWidget* CardWidgetFactory::createCharacterCard(QWidget* parent, CharacterTyp
     return cardWidget;
 }
 
+CardWidget* CardWidgetFactory::createRoleCard(QWidget* parent, PlayerRole role)
+{
+    CardWidget* cardWidget = new CardWidget(parent, Card::Role);
+    registerCard(cardWidget);
+    cardWidget->setPlayerRole(role);
+    cardWidget->setSize(CardWidget::SIZE_NORMAL);
+    return cardWidget;
+}
+
 void CardWidgetFactory::registerCard(CardWidget* cardWidget)
 {
     cardWidget->setGameObjectClickHandler(mp_game->cardWidgetClickHandler());

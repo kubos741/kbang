@@ -45,6 +45,7 @@ public:
     bool                 isSheriff()         const;
     bool                 isAlive()           const;
     int                  lifePoints()        const;
+    int                  maxLifePoints()     const;
     int                  handSize()          const;
     virtual PlayerRole   role()              const;
     QList<PlayingCard*> table()             const;

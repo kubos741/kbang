@@ -21,6 +21,7 @@ public slots:
     void onGameContextChangeEvent(const GameContextData&);
     void onGameSyncEvent(const GameSyncData&);
     void onLifePointsChangeEvent(int playerId, int lifePoints);
+    void onPlayerDiedEvent(int playerId, PlayerRole role);
 
 private:
     Game*           mp_game;

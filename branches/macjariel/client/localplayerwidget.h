@@ -46,6 +46,7 @@ public:
 
     virtual void setFromPublicData(const PublicPlayerData&);
     virtual void setFromPrivateData(const PrivatePlayerData&);
+    virtual void dieAndRevealRole(const PlayerRole& role);
     virtual void clear();
 
     virtual void setActive(uint8_t progress);

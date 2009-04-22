@@ -52,12 +52,17 @@ bool PublicPlayerView::isSheriff() const
 
 bool PublicPlayerView::isAlive() const
 {
-    return 1; /// \todo player alive/dead
+    return mp_player->isAlive();
 }
 
 int PublicPlayerView::lifePoints() const
 {
     return mp_player->lifePoints();
+}
+
+int PublicPlayerView::maxLifePoints() const
+{
+    return mp_player->maxLifePoints();
 }
 
 int PublicPlayerView::handSize() const
@@ -72,8 +77,9 @@ int PublicPlayerView::handSize() const
  */
 PlayerRole PublicPlayerView::role() const
 {
-    return (mp_player->role() == ROLE_SHERIFF) ?
-            ROLE_SHERIFF : ROLE_UNKNOWN;
+    if (mp_player->role() == ROLE_SHERIFF || !isAlive())
+        return mp_player->role();
+    return ROLE_UNKNOWN;
 }
 
 QList<PlayingCard*> PublicPlayerView::table() const

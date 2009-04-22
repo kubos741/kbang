@@ -26,8 +26,6 @@
 class XmlNode;
 class QXmlStreamWriter;
 
-
-
 struct StructServerInfo
 {
     QString name, description;
@@ -238,6 +236,10 @@ struct StructGame
 };
 
 typedef QList<StructGame> StructGameList;
+
+PlayerRole StringToPlayerRole(const QString& s);
+QString PlayerRoleToString(const PlayerRole& r);
+
 
 
 #endif

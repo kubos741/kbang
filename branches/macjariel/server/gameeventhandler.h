@@ -65,6 +65,8 @@ public:
 
     virtual void onPlayerLeavedGame(const PublicPlayerView&) = 0;
 
+    virtual void onPlayerDied(const PublicPlayerView&) = 0;
+
     virtual void onGameStartabilityChanged(bool isStartable) = 0;
     
     virtual void onGameStarted() = 0;

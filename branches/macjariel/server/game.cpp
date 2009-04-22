@@ -187,9 +187,11 @@ void Game::buryPlayer(Player* player)
     foreach(PlayingCard* card, player->table())
         gameTable().playerDiscardCard(card);
 
-    /// @todo
 
-    /// announce decease to family members :)
+    // Announce decease
+    foreach(Player* p, m_playerList) {
+        p->gameEventHandler()->onPlayerDied(player->publicView());
+    }
 
     switch(player->role()) {
         case ROLE_SHERIFF:

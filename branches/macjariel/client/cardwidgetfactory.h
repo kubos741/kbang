@@ -19,6 +19,7 @@ public:
 
     CardWidget* createPlayingCard(QWidget* parent);
     CardWidget* createCharacterCard(QWidget* parent, CharacterType = CHARACTER_UNKNOWN);
+    CardWidget* createRoleCard(QWidget* parent, PlayerRole = ROLE_UNKNOWN);
 
     void registerCard(CardWidget* cardWidget);
 

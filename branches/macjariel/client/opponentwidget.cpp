@@ -30,7 +30,10 @@ using namespace client;
 
 OpponentWidget::OpponentWidget(QWidget *parent):
         PlayerWidget(parent),
-        mp_sheriffBadge(0)
+        mp_sheriffBadge(0),
+        m_isDead(0),
+        m_role(ROLE_UNKNOWN),
+        mp_roleCard(0)
 {
     setupUi(this);
 
@@ -77,6 +80,13 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     updateWidgets();
 }
 
+void OpponentWidget::dieAndRevealRole(const PlayerRole& role)
+{
+    m_isDead = 1;
+    m_role = role;
+    updateWidgets();
+}
+
 void OpponentWidget::clear()
 {
     setId(0);
@@ -110,6 +120,10 @@ void OpponentWidget::updateWidgets()
     if (isVoid()) {
         mp_labelPlayerName->setText("");
         mp_characterWidget->hide();
+        if (mp_roleCard)
+            mp_roleCard->hide();
+        if (mp_sheriffBadge)
+            mp_sheriffBadge->hide();
     } else {
         mp_labelPlayerName->setText(name());
         mp_characterWidget->show();
@@ -128,6 +142,18 @@ void OpponentWidget::updateWidgets()
         } else {
             if (mp_sheriffBadge != 0)
                 mp_sheriffBadge->hide();
+        }
+        if (m_isDead) {
+            if (mp_roleCard == 0) {
+                mp_roleCard = mp_cardWidgetFactory->createRoleCard(this, m_role);
+                mp_roleCard->setSize(CardWidget::SIZE_NORMAL);
+            } else {
+                mp_roleCard->setPlayerRole(m_role);
+            }
+            mp_roleCard->validate();
+            mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
+                              (int)(height() / 2 - mp_roleCard->height() / 2));
+            mp_roleCard->show();
         }
     }
 }

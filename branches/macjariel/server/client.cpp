@@ -191,6 +191,8 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
         qDebug("[CLIENT]    BadGameStateException");
     } catch (BadCardException e) {
         qDebug("[CLIENT]    BadCardException");
+    } catch (BadUsageException e) {
+        qDebug("[CLIENT]    BadUsageException");
     }
 
 }
@@ -339,6 +341,14 @@ void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
     if (leavingPlayer.id() != playerId) {
         mp_parser->eventLeaveGame(gameId, leavingPlayer.structPlayer(), 1);
     }
+}
+
+void Client::onPlayerDied(const PublicPlayerView& player)
+{
+    int         playerId = player.id();
+    PlayerRole  role     = player.role();
+    Q_ASSERT(role != ROLE_UNKNOWN);
+    mp_parser->eventPlayerDied(playerId, role);
 }
 
 void Client::onGameStartabilityChanged(bool isStartable)

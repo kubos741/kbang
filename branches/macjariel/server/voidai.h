@@ -19,6 +19,7 @@ public:
     virtual void onPlayerExit() {}
     virtual void onPlayerJoinedGame(const PublicPlayerView&) {}
     virtual void onPlayerLeavedGame(const PublicPlayerView&) {}
+    virtual void onPlayerDied(const PublicPlayerView&) {};
     virtual void onGameStartabilityChanged(bool isStartable) { Q_UNUSED(isStartable); }
     virtual void onGameStarted() {}
     virtual void onPlayerDrawedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }

@@ -133,7 +133,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer
     if (!targetPlayer->isAlive())
         throw BadTargetPlayerException();
 
-    if (m_state == GAMEPLAYSTATE_DRAW || m_state == GAMEPLAYSTATE_DISCARD)
+    if (m_state != GAMEPLAYSTATE_TURN)
         throw BadGameStateException();
 
     card->play(targetPlayer);

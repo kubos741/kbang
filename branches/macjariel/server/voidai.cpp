@@ -3,6 +3,7 @@
 #include "publicgameview.h"
 #include "privateplayerview.h"
 #include "cards.h"
+#include "util.h"
 
 #include <QDebug>
 #include <QTimer>
@@ -51,9 +52,20 @@ void VoidAI::requestWithAction()
                 try {
                     switch(card->type()) {
                         case CARD_APPALOSSA:
-                        case CARD_MUSTANG:
+                        //case CARD_MUSTANG:
+                        case CARD_VOLCANIC:
+                        case CARD_SCHOFIELD:
+                        case CARD_REMINGTON:
+                        case CARD_CARABINE:
+                        case CARD_WINCHESTER:
                             mp_playerCtrl->playCard(card);
                             return;
+                        case CARD_BEER:
+                            if (mp_playerCtrl->privatePlayerView().lifePoints() !=
+                                    mp_playerCtrl->privatePlayerView().maxLifePoints()) {
+                                mp_playerCtrl->playCard(card);
+                                return;
+                            }
                         default:
                             break;
                     }
@@ -70,10 +82,13 @@ void VoidAI::requestWithAction()
 
                     QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().neighbors(
                                 &mp_playerCtrl->privatePlayerView(), 1);
-                    foreach (const PublicPlayerView* p, players) {
+                    int size = players.size();
+                    qDebug() << "Selecting from " << size << " targets!";
+                    if (size > 0) {
+                        int targetId = rand() % size;
+                        const PublicPlayerView* p = players[targetId];
                         mp_playerCtrl->playCard(bang, p);
                         return;
-
                     }
                 }
             } catch (OneBangPerTurnException e) {

@@ -63,6 +63,7 @@ void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, Car
 {
     PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
     mp_characterWidget->init(mp_cardWidgetFactory);
+    mp_cardWidgetFactory->registerCard(mp_roleCardWidget);
 }
 
 void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -103,6 +104,11 @@ void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlaye
     */
     updateWidgets();
 }
+
+void LocalPlayerWidget::dieAndRevealRole(const PlayerRole& role)
+{
+}
+
 
 void LocalPlayerWidget::clear()
 {

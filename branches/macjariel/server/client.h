@@ -82,6 +82,7 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerExit();
     virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView);
     virtual void onPlayerLeavedGame(const PublicPlayerView&);
+    virtual void onPlayerDied(const PublicPlayerView&);
     virtual void onGameStartabilityChanged(bool isStartable);
     virtual void onGameStarted();
     virtual void onPlayerDrawedCard(int playerId, const PlayingCard*);

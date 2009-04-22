@@ -414,6 +414,13 @@ void Parser::processStanza()
             emit sigEventLifePointsChange(playerId, lifePoints);
             return;
         }
+        if (event->name() == "player-died") {
+            int playerId = event->attribute("playerId").toInt();
+            PlayerRole role = StringToPlayerRole(event->attribute("role"));
+            emit sigEventPlayerDied(playerId, role);
+            return;
+        }
+
 
         if (event->name() == "card-movement")
         {
@@ -578,6 +585,16 @@ void Parser::eventLifePointsChange(int playerId, int lifePoints)
     eventEnd();
 }
 
+void Parser::eventPlayerDied(int playerId, PlayerRole role)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("player-died");
+    mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
+    mp_streamWriter->writeAttribute("role", PlayerRoleToString(role));
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
 
 void Parser::streamError()
 {

@@ -27,6 +27,7 @@
 #include "parser/parserstructs.h"
 
 namespace client {
+class CardWidget;
 class CardList;
 class PlayerCharacterWidget;
 
@@ -42,6 +43,7 @@ public:
     virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
 
     virtual void setFromPublicData(const PublicPlayerData&);
+    virtual void dieAndRevealRole(const PlayerRole& role);
     virtual void clear();
 
     virtual void setActive(uint8_t progress);
@@ -62,6 +64,10 @@ private:
     QString m_baseStyleSheet;
     QPixmap m_sheriffBadgePixmap;
     QLabel* mp_sheriffBadge;
+
+    bool        m_isDead;
+    PlayerRole  m_role;
+    CardWidget* mp_roleCard;
 };
 }
 #endif
