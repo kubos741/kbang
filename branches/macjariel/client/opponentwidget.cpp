@@ -22,6 +22,8 @@
 #include "cardlist.h"
 
 #include <QtDebug>
+#include <QPainter>
+#include <QPaintEvent>
 
 #include "cardpilewidget.h"
 #include "cardwidgetfactory.h"
@@ -36,6 +38,7 @@ OpponentWidget::OpponentWidget(QWidget *parent):
         mp_roleCard(0)
 {
     setupUi(this);
+    setContentsMargins(5, 5, 5, 5);
 
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
@@ -79,6 +82,13 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     mp_table->setOwnerId(id());
     updateWidgets();
 }
+
+void OpponentWidget::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+}
+
 
 void OpponentWidget::dieAndRevealRole(const PlayerRole& role)
 {

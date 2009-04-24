@@ -19,16 +19,7 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet" >
-   <string notr="true" >#mp_centralWidget {
-/*	background-image: url(:/misc/gfx/misc/background.png)*/
-	background-color: rgb(1, 127, 53);
-}
-
-QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(0, 170, 0), stop:1 darkgreen); }
-
-
-
-</string>
+   <string notr="true" />
   </property>
   <widget class="QWidget" name="mp_centralWidget" >
    <property name="autoFillBackground" >
@@ -287,7 +278,7 @@ QMenuBar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Preferred</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>

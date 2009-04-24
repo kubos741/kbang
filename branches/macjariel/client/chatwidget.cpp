@@ -19,12 +19,23 @@
  ***************************************************************************/
 #include "chatwidget.h"
 
+#include <QPainter>
+#include <QPaintEvent>
+
+
 using namespace client;
 
 ChatWidget::ChatWidget(QWidget *parent)
  : QWidget(parent)
 {
     setupUi(this);
+    setContentsMargins(5, 5, 5, 5);
+    QPalette palette = QApplication::palette();
+    palette.setColor(QPalette::Base, QColor(0, 0, 0, 16));
+    setPalette(palette);
+
+    mp_chatView->setFocusPolicy(Qt::NoFocus);
+    mp_messageBox->setFocusPolicy(Qt::ClickFocus);
     connect(mp_messageBox, SIGNAL(returnPressed()),
             this, SLOT(sendMessage()));
 }
@@ -33,6 +44,13 @@ ChatWidget::ChatWidget(QWidget *parent)
 ChatWidget::~ChatWidget()
 {
 }
+
+void ChatWidget::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+}
+
 
 void ChatWidget::incomingMessage(int, const QString& senderName, const QString& message)
 {

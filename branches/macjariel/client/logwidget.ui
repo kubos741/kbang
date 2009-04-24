@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>452</height>
+    <width>394</width>
+    <height>252</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -27,22 +27,6 @@
    </property>
    <item row="0" column="0" >
     <widget class="QFrame" name="frame" >
-     <property name="styleSheet" >
-      <string notr="true" >QFrame#frame
-{
-	background-color: rgba(0, 0, 0, 48);
-    border: 0px;
-    padding: 0px;
-    margin: 0px;
-}
-
-QWidget
-{
-/*	background-color: transparent;*/
-}
-
-</string>
-     </property>
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -52,37 +36,6 @@ QWidget
       </property>
       <item row="0" column="0" >
        <widget class="QTabWidget" name="mp_tabWidget" >
-        <property name="styleSheet" >
-         <string notr="true" >
-
-QTabWidget::pane 
-{
-/*	position: absolute;*/
-    top: 0.25em;
-	border: 2px solid rgb(0, 100, 0);
- }
-
-QTabWidget::tab-bar {
-	left: 3px; /* move to the right by 5px */
- }
-
-QTabBar::tab:!selected
-{
-	margin-top: 2px;
-}
-
-QTabBar::tab {
-	color: yellow;
-	background-color: rgb(0, 95, 26);
-	border: 2px solid rgb(0,100,0);
-	min-width: 10ex;
-    margin-left: 2px;
-	padding: 0px;
-}
-
-/* make use of negative margins for overlapping tabs */ QTabBar::tab:selected { /* expand/overlap to the left and right by 4px */ margin-left: -4px; margin-right: -4px; } QTabBar::tab:first:selected { margin-left: 0; /* the first selected tab has nothing to overlap with on the left */ } QTabBar::tab:last:selected { margin-right: 0; /* the last selected tab has nothing to overlap with on the right */ } QTabBar::tab:only-one { margin: 0; /* if there is only one tab, we don't want overlapping margins */ }
-</string>
-        </property>
         <property name="tabShape" >
          <enum>QTabWidget::Rounded</enum>
         </property>
@@ -102,9 +55,6 @@ QTabBar::tab {
           </property>
           <item row="0" column="0" >
            <widget class="QTextBrowser" name="mp_logView" >
-            <property name="styleSheet" >
-             <string notr="true" >background-color: rgba(0,0,0,48);</string>
-            </property>
             <property name="frameShadow" >
              <enum>QFrame::Plain</enum>
             </property>
@@ -129,13 +79,6 @@ QTabBar::tab {
             </property>
             <property name="autoFillBackground" >
              <bool>false</bool>
-            </property>
-            <property name="styleSheet" >
-             <string notr="true" >QTextBrowser
-{
-	font-size: 7pt;
-	background-color: rgba(0, 0, 0, 64);
-}</string>
             </property>
             <property name="verticalScrollBarPolicy" >
              <enum>Qt::ScrollBarAsNeeded</enum>

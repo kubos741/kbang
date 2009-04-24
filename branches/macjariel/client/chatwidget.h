@@ -34,9 +34,8 @@ class ChatWidget : public QWidget, public Ui::ChatWidget
 Q_OBJECT
 public:
     ChatWidget(QWidget *parent = 0);
-
     ~ChatWidget();
-
+    virtual void paintEvent(QPaintEvent* event);
 
 public slots:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);

@@ -183,6 +183,7 @@ void CardMovementEvent::timerEvent(QTimerEvent*)
         m_currPos = m_srcPos + (m_destPos - m_srcPos) * progress;
         mp_card->move(m_currPos);
     }
+    mp_card->repaint();
 }
 
 void CardMovementEvent::stopTransition()

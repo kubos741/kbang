@@ -51,6 +51,8 @@ public:
     MainWindow();
     virtual ~MainWindow();
 
+    virtual void paintEvent(QPaintEvent* event);
+
 private slots:
     void connectToServer();
     void disconnectFromServer();

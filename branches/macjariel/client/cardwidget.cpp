@@ -115,12 +115,15 @@ void CardWidget::paintEvent(QPaintEvent *event)
         QLabel::paintEvent(event);
         if (m_hasHighlight) {
             QPainter painter(this);
-
             painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
         }
     } else {
-        QPainter painter(this);
-        painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
+        QLabel::paintEvent(event);
+
+
+        //QPainter painter(this);
+        //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,255)));
+        //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
     }
 }
 

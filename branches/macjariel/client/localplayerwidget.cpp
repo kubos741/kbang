@@ -26,6 +26,8 @@
 
 
 #include <QtDebug>
+#include <QPainter>
+#include <QPaintEvent>
 
 using namespace client;
 
@@ -42,7 +44,7 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
-    m_baseStyleSheet = mainFrame->styleSheet();
+    //m_baseStyleSheet = mainFrame->styleSheet();
     setActive(0);
     updateWidgets();
 
@@ -132,6 +134,12 @@ void LocalPlayerWidget::setActive(uint8_t progress)
     }
 }
 
+
+void LocalPlayerWidget::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect(), QColor(0, 0, 0, 32));
+}
 
 void LocalPlayerWidget::onEndTurnClicked()
 {

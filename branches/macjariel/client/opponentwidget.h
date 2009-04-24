@@ -42,6 +42,8 @@ public:
 
     virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
 
+    virtual void paintEvent(QPaintEvent* event);
+
     virtual void setFromPublicData(const PublicPlayerData&);
     virtual void dieAndRevealRole(const PlayerRole& role);
     virtual void clear();
@@ -53,6 +55,7 @@ public:
     virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
     virtual bool                    isLocalPlayer()   { return 0; }
     virtual QSize                   sizeHint() const;
+
 
 
 

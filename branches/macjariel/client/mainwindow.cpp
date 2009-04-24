@@ -30,6 +30,8 @@
 #include "game.h"
 #include "card.h"
 
+#include <QPainter>
+
 using namespace client;
 
 MainWindow::MainWindow():
@@ -244,7 +246,14 @@ void MainWindow::playerLeavedGame(int gameId, const StructPlayer& player, bool o
     }
 }
 
-
-
+void MainWindow::paintEvent(QPaintEvent* e)
+{
+    QPainter painter(this);
+    QRadialGradient g(width() / 2, height() / 2, width() / 2, width() / 2 , height() / 2);
+    g.setColorAt(0, QColor(239, 215, 179));
+    g.setColorAt(0.5 , QColor(211, 179, 140));
+    painter.fillRect(e->rect(), g);
+    QMainWindow::paintEvent(e);
+}
 
 

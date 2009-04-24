@@ -23,6 +23,9 @@
 #include <stdlib.h>
 
 #include <QSize>
+#include <QPainter>
+#include <QPaintEvent>
+
 
 using namespace client;
 
@@ -32,7 +35,7 @@ CardList::CardList(QWidget *parent):
         m_hPadding(3),
         m_vPadding(3)
 {
-    setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
+    //setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
 }
 
 CardList::~CardList()
@@ -99,6 +102,13 @@ CardWidget* CardList::pop()
     return res;
 }
 
+void CardList::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 16));
+}
+
+
 void CardList::reorder()
 {
     for(int i = 0; i < m_cards.size(); ++i) {
@@ -135,4 +145,5 @@ int CardList::cardX(int i, bool newCard) const
         return m_hPadding + i * newMoveFactor;
     }
 }
+
 

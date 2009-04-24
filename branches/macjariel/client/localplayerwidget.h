@@ -57,6 +57,8 @@ public:
     virtual bool                    isLocalPlayer()   { return 1; }
     PlayerRole                      role()            { return m_role; }
 
+    virtual void paintEvent(QPaintEvent* event);
+
 private slots:
     void onEndTurnClicked();
     void onPassClicked();

@@ -44,6 +44,8 @@ public:
     virtual CardWidget* take(int cardId);
     virtual CardWidget* pop();
 
+    virtual void paintEvent(QPaintEvent* event);
+
 protected:
     QList<CardWidget*> m_cards;
 
