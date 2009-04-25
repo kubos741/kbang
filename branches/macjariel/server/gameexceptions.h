@@ -3,34 +3,138 @@
 #define GAMEEXCEPTIONS_H
 
 
-class BadPlayerException
+#include "parser/parserstructs.h"
+#include <QtDebug>
+
+
+class GameException
+{
+public:
+    virtual void debug() = 0;
+    virtual ~GameException() {}
+};
+
+class BadPlayerException: public GameException
 {
 public:
     BadPlayerException(int playerId): m_playerId(playerId) {}
     int playerId() const { return m_playerId; }
+    virtual void debug() {
+        qDebug("BadPlayerException");
+    }
 private:
     int m_playerId;
 };
 
 
-class BadGameStateException {};
+class BadGameStateException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadGameStateException");
+    }
+};
 
-class OneBangPerTurnException: public BadGameStateException {};
-class TwoSameOnTableException: public BadGameStateException {};
+
+class BadGamePlayStateException: public GameException
+{
+public:
+    BadGamePlayStateException(GamePlayState current, GamePlayState expected):
+            m_current(current), m_expected(expected) {}
+
+    virtual void debug() {
+        qDebug(qPrintable(QString("BadGamePlayStateException: expected %1 but current is %1.").arg(
+                GamePlayStateToString(m_expected)).arg(GamePlayStateToString(m_current))));
+    }
+    virtual ~BadGamePlayStateException() {}
+private:
+    GamePlayState m_current, m_expected;
+};
 
 
-class BadTargetPlayerException: public BadGameStateException {};
-class PlayerOutOfRangeException: public BadTargetPlayerException {};
+
+class OneBangPerTurnException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("OneBangPerTurnException");
+    }
+};
+
+class TwoSameOnTableException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("TwoSameOnTableException");
+    }
+};
+
+class BadTargetPlayerException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadTargetPlayerException");
+    }
+};
+
+class PlayerOutOfRangeException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("PlayerOutOfRangeException");
+    }
+};
 
 
-class BadGameException {};
+class BadGameException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadGameException");
+    }
+};
 
-class TooManyCardsInHandException {};
+class TooManyCardsInHandException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("TooManyCardsInHandException");
+    }
+};
 
-class BadCardException {};
+class BadCardException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadCardException");
+    }
+};
 
-class BadUsageException {};
+class BadTargetCardException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadTargetCardException");
+    }
+};
 
+
+class BadUsageException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadUsageException");
+    }
+};
+
+class BadPredrawException: public GameException
+{
+/// @todo: add information about predraw card
+public:
+    virtual void debug() {
+        qDebug("BadPredrawException");
+    }
+};
 
 
 #endif // GAMEEXCEPTIONS_H

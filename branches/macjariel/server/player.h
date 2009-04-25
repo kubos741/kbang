@@ -158,9 +158,10 @@ public:
      * @param preventDeath set to true to prevent dying (used by instantly
      *                     played beer)
      */
-    void modifyLifePoints(int lifePoints, bool preventDeath = 0);
+    void modifyLifePoints(int lifePoints, Player* shooter, bool disableBeerRescue = 0);
     void modifyDistanceIn(int delta);
     void modifyDistanceOut(int delta);
+    void modifyUnlimitedBangs(int delta);
     void setWeaponRange(int weaponRange);
     void setAlive(bool isAlive);
     void appendCardToHand(PlayingCard* card);
@@ -173,6 +174,7 @@ public:
      */
     bool removeCardFromHand(PlayingCard* card);
 
+    PlayingCard* getRandomCardFromHand();
     /**
      * Removes the given card from player's table. Returns
      * true if player has this card in his table.
@@ -183,12 +185,19 @@ public:
 
     void setRole(const PlayerRole& role);
 
+    void registerPredrawCheck(int checkId);
+    void unregisterPredrawCheck(int checkId);
+    void predrawCheck(int checkId);
+
+
     /**
      * This method needs to be called after the Bang! card was played.
      * This is necessary to implement the one-bang-per-turn rule.
      * @see bool Player::canPlayBang()
      */
     void onBangPlayed();
+
+    void onTurnStart();
 
   ////////////////
  // DEPRECATED //
@@ -226,6 +235,10 @@ private:
     int                       m_distanceIn;
     int                       m_distanceOut;
     int                       m_lastBangTurn;
+    int                       m_unlimitedBangs;
+    int                       m_currentPredraw;
+
+    QList<int>                m_predrawChecks;
 
     const PublicPlayerView    m_publicPlayerView;
     const PrivatePlayerView   m_privatePlayerView;

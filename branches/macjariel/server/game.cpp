@@ -28,7 +28,7 @@
 #include "client.h"
 #include "player.h"
 #include "common.h"
-#include "cards.h"
+#include "cardbeer.h"
 #include "util.h"
 #include "gameexceptions.h"
 
@@ -48,6 +48,7 @@ Game::Game(GameServer* parent, const StructGame& structGame):
     mp_gameInfo = new GameInfo(structGame);
     mp_gameTable = new GameTable(this);
     mp_gameCycle = new GameCycle(this);
+    mp_beerRescue = new BeerRescue(this);
 }
 
 Game::~Game()
@@ -60,6 +61,11 @@ Game::~Game()
 int Game::id() const
 {
     return mp_gameInfo->id();
+}
+
+int Game::alivePlayersCount() const
+{
+    return m_goodGuysCount + m_outlawsCount + m_renegadesCount;
 }
 
 Player* Game::player(int playerId)
@@ -175,7 +181,7 @@ void Game::removePlayer(Player* player)
     player->deleteLater();
 }
 
-void Game::buryPlayer(Player* player)
+void Game::buryPlayer(Player* player, Player* killer)
 {
     Q_ASSERT(player->lifePoints() == 0);
     Q_ASSERT(player->isAlive());
@@ -216,9 +222,10 @@ void Game::buryPlayer(Player* player)
             winningSituation(ROLE_OUTLAW);
         else
             winningSituation(ROLE_RENEGADE);
-    } else {
-        if (m_outlawsCount == 0 && m_renegadesCount == 0)
+    } else if (m_outlawsCount == 0 && m_renegadesCount == 0) {
             winningSituation(ROLE_SHERIFF);
+    } else if (player->role() == ROLE_OUTLAW && killer != 0) {
+            mp_gameTable->drawCard(killer, 3);
     }
 }
 

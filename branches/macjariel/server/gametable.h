@@ -23,6 +23,8 @@ public:
      */
     void drawCard(Player* player, int count = 1, bool revealCard = 0);
 
+    bool checkCard(Player* player, PlayingCard* card, bool (*checkFunc)(PlayingCard*));
+
     /**
      * The player discards the specified card. The card can be in the player's
      * hand, table or selection.
@@ -36,9 +38,18 @@ public:
 
     void playOnTable(TableCard* card, Player* targetPlayer = 0);
 
+    void stealCard(PlayingCard* card, Player* stealer);
+
+
+    void drawIntoPublicSelection(int cardCount);
+
+    void drawFromPublicSelection(Player* player, PlayingCard* card);
+
     PlayingCard* card(int cardId) const {
         return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
     }
+
+    QList<PlayingCard*> selection() const { return m_selection; }
 
 private:
     void generateCards(CardFactory*);

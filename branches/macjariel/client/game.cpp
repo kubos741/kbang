@@ -201,6 +201,12 @@ void Game::gameStarted(const StructGame&, const StructPlayerList&)
     mp_deck->init(&m_cardWidgetFactory);
     mp_graveyard = new CardPileWidget(0);
     mp_graveyard->setPocketType(POCKET_GRAVEYARD);
+    mp_selection = new CardList(0);
+    mp_selection->setPocketType(POCKET_SELECTION);
+    mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
+    mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+
     if (mp_middleWidget->layout() != 0) {
         delete mp_middleWidget->layout();
     }
@@ -211,7 +217,17 @@ void Game::gameStarted(const StructGame&, const StructPlayerList&)
     l->addStretch(1);
     l->addWidget(mp_deck);
     l->addStretch(3);
-    mp_middleWidget->setLayout(l);
+
+    QBoxLayout* l2 = new QBoxLayout(QBoxLayout::LeftToRight);
+    l2->addStretch(3);
+    l2->addWidget(mp_selection);
+    l2->addStretch(3);
+
+    QBoxLayout* l3 = new QVBoxLayout();
+    l3->addLayout(l);
+    l3->addStretch(1);
+    l3->addLayout(l2);
+    mp_middleWidget->setLayout(l3);
 }
 
 

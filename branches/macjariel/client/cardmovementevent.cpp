@@ -31,12 +31,12 @@
 
 using namespace client;
 
-const int       tickTime        = 20;
-const double    pixelsPerTick   = 24;
+//const int       tickTime        = 20;
+//const double    pixelsPerTick   = 24;
 
 // DEBUG FAST VALUES
-//const int       tickTime        = 10;
-//const double    pixelsPerTick   = 100;
+const int       tickTime        = 10;
+const double    pixelsPerTick   = 100;
 
 QBasicTimer CardMovementEvent:: sm_timer;
 
@@ -105,11 +105,8 @@ void CardMovementEvent::setCardAndPocket()
         }
         mp_card = srcPlayer->table()->take(m_cardMovementData.card.id);
         break;
-    case POCKET_PLAYED:
-        // todo
-        break;
     case POCKET_SELECTION:
-        // todo
+        mp_card = mp_game->selection()->take(m_cardMovementData.card.id);
         break;
     case POCKET_INVALID:
         break;
@@ -133,7 +130,7 @@ void CardMovementEvent::setCardAndPocket()
         mp_destPocket = mp_game->graveyard();
         break;
     case POCKET_SELECTION:
-        /// \todo Implement moveCard to POCKET_SELECTION
+        mp_destPocket = mp_game->selection();
         break;
     case POCKET_INVALID:
         break;
@@ -193,5 +190,18 @@ void CardMovementEvent::stopTransition()
     mp_card->validate();
     mp_card->unsetShadowMode();
     mp_destPocket->push(mp_card);
+    if (mp_card->cardData().id != 0 && (mp_card->pocketType() == POCKET_HAND &&
+                                        mp_card->ownerId() != mp_game->playerId() ||
+                                        mp_card->pocketType() == POCKET_DECK)) {
+        QTimer::singleShot(500, this, SLOT(unrevealCard()));
+    } else {
+        GameEvent::finish();
+    }
+}
+
+void CardMovementEvent::unrevealCard()
+{
+    mp_card->setCardData(CardData());
+    mp_card->validate();
     GameEvent::finish();
 }

@@ -2,6 +2,7 @@
 #include "gameexceptions.h"
 #include "player.h"
 #include "gametable.h"
+#include "gamecycle.h"
 
 
 CardHorse::CardHorse(Game *game, int id, CardHorse::HorseType horseType, CardSuit suit, CardRank rank):
@@ -24,6 +25,8 @@ CardHorse::~CardHorse()
 
 void CardHorse::play()
 {
+    gameCycle()->assertTurn();
+    assertInHand();
     if (owner()->hasIdenticalCardOnTable(this)) {
         throw TwoSameOnTableException();
     }

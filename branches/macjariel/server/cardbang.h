@@ -40,6 +40,7 @@ public:
     virtual void respondCard(PlayingCard* targetCard);
 
 private:
+    Player* mp_attackingPlayer;
     Player* mp_attackedPlayer;
 };
 

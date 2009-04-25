@@ -137,18 +137,9 @@ void Client::onActionDrawCard(int numCards, bool revealCard)
 {
     try {
         mp_playerCtrl->drawCard(numCards, revealCard);
-    } catch (BadGameStateException e) {
-        qDebug() << "Cannot draw card now - the gamestate now is:";
-        qDebug() << "current player: " << mp_playerCtrl->publicGameView().gameContextData().currentPlayerId;
-        qDebug() << "requested player: " << mp_playerCtrl->publicGameView().gameContextData().requestedPlayerId;
-        /*
-        switch (mp_playerCtrl->publicGameView().gameContextData().gamePlayState)
-        {
-            case GAMEPLAYSTATE_DRAW: qDebug() << "DRAW"; break;
-            case GAMEPLAYSTATE_DISCARD: qDebug() << "DISCARD"; break;
-            case GAMEPLAYSTATE_TURN: qDebug() << "TURN"; break;
-        }
-        */
+    } catch (GameException& e) {
+        qDebug() << "Client::onActionDrawCard - exception:";
+        e.debug();
     }
 }
 
@@ -169,8 +160,15 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
         case ActionPlayCardData::PLAYCARD_SIMPLE:
             mp_playerCtrl->playCard(playedCard);
             break;
-        case ActionPlayCardData::PLAYCARD_PLAYER: {
-                const PublicPlayerView* targetPlayer = mp_playerCtrl->publicGameView().publicPlayerView(actionPlayCardData.targetPlayerId);
+        case ActionPlayCardData::PLAYCARD_PLAYER:
+        case ActionPlayCardData::PLAYCARD_HAND:{
+                int targetPlayerId = (actionPlayCardData.type == ActionPlayCardData::PLAYCARD_PLAYER) ?
+                                     actionPlayCardData.targetPlayerId :
+                                     actionPlayCardData.targetHandId;
+
+                const PublicPlayerView* targetPlayer =
+                        mp_playerCtrl->publicGameView().publicPlayerView(targetPlayerId);
+
                 if (targetPlayer == 0) {
                     qDebug(qPrintable(QString("[CLIENT]   Target player '%1' not exist!").arg(actionPlayCardData.targetPlayerId)));
                     // @todo feedback
@@ -179,32 +177,29 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
                 mp_playerCtrl->playCard(playedCard, targetPlayer);
             } break;
         case ActionPlayCardData::PLAYCARD_CARD:
-            qDebug("[CLIENT]   PLAYCARD_CARD not implemented yet.");
-            break;
-        case ActionPlayCardData::PLAYCARD_HAND:
-            qDebug("[CLIENT]   PLAYCARD_HAND not implemented yet.");
+            int targetCardId = actionPlayCardData.targetCardId;
+            PlayingCard* card = mp_playerCtrl->card(targetCardId);
+            if (card == 0) {
+                qDebug(qPrintable(QString("[CLIENT]   Target card '%1' not exist!").arg(targetCardId)));
+                // @todo feedback
+                return;
+            }
+            mp_playerCtrl->playCard(playedCard, card);
             break;
         }
-    } catch (OneBangPerTurnException e) {
-        qDebug("[CLIENT]    OneBangPerTurnException");
-    } catch (BadGameStateException e) {
-        qDebug("[CLIENT]    BadGameStateException");
-    } catch (BadCardException e) {
-        qDebug("[CLIENT]    BadCardException");
-    } catch (BadUsageException e) {
-        qDebug("[CLIENT]    BadUsageException");
+    } catch (GameException& e) {
+        qDebug("[CLIENT]: onActionPlayCard - exception:");
+        e.debug();
     }
-
 }
 
 void Client::onActionEndTurn()
 {
     try {
         mp_playerCtrl->finishTurn();
-    } catch (BadGameStateException e) {
-        qDebug("Cannot end turn now.");
-    } catch (TooManyCardsInHandException e) {
-        qDebug("[CLIENT]    TooManyCardsInHandException");
+    } catch (GameException& e) {
+        qDebug("[CLIENT]: onActionEndTurn - exception:");
+        e.debug();
     }
 }
 
@@ -212,8 +207,9 @@ void Client::onActionPass()
 {
     try {
         mp_playerCtrl->pass();
-    } catch (BadGameStateException e) {
-        qDebug("Cannot pass now.");
+    } catch (GameException& e) {
+        qDebug("[CLIENT]: onActionPass - exception:");
+        e.debug();
     }
 }
 
@@ -226,8 +222,9 @@ void Client::onActionDiscard(int cardId)
             return;
         }
         mp_playerCtrl->discardCard(card);
-    } catch (BadGameStateException e) {
-        qDebug("Cannot discard now.");
+    } catch (GameException& e) {
+        qDebug("[CLIENT]: onActionDiscard - exception:");
+        e.debug();
     }
 }
 
@@ -322,8 +319,9 @@ void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
     if (playerId == mp_playerCtrl->privatePlayerView().id()) {
         structPlayer = mp_playerCtrl->privatePlayerView().structPlayer();
         isOther = 0;
-        if (mp_playerCtrl->privatePlayerView().isCreator())
+        if (mp_playerCtrl->privatePlayerView().isCreator())  {
             QTimer::singleShot(500, this, SLOT(startAI()));
+        }
     } else {
         structPlayer = mp_playerCtrl->publicPlayerView(playerId).structPlayer();
         isOther = 1;
@@ -401,16 +399,62 @@ void Client::onPlayerPlayedCard(int playerId, const PlayingCard* card)
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerPlayedOnTable(int playerId, const PlayingCard* card)
+void Client::onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId)
 {
     CardMovementData x;
-    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeFrom = pocketFrom;
     x.pocketTypeTo   = POCKET_TABLE;
     x.playerFrom     = playerId;
+    x.playerTo       = targetPlayerId != 0 ? targetPlayerId : playerId;
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerCheckedCard(int playerId, const PlayingCard* card,
+                                 const PlayingCard* checkedCard, bool checkResult)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_DECK;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = 0;
+    x.playerTo       = 0;
+    x.card           = checkedCard->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = pocketFrom;
+    x.pocketTypeTo   = POCKET_HAND;
+    x.playerFrom     = stealedId;
+    x.playerTo       = stealerId;
+    if (card != 0)
+        x.card       = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onDrawIntoSelection(const PlayingCard* card)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_DECK;
+    x.pocketTypeTo   = POCKET_SELECTION;
+    x.playerTo       = 0;
+    x.card = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerDrawedFromSelection(int playerId, const PlayingCard* card)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_SELECTION;
+    x.pocketTypeTo   = POCKET_HAND;
+    x.playerFrom     = 0;
     x.playerTo       = playerId;
     x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
+
 
 void Client::onPlayedCardsCleared()
 {

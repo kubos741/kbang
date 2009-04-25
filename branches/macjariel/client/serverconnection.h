@@ -64,6 +64,7 @@ public slots:
     void drawCard(int numCards = 1, bool revealCard = 0);
     void playCard(int cardId);
     void playCardWithPlayer(int cardId, int playerId);
+    void playCardWithCard(int cardId, int otherCardId);
 
     void endTurn();
     void pass();

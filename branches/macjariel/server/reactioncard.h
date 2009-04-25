@@ -21,6 +21,7 @@
 #define REACTIONCARD_H
 
 #include "playingcard.h"
+#include "reactionhandler.h"
 #include "parser/parserstructs.h"
 
 /**
@@ -36,15 +37,12 @@
  *
  * @author MacJariel <MacJariel@gmail.com>
  */
-class ReactionCard: public PlayingCard
+class ReactionCard: public PlayingCard, public ReactionHandler
 {
 Q_OBJECT
 public:
     ReactionCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
-    virtual ~ReactionCard();
-
-    virtual void respondPass() = 0;
-    virtual void respondCard(PlayingCard* targetCard) = 0;
+    //virtual ~ReactionCard();
 };
 
 #endif

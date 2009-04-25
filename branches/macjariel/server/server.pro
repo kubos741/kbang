@@ -26,7 +26,15 @@ HEADERS += player.h \
     voidai.h \
     cardbeer.h \
     cardhorse.h \
-    cardfactory.h
+    cardfactory.h \
+    carddrawcards.h \
+    cardmultishoot.h \
+    cardduel.h \
+    cardgeneralstore.h \
+    cardjail.h \
+    reactionhandler.h \
+    carddynamite.h \
+    cardtaker.h
 SOURCES += main.cpp \
     player.cpp \
     gameserver.cpp \
@@ -54,7 +62,15 @@ SOURCES += main.cpp \
     gameeventhandler.cpp \
     cardbeer.cpp \
     cardhorse.cpp \
-    cardfactory.cpp
+    cardfactory.cpp \
+    carddrawcards.cpp \
+    cardmultishoot.cpp \
+    cardduel.cpp \
+    cardgeneralstore.cpp \
+    cardjail.cpp \
+    reactionhandler.cpp \
+    carddynamite.cpp \
+    cardtaker.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

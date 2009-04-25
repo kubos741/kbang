@@ -60,6 +60,7 @@ public:
 
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline CardPileWidget* graveyard() const          { return mp_graveyard; }
+    inline CardList*       selection() const          { return mp_selection; }
     inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
     inline LocalPlayerWidget*
                            localPlayerWidget() const  { return mp_localPlayerWidget; }
@@ -67,7 +68,7 @@ public:
 
     inline int             currentPlayerId() const    { return m_currentPlayerId; }
     inline int             requestedPlayerId() const  { return m_requestedPlayerId; }
-
+    inline GamePlayState   gamePlayState() const      { return m_gamePlayState; }
     inline bool            isAbleToRequest() const    { return m_requestedPlayerId == m_playerId; }
 
     inline int playerId() const { return m_playerId; }
@@ -105,6 +106,7 @@ private:
     QPushButton*              mp_startButton;
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
+    CardList*                 mp_selection;
     bool                      m_creator;
     QQueue<CardMovementData> m_cardMovementQueue;
 

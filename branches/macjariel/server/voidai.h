@@ -19,13 +19,17 @@ public:
     virtual void onPlayerExit() {}
     virtual void onPlayerJoinedGame(const PublicPlayerView&) {}
     virtual void onPlayerLeavedGame(const PublicPlayerView&) {}
-    virtual void onPlayerDied(const PublicPlayerView&) {};
+    virtual void onPlayerDied(const PublicPlayerView&) {}
     virtual void onGameStartabilityChanged(bool isStartable) { Q_UNUSED(isStartable); }
     virtual void onGameStarted() {}
     virtual void onPlayerDrawedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
     virtual void onPlayerDiscardedCard(int playerId, PocketType, const PlayingCard*) { Q_UNUSED(playerId); }
     virtual void onPlayerPlayedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
-    virtual void onPlayerPlayedOnTable(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
+    virtual void onPlayerPlayedOnTable(int playerId, PocketType, const PlayingCard*, int targetPlayerId) { Q_UNUSED(playerId); }
+    virtual void onPlayerCheckedCard(int, const PlayingCard*, const PlayingCard*, bool) {}
+    virtual void onPlayerStealedCard(int, int, PocketType, const PlayingCard*) {}
+    virtual void onDrawIntoSelection(const PlayingCard*) {}
+    virtual void onPlayerDrawedFromSelection(int, const PlayingCard*) {}
     virtual void onPlayedCardsCleared() {}
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints)
                 { Q_UNUSED(oldLifePoints); Q_UNUSED(newLifePoints);}

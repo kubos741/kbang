@@ -71,6 +71,9 @@ private:
     void timerEvent(QTimerEvent*);
     void stopTransition();
 
+private slots:
+    void unrevealCard();
+
 private:
     CardMovementData    m_cardMovementData;
     CardWidget*         mp_card;

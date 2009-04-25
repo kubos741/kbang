@@ -21,6 +21,7 @@
 #include "gameexceptions.h"
 #include "player.h"
 #include "gametable.h"
+#include "gamecycle.h"
 
 WeaponCard::WeaponCard(Game *game, int id, int range, CardSuit suit, CardRank rank):
         TableCard(game, id, CARD_UNKNOWN, suit, rank),
@@ -51,6 +52,8 @@ WeaponCard::~WeaponCard()
 
 void WeaponCard::play()
 {
+    gameCycle()->assertTurn();
+
     if (this->pocket() != POCKET_HAND)
         throw BadUsageException();
 
@@ -68,12 +71,17 @@ void WeaponCard::play()
 void WeaponCard::registerPlayer(Player* player)
 {
     player->setWeaponRange(m_range);
-    /// @todo implement Volcanic
+    if (m_range == 1) {
+        player->modifyUnlimitedBangs(1);
+    }
 }
 
 void WeaponCard::unregisterPlayer(Player* player)
 {
     player->setWeaponRange(1);
+    if (m_range == 1) {
+        player->modifyUnlimitedBangs(-1);
+    }
 }
 
 

@@ -88,7 +88,11 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerDrawedCard(int playerId, const PlayingCard*);
     virtual void onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card);
     virtual void onPlayerPlayedCard(int playerId, const PlayingCard* card);
-    virtual void onPlayerPlayedOnTable(int playerId, const PlayingCard* card);
+    virtual void onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId);
+    virtual void onPlayerCheckedCard(int playerId, const PlayingCard* card, const PlayingCard* checkedCard, bool checkResult);
+    virtual void onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card);
+    virtual void onDrawIntoSelection(const PlayingCard* card);
+    virtual void onPlayerDrawedFromSelection(int playerId, const PlayingCard* card);
     virtual void onPlayedCardsCleared();
     virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
     virtual void onGameContextChange(const GameContextData&);

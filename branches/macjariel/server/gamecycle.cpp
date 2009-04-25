@@ -15,6 +15,31 @@ GameCycle::GameCycle(Game* game):
 {
 }
 
+void GameCycle::assertDraw() const
+{
+    if (!isDraw())
+        throw BadGamePlayStateException(m_state, GAMEPLAYSTATE_DRAW);
+}
+
+void GameCycle::assertTurn() const
+{
+    if (!isTurn())
+        throw BadGamePlayStateException(m_state, GAMEPLAYSTATE_TURN);
+}
+
+void GameCycle::assertResponse() const
+{
+    if (!isResponse())
+        throw BadGamePlayStateException(m_state, GAMEPLAYSTATE_RESPONSE);
+}
+
+ void GameCycle::assertDiscard() const
+ {
+     if (!isDiscard())
+         throw BadGamePlayStateException(m_state, GAMEPLAYSTATE_DISCARD);
+ }
+
+
 GameContextData GameCycle::gameContextData() const
 {
     GameContextData res;
@@ -41,10 +66,12 @@ void GameCycle::start()
 void GameCycle::startTurn(Player* player)
 {
 
+    qDebug(qPrintable(QString("GameCycle: startTurn(%1)").arg(player->id())));
     if (player->role() == ROLE_SHERIFF)
         m_turnNum++;
     mp_currentPlayer = mp_requestedPlayer = player;
     m_state = GAMEPLAYSTATE_DRAW;
+    mp_currentPlayer->onTurnStart();
     announceContextChange();
     m_drawCardCount = 0;
     m_drawCardMax = 2;
@@ -53,6 +80,7 @@ void GameCycle::startTurn(Player* player)
 void GameCycle::drawCard(Player* player, int numCards, bool revealCard)
 {
     checkPlayerAndState(player, GAMEPLAYSTATE_DRAW);
+    player->predrawCheck(0);
 
     if (m_drawCardCount + numCards > m_drawCardMax) {
         throw BadGameStateException();
@@ -73,6 +101,12 @@ void GameCycle::checkDeck(Player* player)
 {
     checkPlayerAndState(player, GAMEPLAYSTATE_DRAW);
     /// \todo
+}
+
+
+void GameCycle::skipPlayersTurn()
+{
+    startTurn(mp_game->nextPlayer(mp_currentPlayer));
 }
 
 void GameCycle::finishTurn(Player* player)
@@ -114,13 +148,14 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
-    if (m_state == GAMEPLAYSTATE_DRAW || m_state == GAMEPLAYSTATE_DISCARD)
-        throw BadGameStateException();
+    if (card->owner() !=  0 && card->owner() != player) {
+        throw BadCardException();
+    }
 
-    if (m_state == GAMEPLAYSTATE_TURN) {
-        card->play();
+    if (isResponse()) {
+        mp_reactionHandler->respondCard(card);
     } else {
-        mp_reactionCard->respondCard(card);
+        card->play();
     }
     sendRequest();
 }
@@ -130,15 +165,36 @@ void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
+    if (card->owner() !=  0 && card->owner() != player) {
+        throw BadCardException();
+    }
+
     if (!targetPlayer->isAlive())
         throw BadTargetPlayerException();
 
-    if (m_state != GAMEPLAYSTATE_TURN)
+    if (isResponse())
         throw BadGameStateException();
 
     card->play(targetPlayer);
     sendRequest();
 }
+
+void GameCycle::playCard(Player* player, PlayingCard* card, PlayingCard* targetCard)
+{
+    if (player != mp_requestedPlayer)
+        throw BadPlayerException(mp_currentPlayer->id());
+
+    if (card->owner() !=  0 && card->owner() != player) {
+        throw BadCardException();
+    }
+
+    if (isResponse())
+        throw BadGameStateException();
+
+    card->play(targetCard);
+    sendRequest();
+}
+
 
 void GameCycle::pass(Player* player)
 {
@@ -148,27 +204,27 @@ void GameCycle::pass(Player* player)
     if (m_state != GAMEPLAYSTATE_RESPONSE)
         throw BadGameStateException();
 
-    mp_reactionCard->respondPass();
+    mp_reactionHandler->respondPass();
     sendRequest();
 }
 
 
-void GameCycle::setResponseMode(ReactionCard* reactionCard, Player* player)
+void GameCycle::setResponseMode(ReactionHandler* reactionHandler, Player* player)
 {
-    mp_reactionCard = reactionCard;
-    if (mp_requestedPlayer != player || m_state != GAMEPLAYSTATE_RESPONSE) {
-        mp_requestedPlayer = player;
-        m_state = GAMEPLAYSTATE_RESPONSE;
-        announceContextChange();
-    }
+    Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
+    m_lastState = m_state;
+    mp_reactionHandler = reactionHandler;
+    mp_requestedPlayer = player;
+    m_state = GAMEPLAYSTATE_RESPONSE;
+    announceContextChange();
 }
 
 
 void GameCycle::unsetResponseMode()
 {
-    mp_reactionCard = 0;
+    mp_reactionHandler = 0;
     mp_requestedPlayer = mp_currentPlayer;
-    m_state = GAMEPLAYSTATE_TURN;
+    m_state = m_lastState;
     announceContextChange();
 }
 

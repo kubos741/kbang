@@ -141,6 +141,14 @@ void ServerConnection::playCardWithPlayer(int cardId, int playerId)
     mp_parser->actionPlayCard(actionPlayCardData);
 }
 
+void ServerConnection::playCardWithCard(int cardId, int otherCardId)
+{
+    ActionPlayCardData actionPlayCardData;
+    actionPlayCardData.playedCardId = cardId;
+    actionPlayCardData.type = ActionPlayCardData::PLAYCARD_CARD;
+    actionPlayCardData.targetCardId = otherCardId;
+    mp_parser->actionPlayCard(actionPlayCardData);
+}
 
 void ServerConnection::endTurn()
 {

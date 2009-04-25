@@ -42,22 +42,44 @@ void VoidAI::requestWithAction()
     QList<PlayingCard*> hand = mp_playerCtrl->privatePlayerView().hand();
     switch(m_requestType) {
         case REQUEST_DRAW:
+        qDebug() << QString("VoidAI (%1): REQUEST_DRAW");
             // Drawing two cards
-            mp_playerCtrl->drawCard(2);
+            try {
+                mp_playerCtrl->drawCard(2);
+            } catch (BadPredrawException& e) {
+                e.debug();
+                QList<PlayingCard*> table = mp_playerCtrl->privatePlayerView().table();
+                foreach(PlayingCard* c, table) {
+                    try {
+                        qDebug() << "Trying to play some card to bypass predraw exception";
+                        mp_playerCtrl->playCard(c);
+                        return;
+                    } catch (GameException& e) {
+                        qDebug() << "Predraw exception test exception:";
+                        e.debug();
+                    }
+                }
+            }
             break;
         case REQUEST_PLAY: {
-
+            qDebug() << QString("VoidAI (%1): REQUEST_PLAY");
             // Try to use blue cards:
             foreach (PlayingCard* card, hand) {
                 try {
                     switch(card->type()) {
                         case CARD_APPALOSSA:
-                        //case CARD_MUSTANG:
+                        case CARD_MUSTANG:
                         case CARD_VOLCANIC:
                         case CARD_SCHOFIELD:
                         case CARD_REMINGTON:
                         case CARD_CARABINE:
                         case CARD_WINCHESTER:
+                        case CARD_DILIGENZA:
+                        case CARD_WELLSFARGO:
+                        case CARD_INDIANS:
+                        case CARD_GATLING:
+                        case CARD_GENERALSTORE:
+                        case CARD_DYNAMITE:
                             mp_playerCtrl->playCard(card);
                             return;
                         case CARD_BEER:
@@ -69,32 +91,35 @@ void VoidAI::requestWithAction()
                         default:
                             break;
                     }
-                } catch (BadGameStateException e)  {
+                } catch (GameException& e)  {
+                    qDebug() << "VoidAI: (checkpoint #1)";
+                    e.debug();
                 }
             }
-
-            // If have bang, tries to play it
-            try {
-
-                foreach (PlayingCard* c, hand) {
-                    CardBang* bang = qobject_cast<CardBang*>(c);
-                    if (bang == 0) continue;
-
-                    QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().neighbors(
-                                &mp_playerCtrl->privatePlayerView(), 1);
-                    int size = players.size();
-                    qDebug() << "Selecting from " << size << " targets!";
-                    if (size > 0) {
-                        int targetId = rand() % size;
-                        const PublicPlayerView* p = players[targetId];
-                        mp_playerCtrl->playCard(bang, p);
-                        return;
+            foreach (PlayingCard* card, hand) {
+                try {
+                    switch(card->type()) {
+                        case CARD_BANG:
+                        case CARD_DUEL:
+                        {
+                            QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().publicPlayerList();
+                            shuffleList(players);
+                            foreach(const PublicPlayerView* p, players) {
+                                try {
+                                    mp_playerCtrl->playCard(card, p);
+                                    return;
+                                } catch (BadTargetPlayerException e) {
+                                    qDebug() << "VoidAI: BadTargetPlayerException!";
+                                } catch (OneBangPerTurnException e) {
+                                    qDebug() << "VoidAI: One bang per turn!";
+                                }
+                            }
+                        }
                     }
+                } catch (GameException& e) {
+                    qDebug() << "VoidAI: (checkpoint #2)";
+                    e.debug();
                 }
-            } catch (OneBangPerTurnException e) {
-                qDebug() << "VoidAI: One bang per turn!";
-            } catch (BadPlayerException e) {
-                qDebug() << "VoidAI: Bad player exception!";
             }
 
             // Finish turn or discard random card
@@ -110,20 +135,35 @@ void VoidAI::requestWithAction()
             break;
         }
         case REQUEST_RESPOND: {
+            if (mp_playerCtrl->publicGameView().selection().size() > 0) {
+                QList<PlayingCard*> cards = mp_playerCtrl->publicGameView().selection();
+                int index = rand() % cards.size();
+                mp_playerCtrl->playCard(cards[index]);
+                return;
+            }
+            qDebug() << QString("VoidAI (%1): REQUEST_RESPOND");
             QList<PlayingCard*> cards = mp_playerCtrl->privatePlayerView().hand();
             foreach (PlayingCard* c, cards) {
                 try {
-                    CardMissed* missed = qobject_cast<CardMissed*>(c);
-                    if (missed == 0) continue;
-                    qDebug() << QString("VoidAI (%1): Trying to play Missed").arg(m_id);
-                    mp_playerCtrl->playCard(missed);
+                    qDebug() << "Trying to play: " << PlayingCardTypeToString(c->type());
+                    mp_playerCtrl->playCard(c);
                     return;
                 } catch (BadCardException e) {
-                    qDebug() << QString("VoidAI (%1): BadCardException (missed)").arg(m_id);
+                    qDebug() << QString("VoidAI (%1): Respond: BadCardException").arg(m_id);
+                } catch (BadPlayerException e) {
+                    qDebug() << QString("VoidAI (%1): Respond: BadPlayerException").arg(m_id);
+                } catch (GameException& e) {
+                    qDebug("VoidAI");
+                    e.debug();
                 }
             }
             qDebug() << QString("VoidAI (%1): Trying to pass").arg(m_id);
-            mp_playerCtrl->pass();
+            try {
+                mp_playerCtrl->pass();
+            } catch (GameException& e) {
+                qDebug("Pass exception:");
+                e.debug();
+            }
 
 
             return;

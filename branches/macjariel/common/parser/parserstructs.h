@@ -241,5 +241,7 @@ PlayerRole StringToPlayerRole(const QString& s);
 QString PlayerRoleToString(const PlayerRole& r);
 
 
+QString GamePlayStateToString(const GamePlayState& s);
+QString PlayingCardTypeToString(const PlayingCardType& c);
 
 #endif

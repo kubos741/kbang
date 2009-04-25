@@ -72,6 +72,24 @@ GameTable* PlayingCard::gameTable() const
     return &mp_game->gameTable();
 }
 
+GameCycle* PlayingCard::gameCycle() const
+{
+    return &mp_game->gameCycle();
+}
+
+void PlayingCard::assertInHand() const
+{
+    if (pocket() != POCKET_HAND)
+        throw BadCardException();
+}
+
+void PlayingCard::assertOnTable() const
+{
+    if (pocket() != POCKET_TABLE)
+        throw BadCardException();
+}
+
+
 void PlayingCard::setType(PlayingCardType type)
 {
     m_type = type;

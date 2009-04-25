@@ -45,11 +45,13 @@ Player::Player(Game* game,
         m_distanceIn(0),
         m_distanceOut(0),
         m_lastBangTurn(-1),
+        m_unlimitedBangs(0),
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
     mp_playerCtrl = new PlayerCtrl(this);
     mp_gameEventHandler->onPlayerInit(mp_playerCtrl);
+    m_predrawChecks.append(0);
 }
 
 
@@ -79,40 +81,42 @@ bool Player::hasIdenticalCardOnTable(PlayingCard* card) const
 
 bool Player::canPlayBang() const
 {
-    return (m_lastBangTurn != mp_game->gameCycle().turnNumber());
+    return (m_unlimitedBangs > 0 || m_lastBangTurn != mp_game->gameCycle().turnNumber());
 }
 
-void Player::modifyLifePoints(int x, bool preventDeath)
+void Player::modifyLifePoints(int x, Player* shooter, bool disableBeerRescue)
 {
     int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
     if (m_lifePoints > m_maxLifePoints)
         m_lifePoints = m_maxLifePoints;
 
-    if (m_lifePoints < 0)
-        m_lifePoints = 0;
-
-    if (oldLifePoints == m_lifePoints)
-        return;
-
-    foreach (Player* p, mp_game->playerList()) {
-        p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
+    if (oldLifePoints != m_lifePoints) {
+        foreach (Player* p, mp_game->playerList()) {
+            p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
+        }
     }
-    if (m_lifePoints == 0 && !preventDeath) {
-        mp_game->buryPlayer(this);
+    if (m_lifePoints <= 0) {
+        if (disableBeerRescue) 
+            mp_game->buryPlayer(this, shooter);
+        else
+            mp_game->beerRescue()->allowSaveWithBeer(shooter, this, 1 - m_lifePoints);
     }
 }
 
 void Player::modifyDistanceIn(int delta)
 {
     m_distanceIn += delta;
-    // todo - tell game to invalidate cache
 }
 
 void Player::modifyDistanceOut(int delta)
 {
     m_distanceOut += delta;
-    // todo - tell game to invalidate cache
+}
+
+void Player::modifyUnlimitedBangs(int delta)
+{
+    m_unlimitedBangs += delta;
 }
 
 void Player::setWeaponRange(int weaponRange)
@@ -145,6 +149,13 @@ bool Player::removeCardFromHand(PlayingCard* card)
     return m_hand.removeOne(card);
 }
 
+PlayingCard* Player::getRandomCardFromHand()
+{
+    int size = m_hand.size();
+    if (size == 0) return 0;
+    return m_hand[rand() % size];
+}
+
 bool Player::removeCardFromTable(PlayingCard* card)
 {
     return m_table.removeOne(card);
@@ -171,10 +182,36 @@ void Player::setRole(const PlayerRole& role)
 //        m_lifePoints = 1;
 }
 
+void Player::registerPredrawCheck(int priority)
+{
+    m_predrawChecks.append(priority);
+    qSort(m_predrawChecks.begin(), m_predrawChecks.end());
+}
+
+void Player::unregisterPredrawCheck(int priority)
+{
+    m_predrawChecks.removeAll(priority);
+}
+
+void Player::predrawCheck(int checkId)
+{
+    if (m_currentPredraw != checkId)
+        throw BadPredrawException();
+    if (checkId == 0)
+        return;
+    int index = m_predrawChecks.indexOf(checkId);
+    Q_ASSERT(index > 0);
+    m_currentPredraw = m_predrawChecks[index - 1];
+}
 
 void Player::onBangPlayed()
 {
     m_lastBangTurn = mp_game->gameCycle().turnNumber();
+}
+
+void Player::onTurnStart()
+{
+    m_currentPredraw = m_predrawChecks.last();
 }
 
 

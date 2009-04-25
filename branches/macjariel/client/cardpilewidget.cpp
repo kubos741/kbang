@@ -33,7 +33,6 @@ CardPileWidget::CardPileWidget(QWidget *parent):
 {
     setMinimumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
     setMaximumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
-    setStyleSheet("background-color: rgba(0, 0, 0, 64);");
 }
 
 

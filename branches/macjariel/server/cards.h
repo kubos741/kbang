@@ -22,9 +22,17 @@
 #define CARDS_H
 
 #include "cardbang.h"
+#include "cardduel.h"
+#include "carddynamite.h"
 #include "cardmissed.h"
 #include "cardbeer.h"
+#include "carddrawcards.h"
+#include "cardgeneralstore.h"
+#include "cardjail.h"
 #include "cardhorse.h"
+#include "cardmultishoot.h"
+#include "cardtaker.h"
 #include "weaponcard.h"
+
 
 #endif

@@ -37,6 +37,13 @@ CardBang::~CardBang()
 
 void CardBang::play(Player *targetPlayer)
 {
+    gameCycle()->assertTurn();
+    assertInHand();
+
+    /* don't allow shoot yourself */
+    if (owner() == targetPlayer)
+        throw BadTargetPlayerException();
+
     /* distance check */
     if (game()->getDistance(owner(), targetPlayer) > owner()->weaponRange())
         throw PlayerOutOfRangeException();
@@ -46,6 +53,7 @@ void CardBang::play(Player *targetPlayer)
         throw OneBangPerTurnException();
 
     owner()->onBangPlayed();
+    mp_attackingPlayer = owner();
     gameTable()->playCard(this);
     game()->gameCycle().setResponseMode(this, targetPlayer);
     mp_attackedPlayer = targetPlayer;
@@ -55,25 +63,29 @@ void CardBang::respondPass()
 {
     Q_ASSERT(mp_attackedPlayer != 0);
     /// @todo announce pass
-    mp_attackedPlayer->modifyLifePoints(-1);
     game()->gameCycle().unsetResponseMode();
+    mp_attackedPlayer->modifyLifePoints(-1, mp_attackingPlayer);
+
 }
 
 void CardBang::respondCard(PlayingCard* targetCard)
 {
+    targetCard->assertInHand();
     switch(targetCard->type()) {
     case CARD_MISSED:
-        gameTable()->playCard(targetCard);
         game()->gameCycle().unsetResponseMode();
+        gameTable()->playCard(targetCard);
+
         return;
-    case CARD_BEER:
+/*    case CARD_BEER:
         if (mp_attackedPlayer->lifePoints() == 1) {
-            mp_attackedPlayer->modifyLifePoints(-1);
+            mp_attackedPlayer->modifyLifePoints(-1, mp_attackingPlayer, 1);
             gameTable()->playCard(targetCard);
-            mp_attackedPlayer->modifyLifePoints(1);
+            mp_attackedPlayer->modifyLifePoints(1, mp_attackingPlayer, 1);
             game()->gameCycle().unsetResponseMode();
+            return;
         }
-        return;
+*/
     default:
         break;
     }

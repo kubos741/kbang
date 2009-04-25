@@ -38,6 +38,18 @@ void GameTable::drawCard(Player *player, int count, bool revealCard)
     }
 }
 
+bool GameTable::checkCard(Player* player, PlayingCard* card, bool (*checkFunc)(PlayingCard*))
+{
+    PlayingCard* checkedCard = popCardFromDeck();
+    m_graveyard.push_back(checkedCard);
+    checkedCard->setOwner(0);
+    checkedCard->setPocket(POCKET_GRAVEYARD);
+    bool checkResult = (*checkFunc)(checkedCard);
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayerCheckedCard(player->id(), card, checkedCard, checkResult);
+    return checkResult;
+}
+
 void GameTable::playerDiscardCard(PlayingCard* card)
 {
     Player* owner = card->owner();
@@ -45,6 +57,9 @@ void GameTable::playerDiscardCard(PlayingCard* card)
         owner->removeCardFromHand(card);
     } else if (card->pocket() == POCKET_TABLE) {
         owner->removeCardFromTable(card);
+        TableCard* tableCard = qobject_cast<TableCard*>(card);
+        Q_ASSERT(tableCard != 0);
+        tableCard->unregisterPlayer(owner);
     } else if (card->pocket() == POCKET_SELECTION && card->owner() != 0) {
         owner->removeCardFromSelection(card);
     } else {
@@ -73,17 +88,74 @@ void GameTable::playCard(PlayingCard* card)
 void GameTable::playOnTable(TableCard* card, Player* targetPlayer)
 {
     Player* owner = card->owner();
+    PocketType pocketFrom = card->pocket();
     if (targetPlayer == 0)
         targetPlayer = owner;
-    owner->removeCardFromHand(card);
+
+    if (card->pocket() == POCKET_HAND) {
+        owner->removeCardFromHand(card);
+    } else if (card->pocket() == POCKET_TABLE) {
+        owner->removeCardFromTable(card);
+        card->unregisterPlayer(owner);
+    }
+
     targetPlayer->appendCardToTable(card);
     card->setOwner(targetPlayer);
     card->setPocket(POCKET_TABLE);
     card->registerPlayer(targetPlayer);
 
     foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerPlayedOnTable(owner->id(), card);
-        // TODO - onPlayerPlayedOnTable(player, card, targetPlayer)
+        p->gameEventHandler()->onPlayerPlayedOnTable(owner->id(), pocketFrom, card, targetPlayer->id());
+}
+
+void GameTable::stealCard(PlayingCard* card, Player* stealer)
+{
+    PocketType pocketFrom = card->pocket();
+    Player* owner = card->owner();
+    if (card->pocket() == POCKET_HAND) {
+        owner->removeCardFromHand(card);
+    } else if (card->pocket() == POCKET_TABLE) {
+        owner->removeCardFromTable(card);
+        TableCard* tableCard = qobject_cast<TableCard*>(card);
+        Q_ASSERT(tableCard != 0);
+        tableCard->unregisterPlayer(owner);
+    } else {
+        NOT_REACHED();
+    }
+    stealer->appendCardToHand(card);
+    card->setOwner(stealer);
+    card->setPocket(POCKET_HAND);
+
+    foreach(Player* p, mp_game->playerList()) {
+        PlayingCard* c = (pocketFrom == POCKET_TABLE) ? card : 0;
+        if (!c && (p == owner || p == stealer))
+            c = card;
+        p->gameEventHandler()->onPlayerStealedCard(stealer->id(), owner->id(), pocketFrom, c);
+    }
+}
+
+void GameTable::drawIntoPublicSelection(int count)
+{
+    for(int i = 0; i < count; ++i)
+    {
+        PlayingCard* card = popCardFromDeck();
+        m_selection.append(card);
+        card->setOwner(0);
+        card->setPocket(POCKET_SELECTION);
+
+        foreach(Player* p, mp_game->playerList())
+            p->gameEventHandler()->onDrawIntoSelection(card);
+    }
+}
+
+void GameTable::drawFromPublicSelection(Player* player, PlayingCard* card)
+{
+    m_selection.removeAll(card);
+    player->appendCardToHand(card);
+    card->setOwner(player);
+    card->setPocket(POCKET_HAND);
+    foreach(Player* p, mp_game->playerList())
+        p->gameEventHandler()->onPlayerDrawedFromSelection(player->id(), card);
 }
 
 void GameTable::generateCards(CardFactory* cardFactory)

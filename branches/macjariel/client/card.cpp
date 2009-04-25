@@ -73,9 +73,22 @@ void Card::loadDefaultRuleset()
     new Card("Bang!",       CARD_BANG,       "gfx/cards/bang.png");
     new Card("Mancato",     CARD_MISSED,     "gfx/cards/missed.png");
     new Card("Birra",       CARD_BEER,       "gfx/cards/beer.png");
+    new Card("Saloon",      CARD_SALOON,     "gfx/cards/saloon.png");
+    new Card("Wells Fargo", CARD_WELLSFARGO,  "gfx/cards/wellsfargo.png");
+    new Card("Diligenza",   CARD_DILIGENZA,   "gfx/cards/diligenza.png");
+    new Card("Emporio",     CARD_GENERALSTORE,"gfx/cards/emporio.png");
+    new Card("Panico!",     CARD_PANIC,       "gfx/cards/panico.png");
+    new Card("Cat Balou",   CARD_CATBALOU,    "gfx/cards/catbalou.png");
+    new Card("Indiani!",    CARD_INDIANS,     "gfx/cards/indians.png");
+    new Card("Duello",      CARD_DUEL,        "gfx/cards/duel.png");
+    new Card("Gatling",     CARD_GATLING,     "gfx/cards/gatling.png");
+
     new Card("Mustang",     CARD_MUSTANG,    "gfx/cards/mustang.png");
     new Card("Appaloosa",   CARD_APPALOSSA,  "gfx/cards/appaloosa.png");
-    new Card("Barrel",      CARD_BARREL,     "gfx/cards/barrel.png");
+    new Card("Barile",      CARD_BARREL,     "gfx/cards/barrel.png");
+    new Card("Dinamite",    CARD_DYNAMITE,   "gfx/cards/dynamite.png");
+    new Card("Prigione",    CARD_JAIL,       "gfx/cards/jail.png");
+
 
     new Card("Volcanic",    CARD_VOLCANIC,   "gfx/cards/volcanic.png");
     new Card("Schofield",   CARD_SCHOFIELD,  "gfx/cards/schofield.png");

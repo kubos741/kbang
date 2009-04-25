@@ -4,8 +4,8 @@
 #include "player.h"
 #include "playerctrl.h"
 #include "gameeventhandler.h"
-
-
+#include "gametable.h"
+#include "playingcard.h"
 
 
 PlayerCtrl::PlayerCtrl(Player* player):
@@ -44,11 +44,19 @@ void PlayerCtrl::playCard(PlayingCard* card)
     mp_player->game()->gameCycle().playCard(mp_player, card);
 }
 
+
 void PlayerCtrl::playCard(PlayingCard* card, const PublicPlayerView* targetPlayer)
 {
     mp_player->game()->gameCycle().playCard(mp_player,
                                             card,
                                             Player::player(targetPlayer));
+}
+
+void PlayerCtrl::playCard(PlayingCard* card, PlayingCard* targetCard)
+{
+    mp_player->game()->gameCycle().playCard(mp_player,
+                                            card,
+                                            targetCard);
 }
 
 
@@ -59,6 +67,24 @@ void PlayerCtrl::pass()
 
 
 
+PlayingCard* PlayerCtrl::card(int cardId) const
+{
+    PlayingCard* c = mp_player->game()->gameTable().card(cardId);
+    if (c == 0)
+        return c;
+
+    if (c->pocket() == POCKET_TABLE)
+        return c;
+
+    if (c->pocket() == POCKET_SELECTION &&
+        (c->owner() == 0 || c->owner() == mp_player))
+        return c;
+
+    if (c->pocket() == POCKET_HAND &&
+        c->owner() == mp_player)
+        return c;
+    return 0;
+}
 
 
 const PublicGameView& PlayerCtrl::publicGameView() const

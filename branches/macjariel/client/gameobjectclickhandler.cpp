@@ -30,26 +30,46 @@ void GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
     }
 
     if (m_state == STATE_SELECT_PLAYER) {
-        if (cardWidget == mp_activeCard) {
-            unsetActiveCard();
-            return;
+        unsetActiveCard();
+        return;
+    } else if (m_state == STATE_SELECT_CARD) {
+        Q_ASSERT(mp_activeCard != 0);
+        if (cardWidget->pocketType() == POCKET_HAND && cardWidget->ownerId() != mp_game->playerId()) {
+            mp_game->serverConnection()->playCardWithPlayer(mp_activeCard->cardData().id, cardWidget->ownerId());
+        } else {
+            mp_game->serverConnection()->playCardWithCard(mp_activeCard->cardData().id, cardWidget->cardData().id);
         }
-        qDebug() << "card click cannot be handled now - expecting player click: " << cardWidget;
+        unsetActiveCard();
+        return;
     }
 
     if (m_state == STATE_MAIN && cardWidget->pocketType() == POCKET_DECK) {
         mp_game->serverConnection()->drawCard();
     }
 
+    if (mp_game->gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
+        mp_game->serverConnection()->playCard(cardWidget->cardData().id);
+        return;
+    }
+
+
+
     if (m_state == STATE_MAIN && cardWidget->pocketType() == POCKET_HAND && cardWidget->ownerId() == mp_game->playerId())
     {
-        onMainCardClicked(cardWidget);
-
+        onMainCardClicked(cardWidget);\
+    } else {
+        mp_game->serverConnection()->playCard(cardWidget->cardData().id);
     }
+
 }
 
 void GameObjectClickHandler::onPlayerClicked(PlayerWidget* playerWidget)
 {
+    if (!mp_game->isAbleToRequest()) {
+        qDebug() << "clicks cannot be handled now: ";
+        return;
+    }
+
     if (m_state != STATE_SELECT_PLAYER) {
         qDebug() << "player click cannot be handled now: " << playerWidget->id();
         return;
@@ -84,6 +104,7 @@ void GameObjectClickHandler::setDiscardMode(bool inDiscardMode)
 
 void GameObjectClickHandler::onMainCardClicked(CardWidget* cardWidget)
 {
+
     if (m_inDiscardMode) {
         mp_game->serverConnection()->discardCard(cardWidget->cardData().id);
         return;
@@ -91,10 +112,16 @@ void GameObjectClickHandler::onMainCardClicked(CardWidget* cardWidget)
 
     switch (cardWidget->cardData().type) {
         case CARD_BANG:
-            debug("onMainCardClicked - bang");
-            setActiveCard(cardWidget);
-            setSelectPlayerState();
-            break;
+        case CARD_DUEL:
+        case CARD_JAIL:
+                setActiveCard(cardWidget);
+                m_state = STATE_SELECT_PLAYER;
+                break;
+        case CARD_PANIC:
+        case CARD_CATBALOU:
+                setActiveCard(cardWidget);
+                m_state = STATE_SELECT_CARD;
+                break;
         default:
             debug("onMainCardClicked - other");
             mp_game->serverConnection()->playCard(cardWidget->cardData().id);

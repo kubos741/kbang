@@ -85,6 +85,9 @@ public:
 
     GameContextData gameContextData() const;
 
+    //const PlayingCard* reactionCard() const;
+
+    QList<PlayingCard*> selection() const;
 
     /**
      * Returns the public list of players.

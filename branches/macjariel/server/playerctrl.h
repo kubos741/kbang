@@ -81,12 +81,12 @@ public slots:
      */
     void playCard(PlayingCard* card);
     void playCard(PlayingCard* card, const PublicPlayerView* player);
-
-
+    void playCard(PlayingCard* card, PlayingCard* targetCard);
     void pass();
 
-public:
 
+public:
+    PlayingCard* card(int cardId) const;
 
 
     const PublicGameView& publicGameView() const;

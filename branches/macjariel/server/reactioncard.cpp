@@ -18,12 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "reactioncard.h"
+#include "gameexceptions.h"
 
 ReactionCard::ReactionCard(Game *game, int id, PlayingCardType pocket, CardSuit suit, CardRank rank):
         PlayingCard(game, id, pocket, suit, rank)
 {
 }
 
+/*
 ReactionCard::~ReactionCard()
 {
 }
+*/

@@ -39,6 +39,7 @@ class PublicPlayerView;
 class GameInfo;
 class GameTable;
 class GameCycle;
+class BeerRescue;
 
 /**
  * The Game class represents a bang game. Because there is a lot
@@ -84,6 +85,8 @@ public:
      */
     inline int playersCount() const { return m_playerList.size(); }
 
+    int alivePlayersCount() const;
+
     /**
      * Returns the count of spectators in the game.
      */
@@ -92,6 +95,7 @@ public:
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
     inline GameCycle& gameCycle() { return *mp_gameCycle; }
     inline GameTable& gameTable() { return *mp_gameTable; }
+    inline BeerRescue* beerRescue() { return mp_beerRescue; }
 
     inline const PublicGameView& publicGameView() const
                                   { return m_publicGameView; }
@@ -149,7 +153,7 @@ public:
      */
     void removePlayer(Player* player);
 
-    void buryPlayer(Player* player);
+    void buryPlayer(Player* player, Player* killer);
 
     void winningSituation(PlayerRole winners);
 
@@ -195,6 +199,7 @@ private:
     int                 m_goodGuysCount;
     int                 m_outlawsCount;
     int                 m_renegadesCount;
+    BeerRescue*         mp_beerRescue;
 };
 
 #endif

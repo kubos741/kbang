@@ -26,6 +26,7 @@
 class Game;
 class Player;
 class GameTable;
+class GameCycle;
 
 /**
  * The PlayingCard is the base class for all playing cards. The each playing
@@ -75,9 +76,14 @@ public:
     virtual void play(Player* targetPlayer);
     virtual void play(PlayingCard* targetCard);
 
+    void assertInHand() const;
+    void assertOnTable() const;
+
+
 protected:
     Game*       game()      const { return mp_game; }
     GameTable*  gameTable() const;
+    GameCycle*  gameCycle() const;
 
 
     void setType(PlayingCardType type);

@@ -23,6 +23,8 @@
 #include "gameinfo.h"
 #include "player.h"
 #include "gamecycle.h"
+#include "gametable.h"
+#include "reactioncard.h"
 
 PublicGameView::PublicGameView(Game* game):
 mp_game(game)
@@ -62,6 +64,18 @@ StructGame PublicGameView::structGame() const
 GameContextData PublicGameView::gameContextData() const
 {
     return mp_game->gameCycle().gameContextData();
+}
+
+/*
+const PlayingCard* PublicGameView::reactionCard() const
+{
+        return qobject_cast<ReactionCard*>(mp_game->gameCycle().reactionHandler());
+}
+*/
+
+QList<PlayingCard*> PublicGameView::selection() const
+{
+    return mp_game->gameTable().selection();
 }
 
 QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const

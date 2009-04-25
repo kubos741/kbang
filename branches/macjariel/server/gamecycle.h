@@ -7,7 +7,7 @@
 class Game;
 class Player;
 class PlayingCard;
-class ReactionCard;
+class ReactionHandler;
 
 
 class GameCycle
@@ -24,6 +24,13 @@ public:
     inline bool isTurn()     const { return m_state == GAMEPLAYSTATE_TURN; }
     inline bool isResponse() const { return m_state == GAMEPLAYSTATE_RESPONSE; }
     inline bool isDiscard()  const { return m_state == GAMEPLAYSTATE_DISCARD; }
+
+    void assertDraw() const;
+    void assertTurn() const;
+    void assertResponse() const;
+    void assertDiscard() const;
+
+    inline ReactionHandler* reactionHandler() const { return mp_reactionHandler; }
 
     GameContextData gameContextData() const;
 
@@ -55,6 +62,7 @@ public:
      */
     void checkDeck(Player* player);
 
+    void skipPlayersTurn();
 
     void finishTurn(Player* player);
 
@@ -65,18 +73,20 @@ public:
 
     void playCard(Player* player, PlayingCard* card);
     void playCard(Player* player, PlayingCard* card, Player* targetPlayer);
+    void playCard(Player* player, PlayingCard* card, PlayingCard* targetCard);
     void pass(Player* player);
 
 
-    void setResponseMode(ReactionCard* reactionCard, Player* requestedPlayer);
+    void setResponseMode(ReactionHandler* reactionHandler, Player* requestedPlayer);
     void unsetResponseMode();
 
 private:
-    Game*           mp_game;
-    GamePlayState   m_state;
-    Player*         mp_currentPlayer;
-    Player*         mp_requestedPlayer;
-    ReactionCard*   mp_reactionCard;
+    Game*            mp_game;
+    GamePlayState    m_state;
+    GamePlayState    m_lastState;
+    Player*          mp_currentPlayer;
+    Player*          mp_requestedPlayer;
+    ReactionHandler* mp_reactionHandler;
 
     int     m_drawCardCount;
     int     m_drawCardMax;

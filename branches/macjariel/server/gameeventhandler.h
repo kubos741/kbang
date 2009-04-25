@@ -81,7 +81,15 @@ public:
 
     virtual void onPlayerPlayedCard(int playerId, const PlayingCard* card) = 0;
 
-    virtual void onPlayerPlayedOnTable(int playerId, const PlayingCard* card) = 0;
+    virtual void onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId) = 0;
+
+    virtual void onPlayerCheckedCard(int playerId, const PlayingCard* card, const PlayingCard* checkedCard, bool checkResult) = 0;
+
+    virtual void onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card) = 0;
+
+    virtual void onDrawIntoSelection(const PlayingCard* card) = 0;
+
+    virtual void onPlayerDrawedFromSelection(int playerId, const PlayingCard* card) = 0;
 
     virtual void onPlayedCardsCleared() = 0;
 
@@ -91,7 +99,7 @@ public:
 
     virtual void onActionRequest(ActionRequestType requestType) = 0;
 
-    virtual ~GameEventHandler() {};
+    virtual ~GameEventHandler() {}
 };
 
 
