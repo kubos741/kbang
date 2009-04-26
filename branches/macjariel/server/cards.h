@@ -21,7 +21,9 @@
 #ifndef CARDS_H
 #define CARDS_H
 
+
 #include "cardbang.h"
+#include "cardbarrel.h"
 #include "cardduel.h"
 #include "carddynamite.h"
 #include "cardmissed.h"

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "cardmovementevent.h"
 
+
 #include <QtCore>
 #include <QtDebug>
 
@@ -35,8 +36,8 @@ using namespace client;
 //const double    pixelsPerTick   = 24;
 
 // DEBUG FAST VALUES
-const int       tickTime        = 10;
-const double    pixelsPerTick   = 100;
+const int       tickTime        = 20;
+const double    pixelsPerSecond = 1000;
 
 QBasicTimer CardMovementEvent:: sm_timer;
 
@@ -167,20 +168,19 @@ void CardMovementEvent::startTransition()
     m_destPos = mp_destPocket->mapTo(mp_game->mainWidget(), mp_destPocket->newCardPosition());
     m_length  = sqrt(pow(m_destPos.x() - m_srcPos.x(), 2) + pow(m_destPos.y() - m_srcPos.y(), 2));
     mp_card->setShadowMode();
+    m_time.start();
     sm_timer.start(tickTime, this);
 }
 
 void CardMovementEvent::timerEvent(QTimerEvent*)
 {
-    m_tick++;
-    qreal progress = (m_tick * pixelsPerTick) / m_length;
+    qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / m_length;
     if (progress >= 1) {
         stopTransition();
     } else {
         m_currPos = m_srcPos + (m_destPos - m_srcPos) * progress;
         mp_card->move(m_currPos);
     }
-    mp_card->repaint();
 }
 
 void CardMovementEvent::stopTransition()

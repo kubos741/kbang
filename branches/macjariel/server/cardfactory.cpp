@@ -102,6 +102,8 @@ struct CardFactory::CardFactoryImp
         list.append(new CardTaker(game, id(), CardTaker::CatBalou, SUIT_DIAMONDS, 11));
         list.append(new CardTaker(game, id(), CardTaker::CatBalou, SUIT_HEARTS,   13));
 
+        list.append(new CardBarrel(game, id(), SUIT_SPADES, 12));
+        list.append(new CardBarrel(game, id(), SUIT_SPADES, 13));
 
         foreach(PlayingCard* card, list) {
             res[card->id()] = card;

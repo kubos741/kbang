@@ -23,6 +23,7 @@
 #include "gameexceptions.h"
 #include "gametable.h"
 #include "game.h"
+#include "cardbarrel.h"
 
 CardBang::CardBang(Game* game, int id, CardSuit cardSuit, CardRank cardRank):
         ReactionCard(game, id, CARD_BANG, cardSuit, cardRank),
@@ -70,22 +71,20 @@ void CardBang::respondPass()
 
 void CardBang::respondCard(PlayingCard* targetCard)
 {
-    targetCard->assertInHand();
     switch(targetCard->type()) {
     case CARD_MISSED:
+        targetCard->assertInHand();
         game()->gameCycle().unsetResponseMode();
         gameTable()->playCard(targetCard);
-
         return;
-/*    case CARD_BEER:
-        if (mp_attackedPlayer->lifePoints() == 1) {
-            mp_attackedPlayer->modifyLifePoints(-1, mp_attackingPlayer, 1);
-            gameTable()->playCard(targetCard);
-            mp_attackedPlayer->modifyLifePoints(1, mp_attackingPlayer, 1);
+    case CARD_BARREL: {
+        targetCard->assertOnTable();
+        CardBarrel* barrel = qobject_cast<CardBarrel*>(targetCard);
+        if (barrel->check()) {
             game()->gameCycle().unsetResponseMode();
-            return;
         }
-*/
+        return;
+        }
     default:
         break;
     }

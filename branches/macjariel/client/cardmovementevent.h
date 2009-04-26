@@ -28,7 +28,7 @@
 #include <QPointer>
 #include <QWidget>
 #include <QBasicTimer>
-
+#include <QTime>
 
 #include "parser/parserstructs.h"
 #include "gameevent.h"
@@ -85,6 +85,7 @@ private:
     int                 m_tick;
     bool                m_cardAndPocketIsSet;
     static QBasicTimer  sm_timer;
+    QTime               m_time;
 };
 }
 #endif

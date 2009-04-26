@@ -183,7 +183,7 @@ void Game::removePlayer(Player* player)
 
 void Game::buryPlayer(Player* player, Player* killer)
 {
-    Q_ASSERT(player->lifePoints() == 0);
+    Q_ASSERT(player->lifePoints() <= 0);
     Q_ASSERT(player->isAlive());
     player->setAlive(0);
 

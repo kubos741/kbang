@@ -48,6 +48,7 @@ void GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
     }
 
     if (mp_game->gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
+        qDebug() << "Playing response";
         mp_game->serverConnection()->playCard(cardWidget->cardData().id);
         return;
     }

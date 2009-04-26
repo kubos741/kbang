@@ -118,12 +118,12 @@ void CardWidget::paintEvent(QPaintEvent *event)
             painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
         }
     } else {
-        //QLabel::paintEvent(event);
+        QLabel::paintEvent(event);
 
 
-        QPainter painter(this);
+        //QPainter painter(this);
         //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,255)));
-        painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
+        //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
     }
 }
 

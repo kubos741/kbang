@@ -80,6 +80,7 @@ void VoidAI::requestWithAction()
                         case CARD_GATLING:
                         case CARD_GENERALSTORE:
                         case CARD_DYNAMITE:
+                        case CARD_BARREL:
                             mp_playerCtrl->playCard(card);
                             return;
                         case CARD_BEER:
@@ -101,6 +102,9 @@ void VoidAI::requestWithAction()
                     switch(card->type()) {
                         case CARD_BANG:
                         case CARD_DUEL:
+                        case CARD_JAIL:
+                        case CARD_PANIC:
+                        case CARD_CATBALOU:
                         {
                             QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().publicPlayerList();
                             shuffleList(players);

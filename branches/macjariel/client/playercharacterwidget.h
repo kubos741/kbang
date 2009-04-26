@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QTime>
 #include <QSize>
 #include "cardwidget.h"
 
@@ -64,6 +65,7 @@ signals:
 private:
     QString m_character;
     int m_lifePoints;
+    int m_sourceY;
     int m_targetY;
 
     CardWidget* mp_backCard;
@@ -76,6 +78,7 @@ private:
     //QSize         m_sizeHint;
 
     CardWidgetFactory*  mp_cardWidgetFactory;
+    QTime         m_time;
 };
 
 }
