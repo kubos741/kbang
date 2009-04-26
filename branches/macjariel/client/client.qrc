@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/misc" >
+        <file>gfx/misc/background.png</file>
+        <file>gfx/misc/sheriff-badge.png</file>
+    </qresource>
+    <qresource prefix="/icons" >
+        <file>gfx/icons/icon-connect.svg</file>
+    </qresource>
+</RCC>
