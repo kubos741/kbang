@@ -16,34 +16,73 @@ class GameTable
 public:
     GameTable(Game* game);
 
-    /**
-     * The player obtains certain number of cards from the deck.
-     * \param player    Target player
-     * \param count     The count of cards
-     */
-    void drawCard(Player* player, int count = 1, bool revealCard = 0);
-
-    bool checkCard(Player* player, PlayingCard* card, bool (*checkFunc)(PlayingCard*));
 
     /**
-     * The player discards the specified card. The card can be in the player's
-     * hand, table or selection.
+     * Player draws specified amount of cards to his hands. If revealCards
+     * is set, the other players can see the cards.
      */
-    void playerDiscardCard(PlayingCard* card);
+    void playerDrawFromDeck(Player*, int count = 1, bool revealCards = 0);
 
     /**
-     * Player moves a card from his hand/table to the playedCards list.
+     * Card's owner discards a specified card. The card must be either in
+     * player's hand or on player's table.
      */
-    void playCard(PlayingCard* card);
+    void playerDiscardCard(PlayingCard*);
 
-    void playOnTable(TableCard* card, Player* targetPlayer = 0);
+    /**
+     * Card's owner plays a card (puts it into graveyard) without specifying any target.
+     */
+    void playerPlayCard(PlayingCard*);
 
-    void stealCard(PlayingCard* card, Player* stealer);
+    /**
+     * Card's owner plays a card (puts it into graveyard) with specifying target player.
+     */
+    void playerPlayCard(PlayingCard*, Player* targetPlayer);
 
+    /**
+     * Card's owner plays a card (puts it into graveyard) with specifying target card.
+     */
+    void playerPlayCard(PlayingCard*, PlayingCard* targetCard);
 
-    void drawIntoPublicSelection(int cardCount);
+    /**
+     * Card's owner plays a card on his (or other player's) table. If targetPlayer is
+     * not NULL, the card is played on that player's table (e.g. Jail).
+     */
+    void playerPlayCardOnTable(TableCard*, Player* targetPlayer = 0);
 
-    void drawFromPublicSelection(Player* player, PlayingCard* card);
+    /**
+     * The specified card is passed to the table of targetPlayer. The specified
+     * card must be already on table. (e.g. used by Dynamite passing)
+     */
+    void passTableCard(TableCard*, Player* targetPlayer);
+
+    /**
+     * The specified amount of cards is drawn to the card selection. If selectionOwner
+     * is NULL, the cards are revealed to everyone. Otherwise only for that player.
+     */
+    void drawIntoSelection(int count, Player* selectionOwner = 0);
+
+    /**
+     * The player picks a card from selection.
+     */
+    void playerPickFromSelection(Player*, PlayingCard*);
+
+    /**
+     * The player checks the deck and returns the result.
+     */
+    bool playerCheckDeck(Player*, PlayingCard* reasonCard, bool (*checkFunc)(PlayingCard*));
+
+    /**
+     * The player steals a card from other player.
+     */
+    void playerStealCard(Player*, PlayingCard*);
+
+    /**
+     * The target card is canceled. If player is not NULL,
+     * he is the one that initiated the cancelation.
+     */
+    void cancelCard(PlayingCard*, Player* player = 0);
+
 
     PlayingCard* card(int cardId) const {
         return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
@@ -56,15 +95,14 @@ private:
     void shuffleDeck();
     void dealCards();
     void regenerateDeck();
-
+    void moveCardToGraveyard(PlayingCard*);
     inline PlayingCard* popCardFromDeck();
-    inline void putCardToGraveyard(PlayingCard* card);
-
+    inline void putCardToGraveyard(PlayingCard*);
 
 protected:
    /**
-     * Prepares the game.
-     */
+    * Prepares the game.
+    */
     void prepareGame(CardFactory*);
 
 private:

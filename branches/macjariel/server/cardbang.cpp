@@ -55,7 +55,7 @@ void CardBang::play(Player *targetPlayer)
 
     owner()->onBangPlayed();
     mp_attackingPlayer = owner();
-    gameTable()->playCard(this);
+    gameTable()->playerPlayCard(this, targetPlayer);
     game()->gameCycle().setResponseMode(this, targetPlayer);
     mp_attackedPlayer = targetPlayer;
 }
@@ -75,7 +75,7 @@ void CardBang::respondCard(PlayingCard* targetCard)
     case CARD_MISSED:
         targetCard->assertInHand();
         game()->gameCycle().unsetResponseMode();
-        gameTable()->playCard(targetCard);
+        gameTable()->playerPlayCard(targetCard);
         return;
     case CARD_BARREL: {
         targetCard->assertOnTable();

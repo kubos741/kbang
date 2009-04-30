@@ -19,8 +19,8 @@ void CardGeneralStore::play()
     assertInHand();
     mp_firstPlayer = owner();
     mp_currentPlayer = 0;
-    gameTable()->playCard(this);
-    gameTable()->drawIntoPublicSelection(game()->alivePlayersCount());
+    gameTable()->playerPlayCard(this);
+    gameTable()->drawIntoSelection(game()->alivePlayersCount());
     requestNext();
 }
 
@@ -30,7 +30,7 @@ void CardGeneralStore::respondCard(PlayingCard* targetCard)
 {
     if (targetCard->pocket() != POCKET_SELECTION)
         throw BadCardException();
-    gameTable()->drawFromPublicSelection(mp_currentPlayer,targetCard);
+    gameTable()->playerPickFromSelection(mp_currentPlayer,targetCard);
     game()->gameCycle().unsetResponseMode();
     requestNext();
 }

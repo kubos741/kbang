@@ -78,22 +78,22 @@ QList<PlayingCard*> PublicGameView::selection() const
     return mp_game->gameTable().selection();
 }
 
-QList<const PublicPlayerView*>  PublicGameView::publicPlayerList() const
+QList<PublicPlayerView*>  PublicGameView::publicPlayerList() const
 {
     return mp_game->publicPlayerList();
 }
 
-const PublicPlayerView* PublicGameView::publicPlayerView(int playerId) const
+PublicPlayerView* PublicGameView::publicPlayerView(int playerId) const
 {
     Player* player = mp_game->player(playerId);
     if (player == 0) return 0;
     return &player->publicView();
 }
 
-QList<const PublicPlayerView*> PublicGameView::neighbors(const PublicPlayerView* source, int distance) const
+QList<PublicPlayerView*> PublicGameView::neighbors(PublicPlayerView* source, int distance) const
 {
-    QList<const PublicPlayerView*> result;
-    foreach (const PublicPlayerView* p, mp_game->publicPlayerList()) {
+    QList<PublicPlayerView*> result;
+    foreach (PublicPlayerView* p, mp_game->publicPlayerList()) {
         if (p->id() == source->id()) continue;
         if (mp_game->getDistance(Player::player(source), Player::player(p)) <= distance)
             result.append(p);

@@ -92,11 +92,11 @@ public:
     /**
      * Returns the public list of players.
      */
-    QList<const PublicPlayerView*>  publicPlayerList() const;
+    QList<PublicPlayerView*>  publicPlayerList() const;
 
-    const PublicPlayerView* publicPlayerView(int playerId) const;
+    PublicPlayerView* publicPlayerView(int playerId) const;
 
-    QList<const PublicPlayerView*> neighbors(const PublicPlayerView* source, int distance) const;
+    QList<PublicPlayerView*> neighbors(PublicPlayerView* source, int distance) const;
 
 private:
     Game* mp_game;

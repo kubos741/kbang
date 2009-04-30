@@ -38,7 +38,7 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
 {
     setupUi(this);
     mp_roleCardWidget->setType(Card::Role);
-    mp_hand->setCardSize(CardWidget::SIZE_NORMAL);
+    mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
     mp_table->setCardSize(CardWidget::SIZE_SMALL);

@@ -19,22 +19,22 @@ void CardBarrel::play()
     assertInHand();
     if (owner()->hasIdenticalCardOnTable(this))
         throw TwoSameOnTableException();
-    gameTable()->playOnTable(this);
+    gameTable()->playerPlayCardOnTable(this);
 }
 
 
-void CardBarrel::registerPlayer(Player* player)
+void CardBarrel::registerPlayer(Player*)
 {
 }
 
-void CardBarrel::unregisterPlayer(Player* player)
+void CardBarrel::unregisterPlayer(Player*)
 {
 }
 
 
 bool CardBarrel::check()
 {
-    return gameTable()->checkCard(owner(), this, *CardBarrel::checkBarrel);
+    return gameTable()->playerCheckDeck(owner(), this, *CardBarrel::checkBarrel);
 }
 
 bool CardBarrel::checkBarrel(PlayingCard* card)

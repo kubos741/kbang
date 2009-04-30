@@ -36,6 +36,8 @@
 #include "gameinfo.h"
 #include "gametable.h"
 #include "gamecycle.h"
+#include "gameeventbroadcaster.h"
+#include "gamelogger.h"
 
 
 Game::Game(GameServer* parent, const StructGame& structGame):
@@ -48,7 +50,10 @@ Game::Game(GameServer* parent, const StructGame& structGame):
     mp_gameInfo = new GameInfo(structGame);
     mp_gameTable = new GameTable(this);
     mp_gameCycle = new GameCycle(this);
+    mp_gameEventBroadcaster = new GameEventBroadcaster();
     mp_beerRescue = new BeerRescue(this);
+    mp_gameLogger = new GameLogger();
+    mp_gameEventBroadcaster->registerHandler(mp_gameLogger, 0);
 }
 
 Game::~Game()
@@ -56,6 +61,8 @@ Game::~Game()
     delete mp_gameInfo;
     delete mp_gameTable;
     delete mp_gameCycle;
+    delete mp_gameEventBroadcaster;
+    delete mp_gameLogger;
 }
 
 int Game::id() const
@@ -144,9 +151,7 @@ Player* Game::createPlayer(StructPlayer structPlayer,
         mp_gameInfo->setCreatorId(m_nextUnusedPlayerId);
     }
 
-    foreach(Player* p, m_playerList) {
-        p->gameEventHandler()->onPlayerJoinedGame(newPlayer->publicView());
-    }
+    gameEventBroadcaster().onPlayerJoinedGame(newPlayer);
     checkStartable();
     return newPlayer;
 }
@@ -164,7 +169,7 @@ void Game::removePlayer(Player* player)
 
     if (player->isCreator() && m_state == StateWaitingForPlayers) {
         foreach(Player* p, m_playerList) {
-            p->gameEventHandler()->onPlayerExit();
+            p->unregisterGameEventHandler();
         }
         GameServer::instance().removeGame(this);
         return;
@@ -173,31 +178,27 @@ void Game::removePlayer(Player* player)
     m_playerList.removeAll(player);
     m_playerMap.remove(playerId);
 
-    player->gameEventHandler()->onPlayerExit();
-    foreach(Player* p, m_playerList) {
-        p->gameEventHandler()->onPlayerLeavedGame(player->publicView());
-    }
-    checkStartable();
+    player->unregisterGameEventHandler();
+    gameEventBroadcaster().onPlayerLeavedGame(player);
+    if (m_state == StateWaitingForPlayers)
+        checkStartable();
     player->deleteLater();
 }
 
-void Game::buryPlayer(Player* player, Player* killer)
+void Game::buryPlayer(Player* player, Player* causedBy)
 {
     Q_ASSERT(player->lifePoints() <= 0);
     Q_ASSERT(player->isAlive());
     player->setAlive(0);
 
     foreach(PlayingCard* card, player->hand())
-        gameTable().playerDiscardCard(card);
+        gameTable().cancelCard(card);
 
     foreach(PlayingCard* card, player->table())
-        gameTable().playerDiscardCard(card);
+        gameTable().cancelCard(card);
 
 
-    // Announce decease
-    foreach(Player* p, m_playerList) {
-        p->gameEventHandler()->onPlayerDied(player->publicView());
-    }
+    gameEventBroadcaster().onPlayerDied(player, causedBy);
 
     switch(player->role()) {
         case ROLE_SHERIFF:
@@ -214,8 +215,6 @@ void Game::buryPlayer(Player* player, Player* killer)
             NOT_REACHED();
     }
 
-
-
     /// game winning condition check
     if (player->role() == ROLE_SHERIFF) {
         if (m_outlawsCount > 0 || m_goodGuysCount > 0)
@@ -224,8 +223,8 @@ void Game::buryPlayer(Player* player, Player* killer)
             winningSituation(ROLE_RENEGADE);
     } else if (m_outlawsCount == 0 && m_renegadesCount == 0) {
             winningSituation(ROLE_SHERIFF);
-    } else if (player->role() == ROLE_OUTLAW && killer != 0) {
-            mp_gameTable->drawCard(killer, 3);
+    } else if (player->role() == ROLE_OUTLAW && causedBy != 0) {
+            mp_gameTable->playerDrawFromDeck(causedBy, 3);
     }
 }
 
@@ -253,10 +252,7 @@ void Game::startGame(Player* player)
     //setCharacters();
     setRoles();
 
-    // Announce that game started
-    foreach(Player* player, m_playerList) {
-        player->gameEventHandler()->onGameStarted();
-    }
+    gameEventBroadcaster().onGameStarted();
     mp_gameTable->prepareGame(GameServer::instance().cardFactory());
     mp_gameCycle->start();
 }
@@ -264,14 +260,8 @@ void Game::startGame(Player* player)
 
 void Game::sendMessage(Player* player, const QString& message)
 {
-    foreach(Player* p, m_playerList) {
-        p->gameEventHandler()->onIncomingMessage(player->publicView(), message);
-    }
+    gameEventBroadcaster().onChatMessage(player, message);
 }
-
-
-
-
 
 void Game::checkStartable()
 {

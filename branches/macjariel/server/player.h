@@ -69,7 +69,7 @@ public:
      * @param handler   the gameEventHandler, that will control the player
      */
     Player(Game* game, int id, const QString& name, const QString& password, GameEventHandler* handler);
-
+    ~Player();
     typedef QList<PlayingCard*> CardList;
 
   /////////////
@@ -97,8 +97,8 @@ public:
     inline int                  weaponRange()      const { return m_weaponRange;       }
     inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
 
-    inline const PublicPlayerView&  publicView()   const { return m_publicPlayerView;  }
-    inline const PrivatePlayerView& privateView()  const { return m_privatePlayerView; }
+    inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
+    inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
 
 
     /**
@@ -158,7 +158,7 @@ public:
      * @param preventDeath set to true to prevent dying (used by instantly
      *                     played beer)
      */
-    void modifyLifePoints(int lifePoints, Player* shooter, bool disableBeerRescue = 0);
+    void modifyLifePoints(int lifePoints, Player* causedBy, bool disableBeerRescue = 0);
     void modifyDistanceIn(int delta);
     void modifyDistanceOut(int delta);
     void modifyUnlimitedBangs(int delta);
@@ -198,6 +198,11 @@ public:
     void onBangPlayed();
 
     void onTurnStart();
+
+
+    void registerGameEventHandler(GameEventHandler*);
+    void unregisterGameEventHandler();
+
 
   ////////////////
  // DEPRECATED //
@@ -240,8 +245,8 @@ private:
 
     QList<int>                m_predrawChecks;
 
-    const PublicPlayerView    m_publicPlayerView;
-    const PrivatePlayerView   m_privatePlayerView;
+    mutable PublicPlayerView   m_publicPlayerView;
+    mutable PrivatePlayerView  m_privatePlayerView;
 };
 
 #endif

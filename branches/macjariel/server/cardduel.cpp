@@ -28,13 +28,14 @@ void CardDuel::play(Player* targetPlayer)
     mp_requestedPlayer = owner();
     mp_shootingPlayer  = targetPlayer;
 
-    gameTable()->playCard(this);
+    gameTable()->playerPlayCard(this, targetPlayer);
     requestNext();
 }
 
 void CardDuel::respondPass()
 {
     game()->gameCycle().unsetResponseMode();
+
     mp_requestedPlayer->modifyLifePoints(-1, mp_shootingPlayer);
 }
 
@@ -43,7 +44,7 @@ void CardDuel::respondCard(PlayingCard* targetCard)
     targetCard->assertInHand();
     switch(targetCard->type()) {
     case CARD_BANG:
-        gameTable()->playCard(targetCard);
+        gameTable()->playerPlayCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
         return;

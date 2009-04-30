@@ -29,7 +29,7 @@ void CardMultiShoot::play()
     gameCycle()->assertTurn();
     mp_shootingPlayer = owner();
     mp_requestedPlayer = owner();
-    gameTable()->playCard(this);
+    gameTable()->playerPlayCard(this);
     requestNext();
 }
 
@@ -46,7 +46,7 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
     case CARD_BANG:
         if (m_type != Indians)
             break;
-        gameTable()->playCard(targetCard);
+        gameTable()->playerPlayCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
         return;
@@ -54,7 +54,7 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
     case CARD_MISSED:
         if (m_type != Gatling)
             break;
-        gameTable()->playCard(targetCard);
+        gameTable()->playerPlayCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
         return;

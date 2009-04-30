@@ -4,6 +4,7 @@
 #include "game.h"
 #include "player.h"
 #include "gameeventhandler.h"
+#include "gameeventbroadcaster.h"
 #include "reactioncard.h"
 #include <QDebug>
 
@@ -86,10 +87,7 @@ void GameCycle::drawCard(Player* player, int numCards, bool revealCard)
         throw BadGameStateException();
     }
 
-    /// \todo Premature draw check and notification
-
-    /// Give player his cards
-    mp_game->gameTable().drawCard(player, numCards, revealCard);
+    mp_game->gameTable().playerDrawFromDeck(player, numCards, revealCard);
     m_drawCardCount += numCards;
     if (m_drawCardCount == m_drawCardMax) {
         m_state = GAMEPLAYSTATE_TURN;
@@ -153,7 +151,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     }
 
     if (isResponse()) {
-        mp_reactionHandler->respondCard(card);
+        m_reactionHandlers.head()->respondCard(card);
     } else {
         card->play();
     }
@@ -204,30 +202,41 @@ void GameCycle::pass(Player* player)
     if (m_state != GAMEPLAYSTATE_RESPONSE)
         throw BadGameStateException();
 
-    mp_reactionHandler->respondPass();
+    m_reactionHandlers.head()->respondPass();
     sendRequest();
 }
 
 
 void GameCycle::setResponseMode(ReactionHandler* reactionHandler, Player* player)
 {
-    Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
-    m_lastState = m_state;
-    mp_reactionHandler = reactionHandler;
-    mp_requestedPlayer = player;
-    m_state = GAMEPLAYSTATE_RESPONSE;
-    announceContextChange();
-}
+    if (m_reactionHandlers.isEmpty()) {
+        Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
+        m_lastState = m_state;
+    }
 
+    m_reactionHandlers.enqueue(reactionHandler);
+    m_reactionPlayers.enqueue(player);
+
+    if (m_reactionHandlers.size() == 1) {
+        mp_requestedPlayer = player;
+        m_state = GAMEPLAYSTATE_RESPONSE;
+        announceContextChange();
+    }
+}
 
 void GameCycle::unsetResponseMode()
 {
-    mp_reactionHandler = 0;
-    mp_requestedPlayer = mp_currentPlayer;
-    m_state = m_lastState;
+    Q_ASSERT(m_state == GAMEPLAYSTATE_RESPONSE);
+    m_reactionHandlers.dequeue();
+    m_reactionPlayers.dequeue();
+    if (!m_reactionHandlers.isEmpty()) {
+        mp_requestedPlayer = m_reactionPlayers.head();
+    } else {
+        mp_requestedPlayer = mp_currentPlayer;
+        m_state = m_lastState;
+    }
     announceContextChange();
 }
-
 
 void GameCycle::sendRequest()
 {
@@ -279,7 +288,5 @@ int GameCycle::needDiscard(Player* player)
 
 void GameCycle::announceContextChange()
 {
-    GameContextData aGameContextData = gameContextData();
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onGameContextChange(aGameContextData);
+    mp_game->gameEventBroadcaster().onGameContextChange(gameContextData());
 }

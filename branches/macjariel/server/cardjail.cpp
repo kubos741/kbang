@@ -21,7 +21,7 @@ void CardJail::play()
     gameCycle()->assertDraw();
     assertOnTable();
     owner()->predrawCheck(PredrawCheck);
-    bool check = gameTable()->checkCard(owner(), this, *CardJail::checkJail);
+    bool check = gameTable()->playerCheckDeck(owner(), this, *CardJail::checkJail);
     gameTable()->playerDiscardCard(this);
     if (!check) {
         gameCycle()->skipPlayersTurn();
@@ -40,7 +40,7 @@ void CardJail::play(Player* targetPlayer)
     if (targetPlayer->hasIdenticalCardOnTable(this)) {
         throw TwoSameOnTableException();
     }
-    gameTable()->playOnTable(this, targetPlayer);
+    gameTable()->playerPlayCardOnTable(this, targetPlayer);
 }
 
 void CardJail::registerPlayer(Player* player)

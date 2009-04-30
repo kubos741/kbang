@@ -174,6 +174,7 @@ void CardMovementEvent::startTransition()
 
 void CardMovementEvent::timerEvent(QTimerEvent*)
 {
+
     qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / m_length;
     if (progress >= 1) {
         stopTransition();
@@ -186,6 +187,8 @@ void CardMovementEvent::timerEvent(QTimerEvent*)
 void CardMovementEvent::stopTransition()
 {
     sm_timer.stop();
+    qDebug() << "Animation should take: " <<  (m_length * 1000 / pixelsPerSecond) <<
+     "But took: " <<  m_time.elapsed();
     mp_card->setCardData(m_cardMovementData.card);
     mp_card->validate();
     mp_card->unsetShadowMode();

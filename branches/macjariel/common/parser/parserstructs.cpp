@@ -456,6 +456,19 @@ void StructPlayer::write(QXmlStreamWriter* writer, bool writePassword) const
     writer->writeEndElement();
 }
 
+
+QString cardMovementTypeToString(const CardMovementType& c)
+{
+    if (c == CardMovementCancelCard)       return "cancel-card";
+    if (c == CardMovementDiscardCard)      return "discard-card";
+    if (c == CardMovementDrawCard)         return "draw";
+    if (p == POCKET_TABLE)      return "table";
+    if (p == POCKET_PLAYED)     return "played";
+    if (p == POCKET_SELECTION)  return "selection";
+    return "";
+}
+
+
 void CardMovementData::read(XmlNode* node)
 {
     pocketTypeFrom = stringToPocketType(node->attribute("pocketTypeFrom"));

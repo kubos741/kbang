@@ -21,7 +21,7 @@ VoidAI::VoidAI(int gameId):
 
 }
 
-void VoidAI::onPlayerInit(PlayerCtrl* playerCtrl)
+void VoidAI::onHandlerRegistered(PlayerCtrl* playerCtrl)
 {
     mp_playerCtrl = playerCtrl;
 }
@@ -106,7 +106,7 @@ void VoidAI::requestWithAction()
                         case CARD_PANIC:
                         case CARD_CATBALOU:
                         {
-                            QList<const PublicPlayerView*> players = mp_playerCtrl->publicGameView().publicPlayerList();
+                            QList<PublicPlayerView*> players = mp_playerCtrl->publicGameView().publicPlayerList();
                             shuffleList(players);
                             foreach(const PublicPlayerView* p, players) {
                                 try {
@@ -118,7 +118,10 @@ void VoidAI::requestWithAction()
                                     qDebug() << "VoidAI: One bang per turn!";
                                 }
                             }
+                            break;
                         }
+                        default:
+                            break;
                     }
                 } catch (GameException& e) {
                     qDebug() << "VoidAI: (checkpoint #2)";

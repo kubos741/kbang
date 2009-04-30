@@ -13,27 +13,35 @@ Q_OBJECT;
 public:
     VoidAI(int gameId);
     virtual ~VoidAI() {}
-    virtual void onIncomingMessage(const PublicPlayerView&, const QString&) {}
-    virtual void onPlayerInit(PlayerCtrl*);
+
+    virtual void onHandlerRegistered(PlayerCtrl* playerCtrl);
+    virtual void onHandlerUnregistered() {}
+
+    virtual void onGameStartabilityChanged(bool) {}
+
+    virtual void onChatMessage(PublicPlayerView&, const QString&) {}
     virtual void onGameSync() {}
-    virtual void onPlayerExit() {}
-    virtual void onPlayerJoinedGame(const PublicPlayerView&) {}
-    virtual void onPlayerLeavedGame(const PublicPlayerView&) {}
-    virtual void onPlayerDied(const PublicPlayerView&) {}
-    virtual void onGameStartabilityChanged(bool isStartable) { Q_UNUSED(isStartable); }
+    virtual void onPlayerJoinedGame(PublicPlayerView&) {}
+    virtual void onPlayerLeavedGame(PublicPlayerView&) {}
+    virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy) {}
     virtual void onGameStarted() {}
-    virtual void onPlayerDrawedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
-    virtual void onPlayerDiscardedCard(int playerId, PocketType, const PlayingCard*) { Q_UNUSED(playerId); }
-    virtual void onPlayerPlayedCard(int playerId, const PlayingCard*) { Q_UNUSED(playerId); }
-    virtual void onPlayerPlayedOnTable(int playerId, PocketType, const PlayingCard*, int targetPlayerId) { Q_UNUSED(playerId); }
-    virtual void onPlayerCheckedCard(int, const PlayingCard*, const PlayingCard*, bool) {}
-    virtual void onPlayerStealedCard(int, int, PocketType, const PlayingCard*) {}
-    virtual void onDrawIntoSelection(const PlayingCard*) {}
-    virtual void onPlayerDrawedFromSelection(int, const PlayingCard*) {}
-    virtual void onPlayedCardsCleared() {}
-    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints)
-                { Q_UNUSED(oldLifePoints); Q_UNUSED(newLifePoints);}
+    virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*>, bool) {}
+    virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard*, PocketType) {}
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard*) {}
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard*, PublicPlayerView&) {}
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard*, const PlayingCard*) {}
+    virtual void onPlayerPlayCardOnTable(PublicPlayerView&, const PlayingCard*, PublicPlayerView&) {}
+    virtual void onPassTableCard(PublicPlayerView&, const PlayingCard*, PublicPlayerView&) {}
+    virtual void onPlayerPass(PublicPlayerView&) {}
+    virtual void onDrawIntoSelection(QList<const PlayingCard*>) {}
+    virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard*) {}
+    virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard*, const PlayingCard*, bool) {}
+    virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView&, PocketType, const PlayingCard*) {}
+    virtual void onPlayerCancelCard(PublicPlayerView&, PocketType, const PlayingCard*, PublicPlayerView*) {}
     virtual void onGameContextChange(const GameContextData&) {}
+    virtual void onLifePointsChange(PublicPlayerView&, int, PublicPlayerView*) {}
+    virtual void onDeckRegenerate() {}
+
     virtual void onActionRequest(ActionRequestType);
 
 public slots:

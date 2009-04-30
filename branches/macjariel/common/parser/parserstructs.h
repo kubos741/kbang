@@ -193,12 +193,21 @@ struct GameSyncData {
 };
 
 
+enum CardMovementType {
+    CardMovementDrawCard,
+    CardMovementDiscardCard,
+    CardMovementPlayCard,
+    CardMovementStealCard,
+    CardMovementCancelCard
+};
+
 struct CardMovementData {
     PocketType        pocketTypeFrom;
     PocketType        pocketTypeTo;
     int               playerFrom;
     int               playerTo;
     CardData          card;
+    CardMovementType  type;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };

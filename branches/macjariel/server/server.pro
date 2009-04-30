@@ -35,7 +35,9 @@ HEADERS += player.h \
     reactionhandler.h \
     carddynamite.h \
     cardtaker.h \
-    cardbarrel.h
+    cardbarrel.h \
+    gameeventbroadcaster.h \
+    gamelogger.h
 SOURCES += main.cpp \
     player.cpp \
     gameserver.cpp \
@@ -72,7 +74,9 @@ SOURCES += main.cpp \
     reactionhandler.cpp \
     carddynamite.cpp \
     cardtaker.cpp \
-    cardbarrel.cpp
+    cardbarrel.cpp \
+    gameeventbroadcaster.cpp \
+    gamelogger.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

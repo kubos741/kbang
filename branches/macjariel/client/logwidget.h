@@ -38,6 +38,11 @@ public:
 
 public slots:
     void appendLogMessage(QString message);
+
+
+
+
+
     void appendIncomingData(const QByteArray& data);
     void appendOutgoingData(const QByteArray& data);
 

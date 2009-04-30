@@ -28,7 +28,7 @@ using namespace client;
 QTimer PlayerCharacterWidget::sm_timer;
 int    PlayerCharacterWidget::sm_countAnimaton = 0;
 
-double pixelsPerSecond =  15;
+double pixelsPerSecond =  25;
 const int timerInterval = 100;
 
 
@@ -68,11 +68,13 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
     m_lifePoints = lifePoints;
     if (oldLifePoints != m_lifePoints)
         lifePointsChanged();
+    else
+        emit animationFinished();
 }
 
 void PlayerCharacterWidget::lifePointsChanged()
 {
-    static int levels[6] = {0, 20, 33, 48, 63, 74};
+    static int levels[6] = {0, 21, 34, 49, 64, 77};
     m_sourceY = mp_characterCard->y();
     m_targetY = mp_backCard->y() + levels[m_lifePoints];
     m_time.start();

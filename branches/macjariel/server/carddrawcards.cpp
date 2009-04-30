@@ -26,6 +26,7 @@ void CardDrawCards::play()
 {
     gameCycle()->assertTurn();
     assertInHand();
-    gameTable()->playCard(this);
-    gameTable()->drawCard(owner(), m_cardCount);
+    Player* player = owner();
+    gameTable()->playerPlayCard(this);
+    gameTable()->playerDrawFromDeck(player, m_cardCount);
 }

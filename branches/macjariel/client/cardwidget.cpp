@@ -32,9 +32,10 @@ using namespace client;
 
 
 //const QSize CardWidget::sm_qsizeSmall(48, 78 );
-const QSize CardWidget::sm_qsizeSmall(50, 80);
-const QSize CardWidget::sm_qsizeNormal(70, 113);
-const QSize CardWidget::sm_qsizeBig(200, 320);
+//const QSize CardWidget::sm_qsizeSmall(50, 80);
+const QSize CardWidget::sm_qsizeSmall(55, 85);
+const QSize CardWidget::sm_qsizeNormal(80, 124);
+const QSize CardWidget::sm_qsizeBig(200, 310);
 
 //const QSize  margins(10,10);
 //const QPoint padding(5,5);
@@ -111,19 +112,84 @@ void CardWidget::validate()
 
 void CardWidget::paintEvent(QPaintEvent *event)
 {
-    if (!m_shadowMode) {
-        QLabel::paintEvent(event);
-        if (m_hasHighlight) {
-            QPainter painter(this);
-            painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
+    QLabel::paintEvent(event);
+
+    if (type() == Card::Playing && cardData().type != CARD_UNKNOWN) {
+        QPoint posRank, posSuit;
+        QColor suitColor;
+        QFont font;
+        QPainter painter(this);
+
+        if (size() == SIZE_SMALL) {
+            posRank = QPoint(6, 81);
+            font = QFont("Verdana", 7);
+        } else {
+            posRank = QPoint(8, 118);
+            font = QFont("Verdana", 10);
         }
-    } else {
-        QLabel::paintEvent(event);
+        QString textRank;
+        QChar   textSuit;
+        if (cardData().rank < 9) {
+            textRank = QString::number(cardData().rank);
+        } else if (cardData().rank == 10) {
+            textRank = "10";
+        } else if (cardData().rank == 11) {
+            textRank = "J";
+        } else if (cardData().rank == 12) {
+            textRank = "Q";
+        } else if (cardData().rank == 13) {
+            textRank = "K";
+        } else {
+            textRank = "A";
+        }
+        switch (cardData().suit) {
+            case SUIT_CLUBS:
+                textSuit = 0x2663;
+                suitColor = Qt::black;
+                break;
+            case SUIT_DIAMONDS:
+                textSuit = 0x2666;
+                suitColor = Qt::red;
+                break;
+            case SUIT_HEARTS:
+                textSuit = 0x2665;
+                suitColor = Qt::red;
+                break;
+            case SUIT_SPADES:
+                textSuit = 0x2660;
+                suitColor = Qt::black;
+                break;
+        }
 
+        QPainterPath path1;
+        QPainterPath path2;
+        //timesFont.setStyleStrategy(QFont::ForceOutline);
+        path1.addText(posRank, font, textRank);
+        posSuit = posRank + QPoint(font.pointSize() * textRank.size(), 0);
+        path2.addText(posSuit, font, textSuit);
 
-        //QPainter painter(this);
-        //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,255)));
-        //painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        painter.setPen(QPen(Qt::white, 2, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+
+        painter.setBrush(Qt::white);
+        painter.drawPath(path1);
+        painter.drawPath(path2);
+
+        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+        painter.drawPath(path1);
+        painter.setPen(QPen(suitColor, 1, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+        painter.setBrush(suitColor);
+        painter.drawPath(path2);
+
+    }
+
+    if (m_hasHighlight) {
+        QPainter painter(this);
+        painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
     }
 }
 

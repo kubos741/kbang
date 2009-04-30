@@ -275,29 +275,28 @@ void Client::startAI() {
 // The AbstractPlayerController interface //
 ////////////////////////////////////////////
 
-void Client::onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message)
+
+void Client::onHandlerRegistered(PlayerCtrl* playerCtrl)
+{
+    mp_playerCtrl = playerCtrl;
+}
+
+void Client::onHandlerUnregistered()
+{
+    mp_playerCtrl = 0;
+}
+
+void Client::onGameStartabilityChanged(bool isStartable)
+{
+    mp_parser->eventGameStartable(mp_playerCtrl->publicGameView().id(), isStartable);
+}
+
+void Client::onChatMessage(PublicPlayerView& publicPlayerView, const QString& message)
 {
     mp_parser->eventMessage(publicPlayerView.id(),
                             publicPlayerView.name(),
                             message);
 }
-
-void Client::onPlayerInit(PlayerCtrl* playerCtrl)
-{
-    mp_playerCtrl = playerCtrl;
-    /* SOME CACHING POSSIBLE HERE */
-
-
-}
-
-void Client::onPlayerExit()
-{
-    mp_playerCtrl = 0;
-    //mp_parser->eventLeaveGame(gameId, player, 0);
-    // tell client to leave game
-    /* IF CACHING, UNCACHE ASAP */
-}
-
 
 void Client::onGameSync()
 {
@@ -310,7 +309,7 @@ void Client::onGameSync()
 }
 
 
-void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
+void Client::onPlayerJoinedGame(PublicPlayerView& publicPlayerView)
 {
     int gameId = mp_playerCtrl->publicGameView().id();
     int playerId = publicPlayerView.id();
@@ -331,7 +330,7 @@ void Client::onPlayerJoinedGame(const PublicPlayerView& publicPlayerView)
 
 }
 
-void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
+void Client::onPlayerLeavedGame(PublicPlayerView& leavingPlayer)
 {
     Q_ASSERT(isInGame());
     int gameId = mp_playerCtrl->publicGameView().id();
@@ -341,7 +340,7 @@ void Client::onPlayerLeavedGame(const PublicPlayerView& leavingPlayer)
     }
 }
 
-void Client::onPlayerDied(const PublicPlayerView& player)
+void Client::onPlayerDied(PublicPlayerView& player, PublicPlayerView* causedBy)
 {
     int         playerId = player.id();
     PlayerRole  role     = player.role();
@@ -349,10 +348,6 @@ void Client::onPlayerDied(const PublicPlayerView& player)
     mp_parser->eventPlayerDied(playerId, role);
 }
 
-void Client::onGameStartabilityChanged(bool isStartable)
-{
-    mp_parser->eventGameStartable(mp_playerCtrl->publicGameView().id(), isStartable);
-}
 
 void Client::onGameStarted()
 {
@@ -367,51 +362,110 @@ void Client::onGameStarted()
     mp_parser->eventStartGame(structGame, structPlayerList);
 }
 
-void Client::onPlayerDrawedCard(int playerId, const PlayingCard* card)
+void Client::onPlayerDrawFromDeck(PublicPlayerView& player, QList<const PlayingCard*> cards, bool revealCards)
 {
-    CardMovementData x;
-    x.pocketTypeFrom = POCKET_DECK;
-    x.pocketTypeTo   = POCKET_HAND;
-    x.playerTo       = playerId;
-    if (card != 0) {
-        x.card = card->cardData();
+    foreach (const PlayingCard* card, cards) {
+        CardMovementData x;
+        x.pocketTypeFrom = POCKET_DECK;
+        x.pocketTypeTo   = POCKET_HAND;
+        x.playerTo       = player.id();
+        if (card != 0)
+            x.card = card->cardData();
+        mp_parser->eventCardMovement(x);
     }
-    mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card)
+void Client::onPlayerDiscardCard(PublicPlayerView& player, const PlayingCard* card, PocketType pocketFrom)
 {
     CardMovementData x;
-    x.pocketTypeFrom = pocket;
+    x.pocketTypeFrom = pocketFrom;
     x.pocketTypeTo   = POCKET_GRAVEYARD;
-    x.playerFrom     = playerId;
+    x.playerFrom     = player.id();
     x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerPlayedCard(int playerId, const PlayingCard* card)
+void Client::onPlayerPlayCard(PublicPlayerView& player, const PlayingCard* card)
 {
     CardMovementData x;
     x.pocketTypeFrom = POCKET_HAND;
     x.pocketTypeTo   = POCKET_GRAVEYARD;
-    x.playerFrom     = playerId;
+    x.playerFrom     = player.id();
     x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId)
+void Client::onPlayerPlayCard(PublicPlayerView& player, const PlayingCard* card, PublicPlayerView& target)
 {
     CardMovementData x;
-    x.pocketTypeFrom = pocketFrom;
-    x.pocketTypeTo   = POCKET_TABLE;
-    x.playerFrom     = playerId;
-    x.playerTo       = targetPlayerId != 0 ? targetPlayerId : playerId;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = player.id();
     x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onPlayerCheckedCard(int playerId, const PlayingCard* card,
-                                 const PlayingCard* checkedCard, bool checkResult)
+void Client::onPlayerPlayCard(PublicPlayerView& player, const PlayingCard* card, const PlayingCard* target)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = player.id();
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerPlayCardOnTable(PublicPlayerView& player, const PlayingCard* card, PublicPlayerView& targetPlayer)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_HAND;
+    x.pocketTypeTo   = POCKET_TABLE;
+    x.playerFrom     = player.id();
+    x.playerTo       = targetPlayer.id();
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPassTableCard(PublicPlayerView& player, const PlayingCard* card, PublicPlayerView& targetPlayer)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_TABLE;
+    x.pocketTypeTo   = POCKET_TABLE;
+    x.playerFrom     = player.id();
+    x.playerTo       = targetPlayer.id();
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerPass(PublicPlayerView& player)
+{
+}
+
+void Client::onDrawIntoSelection(QList<const PlayingCard*> cards)
+{
+    foreach (const PlayingCard* card, cards) {
+        CardMovementData x;
+        x.pocketTypeFrom = POCKET_DECK;
+        x.pocketTypeTo   = POCKET_SELECTION;
+        x.playerTo       = 0;
+        if (card != 0)
+            x.card = card->cardData();
+        mp_parser->eventCardMovement(x);
+    }
+}
+
+void Client::onPlayerPickFromSelection(PublicPlayerView& player, const PlayingCard* card)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_SELECTION;
+    x.pocketTypeTo   = POCKET_HAND;
+    x.playerFrom     = 0;
+    x.playerTo       = player.id();
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
+void Client::onPlayerCheckDeck(PublicPlayerView& player, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult)
 {
     CardMovementData x;
     x.pocketTypeFrom = POCKET_DECK;
@@ -420,55 +474,45 @@ void Client::onPlayerCheckedCard(int playerId, const PlayingCard* card,
     x.playerTo       = 0;
     x.card           = checkedCard->cardData();
     mp_parser->eventCardMovement(x);
+
 }
 
-void Client::onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card)
+void Client::onPlayerStealCard(PublicPlayerView& player, PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card)
 {
     CardMovementData x;
     x.pocketTypeFrom = pocketFrom;
     x.pocketTypeTo   = POCKET_HAND;
-    x.playerFrom     = stealedId;
-    x.playerTo       = stealerId;
+    x.playerFrom     = targetPlayer.id();
+    x.playerTo       = player.id();
     if (card != 0)
         x.card       = card->cardData();
     mp_parser->eventCardMovement(x);
 }
 
-void Client::onDrawIntoSelection(const PlayingCard* card)
+void Client::onPlayerCancelCard(PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* p)
 {
     CardMovementData x;
-    x.pocketTypeFrom = POCKET_DECK;
-    x.pocketTypeTo   = POCKET_SELECTION;
+    x.pocketTypeFrom = pocketFrom;
+    x.pocketTypeTo   = POCKET_GRAVEYARD;
+    x.playerFrom     = targetPlayer.id();
     x.playerTo       = 0;
-    x.card = card->cardData();
-    mp_parser->eventCardMovement(x);
-}
-
-void Client::onPlayerDrawedFromSelection(int playerId, const PlayingCard* card)
-{
-    CardMovementData x;
-    x.pocketTypeFrom = POCKET_SELECTION;
-    x.pocketTypeTo   = POCKET_HAND;
-    x.playerFrom     = 0;
-    x.playerTo       = playerId;
     x.card           = card->cardData();
     mp_parser->eventCardMovement(x);
-}
-
-
-void Client::onPlayedCardsCleared()
-{
-}
-
-void Client::onLifePointsChange(const PublicPlayerView& player, int oldLifePoints, int newLifePoints)
-{
-    Q_UNUSED(oldLifePoints);
-    mp_parser->eventLifePointsChange(player.id(), newLifePoints);
 }
 
 void Client::onGameContextChange(const GameContextData& gameContextData)
 {
     mp_parser->eventGameContextChange(gameContextData);
+}
+
+void Client::onLifePointsChange(PublicPlayerView& player, int lifePoints, PublicPlayerView* causedBy)
+{
+    mp_parser->eventLifePointsChange(player.id(), lifePoints);
+}
+
+void Client::onDeckRegenerate()
+{
+
 }
 
 void Client::onActionRequest(ActionRequestType requestType)

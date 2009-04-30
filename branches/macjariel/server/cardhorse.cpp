@@ -30,7 +30,7 @@ void CardHorse::play()
     if (owner()->hasIdenticalCardOnTable(this)) {
         throw TwoSameOnTableException();
     }
-    gameTable()->playOnTable(this);
+    gameTable()->playerPlayCardOnTable(this);
 }
 
 void CardHorse::registerPlayer(Player* player)

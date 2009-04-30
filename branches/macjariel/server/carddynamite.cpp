@@ -19,13 +19,13 @@ void CardDynamite::play()
     if (gameCycle()->isDraw()) {
         assertOnTable();
         owner()->predrawCheck(PredrawCheck);
-        bool check = gameTable()->checkCard(owner(), this, *CardDynamite::checkDynamite);
+        bool check = gameTable()->playerCheckDeck(owner(), this, *CardDynamite::checkDynamite);
         if (check) { // luck
-            gameTable()->playOnTable(this, game()->nextPlayer(owner()));
+            gameTable()->passTableCard(this, game()->nextPlayer(owner()));
         } else {
-            Player* o = owner();
+            Player* player = owner();
             gameTable()->playerDiscardCard(this);
-            o->modifyLifePoints(-3, 0);
+            player->modifyLifePoints(-3, 0);
         }
     } else {
         gameCycle()->assertTurn();
@@ -33,7 +33,7 @@ void CardDynamite::play()
         if (owner()->hasIdenticalCardOnTable(this)) {
             throw TwoSameOnTableException();
         }
-        gameTable()->playOnTable(this);
+        gameTable()->playerPlayCardOnTable(this);
     }
 }
 

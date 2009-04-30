@@ -3,6 +3,7 @@
 
 #include "parser/parserstructs.h"
 
+#include <QQueue>
 
 class Game;
 class Player;
@@ -30,7 +31,7 @@ public:
     void assertResponse() const;
     void assertDiscard() const;
 
-    inline ReactionHandler* reactionHandler() const { return mp_reactionHandler; }
+    inline ReactionHandler* reactionHandler() const { return isResponse() ? m_reactionHandlers.head() : 0; }
 
     GameContextData gameContextData() const;
 
@@ -81,12 +82,13 @@ public:
     void unsetResponseMode();
 
 private:
-    Game*            mp_game;
-    GamePlayState    m_state;
-    GamePlayState    m_lastState;
-    Player*          mp_currentPlayer;
-    Player*          mp_requestedPlayer;
-    ReactionHandler* mp_reactionHandler;
+    Game*                       mp_game;
+    GamePlayState               m_state;
+    GamePlayState               m_lastState;
+    Player*                     mp_currentPlayer;
+    Player*                     mp_requestedPlayer;
+    QQueue<ReactionHandler*>    m_reactionHandlers;
+    QQueue<Player*>             m_reactionPlayers;
 
     int     m_drawCardCount;
     int     m_drawCardMax;

@@ -32,6 +32,8 @@ class Game;
 class PlayingCard;
 class CardPlayable;
 class GameEventHandler;
+class GameEventBroadcaster;
+class GameLogger;
 
 class PublicPlayerView;
 
@@ -95,6 +97,8 @@ public:
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
     inline GameCycle& gameCycle() { return *mp_gameCycle; }
     inline GameTable& gameTable() { return *mp_gameTable; }
+    inline GameEventBroadcaster&
+            gameEventBroadcaster(){ return *mp_gameEventBroadcaster; }
     inline BeerRescue* beerRescue() { return mp_beerRescue; }
 
     inline const PublicGameView& publicGameView() const
@@ -112,7 +116,7 @@ public:
      * This method is provided for convenience.
      * @see Game::playerList()
      */
-    QList<const PublicPlayerView*> publicPlayerList() const
+    QList<PublicPlayerView*> publicPlayerList() const
         { return m_publicPlayerList; }
 
     /**
@@ -186,20 +190,23 @@ private:
         StateFinished
     } m_state;
 
-    GameInfo*           mp_gameInfo;
-    GameTable*          mp_gameTable;
-    GameCycle*          mp_gameCycle;
+    GameInfo*             mp_gameInfo;
+    GameTable*            mp_gameTable;
+    GameCycle*            mp_gameCycle;
+    GameEventBroadcaster* mp_gameEventBroadcaster;
+
     PublicGameView      m_publicGameView;
     int                 m_nextUnusedPlayerId;
     QMap<int, Player*>  m_playerMap;
     QList<Player*>      m_playerList;
     bool                m_startable;
-    QList<const PublicPlayerView*>
+    QList<PublicPlayerView*>
                         m_publicPlayerList;
     int                 m_goodGuysCount;
     int                 m_outlawsCount;
     int                 m_renegadesCount;
     BeerRescue*         mp_beerRescue;
+    GameLogger*         mp_gameLogger;
 };
 
 #endif

@@ -65,7 +65,7 @@ void WeaponCard::play()
             throw TwoSameOnTableException();
         gameTable()->playerDiscardCard(weaponCard);
     }
-    gameTable()->playOnTable(this);
+    gameTable()->playerPlayCardOnTable(this);
 }
 
 void WeaponCard::registerPlayer(Player* player)

@@ -76,29 +76,35 @@ public slots: // These slots are connected to parser
     void onQueryGameList(QueryResult result);
 
 public: /* The GameEventHandler interface */
-    virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message);
-    virtual void onPlayerInit(PlayerCtrl* playerCtrl);
-    virtual void onGameSync();
-    virtual void onPlayerExit();
-    virtual void onPlayerJoinedGame(const PublicPlayerView& publicPlayerView);
-    virtual void onPlayerLeavedGame(const PublicPlayerView&);
-    virtual void onPlayerDied(const PublicPlayerView&);
+    virtual void onHandlerRegistered(PlayerCtrl* playerCtrl);
+    virtual void onHandlerUnregistered();
     virtual void onGameStartabilityChanged(bool isStartable);
+
+    virtual void onChatMessage(PublicPlayerView& publicPlayerView, const QString& message);
+    virtual void onGameSync();
+    virtual void onPlayerJoinedGame(PublicPlayerView&);
+    virtual void onPlayerLeavedGame(PublicPlayerView&);
+    virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy);
     virtual void onGameStarted();
-    virtual void onPlayerDrawedCard(int playerId, const PlayingCard*);
-    virtual void onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card);
-    virtual void onPlayerPlayedCard(int playerId, const PlayingCard* card);
-    virtual void onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId);
-    virtual void onPlayerCheckedCard(int playerId, const PlayingCard* card, const PlayingCard* checkedCard, bool checkResult);
-    virtual void onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card);
-    virtual void onDrawIntoSelection(const PlayingCard* card);
-    virtual void onPlayerDrawedFromSelection(int playerId, const PlayingCard* card);
-    virtual void onPlayedCardsCleared();
-    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints);
+
+    virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*> cards, bool revealCards);
+    virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard* card, PocketType pocket);
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card);
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target);
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* target);
+    virtual void onPlayerPlayCardOnTable(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target);
+    virtual void onPassTableCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& targetPlayer);
+    virtual void onPlayerPass(PublicPlayerView&);
+    virtual void onDrawIntoSelection(QList<const PlayingCard*> cards);
+    virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard* card);
+    virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult);
+    virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card);
+    virtual void onPlayerCancelCard(PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* p);
     virtual void onGameContextChange(const GameContextData&);
+    virtual void onLifePointsChange(PublicPlayerView&, int lifePoints, PublicPlayerView* causedBy);
+    virtual void onDeckRegenerate();
 
     virtual void onActionRequest(ActionRequestType requestType);
-
 
 public slots:
     void startAI();

@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>639</width>
-    <height>536</height>
+    <height>765</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -468,7 +468,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::ChatWidget" native="1" name="mp_chatWidget" />
+         <widget class="client::ChatWidget" native="1" name="mp_chatWidget" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -487,7 +494,7 @@
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
-            <width>15</width>
+            <width>60</width>
             <height>15</height>
            </size>
           </property>
@@ -542,7 +549,7 @@
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
-            <width>15</width>
+            <width>60</width>
             <height>15</height>
            </size>
           </property>
@@ -572,7 +579,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::LogWidget" native="1" name="mp_logWidget" />
+         <widget class="client::LogWidget" native="1" name="mp_logWidget" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

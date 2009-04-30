@@ -48,7 +48,7 @@ public:
     int                  maxLifePoints()     const;
     int                  handSize()          const;
     virtual PlayerRole   role()              const;
-    QList<PlayingCard*> table()             const;
+    QList<PlayingCard*>  table()             const;
     PublicPlayerData     publicPlayerData()  const;
 
 

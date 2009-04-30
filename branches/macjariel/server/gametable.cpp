@@ -3,7 +3,7 @@
 #include "cards.h"
 #include "player.h"
 #include "util.h"
-#include "gameeventhandler.h"
+#include "gameeventbroadcaster.h"
 #include "gameexceptions.h"
 #include "game.h"
 #include "tablecard.h"
@@ -17,146 +17,168 @@ GameTable::GameTable(Game* game):
 
 void GameTable::prepareGame(CardFactory* cardFactory) {
     generateCards(cardFactory);
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onGameSync();
+    mp_game->gameEventBroadcaster().onGameSync();
     dealCards();
 }
 
 
 
-void GameTable::drawCard(Player *player, int count, bool revealCard)
+void GameTable::playerDrawFromDeck(Player* player, int count, bool revealCards)
 {
+    QList<const PlayingCard*> drawedCards;
     for(int i = 0; i < count; ++i)
     {
         PlayingCard* card = popCardFromDeck();
         player->appendCardToHand(card);
         card->setOwner(player);
         card->setPocket(POCKET_HAND);
-        foreach(Player* p, mp_game->playerList())
-            p->gameEventHandler()->onPlayerDrawedCard(player->id(),
-                    (p == player || revealCard) ? card : 0);
+        drawedCards.append(card);
     }
-}
-
-bool GameTable::checkCard(Player* player, PlayingCard* card, bool (*checkFunc)(PlayingCard*))
-{
-    PlayingCard* checkedCard = popCardFromDeck();
-    m_graveyard.push_back(checkedCard);
-    checkedCard->setOwner(0);
-    checkedCard->setPocket(POCKET_GRAVEYARD);
-    bool checkResult = (*checkFunc)(checkedCard);
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerCheckedCard(player->id(), card, checkedCard, checkResult);
-    return checkResult;
+    mp_game->gameEventBroadcaster().onPlayerDrawFromDeck(player, drawedCards, revealCards);
 }
 
 void GameTable::playerDiscardCard(PlayingCard* card)
 {
-    Player* owner = card->owner();
-    if (card->pocket() == POCKET_HAND) {
-        owner->removeCardFromHand(card);
-    } else if (card->pocket() == POCKET_TABLE) {
-        owner->removeCardFromTable(card);
-        TableCard* tableCard = qobject_cast<TableCard*>(card);
-        Q_ASSERT(tableCard != 0);
-        tableCard->unregisterPlayer(owner);
-    } else if (card->pocket() == POCKET_SELECTION && card->owner() != 0) {
-        owner->removeCardFromSelection(card);
-    } else {
-        NOT_REACHED();
-    }
-    m_graveyard.push_back(card);
-    int ownerId         = owner->id();
-    PocketType pocket   = card->pocket();
-    card->setOwner(0);
-    card->setPocket(POCKET_GRAVEYARD);
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerDiscardedCard(ownerId, pocket, card);
+    Player*     owner  = card->owner();
+    PocketType  pocket = card->pocket();
+
+    Q_ASSERT(pocket == POCKET_HAND || pocket == POCKET_TABLE);
+    moveCardToGraveyard(card);
+
+    mp_game->gameEventBroadcaster().onPlayerDiscardCard(owner, card, pocket);
 }
 
-void GameTable::playCard(PlayingCard* card)
-{
-    Player* owner = card->owner();
-    owner->removeCardFromHand(card);
-    m_graveyard.push_back(card);
-    card->setPocket(POCKET_GRAVEYARD);
 
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerPlayedCard(owner->id(), card);
+void GameTable::playerPlayCard(PlayingCard* card)
+{
+    Q_ASSERT(card->pocket() == POCKET_HAND);
+    Player* owner = card->owner();
+    moveCardToGraveyard(card);
+    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card);
 }
 
-void GameTable::playOnTable(TableCard* card, Player* targetPlayer)
+void GameTable::playerPlayCard(PlayingCard* card, Player* targetPlayer)
 {
+    Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
-    PocketType pocketFrom = card->pocket();
+    moveCardToGraveyard(card);
+    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetPlayer);
+}
+
+void GameTable::playerPlayCard(PlayingCard* card, PlayingCard* targetCard)
+{
+    Q_ASSERT(card->pocket() == POCKET_HAND);
+    Player* owner = card->owner();
+    moveCardToGraveyard(card);
+    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetCard);
+}
+
+void GameTable::playerPlayCardOnTable(TableCard* card, Player* targetPlayer)
+{
+    Q_ASSERT(card->pocket() == POCKET_HAND);
+    Player* owner = card->owner();
+
     if (targetPlayer == 0)
         targetPlayer = owner;
 
-    if (card->pocket() == POCKET_HAND) {
-        owner->removeCardFromHand(card);
-    } else if (card->pocket() == POCKET_TABLE) {
-        owner->removeCardFromTable(card);
-        card->unregisterPlayer(owner);
-    }
+    owner->removeCardFromHand(card);
 
     targetPlayer->appendCardToTable(card);
     card->setOwner(targetPlayer);
     card->setPocket(POCKET_TABLE);
     card->registerPlayer(targetPlayer);
 
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerPlayedOnTable(owner->id(), pocketFrom, card, targetPlayer->id());
+    mp_game->gameEventBroadcaster().onPlayerPlayCardOnTable(owner, card, targetPlayer);
 }
 
-void GameTable::stealCard(PlayingCard* card, Player* stealer)
+void GameTable::passTableCard(TableCard* card, Player* targetPlayer)
 {
-    PocketType pocketFrom = card->pocket();
+    Q_ASSERT(card->pocket() == POCKET_TABLE);
     Player* owner = card->owner();
-    if (card->pocket() == POCKET_HAND) {
-        owner->removeCardFromHand(card);
-    } else if (card->pocket() == POCKET_TABLE) {
-        owner->removeCardFromTable(card);
-        TableCard* tableCard = qobject_cast<TableCard*>(card);
-        Q_ASSERT(tableCard != 0);
-        tableCard->unregisterPlayer(owner);
-    } else {
-        NOT_REACHED();
-    }
-    stealer->appendCardToHand(card);
-    card->setOwner(stealer);
-    card->setPocket(POCKET_HAND);
 
-    foreach(Player* p, mp_game->playerList()) {
-        PlayingCard* c = (pocketFrom == POCKET_TABLE) ? card : 0;
-        if (!c && (p == owner || p == stealer))
-            c = card;
-        p->gameEventHandler()->onPlayerStealedCard(stealer->id(), owner->id(), pocketFrom, c);
-    }
+    owner->removeCardFromTable(card);
+    card->unregisterPlayer(owner);
+
+    targetPlayer->appendCardToTable(card);
+    card->setOwner(targetPlayer);
+    card->setPocket(POCKET_TABLE);
+    card->registerPlayer(targetPlayer);
+    mp_game->gameEventBroadcaster().onPassTableCard(owner, card, targetPlayer);
 }
 
-void GameTable::drawIntoPublicSelection(int count)
+void GameTable::drawIntoSelection(int count, Player* selectionOwner)
 {
+    Q_ASSERT(m_selection.isEmpty());
+    QList<const PlayingCard*> drawedCards;
     for(int i = 0; i < count; ++i)
     {
         PlayingCard* card = popCardFromDeck();
         m_selection.append(card);
-        card->setOwner(0);
+        card->setOwner(selectionOwner);
         card->setPocket(POCKET_SELECTION);
-
-        foreach(Player* p, mp_game->playerList())
-            p->gameEventHandler()->onDrawIntoSelection(card);
+        drawedCards.append(card);
     }
+    mp_game->gameEventBroadcaster().onDrawIntoSelection(selectionOwner, drawedCards);
 }
 
-void GameTable::drawFromPublicSelection(Player* player, PlayingCard* card)
+void GameTable::playerPickFromSelection(Player* player, PlayingCard* card)
 {
+    bool revealCard = (card->owner() != player);
     m_selection.removeAll(card);
     player->appendCardToHand(card);
     card->setOwner(player);
     card->setPocket(POCKET_HAND);
-    foreach(Player* p, mp_game->playerList())
-        p->gameEventHandler()->onPlayerDrawedFromSelection(player->id(), card);
+    mp_game->gameEventBroadcaster().onPlayerPickFromSelection(player, card, revealCard);
 }
+
+
+
+bool GameTable::playerCheckDeck(Player* player, PlayingCard* reasonCard, bool (*checkFunc)(PlayingCard*))
+{
+    PlayingCard* checkedCard = popCardFromDeck();
+    putCardToGraveyard(checkedCard);
+    checkedCard->setOwner(0);
+    checkedCard->setPocket(POCKET_GRAVEYARD);
+    bool checkResult = (*checkFunc)(checkedCard);
+    mp_game->gameEventBroadcaster().onPlayerCheckDeck(player, checkedCard, reasonCard, checkResult);
+    return checkResult;
+}
+
+void GameTable::playerStealCard(Player* player, PlayingCard* card)
+{
+    PocketType pocket = card->pocket();
+    Player*    owner  = card->owner();
+
+    switch(pocket) {
+    case POCKET_HAND:
+        owner->removeCardFromHand(card);
+        break;
+    case POCKET_TABLE:
+        owner->removeCardFromTable(card);
+        (qobject_cast<TableCard*>(card))->unregisterPlayer(owner);
+        break;
+    default:
+        NOT_REACHED();
+    }
+
+    player->appendCardToHand(card);
+    card->setOwner(player);
+    card->setPocket(POCKET_HAND);
+
+    mp_game->gameEventBroadcaster().onPlayerStealCard(player, owner, pocket, card);
+}
+
+
+void GameTable::cancelCard(PlayingCard* card, Player* player)
+{
+    PocketType pocket = card->pocket();
+    Player*    owner  = card->owner();
+
+    moveCardToGraveyard(card);
+
+    mp_game->gameEventBroadcaster().onCancelCard(owner, pocket, card, player);
+}
+
 
 void GameTable::generateCards(CardFactory* cardFactory)
 {
@@ -179,7 +201,7 @@ void GameTable::dealCards()
         {
             if (p->initialCardCount() > cardCount)
             {
-                drawCard(p);
+                playerDrawFromDeck(p);
                 players++;
             }
         }
@@ -195,7 +217,32 @@ void GameTable::regenerateDeck()
     m_graveyard.clear();
     m_graveyard << m_deck.takeLast();
     shuffleList(m_graveyard);
+    mp_game->gameEventBroadcaster().onDeckRegenerate();
 }
+
+void GameTable::moveCardToGraveyard(PlayingCard* card)
+{
+    Player* owner = card->owner();
+    switch(card->pocket()) {
+    case POCKET_HAND:
+        owner->removeCardFromHand(card);
+        break;
+    case POCKET_TABLE:
+        owner->removeCardFromTable(card);
+        (qobject_cast<TableCard*>(card))->unregisterPlayer(owner);
+        break;
+    case POCKET_SELECTION:
+        m_selection.removeAll(card);
+        break;
+    default:
+        NOT_REACHED();
+    }
+
+    putCardToGraveyard(card);
+    card->setOwner(0);
+    card->setPocket(POCKET_GRAVEYARD);
+}
+
 
 PlayingCard* GameTable::popCardFromDeck()
 {
@@ -203,4 +250,7 @@ PlayingCard* GameTable::popCardFromDeck()
     return m_deck.takeFirst();
 }
 
-
+void GameTable::putCardToGraveyard(PlayingCard* card)
+{
+    m_graveyard.push_back(card);
+}

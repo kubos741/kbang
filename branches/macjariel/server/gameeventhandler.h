@@ -22,6 +22,7 @@
 #define GAMEEVENTHANDLER_H
 
 #include <QString>
+#include <QList>
 #include "parser/parserstructs.h"
 
 
@@ -40,13 +41,6 @@ class GameEventHandler
 {
 public:
     //GameEventHandler();
-    /**
-     * This method is called when someone sends a chat message.
-     * \param player The publicPlayerView of sender.
-     * \param playerName The name of the sender.
-     * \param message The chat message.
-     */
-    virtual void onIncomingMessage(const PublicPlayerView& publicPlayerView, const QString& message) = 0;
 
 
     /**
@@ -55,47 +49,65 @@ public:
      * is used to control player and can do some caching of persistent
      * members (for example PublicGameView, PrivatePlayerView objects).
      */
-    virtual void onPlayerInit(PlayerCtrl* playerCtrl) = 0;
+    virtual void onHandlerRegistered(PlayerCtrl* playerCtrl) = 0;
+    virtual void onHandlerUnregistered() = 0;
+
+
+    virtual void onGameStartabilityChanged(bool isStartable) = 0;
+
+    /**
+     * This method is called when someone sends a chat message.
+     * \param player The publicPlayerView of sender.
+     * \param playerName The name of the sender.
+     * \param message The chat message.
+     */
+    virtual void onChatMessage(PublicPlayerView& publicPlayerView, const QString& message) = 0;
 
     virtual void onGameSync() = 0;
 
-    virtual void onPlayerExit() = 0;
+    virtual void onPlayerJoinedGame(PublicPlayerView&) = 0;
 
-    virtual void onPlayerJoinedGame(const PublicPlayerView&) = 0;
+    virtual void onPlayerLeavedGame(PublicPlayerView&) = 0;
 
-    virtual void onPlayerLeavedGame(const PublicPlayerView&) = 0;
+    virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy) = 0;
 
-    virtual void onPlayerDied(const PublicPlayerView&) = 0;
-
-    virtual void onGameStartabilityChanged(bool isStartable) = 0;
-    
     virtual void onGameStarted() = 0;
 
     /**
      * This method is called when a player draws a card. If the controlled player draws a card, the
      * card attribute points to that card, otherwise card is null.
      */
-    virtual void onPlayerDrawedCard(int playerId, const PlayingCard* card) = 0;
+    virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*> cards, bool revealCards) = 0;
 
-    virtual void onPlayerDiscardedCard(int playerId, PocketType pocket, const PlayingCard* card) = 0;
+    virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard* card, PocketType pocket) = 0;
 
-    virtual void onPlayerPlayedCard(int playerId, const PlayingCard* card) = 0;
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card) = 0;
 
-    virtual void onPlayerPlayedOnTable(int playerId, PocketType pocketFrom, const PlayingCard* card, int targetPlayerId) = 0;
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target) = 0;
 
-    virtual void onPlayerCheckedCard(int playerId, const PlayingCard* card, const PlayingCard* checkedCard, bool checkResult) = 0;
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* target) = 0;
 
-    virtual void onPlayerStealedCard(int stealerId, int stealedId, PocketType pocketFrom, const PlayingCard* card) = 0;
+    virtual void onPlayerPlayCardOnTable(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target) = 0;
 
-    virtual void onDrawIntoSelection(const PlayingCard* card) = 0;
+    virtual void onPassTableCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& targetPlayer) = 0;
 
-    virtual void onPlayerDrawedFromSelection(int playerId, const PlayingCard* card) = 0;
+    virtual void onPlayerPass(PublicPlayerView&) = 0;
 
-    virtual void onPlayedCardsCleared() = 0;
+    virtual void onDrawIntoSelection(QList<const PlayingCard*> cards) = 0;
+
+    virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard* card) = 0;
+
+    virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult) = 0;
+
+    virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card) = 0;
+
+    virtual void onPlayerCancelCard(PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* p) = 0;
 
     virtual void onGameContextChange(const GameContextData&) = 0;
 
-    virtual void onLifePointsChange(const PublicPlayerView&, int oldLifePoints, int newLifePoints) = 0;
+    virtual void onLifePointsChange(PublicPlayerView&, int lifePoints, PublicPlayerView* causedBy) = 0;
+
+    virtual void onDeckRegenerate() = 0;
 
     virtual void onActionRequest(ActionRequestType requestType) = 0;
 

@@ -22,6 +22,7 @@
 #include "client.h"
 #include "cards.h"
 #include "playerctrl.h"
+#include "gameeventbroadcaster.h"
 
 
 #include "gameinfo.h"
@@ -40,7 +41,7 @@ Player::Player(Game* game,
         m_role(ROLE_UNKNOWN),
         m_isAlive(1),
         mp_game(game),
-        mp_gameEventHandler(gameEventHandler),
+        mp_gameEventHandler(0),
         m_weaponRange(1),
         m_distanceIn(0),
         m_distanceOut(0),
@@ -50,8 +51,13 @@ Player::Player(Game* game,
         m_privatePlayerView(this)
 {
     mp_playerCtrl = new PlayerCtrl(this);
-    mp_gameEventHandler->onPlayerInit(mp_playerCtrl);
+    registerGameEventHandler(gameEventHandler);
     m_predrawChecks.append(0);
+}
+
+Player::~Player()
+{
+    unregisterGameEventHandler();
 }
 
 
@@ -84,7 +90,7 @@ bool Player::canPlayBang() const
     return (m_unlimitedBangs > 0 || m_lastBangTurn != mp_game->gameCycle().turnNumber());
 }
 
-void Player::modifyLifePoints(int x, Player* shooter, bool disableBeerRescue)
+void Player::modifyLifePoints(int x, Player* causedBy, bool disableBeerRescue)
 {
     int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
@@ -92,15 +98,13 @@ void Player::modifyLifePoints(int x, Player* shooter, bool disableBeerRescue)
         m_lifePoints = m_maxLifePoints;
 
     if (oldLifePoints != m_lifePoints) {
-        foreach (Player* p, mp_game->playerList()) {
-            p->gameEventHandler()->onLifePointsChange(publicView(), oldLifePoints, m_lifePoints);
-        }
+        game()->gameEventBroadcaster().onLifePointsChange(this, m_lifePoints, causedBy);
     }
     if (m_lifePoints <= 0) {
         if (disableBeerRescue) 
-            mp_game->buryPlayer(this, shooter);
+            mp_game->buryPlayer(this, causedBy);
         else
-            mp_game->beerRescue()->allowSaveWithBeer(shooter, this, 1 - m_lifePoints);
+            mp_game->beerRescue()->allowSaveWithBeer(causedBy, this, 1 - m_lifePoints);
     }
 }
 
@@ -213,6 +217,24 @@ void Player::onTurnStart()
 {
     m_currentPredraw = m_predrawChecks.last();
 }
+
+
+void Player::registerGameEventHandler(GameEventHandler* gameEventHandler)
+{
+    Q_ASSERT(mp_gameEventHandler == 0);
+    mp_gameEventHandler = gameEventHandler;
+    mp_game->gameEventBroadcaster().registerHandler(mp_gameEventHandler, this);
+    mp_gameEventHandler->onHandlerRegistered(mp_playerCtrl);
+}
+
+void Player::unregisterGameEventHandler()
+{
+    if (mp_gameEventHandler == 0) return;
+    mp_game->gameEventBroadcaster().unregisterHandler(mp_gameEventHandler, this);
+    mp_gameEventHandler->onHandlerUnregistered();
+    mp_gameEventHandler = 0;
+}
+
 
 
 /*-- DEPRECATED

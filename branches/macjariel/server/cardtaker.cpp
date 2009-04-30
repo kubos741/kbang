@@ -24,8 +24,6 @@ void CardTaker::play(Player* targetPlayer)
     gameCycle()->assertTurn();
     assertInHand();
 
-    Player* o = owner();
-
     /* don't allow steel yourself */
     if (owner() == targetPlayer)
         throw BadTargetPlayerException();
@@ -52,11 +50,11 @@ void CardTaker::play(PlayingCard* targetCard)
         /* distance check */
         if (game()->getDistance(owner(), targetCard->owner()) > 1)
             throw PlayerOutOfRangeException();
-        gameTable()->playCard(this);
-        gameTable()->stealCard(targetCard, o);
+        gameTable()->playerPlayCard(this, targetCard);
+        gameTable()->playerStealCard(o, targetCard);
     } else {
-        gameTable()->playCard(this);
-        gameTable()->playerDiscardCard(targetCard);
+        gameTable()->playerPlayCard(this, targetCard);
+        gameTable()->cancelCard(targetCard, o);
     }
 }
 
