@@ -39,9 +39,14 @@ public:
     virtual void respondPass();
     virtual void respondCard(PlayingCard* targetCard);
 
+    virtual ReactionType reactionType() const { return REACTION_BANG; }
 private:
+    void missed();
+
     Player* mp_attackingPlayer;
     Player* mp_attackedPlayer;
+    int     m_missedLeft;
+    QList<PlayingCard*> m_usedBarrels;
 };
 
 #endif

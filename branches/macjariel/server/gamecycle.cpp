@@ -6,6 +6,7 @@
 #include "gameeventhandler.h"
 #include "gameeventbroadcaster.h"
 #include "reactioncard.h"
+#include "characterbase.h"
 #include <QDebug>
 
 GameCycle::GameCycle(Game* game):
@@ -78,27 +79,13 @@ void GameCycle::startTurn(Player* player)
     m_drawCardMax = 2;
 }
 
-void GameCycle::drawCard(Player* player, int numCards, bool revealCard)
+void GameCycle::draw(Player* player, bool specialDraw)
 {
     checkPlayerAndState(player, GAMEPLAYSTATE_DRAW);
     player->predrawCheck(0);
-
-    if (m_drawCardCount + numCards > m_drawCardMax) {
-        throw BadGameStateException();
-    }
-
-    mp_game->gameTable().playerDrawFromDeck(player, numCards, revealCard);
-    m_drawCardCount += numCards;
-    if (m_drawCardCount == m_drawCardMax) {
-        m_state = GAMEPLAYSTATE_TURN;
-    }
+    player->character()->draw(specialDraw);
+    m_state = GAMEPLAYSTATE_TURN;
     sendRequest();
-}
-
-void GameCycle::checkDeck(Player* player)
-{
-    checkPlayerAndState(player, GAMEPLAYSTATE_DRAW);
-    /// \todo
 }
 
 
@@ -151,9 +138,9 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     }
 
     if (isResponse()) {
-        m_reactionHandlers.head()->respondCard(card);
+        player->character()->respondCard(m_reactionHandlers.head(), card);
     } else {
-        card->play();
+        player->character()->playCard(card);
     }
     sendRequest();
 }
@@ -173,7 +160,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer
     if (isResponse())
         throw BadGameStateException();
 
-    card->play(targetPlayer);
+    player->character()->playCard(card, targetPlayer);
     sendRequest();
 }
 
@@ -189,7 +176,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card, PlayingCard* targetC
     if (isResponse())
         throw BadGameStateException();
 
-    card->play(targetCard);
+    player->character()->playCard(card, targetCard);
     sendRequest();
 }
 
@@ -202,7 +189,7 @@ void GameCycle::pass(Player* player)
     if (m_state != GAMEPLAYSTATE_RESPONSE)
         throw BadGameStateException();
 
-    m_reactionHandlers.head()->respondPass();
+    player->character()->respondPass(m_reactionHandlers.head());
     sendRequest();
 }
 

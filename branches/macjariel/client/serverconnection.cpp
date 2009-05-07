@@ -150,6 +150,30 @@ void ServerConnection::playCardWithCard(int cardId, int otherCardId)
     mp_parser->actionPlayCard(actionPlayCardData);
 }
 
+void ServerConnection::useAbility()
+{
+    ActionUseAbilityData actionUseAbilityData;
+    actionUseAbilityData.type = ActionUseAbilityData::TypeSimple;
+    mp_parser->actionUseAbility(actionUseAbilityData);
+}
+
+void ServerConnection::useAbility(int playerId)
+{
+    ActionUseAbilityData actionUseAbilityData;
+    actionUseAbilityData.type = ActionUseAbilityData::TypePlayer;
+    actionUseAbilityData.targetPlayerId = playerId;
+    mp_parser->actionUseAbility(actionUseAbilityData);
+}
+
+void ServerConnection::useAbility(QList<int> cards)
+{
+    ActionUseAbilityData actionUseAbilityData;
+    actionUseAbilityData.type = ActionUseAbilityData::TypeCards;
+    actionUseAbilityData.targetCardsId = cards;
+    mp_parser->actionUseAbility(actionUseAbilityData);
+}
+
+
 void ServerConnection::endTurn()
 {
     mp_parser->actionEndTurn();

@@ -37,6 +37,8 @@ public:
 
     void onPlayerDrawFromDeck(Player*, QList<const PlayingCard*>, bool revealCards);
 
+    void onPlayerDrawFromGraveyard(Player*, const PlayingCard*, const PlayingCard*);
+
     void onPlayerDiscardCard(Player*, PlayingCard*, PocketType pocketFrom);
 
     void onPlayerPlayCard(Player*, PlayingCard*);
@@ -54,6 +56,8 @@ public:
     void onDrawIntoSelection(Player* selectionOwner, QList<const PlayingCard*>);
 
     void onPlayerPickFromSelection(Player*, PlayingCard*, bool revealCard);
+
+    void onUndrawFromSelection(PlayingCard*, Player* selectionOwner);
 
     void onPlayerCheckDeck(Player*, PlayingCard* checkedCard, PlayingCard* causedBy, bool checkResult);
 

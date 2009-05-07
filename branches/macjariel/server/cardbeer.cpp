@@ -24,8 +24,11 @@ void CardBeer::play()
     assertInHand();
     Player* player = owner();
     gameTable()->playerPlayCard(this);
-    player->modifyLifePoints(1, 0);
-    if (m_isSaloon) {
+    if (!m_isSaloon) {
+        if (game()->alivePlayersCount() > 2)
+            player->modifyLifePoints(1, 0);
+    } else {
+        player->modifyLifePoints(1, 0);
         for (Player* p = game()->nextPlayer(player);
              p != player;
              p = game()->nextPlayer(p)) {
@@ -50,16 +53,21 @@ void BeerRescue::respondPass()
 void BeerRescue::respondCard(PlayingCard* targetCard)
 {
     targetCard->assertInHand();
-    if (targetCard->type() == CARD_BEER) {
-            m_lifePointsToSave--;
+    if (targetCard->type() == CARD_BEER && mp_game->alivePlayersCount() > 2) {
             mp_game->gameTable().playerPlayCard(targetCard);
-            if (m_lifePointsToSave == 0) {
-                mp_game->gameCycle().unsetResponseMode();
-                mp_target->modifyLifePoints(1, mp_attacker);
-            }
+            dismiss();
             return;
     }
     throw BadCardException();
+}
+
+void BeerRescue::dismiss()
+{
+    m_lifePointsToSave--;
+    if (m_lifePointsToSave == 0) {
+        mp_game->gameCycle().unsetResponseMode();
+        mp_target->modifyLifePoints(1, mp_attacker);
+    }
 }
 
 void BeerRescue::allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave)

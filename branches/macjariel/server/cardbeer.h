@@ -25,6 +25,9 @@ public:
     BeerRescue(Game* game);
     virtual void respondPass();
     virtual void respondCard(PlayingCard* targetCard);
+    virtual void dismiss();
+
+    virtual ReactionType reactionType() const { return REACTION_LASTSAVE; }
 
     void allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave);
 

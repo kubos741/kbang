@@ -66,20 +66,21 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
     setId(publicPlayerData.id);
     setName(publicPlayerData.name);
-    //mp_characterWidget->setCharacter(publicPlayerData.character);
+    mp_characterWidget->setCharacter(publicPlayerData.character);
     mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
+    mp_characterWidget->setOwnerId(id());
     setSheriff(publicPlayerData.isSheriff);
-    // Set cards on table
-    /* TODO
-    foreach (const CardData& cardData, publicPlayerData.table) {
-        CardWidget* card = mp_cardWidgetFactory->createBackCard();
-        card->setCardId(cardData.id);
-        card->setCardClass(cardData.type); /// \todo Naming (cardType vs cardClass vs anything else)
-        mp_table->push(card);
-    }
-    */
+
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
+
+    foreach (const CardData& cardData, publicPlayerData.table) {
+        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
+        card->setCardData(cardData);
+        card->validate();
+        mp_table->push(card);
+    }
+
     updateWidgets();
 }
 

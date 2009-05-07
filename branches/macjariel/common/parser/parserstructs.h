@@ -101,6 +101,7 @@ enum CardSuit {
 };
 
 
+
 /**
  * Represents the rank of a card. Numeral ranks are represented with the
  * corresponding number, others are represented by following values:
@@ -113,8 +114,34 @@ enum CardSuit {
 typedef int CardRank;
 
 enum CharacterType {
-    CHARACTER_UNKNOWN
+    CHARACTER_UNKNOWN = 0,
+    CHARACTER_BART_CASSIDY,
+    CHARACTER_BLACK_JACK,
+    CHARACTER_CALAMITY_JANET,
+    CHARACTER_EL_GRINGO,
+    CHARACTER_JESSE_JONES,
+    CHARACTER_JOURDONNAIS,
+    CHARACTER_KIT_CARLSON,
+    CHARACTER_LUCKY_DUKE,
+    CHARACTER_PAUL_REGRET,
+    CHARACTER_PEDRO_RAMIREZ,
+    CHARACTER_ROSE_DOOLAN,
+    CHARACTER_SID_KETCHUM,
+    CHARACTER_SLAB_THE_KILLER,
+    CHARACTER_SUZY_LAFAYETTE,
+    CHARACTER_VULTURE_SAM,
+    CHARACTER_WILLY_THE_KID
 };
+
+enum ReactionType {
+    REACTION_BANG,
+    REACTION_GATLING,
+    REACTION_INDIANS,
+    REACTION_DUEL,
+    REACTION_CHOOSECARD,
+    REACTION_LASTSAVE
+};
+
 
 struct ActionPlayCardData {
     int playedCardId;
@@ -133,6 +160,17 @@ struct ActionPlayCardData {
     void write(QXmlStreamWriter*) const;
 };
 
+struct ActionUseAbilityData {
+    enum {
+        TypeSimple,
+        TypePlayer,
+        TypeCards
+    } type;
+    int targetPlayerId;
+    QList<int> targetCardsId;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
 
 struct CardData {
     int             id;
@@ -252,5 +290,6 @@ QString PlayerRoleToString(const PlayerRole& r);
 
 QString GamePlayStateToString(const GamePlayState& s);
 QString PlayingCardTypeToString(const PlayingCardType& c);
+QString CharacterTypeToString(const CharacterType& t);
 
 #endif

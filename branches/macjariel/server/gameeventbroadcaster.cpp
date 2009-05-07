@@ -79,6 +79,13 @@ void GameEventBroadcaster::onPlayerDrawFromDeck(Player* p, QList<const PlayingCa
     }
 }
 
+void GameEventBroadcaster::onPlayerDrawFromGraveyard(Player* p, const PlayingCard* card, const PlayingCard* nextCard)
+{
+    foreach(handler, m_handlers) {
+        handler.first->onPlayerDrawFromGraveyard(p->publicView(), card, nextCard);
+    }
+}
+
 void GameEventBroadcaster::onPlayerDiscardCard(Player* p, PlayingCard* card, PocketType pocketFrom)
 {
     foreach(handler, m_handlers) {
@@ -145,6 +152,16 @@ void GameEventBroadcaster::onPlayerPickFromSelection(Player* p, PlayingCard* car
             handler.first->onPlayerPickFromSelection(p->publicView(), card);
         else
             handler.first->onPlayerPickFromSelection(p->publicView(), 0);
+    }
+}
+
+void GameEventBroadcaster::onUndrawFromSelection(PlayingCard* card, Player* selectionOwner)
+{
+    foreach(handler, m_handlers) {
+        if (handler.second == selectionOwner)
+            handler.first->onUndrawFromSelection(card);
+        else
+            handler.first->onUndrawFromSelection(0);
     }
 }
 

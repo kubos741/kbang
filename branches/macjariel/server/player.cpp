@@ -23,7 +23,7 @@
 #include "cards.h"
 #include "playerctrl.h"
 #include "gameeventbroadcaster.h"
-
+#include "characterbase.h"
 
 #include "gameinfo.h"
 #include "gamecycle.h"
@@ -39,6 +39,7 @@ Player::Player(Game* game,
         m_name(name),
         m_password(password),
         m_role(ROLE_UNKNOWN),
+        mp_character(0),
         m_isAlive(1),
         mp_game(game),
         mp_gameEventHandler(0),
@@ -47,6 +48,7 @@ Player::Player(Game* game,
         m_distanceOut(0),
         m_lastBangTurn(-1),
         m_unlimitedBangs(0),
+        m_bangPower(1),
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
@@ -60,6 +62,13 @@ Player::~Player()
     unregisterGameEventHandler();
 }
 
+
+CharacterType Player::characterType() const
+{
+    if (mp_character == 0)
+        return CHARACTER_UNKNOWN;
+    return mp_character->characterType();
+}
 
 bool Player::isCreator() const
 {
@@ -100,11 +109,18 @@ void Player::modifyLifePoints(int x, Player* causedBy, bool disableBeerRescue)
     if (oldLifePoints != m_lifePoints) {
         game()->gameEventBroadcaster().onLifePointsChange(this, m_lifePoints, causedBy);
     }
+    int hitPoints = oldLifePoints - m_lifePoints;
+
     if (m_lifePoints <= 0) {
         if (disableBeerRescue) 
             mp_game->buryPlayer(this, causedBy);
         else
             mp_game->beerRescue()->allowSaveWithBeer(causedBy, this, 1 - m_lifePoints);
+    } else {
+
+        if (hitPoints > 0)
+            // TODO: tune emiting this signal when on the fly beer is used
+            emit onHit(hitPoints, causedBy);
     }
 }
 
@@ -121,6 +137,11 @@ void Player::modifyDistanceOut(int delta)
 void Player::modifyUnlimitedBangs(int delta)
 {
     m_unlimitedBangs += delta;
+}
+
+void Player::setBangPower(int bangPower)
+{
+    m_bangPower = bangPower;
 }
 
 void Player::setWeaponRange(int weaponRange)
@@ -170,20 +191,18 @@ bool Player::removeCardFromSelection(PlayingCard* card)
     return m_selection.removeOne(card);
 }
 
-void Player::setRole(const PlayerRole& role)
+void Player::setRoleAndCharacter(const PlayerRole& role, CharacterBase* character)
 {
+    Q_ASSERT(mp_character == 0);
     m_role = role;
+    mp_character = character;
+    mp_character->setPlayer(this);
+    m_maxLifePoints = character->maxLifePoints();
     if (m_role == ROLE_SHERIFF) {
-        m_maxLifePoints = 5;
-    } else {
-        m_maxLifePoints = 4;
+        m_maxLifePoints++;
     }
-    // TODO: character can influence maxLifePoints
-
 
     m_lifePoints = m_maxLifePoints;
-//    if (!isCreator())
-//        m_lifePoints = 1;
 }
 
 void Player::registerPredrawCheck(int priority)
@@ -236,24 +255,11 @@ void Player::unregisterGameEventHandler()
 }
 
 
-
-/*-- DEPRECATED
-StructPlayer Player::structPlayer(bool returnPrivateInfo)
+void Player::checkEmptyHand()
 {
-    StructPlayer x;
-    x.id = m_id;
-    x.name = m_name;
-    x.password = m_password;
-    if (returnPrivateInfo || x.role == ROLE_SHERIFF)
-    {
-        x.role = m_role;
-    } else {
-        x.role = ROLE_UNKNOWN;
+    if (m_hand.size() == 0) {
+        qDebug() << "onEmptyHand()";
+        emit onEmptyHand();
     }
-    return x;
 }
-*/
-
-
-
 

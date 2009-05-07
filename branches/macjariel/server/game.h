@@ -179,7 +179,7 @@ public:
 private:
     void checkStartable();
     void shufflePlayers();
-    void setRoles();
+    void setRolesAndCharacters();
     QList<PlayerRole> getRoleList();
 
 

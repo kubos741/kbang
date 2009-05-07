@@ -22,18 +22,7 @@
 #include "../util.h"
 #include "xmlnode.h"
 #include <QXmlStreamWriter>
-
-CharacterType StringToCharacterType(const QString& s)
-{
-    Q_UNUSED(s);
-    return CHARACTER_UNKNOWN; /// @todo: characters
-}
-
-QString CharacterTypeToString(const CharacterType& c)
-{
-    Q_UNUSED(c);
-    return ""; /// @todo: characters
-}
+#include <QtDebug>
 
 CardSuit StringToCardSuit(const QString& s)
 {
@@ -54,6 +43,51 @@ QString CardSuitToString(const CardSuit& suit)
         case SUIT_CLUBS:    return "clubs";
     }
     return "";
+}
+
+CharacterType StringToCharacterType(const QString& s)
+{
+    if (s == "slab the killer") return CHARACTER_SLAB_THE_KILLER;
+    if (s == "lucky duke")      return CHARACTER_LUCKY_DUKE;
+    if (s == "suzy lafayette")  return CHARACTER_SUZY_LAFAYETTE;
+    if (s == "vulture sam")     return CHARACTER_VULTURE_SAM;
+    if (s == "black jack")      return CHARACTER_BLACK_JACK;
+    if (s == "sid ketchum")     return CHARACTER_SID_KETCHUM;
+    if (s == "jourdonnais")     return CHARACTER_JOURDONNAIS;
+    if (s == "el gringo")       return CHARACTER_EL_GRINGO;
+    if (s == "kit carlson")     return CHARACTER_KIT_CARLSON;
+    if (s == "jesse jones")     return CHARACTER_JESSE_JONES;
+    if (s == "pedro ramirez")   return CHARACTER_PEDRO_RAMIREZ;
+    if (s == "calamity janet")  return CHARACTER_CALAMITY_JANET;
+    if (s == "rose doolan")     return CHARACTER_ROSE_DOOLAN;
+    if (s == "bart cassidy")    return CHARACTER_BART_CASSIDY;
+    if (s == "paul regret")     return CHARACTER_PAUL_REGRET;
+    if (s == "willy the kid")   return CHARACTER_WILLY_THE_KID;
+    return CHARACTER_UNKNOWN;
+}
+
+QString CharacterTypeToString(const CharacterType& t)
+{
+    switch(t) {
+    case CHARACTER_UNKNOWN:         return "unknown";
+    case CHARACTER_SLAB_THE_KILLER: return "slab the killer";
+    case CHARACTER_LUCKY_DUKE:      return "lucky duke";
+    case CHARACTER_SUZY_LAFAYETTE:  return "suzy lafayette";
+    case CHARACTER_VULTURE_SAM:     return "vulture sam";
+    case CHARACTER_BLACK_JACK:      return "black jack";
+    case CHARACTER_SID_KETCHUM:     return "sid ketchum";
+    case CHARACTER_JOURDONNAIS:     return "jourdonnais";
+    case CHARACTER_EL_GRINGO:       return "el gringo";
+    case CHARACTER_KIT_CARLSON:     return "kit carlson";
+    case CHARACTER_JESSE_JONES:     return "jesse jones";
+    case CHARACTER_PEDRO_RAMIREZ:   return "pedro ramirez";
+    case CHARACTER_CALAMITY_JANET:  return "calamity janet";
+    case CHARACTER_ROSE_DOOLAN:     return "rose doolan";
+    case CHARACTER_BART_CASSIDY:    return "bart cassidy";
+    case CHARACTER_PAUL_REGRET:     return "paul regret";
+    case CHARACTER_WILLY_THE_KID:   return "willy the kid";
+    }
+    return "unknown";
 }
 
 PlayingCardType StringToPlayingCardType(const QString& s)
@@ -197,6 +231,41 @@ void ActionPlayCardData::write(QXmlStreamWriter* writer) const
     writer->writeEndElement();
 }
 
+void ActionUseAbilityData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "use-ability");
+    if (!node->attribute("target-player-id").isNull()) {
+        type = TypePlayer;
+        targetPlayerId = node->attribute("target-player-id").toInt();
+    } else if (node->getChildren().size() == 0) {
+        type = TypeSimple;
+    } else {
+        type = TypeCards;
+        foreach (XmlNode* cardNode, node->getChildren()) {
+            targetCardsId.append(cardNode->attribute("id").toInt());
+        }
+    }
+}
+
+void ActionUseAbilityData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("use-ability");
+    switch(type) {
+    case TypeSimple:
+        break;
+    case TypePlayer:
+        writer->writeAttribute("target-player-id", QString::number(targetPlayerId));
+        break;
+    case TypeCards:
+        foreach(int cardId, targetCardsId) {
+            writer->writeStartElement("card");
+            writer->writeAttribute("id", QString::number(cardId));
+            writer->writeEndElement();
+        }
+        break;
+    }
+    writer->writeEndElement();
+}
 
 
 
@@ -462,9 +531,6 @@ QString cardMovementTypeToString(const CardMovementType& c)
     if (c == CardMovementCancelCard)       return "cancel-card";
     if (c == CardMovementDiscardCard)      return "discard-card";
     if (c == CardMovementDrawCard)         return "draw";
-    if (p == POCKET_TABLE)      return "table";
-    if (p == POCKET_PLAYED)     return "played";
-    if (p == POCKET_SELECTION)  return "selection";
     return "";
 }
 

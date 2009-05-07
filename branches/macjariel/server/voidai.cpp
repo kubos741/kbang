@@ -45,7 +45,7 @@ void VoidAI::requestWithAction()
         qDebug() << QString("VoidAI (%1): REQUEST_DRAW");
             // Drawing two cards
             try {
-                mp_playerCtrl->drawCard(2);
+                mp_playerCtrl->draw();
             } catch (BadPredrawException& e) {
                 e.debug();
                 QList<PlayingCard*> table = mp_playerCtrl->privatePlayerView().table();

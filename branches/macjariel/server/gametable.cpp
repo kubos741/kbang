@@ -23,22 +23,38 @@ void GameTable::prepareGame(CardFactory* cardFactory) {
 
 
 
-void GameTable::playerDrawFromDeck(Player* player, int count, bool revealCards)
+QList<const PlayingCard*> GameTable::playerDrawFromDeck(Player* player, int count, bool revealCards)
 {
     QList<const PlayingCard*> drawedCards;
     for(int i = 0; i < count; ++i)
     {
         PlayingCard* card = popCardFromDeck();
+        Q_ASSERT(!card->isVirtual());
         player->appendCardToHand(card);
         card->setOwner(player);
         card->setPocket(POCKET_HAND);
         drawedCards.append(card);
     }
     mp_game->gameEventBroadcaster().onPlayerDrawFromDeck(player, drawedCards, revealCards);
+    return drawedCards;
+}
+
+void GameTable::playerDrawFromGraveyard(Player* player)
+{
+    if (m_graveyard.size() == 0)
+        throw BadGameStateException();
+    PlayingCard* card = m_graveyard.takeLast();
+    Q_ASSERT(!card->isVirtual());
+    player->appendCardToHand(card);
+    card->setOwner(player);
+    card->setPocket(POCKET_HAND);
+    PlayingCard* nextCard = m_graveyard.isEmpty() ? 0 : m_graveyard.first();
+    mp_game->gameEventBroadcaster().onPlayerDrawFromGraveyard(player, card, nextCard);
 }
 
 void GameTable::playerDiscardCard(PlayingCard* card)
 {
+    Q_ASSERT(!card->isVirtual());
     Player*     owner  = card->owner();
     PocketType  pocket = card->pocket();
 
@@ -46,35 +62,49 @@ void GameTable::playerDiscardCard(PlayingCard* card)
     moveCardToGraveyard(card);
 
     mp_game->gameEventBroadcaster().onPlayerDiscardCard(owner, card, pocket);
+    owner->checkEmptyHand();
 }
 
 
 void GameTable::playerPlayCard(PlayingCard* card)
 {
+    if (card->isVirtual())
+        card = card->master();
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
     moveCardToGraveyard(card);
     mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card);
+    owner->checkEmptyHand();
 }
 
 void GameTable::playerPlayCard(PlayingCard* card, Player* targetPlayer)
 {
+    if (card->isVirtual())
+        card = card->master();
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
     moveCardToGraveyard(card);
     mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetPlayer);
+    owner->checkEmptyHand();
 }
 
 void GameTable::playerPlayCard(PlayingCard* card, PlayingCard* targetCard)
 {
+    if (card->isVirtual())
+        card = card->master();
     Q_ASSERT(card->pocket() == POCKET_HAND);
+    Q_ASSERT(!targetCard->isVirtual());
     Player* owner = card->owner();
     moveCardToGraveyard(card);
     mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetCard);
+    owner->checkEmptyHand();
 }
 
 void GameTable::playerPlayCardOnTable(TableCard* card, Player* targetPlayer)
 {
+    if (card->isVirtual())
+        card = qobject_cast<TableCard*>(card->master());
+    Q_ASSERT(card != 0);
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
 
@@ -89,11 +119,15 @@ void GameTable::playerPlayCardOnTable(TableCard* card, Player* targetPlayer)
     card->registerPlayer(targetPlayer);
 
     mp_game->gameEventBroadcaster().onPlayerPlayCardOnTable(owner, card, targetPlayer);
+    owner->checkEmptyHand();
 }
 
 void GameTable::passTableCard(TableCard* card, Player* targetPlayer)
 {
     Q_ASSERT(card->pocket() == POCKET_TABLE);
+    if (card->isVirtual())
+        card = qobject_cast<TableCard*>(card->master());
+    Q_ASSERT(card != 0);
     Player* owner = card->owner();
 
     owner->removeCardFromTable(card);
@@ -113,6 +147,7 @@ void GameTable::drawIntoSelection(int count, Player* selectionOwner)
     for(int i = 0; i < count; ++i)
     {
         PlayingCard* card = popCardFromDeck();
+        Q_ASSERT(!card->isVirtual());
         m_selection.append(card);
         card->setOwner(selectionOwner);
         card->setPocket(POCKET_SELECTION);
@@ -123,6 +158,8 @@ void GameTable::drawIntoSelection(int count, Player* selectionOwner)
 
 void GameTable::playerPickFromSelection(Player* player, PlayingCard* card)
 {
+    if (card->isVirtual())
+        card = card->master();
     bool revealCard = (card->owner() != player);
     m_selection.removeAll(card);
     player->appendCardToHand(card);
@@ -131,11 +168,24 @@ void GameTable::playerPickFromSelection(Player* player, PlayingCard* card)
     mp_game->gameEventBroadcaster().onPlayerPickFromSelection(player, card, revealCard);
 }
 
+void GameTable::undrawFromSelection(PlayingCard* card)
+{
+    Q_ASSERT(m_selection.contains(card));
+    Player* owner = card->owner();
+    m_selection.removeAll(card);
+    putCardToDeck(card);
+    card->setOwner(0);
+    card->setPocket(POCKET_DECK);
+    mp_game->gameEventBroadcaster().onUndrawFromSelection(card, owner);
+}
 
 
 bool GameTable::playerCheckDeck(Player* player, PlayingCard* reasonCard, bool (*checkFunc)(PlayingCard*))
 {
+    if (reasonCard->isVirtual())
+        reasonCard = 0;
     PlayingCard* checkedCard = popCardFromDeck();
+    Q_ASSERT(!checkedCard->isVirtual());
     putCardToGraveyard(checkedCard);
     checkedCard->setOwner(0);
     checkedCard->setPocket(POCKET_GRAVEYARD);
@@ -146,6 +196,7 @@ bool GameTable::playerCheckDeck(Player* player, PlayingCard* reasonCard, bool (*
 
 void GameTable::playerStealCard(Player* player, PlayingCard* card)
 {
+    Q_ASSERT(!card->isVirtual());
     PocketType pocket = card->pocket();
     Player*    owner  = card->owner();
 
@@ -166,19 +217,26 @@ void GameTable::playerStealCard(Player* player, PlayingCard* card)
     card->setPocket(POCKET_HAND);
 
     mp_game->gameEventBroadcaster().onPlayerStealCard(player, owner, pocket, card);
+    owner->checkEmptyHand();
 }
 
 
 void GameTable::cancelCard(PlayingCard* card, Player* player)
 {
+    Q_ASSERT(!card->isVirtual());
     PocketType pocket = card->pocket();
     Player*    owner  = card->owner();
 
     moveCardToGraveyard(card);
 
     mp_game->gameEventBroadcaster().onCancelCard(owner, pocket, card, player);
+    owner->checkEmptyHand();
 }
 
+bool GameTable::isEmptyGraveyard() const
+{
+    return m_graveyard.isEmpty();
+}
 
 void GameTable::generateCards(CardFactory* cardFactory)
 {
@@ -248,6 +306,11 @@ PlayingCard* GameTable::popCardFromDeck()
 {
     if (m_deck.isEmpty()) regenerateDeck();
     return m_deck.takeFirst();
+}
+
+void GameTable::putCardToDeck(PlayingCard* card)
+{
+    m_deck.push_front(card);
 }
 
 void GameTable::putCardToGraveyard(PlayingCard* card)

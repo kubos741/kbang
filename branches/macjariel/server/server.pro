@@ -37,7 +37,19 @@ HEADERS += player.h \
     cardtaker.h \
     cardbarrel.h \
     gameeventbroadcaster.h \
-    gamelogger.h
+    gamelogger.h \
+    characterbase.h \
+    charactercalamityjanet.h \
+    characterblackjack.h \
+    characterlist.h \
+    charactercassidygringo.h \
+    charactersuzylafayette.h \
+    characterpropertychange.h \
+    characterjourdonnais.h \
+    characterpedroramirez.h \
+    characterjessejones.h \
+    charactersidketchum.h \
+    characterkitcarlson.h
 SOURCES += main.cpp \
     player.cpp \
     gameserver.cpp \
@@ -76,7 +88,19 @@ SOURCES += main.cpp \
     cardtaker.cpp \
     cardbarrel.cpp \
     gameeventbroadcaster.cpp \
-    gamelogger.cpp
+    gamelogger.cpp \
+    characterbase.cpp \
+    charactercalamityjanet.cpp \
+    characterblackjack.cpp \
+    characterlist.cpp \
+    charactercassidygringo.cpp \
+    charactersuzylafayette.cpp \
+    characterpropertychange.cpp \
+    characterjourdonnais.cpp \
+    characterpedroramirez.cpp \
+    characterjessejones.cpp \
+    charactersidketchum.cpp \
+    characterkitcarlson.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

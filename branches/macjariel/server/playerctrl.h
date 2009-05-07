@@ -45,17 +45,10 @@ public slots:
 
 
     /**
-     * Player draws the specified number of cards. This is how player starts it turn.
-     * \param numCards The amount of cards to draw.
-     * \param revealCard The player reveals the drawed card(s). This is necessary for
-     *        some characters to gain bonuses.
-     * The player typically draws two cards. Client class can either call drawCard once
-     * with the numCards=2 or twice with numCards=1. Moreover, in case of special characters
-     * (drawing from graveyard, from other hands, ...) the other variant becomes handy.
-     *
-     * \throws BadGameStateException It's not right time to draw cards or the card count is bad.
+     * Player draws two cards in his draw phase.
+     * \throws BadGameStateException It's not right time to draw cards.
      */
-    void drawCard(int numCards, bool revealCard = 0);
+    void draw();
 
     /**
      * Finishes the player's turn.
@@ -75,6 +68,9 @@ public slots:
     void discardCard(PlayingCard* card);
 
 
+    void useAbility();
+    void useAbility(const PublicPlayerView* targetPlayer);
+    void useAbility(QList<PlayingCard*> cards);
 
     /**
      * Plays a card.

@@ -46,6 +46,7 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
     case CARD_BANG:
         if (m_type != Indians)
             break;
+        targetCard->assertInHand();
         gameTable()->playerPlayCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
@@ -54,6 +55,7 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
     case CARD_MISSED:
         if (m_type != Gatling)
             break;
+        targetCard->assertInHand();
         gameTable()->playerPlayCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
@@ -76,6 +78,16 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
         break;
     }
     throw BadCardException();
+}
+
+ReactionType CardMultiShoot::reactionType() const
+{
+    switch(m_type) {
+    case Indians:
+        return REACTION_INDIANS;
+    case Gatling:
+        return REACTION_GATLING;
+    }
 }
 
 void CardMultiShoot::requestNext()

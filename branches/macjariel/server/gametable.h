@@ -21,7 +21,9 @@ public:
      * Player draws specified amount of cards to his hands. If revealCards
      * is set, the other players can see the cards.
      */
-    void playerDrawFromDeck(Player*, int count = 1, bool revealCards = 0);
+    QList<const PlayingCard*> playerDrawFromDeck(Player*, int count = 1, bool revealCards = 0);
+
+    void playerDrawFromGraveyard(Player*);
 
     /**
      * Card's owner discards a specified card. The card must be either in
@@ -67,6 +69,8 @@ public:
      */
     void playerPickFromSelection(Player*, PlayingCard*);
 
+    void undrawFromSelection(PlayingCard* card);
+
     /**
      * The player checks the deck and returns the result.
      */
@@ -83,6 +87,7 @@ public:
      */
     void cancelCard(PlayingCard*, Player* player = 0);
 
+    bool isEmptyGraveyard() const;
 
     PlayingCard* card(int cardId) const {
         return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
@@ -97,6 +102,7 @@ private:
     void regenerateDeck();
     void moveCardToGraveyard(PlayingCard*);
     inline PlayingCard* popCardFromDeck();
+    inline void putCardToDeck(PlayingCard*);
     inline void putCardToGraveyard(PlayingCard*);
 
 protected:

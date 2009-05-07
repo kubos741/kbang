@@ -17,7 +17,6 @@ CardJail::~CardJail()
 
 void CardJail::play()
 {
-    qDebug("CardJail::play()");
     gameCycle()->assertDraw();
     assertOnTable();
     owner()->predrawCheck(PredrawCheck);
@@ -26,7 +25,6 @@ void CardJail::play()
     if (!check) {
         gameCycle()->skipPlayersTurn();
     }
-    qDebug("CardJail::play() ends");
 }
 
 
@@ -34,6 +32,8 @@ void CardJail::play(Player* targetPlayer)
 {
     gameCycle()->assertTurn();
     assertInHand();
+    if (targetPlayer == owner())
+        throw BadTargetPlayerException();
     if (targetPlayer->role() == ROLE_SHERIFF)
         throw BadTargetPlayerException();
 

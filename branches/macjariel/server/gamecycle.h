@@ -51,17 +51,7 @@ public:
      * \todo Draw cards from hands of other players (character feature).
      * \todo Draw three cards and return one on top of deck (character feature).
      */
-    void drawCard(Player* player, int count = 1, bool revealCard = 0);
-
-    /** The current player will <emph>check deck</emph> - revealing the top
-     * card and puting it into graveyard.
-     * \throws BadPlayerException       called by non-playing player.
-     * \throws BadStateException        called in other than Draw state
-     * \throws BadSituationException    called when no need to <emph>check deck</emph>
-     *
-     * \param playerId The calling player's id.
-     */
-    void checkDeck(Player* player);
+    void draw(Player* player, bool specialDraw = 0);
 
     void skipPlayersTurn();
 

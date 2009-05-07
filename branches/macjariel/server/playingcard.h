@@ -63,12 +63,14 @@ public:
     PlayingCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
     virtual ~PlayingCard();
 
-    inline int              id()        const { return m_id;     }
-    inline PlayingCardType  type()      const { return m_type;   }
-    inline CardSuit         suit()      const { return m_suit;   }
-    inline CardRank         rank()      const { return m_rank; }
-    inline Player*          owner()     const { return mp_owner; }
-    inline PocketType       pocket()    const { return m_pocket; }
+    inline int              id()        const { return m_id;        }
+    inline PlayingCardType  type()      const { return m_type;      }
+    inline CardSuit         suit()      const { return m_suit;      }
+    inline CardRank         rank()      const { return m_rank;      }
+    inline Player*          owner()     const { return mp_owner;    }
+    inline PocketType       pocket()    const { return m_pocket;    }
+    inline bool             isVirtual() const { return m_isVirtual; }
+    inline PlayingCard*     master()    const { Q_ASSERT(mp_master != 0); return mp_master;   }
 
     CardData cardData() const;
 
@@ -79,6 +81,8 @@ public:
     void assertInHand() const;
     void assertOnTable() const;
 
+    void setVirtual(PlayingCard* master);
+    void setVirtual(Player* owner, PocketType pocket);
 
 protected:
     Game*       game()      const { return mp_game; }
@@ -100,6 +104,8 @@ private:
     Player*         mp_owner;
     PocketType      m_pocket;
     Game*           mp_game;
+    bool            m_isVirtual;
+    PlayingCard*    mp_master;
 };
 
 #endif

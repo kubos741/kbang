@@ -56,6 +56,8 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
             this,       SLOT(onActionDrawCard(int,bool)));
     connect(mp_parser,  SIGNAL(sigActionPlayCard(const ActionPlayCardData&)),
             this,       SLOT(onActionPlayCard(const ActionPlayCardData&)));
+    connect(mp_parser,  SIGNAL(sigActionUseAbility(const ActionUseAbilityData&)),
+            this,       SLOT(onActionUseAbility(const ActionUseAbilityData&)));
     connect(mp_parser,  SIGNAL(sigActionEndTurn()),
             this,       SLOT(onActionEndTurn()));
     connect(mp_parser,  SIGNAL(sigActionPass()),
@@ -136,7 +138,7 @@ void Client::onActionStartGame()
 void Client::onActionDrawCard(int numCards, bool revealCard)
 {
     try {
-        mp_playerCtrl->drawCard(numCards, revealCard);
+        mp_playerCtrl->draw();
     } catch (GameException& e) {
         qDebug() << "Client::onActionDrawCard - exception:";
         e.debug();
@@ -189,6 +191,33 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
         }
     } catch (GameException& e) {
         qDebug("[CLIENT]: onActionPlayCard - exception:");
+        e.debug();
+    }
+}
+
+void Client::onActionUseAbility(const ActionUseAbilityData& actionUseAbilityData)
+{
+    try {
+        switch(actionUseAbilityData.type) {
+            case ActionUseAbilityData::TypeSimple: {
+                mp_playerCtrl->useAbility();
+                break;
+            }
+            case ActionUseAbilityData::TypePlayer: {
+                PublicPlayerView* targetPlayer = getPlayer(actionUseAbilityData.targetPlayerId);
+                if (targetPlayer == 0)
+                    return;
+                mp_playerCtrl->useAbility(targetPlayer);
+                break;
+            }
+            case ActionUseAbilityData::TypeCards: {
+                QList<PlayingCard*> cards = getCards(actionUseAbilityData.targetCardsId);
+                mp_playerCtrl->useAbility(cards);
+                break;
+            }
+        }
+    } catch (GameException& e) {
+        qDebug("[CLIENT]: onActionUseAbility - exception:");
         e.debug();
     }
 }
@@ -375,6 +404,17 @@ void Client::onPlayerDrawFromDeck(PublicPlayerView& player, QList<const PlayingC
     }
 }
 
+void Client::onPlayerDrawFromGraveyard(PublicPlayerView& player, const PlayingCard* card, const PlayingCard* nextCard)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_GRAVEYARD;
+    x.pocketTypeTo   = POCKET_HAND;
+    x.playerTo       = player.id();
+    x.card           = card->cardData();
+    mp_parser->eventCardMovement(x);
+    ///@todo: send info about nextCard (the card under the drawn card from graveyard)
+}
+
 void Client::onPlayerDiscardCard(PublicPlayerView& player, const PlayingCard* card, PocketType pocketFrom)
 {
     CardMovementData x;
@@ -465,8 +505,21 @@ void Client::onPlayerPickFromSelection(PublicPlayerView& player, const PlayingCa
     mp_parser->eventCardMovement(x);
 }
 
+void Client::onUndrawFromSelection(const PlayingCard* card)
+{
+    CardMovementData x;
+    x.pocketTypeFrom = POCKET_SELECTION;
+    x.pocketTypeTo   = POCKET_DECK;
+    x.playerFrom     = 0;
+    x.playerTo       = 0;
+    if (card != 0)
+        x.card = card->cardData();
+    mp_parser->eventCardMovement(x);
+}
+
 void Client::onPlayerCheckDeck(PublicPlayerView& player, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult)
 {
+    /// caused by can be NULL
     CardMovementData x;
     x.pocketTypeFrom = POCKET_DECK;
     x.pocketTypeTo   = POCKET_GRAVEYARD;
@@ -519,6 +572,36 @@ void Client::onActionRequest(ActionRequestType requestType)
 {
     qDebug() << QString("Client (%1): onActionRequest(%2)").arg(m_id).arg(requestType);
 }
+
+
+PublicPlayerView* Client::getPlayer(int playerId)
+{
+    PublicPlayerView* res = mp_playerCtrl->publicGameView().publicPlayerView(playerId);
+    if (res == 0)
+        qDebug(qPrintable(QString("[CLIENT]   Target player '%1' not exist!").arg(playerId)));
+    return res;
+}
+
+PlayingCard* Client::getCard(int cardId)
+{
+    PlayingCard* card = mp_playerCtrl->card(cardId);
+    if (card == 0) {
+        qDebug(qPrintable(QString("[CLIENT]   Target card '%1' not exist!").arg(cardId)));
+    }
+    return card;
+}
+
+QList<PlayingCard*> Client::getCards(QList<int> cardIds)
+{
+    QList<PlayingCard*> res;
+    foreach(int cardId, cardIds) {
+        PlayingCard* card = getCard(cardId);
+        if (card != 0)
+            res.append(card);
+    }
+    return res;
+}
+
 
 
 bool Client::isInGame() const

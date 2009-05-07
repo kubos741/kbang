@@ -82,34 +82,43 @@ void Card::loadDefaultRuleset()
     new Card("Indiani!",    CARD_INDIANS,     "gfx/cards/indians.png");
     new Card("Duello",      CARD_DUEL,        "gfx/cards/duel.png");
     new Card("Gatling",     CARD_GATLING,     "gfx/cards/gatling.png");
-
     new Card("Mustang",     CARD_MUSTANG,    "gfx/cards/mustang.png");
     new Card("Appaloosa",   CARD_APPALOSSA,  "gfx/cards/appaloosa.png");
     new Card("Barile",      CARD_BARREL,     "gfx/cards/barrel.png");
     new Card("Dinamite",    CARD_DYNAMITE,   "gfx/cards/dynamite.png");
     new Card("Prigione",    CARD_JAIL,       "gfx/cards/jail.png");
-
-
     new Card("Volcanic",    CARD_VOLCANIC,   "gfx/cards/volcanic.png");
     new Card("Schofield",   CARD_SCHOFIELD,  "gfx/cards/schofield.png");
     new Card("Winchester",  CARD_WINCHESTER, "gfx/cards/winchester.png");
     new Card("Remington",   CARD_REMINGTON,  "gfx/cards/remington.png");
     new Card("Carabine",    CARD_CARABINE,   "gfx/cards/carabine.png");
+    new Card("",            CARD_UNKNOWN,    "gfx/cards/back-playing.png");
 
+    new Card("Bart Cassidy",    CHARACTER_BART_CASSIDY,     "gfx/characters/bart-cassidy.png");
+    new Card("Black Jack",      CHARACTER_BLACK_JACK,       "gfx/characters/black-jack.png");
+    new Card("Calamity Janet",  CHARACTER_CALAMITY_JANET,   "gfx/characters/calamity-janet.png");
+    new Card("El Gringo",       CHARACTER_EL_GRINGO,        "gfx/characters/el-gringo.png");
+    new Card("Jesse Jones",     CHARACTER_JESSE_JONES,      "gfx/characters/jesse-jones.png");
+    new Card("Jourdonnais",     CHARACTER_JOURDONNAIS,      "gfx/characters/jourdonnais.png");
+    new Card("Kit Carlson",     CHARACTER_KIT_CARLSON,      "gfx/characters/kit-carlson.png");
+    new Card("Lucky Duke",      CHARACTER_LUCKY_DUKE,       "gfx/characters/lucky-duke.png");
+    new Card("Paul Regret",     CHARACTER_PAUL_REGRET,      "gfx/characters/paul-regret.png");
+    new Card("Pedro Ramirez",   CHARACTER_PEDRO_RAMIREZ,    "gfx/characters/pedro-ramirez.png");
+    new Card("Rose Doolan",     CHARACTER_ROSE_DOOLAN,      "gfx/characters/rose-doolan.png");
+    new Card("Sid Ketchum",     CHARACTER_SID_KETCHUM,      "gfx/characters/sid-ketchum.png");
+    new Card("Slab the Killer", CHARACTER_SLAB_THE_KILLER,  "gfx/characters/slab-the-killer.png");
+    new Card("Suzy Lafayette",  CHARACTER_SUZY_LAFAYETTE,   "gfx/characters/suzy-lafayette.png");
+    new Card("Vulture Sam",     CHARACTER_VULTURE_SAM,      "gfx/characters/vulture-sam.png");
+    new Card("Willy the Kid",   CHARACTER_WILLY_THE_KID,    "gfx/characters/willy-the-kid.png");
+    new Card("",                CHARACTER_UNKNOWN,          "gfx/cards/back-character.png");
 
-
-
-
-    new Card("",         CARD_UNKNOWN, "gfx/cards/back-playing.png");
 
     new Card("Sheriff",  ROLE_SHERIFF,    "gfx/cards/sheriff.png");
     new Card("Renegade", ROLE_RENEGADE,   "gfx/cards/renegade.png");
     new Card("Outlaw",   ROLE_OUTLAW,     "gfx/cards/outlaw.png");
     new Card("Deputy",   ROLE_DEPUTY,     "gfx/cards/deputy.png");
     new Card("",         ROLE_UNKNOWN,    "gfx/cards/back-role.png");
-
-    new Card("",         CHARACTER_UNKNOWN,    "gfx/cards/back-character.png");
-    }
+}
 
 
 const Card* Card::findPlayingCard(PlayingCardType id)

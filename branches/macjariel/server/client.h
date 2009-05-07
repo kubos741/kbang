@@ -67,6 +67,7 @@ public slots: // These slots are connected to parser
     void onActionStartGame();
     void onActionDrawCard(int numCards, bool revealCard);
     void onActionPlayCard(const ActionPlayCardData&);
+    void onActionUseAbility(const ActionUseAbilityData&);
     void onActionEndTurn();
     void onActionPass();
     void onActionDiscard(int cardId);
@@ -88,6 +89,7 @@ public: /* The GameEventHandler interface */
     virtual void onGameStarted();
 
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*> cards, bool revealCards);
+    virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* nextCard);
     virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard* card, PocketType pocket);
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card);
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target);
@@ -97,6 +99,7 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerPass(PublicPlayerView&);
     virtual void onDrawIntoSelection(QList<const PlayingCard*> cards);
     virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard* card);
+    virtual void onUndrawFromSelection(const PlayingCard* card);
     virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult);
     virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card);
     virtual void onPlayerCancelCard(PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* p);
@@ -114,7 +117,12 @@ signals:
 
 
 private:
+    inline PublicPlayerView*    getPlayer(int playerId);
+    inline PlayingCard*         getCard(int cardId);
+    inline QList<PlayingCard*>  getCards(QList<int>);
+
     bool isInGame() const;
+
 
 
 

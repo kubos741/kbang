@@ -33,6 +33,7 @@ class WeaponCard;
 class PlayerCtrl;
 class Game;
 class GameEventHandler;
+class CharacterBase;
 
 /**
  * The Player class represents a Bang! player. The players are created by the Game
@@ -93,10 +94,12 @@ public:
     inline CardList             table()            const { return m_table;             }
     inline CardList             selection()        const { return m_selection;         }
     inline PlayerRole           role()             const { return m_role;              }
+    inline CharacterBase*       character()        const { return mp_character;        }
+    CharacterType               characterType()    const;
     inline bool                 isAlive()          const { return m_isAlive;           }
     inline int                  weaponRange()      const { return m_weaponRange;       }
     inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
-
+    inline int                  bangPower()        const { return m_bangPower;         }
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
     inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
 
@@ -162,6 +165,7 @@ public:
     void modifyDistanceIn(int delta);
     void modifyDistanceOut(int delta);
     void modifyUnlimitedBangs(int delta);
+    void setBangPower(int bangPower);
     void setWeaponRange(int weaponRange);
     void setAlive(bool isAlive);
     void appendCardToHand(PlayingCard* card);
@@ -183,7 +187,7 @@ public:
 
     bool removeCardFromSelection(PlayingCard* card);
 
-    void setRole(const PlayerRole& role);
+    void setRoleAndCharacter(const PlayerRole& role, CharacterBase* character);
 
     void registerPredrawCheck(int checkId);
     void unregisterPredrawCheck(int checkId);
@@ -199,21 +203,21 @@ public:
 
     void onTurnStart();
 
-
     void registerGameEventHandler(GameEventHandler*);
     void unregisterGameEventHandler();
 
+    void checkEmptyHand();
 
-  ////////////////
- // DEPRECATED //
-////////////////
-    // StructPlayer structPlayer(bool returnPrivateInfo = 0);
+signals:
+    void onHit(int lifePoints, Player* causedBy);
+    void onEmptyHand();
 
 
   ////////////
  // STATIC //
 ////////////
 
+public:
     /**
      * Converts a PublicPlayerView to its Player instance.
      */
@@ -231,6 +235,7 @@ private:
     QString                   m_name;
     QString                   m_password;
     PlayerRole                m_role;
+    CharacterBase*            mp_character;
     bool                      m_isAlive;
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
@@ -241,6 +246,7 @@ private:
     int                       m_distanceOut;
     int                       m_lastBangTurn;
     int                       m_unlimitedBangs;
+    int                       m_bangPower;
     int                       m_currentPredraw;
 
     QList<int>                m_predrawChecks;

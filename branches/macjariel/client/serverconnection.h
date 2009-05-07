@@ -22,7 +22,7 @@
 
 #include "parser/parserstructs.h"
 #include <QObject>
-
+#include <QList>
 
 
 /// Forward declarations
@@ -65,6 +65,10 @@ public slots:
     void playCard(int cardId);
     void playCardWithPlayer(int cardId, int playerId);
     void playCardWithCard(int cardId, int otherCardId);
+
+    void useAbility();
+    void useAbility(int playerId);
+    void useAbility(QList<int> cards);
 
     void endTurn();
     void pass();

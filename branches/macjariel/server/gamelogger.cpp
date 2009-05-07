@@ -35,6 +35,11 @@ void GameLogger::onPlayerDrawFromDeck(PublicPlayerView& p, QList<const PlayingCa
     m_logFile << "onPlayerDrawFromDeck (player=" << p.id() << ", cards=todo)" << endl;
 }
 
+void GameLogger::onPlayerDrawFromGraveyard(PublicPlayerView& p, const PlayingCard*, const PlayingCard*)
+{
+    m_logFile << "onPlayerDrawFromGraveyard (player=" << p.id() << ", cards=todo)" << endl;
+}
+
 void GameLogger::onPlayerDiscardCard(PublicPlayerView& p, const PlayingCard*, PocketType)
 {
     m_logFile << "onPlayerDiscardCard (player=" << p.id() << ")" << endl;
@@ -78,6 +83,11 @@ void GameLogger::onDrawIntoSelection(QList<const PlayingCard*>)
 void GameLogger::onPlayerPickFromSelection(PublicPlayerView& p, const PlayingCard*)
 {
     m_logFile << "onPlayerPickFromSelection (player=" << p.id() << ")" << endl;
+}
+
+void GameLogger::onUndrawFromSelection(const PlayingCard* card)
+{
+    m_logFile << "onUndrawFromSelection ()" << endl;
 }
 
 void GameLogger::onPlayerCheckDeck(PublicPlayerView& p, const PlayingCard*, const PlayingCard*, bool)

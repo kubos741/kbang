@@ -344,6 +344,12 @@ void Parser::processStanza()
             emit sigActionPlayCard(actionPlayCardData);
             return;
         }
+        if (action->name() == "use-ability") {
+            ActionUseAbilityData actionUseAbilityData;
+            actionUseAbilityData.read(action);
+            emit sigActionUseAbility(actionUseAbilityData);
+            return;
+        }
         if (action->name() == "end-turn") {
             emit sigActionEndTurn();
             return;
@@ -670,6 +676,14 @@ void Parser::actionPlayCard(const ActionPlayCardData& actionPlayCardData)
     ASSERT_SOCKET;
     actionStart();
     actionPlayCardData.write(mp_streamWriter);
+    actionEnd();
+}
+
+void Parser::actionUseAbility(const ActionUseAbilityData& actionUseAbilityData)
+{
+    ASSERT_SOCKET;
+    actionStart();
+    actionUseAbilityData.write(mp_streamWriter);
     actionEnd();
 }
 

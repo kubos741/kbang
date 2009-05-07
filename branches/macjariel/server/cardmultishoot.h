@@ -20,6 +20,8 @@ public:
     virtual void respondPass();
     virtual void respondCard(PlayingCard* targetCard);
 
+    virtual ReactionType reactionType() const;
+
 private:
     void requestNext();
 

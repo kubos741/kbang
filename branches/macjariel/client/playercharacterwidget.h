@@ -41,17 +41,13 @@ public:
 
     void init(CardWidgetFactory* cardWidgetFactory);
 
-
-
-    inline QString character() const { return m_character; }
+    inline CharacterType character() const { return m_character; }
     inline int     lifePoints() const { return m_lifePoints; }
 
-
-    void setCharacter(const QString& character);
+    void setOwnerId(int ownerId);
+    void setCharacter(CharacterType character);
     void setLifePoints(int lifePoints);
     void unset();
-
-    //virtual QSize sizeHint() const { return m_sizeHint; }
 
 private:
     void lifePointsChanged();
@@ -63,7 +59,7 @@ signals:
     void animationFinished();
 
 private:
-    QString m_character;
+    CharacterType m_character;
     int m_lifePoints;
     int m_sourceY;
     int m_targetY;

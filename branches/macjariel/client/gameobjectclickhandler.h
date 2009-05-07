@@ -1,6 +1,8 @@
 #ifndef CARDWIDGETCLICKHANDLER_H
 #define CARDWIDGETCLICKHANDLER_H
 
+#include <QList>
+
 class QString;
 
 namespace client
@@ -16,7 +18,7 @@ class GameObjectClickHandler
 friend class Game;
 public:
     bool isClickable(CardWidget*);
-    void onCardClicked(CardWidget*);
+    bool onCardClicked(CardWidget*);
     void onPlayerClicked(PlayerWidget*);
     void onEndTurnClicked();
     void onPassClicked();
@@ -25,24 +27,32 @@ public:
 private:
     GameObjectClickHandler(Game* game);
     void onMainCardClicked(CardWidget*);
+    void onCharacterClicked(CardWidget*);
 
-
-    void setActiveCard(CardWidget* cardWidget);
+    void selectPlayer(CardWidget* activeCard);
+    void selectCards(CardWidget* activeCard, int cardCount = 1);
     void unsetActiveCard();
 
-    void setSelectPlayerState();
+    void addToSelection(CardWidget* card);
+    void removeFromSelection(CardWidget* card);
+
+    void useAbilityWithCards();
+    void playWithCards();
+
     void debug(const QString&);
 
     enum {
         STATE_MAIN,
-        STATE_SELECT_CARD,
-        STATE_SELECT_PLAYER
+        STATE_SELECT_CARDS,
+        STATE_SELECT_PLAYER,
+        STATE_DISCARD
     } m_state;
 
 
-    Game*       mp_game;
-    CardWidget* mp_activeCard;
-    bool        m_inDiscardMode;
+    Game*               mp_game;
+    CardWidget*         mp_activeCard;
+    QList<CardWidget*>  m_cardSelection;
+    int                 m_selectionSize;
 };
 }
 

@@ -10,6 +10,7 @@ public:
     virtual ~CardDynamite();
 
     virtual void play();
+    void checkResult(bool result);
     virtual void registerPlayer(Player* player);
     virtual void unregisterPlayer(Player* player);
 

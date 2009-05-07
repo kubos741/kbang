@@ -56,8 +56,10 @@ void CardBang::play(Player *targetPlayer)
     owner()->onBangPlayed();
     mp_attackingPlayer = owner();
     gameTable()->playerPlayCard(this, targetPlayer);
-    game()->gameCycle().setResponseMode(this, targetPlayer);
+    m_usedBarrels.clear();
     mp_attackedPlayer = targetPlayer;
+    m_missedLeft = mp_attackingPlayer->bangPower();
+    game()->gameCycle().setResponseMode(this, targetPlayer);
 }
 
 void CardBang::respondPass()
@@ -76,12 +78,17 @@ void CardBang::respondCard(PlayingCard* targetCard)
         targetCard->assertInHand();
         game()->gameCycle().unsetResponseMode();
         gameTable()->playerPlayCard(targetCard);
+        missed();
         return;
     case CARD_BARREL: {
+        if (m_usedBarrels.contains(targetCard))
+            break;
         targetCard->assertOnTable();
+        m_usedBarrels.append(targetCard);
         CardBarrel* barrel = qobject_cast<CardBarrel*>(targetCard);
         if (barrel->check()) {
             game()->gameCycle().unsetResponseMode();
+            missed();
         }
         return;
         }
@@ -89,6 +96,15 @@ void CardBang::respondCard(PlayingCard* targetCard)
         break;
     }
     throw BadCardException();
+}
+
+void CardBang::missed()
+{
+    m_missedLeft--;
+    if (m_missedLeft > 0) {
+        game()->gameCycle().setResponseMode(this, mp_attackedPlayer);
+    }
+
 }
 
 

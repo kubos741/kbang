@@ -30,7 +30,8 @@ PlayingCard::PlayingCard(Game *game, int id, PlayingCardType type, CardSuit suit
         m_rank(rank),
         mp_owner(0),
         m_pocket(POCKET_DECK),
-        mp_game(game)
+        mp_game(game),
+        m_isVirtual(0)
 {
 }
 
@@ -87,6 +88,27 @@ void PlayingCard::assertOnTable() const
 {
     if (pocket() != POCKET_TABLE)
         throw BadCardException();
+}
+
+void PlayingCard::setVirtual(PlayingCard* master)
+{
+    mp_master   = master;
+    m_isVirtual = 1;
+    m_id        = 0;
+    m_suit      = master->suit();
+    m_rank      = master->rank();
+    mp_owner    = master->owner();
+    m_pocket    = master->pocket();
+    mp_game     = master->game();
+}
+
+void PlayingCard::setVirtual(Player* owner, PocketType pocket)
+{
+    mp_master = 0;
+    m_isVirtual = 1;
+    m_id = 0;
+    mp_owner = owner;
+    m_pocket = pocket;
 }
 
 

@@ -187,8 +187,11 @@ void CardMovementEvent::timerEvent(QTimerEvent*)
 void CardMovementEvent::stopTransition()
 {
     sm_timer.stop();
-    qDebug() << "Animation should take: " <<  (m_length * 1000 / pixelsPerSecond) <<
-     "But took: " <<  m_time.elapsed();
+    int real     = m_time.elapsed();
+    int expected = (m_length * 1000 / pixelsPerSecond);
+    if (real - expected > 30) {
+        qDebug("Animation should take %d ms, but took %d ms.", expected, real);
+    }
     mp_card->setCardData(m_cardMovementData.card);
     mp_card->validate();
     mp_card->unsetShadowMode();

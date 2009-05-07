@@ -79,6 +79,8 @@ public:
      */
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*> cards, bool revealCards) = 0;
 
+    virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* nextCard) = 0;
+
     virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard* card, PocketType pocket) = 0;
 
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card) = 0;
@@ -96,6 +98,8 @@ public:
     virtual void onDrawIntoSelection(QList<const PlayingCard*> cards) = 0;
 
     virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard* card) = 0;
+
+    virtual void onUndrawFromSelection(const PlayingCard* card) = 0;
 
     virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard* checkedCard, const PlayingCard* causedBy, bool checkResult) = 0;
 

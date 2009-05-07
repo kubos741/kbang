@@ -230,6 +230,15 @@ void Game::gameStarted(const StructGame&, const StructPlayerList&)
     mp_middleWidget->setLayout(l3);
 }
 
+CharacterType Game::character() const
+{
+    return mp_localPlayerWidget->characterWidget()->character();
+}
+
+void Game::setPlayerId(int playerId)
+{
+    m_playerId = playerId;
+}
 
 void Game::assignPlayerWidget(int playerId, PlayerWidget* playerWidget)
 {

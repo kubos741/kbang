@@ -72,20 +72,21 @@ void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerDa
 {
     setId(publicPlayerData.id);
     setName(publicPlayerData.name);
-    //mp_characterWidget->setCharacter(publicPlayerData.character);
+    mp_characterWidget->setCharacter(publicPlayerData.character);
     mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
+    mp_characterWidget->setOwnerId(id());
     setSheriff(publicPlayerData.isSheriff);
-    // Set cards on table
-    /* TODO
-    foreach (const CardData& cardData, publicPlayerData.table) {
-        CardWidget* card = mp_cardWidgetFactory->createBackCard();
-        card->setCardId(cardData.id);
-       // card->setCardClass(cardData.type);
-        mp_table->push(card);
-    }
-    */
+
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
+
+    foreach (const CardData& cardData, publicPlayerData.table) {
+        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
+        card->setCardData(cardData);
+        card->validate();
+        mp_table->push(card);
+    }
+
     updateWidgets();
 }
 
@@ -93,17 +94,12 @@ void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlaye
 {
     Q_ASSERT(id() == privatePlayerData.id);
     m_role = privatePlayerData.role;
-
-
-    // Set cards in hand
-    /* TODO
     foreach (const CardData& cardData, privatePlayerData.hand) {
-        CardWidget* card = new CardWidget(0);
-        card->setCardId(cardData.id);
-        //card->setCardClass(cardData.type); //TODO
+        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
+        card->setCardData(cardData);
+        card->validate();
         mp_hand->push(card);
     }
-    */
     updateWidgets();
 }
 

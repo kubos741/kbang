@@ -26,6 +26,8 @@ void GameSyncEvent::run()
         ++index;
     Q_ASSERT(index < m_gameSyncData.players.size());
 
+    mp_game->setPlayerId(m_gameSyncData.localPlayer.id);
+
     mp_game->localPlayerWidget()->setFromPublicData(m_gameSyncData.players[index]);
     mp_game->localPlayerWidget()->setFromPrivateData(m_gameSyncData.localPlayer);
     mp_game->assignPlayerWidget(m_gameSyncData.localPlayer.id, mp_game->localPlayerWidget());

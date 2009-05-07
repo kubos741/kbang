@@ -77,6 +77,7 @@ public slots:
     void actionMessage(const QString& message);
     void actionDrawCard(int numCards, bool revealCard);
     void actionPlayCard(const ActionPlayCardData&);
+    void actionUseAbility(const ActionUseAbilityData&);
     void actionEndTurn();
     void actionPass();
     void actionDiscard(int cardId);
@@ -138,6 +139,7 @@ signals:
     void sigActionMessage(const QString& message);
     void sigActionDrawCard(int numCards, bool revealCard);
     void sigActionPlayCard(const ActionPlayCardData&);
+    void sigActionUseAbility(const ActionUseAbilityData&);
     void sigActionEndTurn();
     void sigActionPass();
     void sigActionDiscard(int cardId);

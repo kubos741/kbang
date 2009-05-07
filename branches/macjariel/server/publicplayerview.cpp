@@ -102,7 +102,7 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     PublicPlayerData res;
     res.id          = mp_player->id();
     res.name        = mp_player->name();
-    res.character   = CHARACTER_UNKNOWN;  /// @todo: characters
+    res.character   = mp_player->characterType();
     res.lifePoints  = lifePoints();
     res.isSheriff   = isSheriff();
     res.handSize    = handSize();

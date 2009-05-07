@@ -38,6 +38,9 @@
 #include "gamecycle.h"
 #include "gameeventbroadcaster.h"
 #include "gamelogger.h"
+#include "characterbase.h"
+#include "characterlist.h"
+
 
 
 Game::Game(GameServer* parent, const StructGame& structGame):
@@ -118,11 +121,14 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
     int downIndex = fromIndex;
     int baseDistance = 0;
     while (upIndex != toIndex && downIndex != toIndex) {
-        upIndex++;
-        if (upIndex == m_playerList.size()) upIndex = 0;
-        downIndex--;
-        if (downIndex == -1)
-            downIndex = m_playerList.size() - 1;
+        do {
+            upIndex++;
+            if (upIndex == m_playerList.size()) upIndex = 0;
+        } while (!m_playerList[upIndex]->isAlive());
+        do {
+            downIndex--;
+            if (downIndex == -1) downIndex = m_playerList.size() - 1;
+        } while (!m_playerList[downIndex]->isAlive());
         baseDistance++;
     }
 
@@ -222,9 +228,16 @@ void Game::buryPlayer(Player* player, Player* causedBy)
         else
             winningSituation(ROLE_RENEGADE);
     } else if (m_outlawsCount == 0 && m_renegadesCount == 0) {
-            winningSituation(ROLE_SHERIFF);
+        winningSituation(ROLE_SHERIFF);
     } else if (player->role() == ROLE_OUTLAW && causedBy != 0) {
-            mp_gameTable->playerDrawFromDeck(causedBy, 3);
+        /// killer draws 3 cards for killing an outlaw
+        mp_gameTable->playerDrawFromDeck(causedBy, 3);
+    } else if (player->role() == ROLE_DEPUTY && causedBy->role() == ROLE_SHERIFF) {
+        /// sheriff killed his deputy and has to cancel all his cards
+        foreach(PlayingCard* card, causedBy->hand())
+            gameTable().cancelCard(card);
+        foreach(PlayingCard* card, causedBy->table())
+            gameTable().cancelCard(card);
     }
 }
 
@@ -249,8 +262,8 @@ void Game::startGame(Player* player)
     m_state = StatePlaying;
     if (mp_gameInfo->hasShufflePlayers())
         shufflePlayers();
-    //setCharacters();
-    setRoles();
+
+    setRolesAndCharacters();
 
     gameEventBroadcaster().onGameStarted();
     mp_gameTable->prepareGame(GameServer::instance().cardFactory());
@@ -285,17 +298,20 @@ void Game::shufflePlayers()
     }
 }
 
-void Game::setRoles()
+void Game::setRolesAndCharacters()
 {
     QList<PlayerRole> roles = getRoleList();
+    CharacterList characters = CharacterList(this, m_playerList.size());
     shuffleList(roles);
     QListIterator<Player*> pIt(m_playerList);
     QListIterator<PlayerRole> rIt(roles);
+    QListIterator<CharacterBase*> cIt(characters);
     int i = 0;
     m_goodGuysCount = m_outlawsCount = m_renegadesCount = 0;
-    while(pIt.hasNext() && rIt.hasNext())
+    while(pIt.hasNext() && rIt.hasNext() && cIt.hasNext())
     {
-        pIt.peekNext()->setRole(rIt.peekNext());
+        // TODO
+        pIt.peekNext()->setRoleAndCharacter(rIt.peekNext(), cIt.peekNext());
         switch(rIt.peekNext()) {
             case ROLE_SHERIFF:
             case ROLE_DEPUTY:
@@ -311,7 +327,7 @@ void Game::setRoles()
                 NOT_REACHED();
         }
         i++;
-        pIt.next(); rIt.next();
+        pIt.next(); rIt.next(); cIt.next();
     }
 }
 

@@ -34,6 +34,7 @@ const int timerInterval = 100;
 
 PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
         QWidget(parent),
+        m_character(CHARACTER_UNKNOWN),
         m_lifePoints(0),
         m_isAnimating(0),
         mp_cardWidgetFactory(0)
@@ -56,9 +57,22 @@ void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
     mp_backCard->show();
 
     mp_characterCard = cardWidgetFactory->createCharacterCard(this);
+    mp_characterCard->setCharacterType(m_character);
     mp_characterCard->validate();
     mp_characterCard->move(0,0);
     mp_characterCard->show();
+}
+
+void PlayerCharacterWidget::setOwnerId(int ownerId)
+{
+    mp_characterCard->setOwnerId(ownerId);
+}
+
+void PlayerCharacterWidget::setCharacter(CharacterType character)
+{
+    m_character = character;
+    mp_characterCard->setCharacterType(m_character);
+    mp_characterCard->validate();
 }
 
 void PlayerCharacterWidget::setLifePoints(int lifePoints)
@@ -70,6 +84,13 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
         lifePointsChanged();
     else
         emit animationFinished();
+}
+
+void PlayerCharacterWidget::unset()
+{
+    mp_characterCard->setOwnerId(0);
+    mp_characterCard->hide();
+    mp_backCard->hide();
 }
 
 void PlayerCharacterWidget::lifePointsChanged()

@@ -6,6 +6,7 @@
 #include "gameeventhandler.h"
 #include "gametable.h"
 #include "playingcard.h"
+#include "characterbase.h"
 
 
 PlayerCtrl::PlayerCtrl(Player* player):
@@ -24,9 +25,9 @@ void PlayerCtrl::startGame()
     mp_player->game()->startGame(mp_player);
 }
 
-void PlayerCtrl::drawCard(int numCards, bool revealCard)
+void PlayerCtrl::draw()
 {
-    mp_player->game()->gameCycle().drawCard(mp_player, numCards, revealCard);
+    mp_player->game()->gameCycle().draw(mp_player);
 }
 
 void PlayerCtrl::finishTurn()
@@ -39,11 +40,25 @@ void PlayerCtrl::discardCard(PlayingCard* card)
     mp_player->game()->gameCycle().discardCard(mp_player, card);
 }
 
+void PlayerCtrl::useAbility()
+{
+    mp_player->character()->useAbility();
+}
+
+void PlayerCtrl::useAbility(const PublicPlayerView* targetPlayer)
+{
+    mp_player->character()->useAbility(Player::player(targetPlayer));
+}
+
+void PlayerCtrl::useAbility(QList<PlayingCard*> cards)
+{
+    mp_player->character()->useAbility(cards);
+}
+
 void PlayerCtrl::playCard(PlayingCard* card)
 {
     mp_player->game()->gameCycle().playCard(mp_player, card);
 }
-
 
 void PlayerCtrl::playCard(PlayingCard* card, const PublicPlayerView* targetPlayer)
 {

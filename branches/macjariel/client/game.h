@@ -72,8 +72,11 @@ public:
     inline bool            isAbleToRequest() const    { return m_requestedPlayerId == m_playerId; }
 
     inline int playerId() const { return m_playerId; }
+    CharacterType character() const;
 
     inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
+
+    void setPlayerId(int playerId);
 
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
@@ -86,7 +89,7 @@ private:
 
 
 private:
-    const int m_playerId;
+    int m_playerId;
     const QString m_playerName;
     const int m_gameId;
     ServerConnection* mp_serverConnection;

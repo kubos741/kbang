@@ -48,6 +48,7 @@ public:
     inline const CardData&  cardData()   const { return m_cardData; }
     inline PocketType       pocketType()     const { return m_pocket; }
     inline int              ownerId()    const { return m_ownerId; }
+    inline CharacterType    character()  const { return m_characterType; }
 
     void setGameObjectClickHandler(GameObjectClickHandler*);
 

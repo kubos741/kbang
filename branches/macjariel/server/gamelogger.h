@@ -23,6 +23,7 @@ public:
     virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy);
     virtual void onGameStarted();
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*>, bool);
+    virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard*, const PlayingCard*);
     virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard*, PocketType);
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard*);
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard*, PublicPlayerView&);
@@ -32,6 +33,7 @@ public:
     virtual void onPlayerPass(PublicPlayerView&);
     virtual void onDrawIntoSelection(QList<const PlayingCard*>);
     virtual void onPlayerPickFromSelection(PublicPlayerView&, const PlayingCard*);
+    virtual void onUndrawFromSelection(const PlayingCard* card);
     virtual void onPlayerCheckDeck(PublicPlayerView&, const PlayingCard*, const PlayingCard*, bool);
     virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView&, PocketType, const PlayingCard*);
     virtual void onPlayerCancelCard(PublicPlayerView&, PocketType, const PlayingCard*, PublicPlayerView*);

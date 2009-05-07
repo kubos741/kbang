@@ -112,8 +112,10 @@ void CardWidget::validate()
 
 void CardWidget::paintEvent(QPaintEvent *event)
 {
+    QTime t;
+    t.start();
     QLabel::paintEvent(event);
-
+/*
     if (type() == Card::Playing && cardData().type != CARD_UNKNOWN) {
         QPoint posRank, posSuit;
         QColor suitColor;
@@ -186,11 +188,14 @@ void CardWidget::paintEvent(QPaintEvent *event)
         painter.drawPath(path2);
 
     }
+*/
 
     if (m_hasHighlight) {
         QPainter painter(this);
         painter.fillRect(this->rect(), QBrush(QColor(0,0,0,128)));
     }
+    if (t.elapsed() > 10)
+        qDebug() << "Card drawing took: " << t.elapsed();
 }
 
 
@@ -237,10 +242,13 @@ void CardWidget::setHighlight(bool hasHighlight)
     update();
 }
 
-void CardWidget::mousePressEvent(QMouseEvent*)
+void CardWidget::mousePressEvent(QMouseEvent* e)
 {
-    if (mp_gameObjectClickHandler)
-        mp_gameObjectClickHandler->onCardClicked(this);
+    if (mp_gameObjectClickHandler) {
+        bool handled = mp_gameObjectClickHandler->onCardClicked(this);
+        if (!handled)
+            QLabel::mousePressEvent(e);
+    }
 }
 
 
