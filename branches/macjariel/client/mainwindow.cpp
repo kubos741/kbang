@@ -53,6 +53,11 @@ MainWindow::MainWindow():
 
     connect(&m_serverConnection, SIGNAL(statusChanged()),
             this, SLOT(serverConnectionStatusChanged()));
+    connect(&m_serverConnection, SIGNAL(enterGameMode(int, const QString&, ClientType)),
+            this,                SLOT(enterGameMode(int, const QString&, ClientType)));
+    connect(&m_serverConnection, SIGNAL(exitGameMode()),
+            this,                SLOT(exitGameMode()));
+
     connect(&m_serverConnection, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool, bool)),
             this, SLOT(playerJoinedGame(int, const StructPlayer&, bool, bool)));
     connect(&m_serverConnection, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)),
@@ -212,38 +217,20 @@ void MainWindow::leaveGame()
     m_serverConnection.leaveGame();
 }
 
-void MainWindow::playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator)
+
+void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
 {
-    if (other == 1)
-    {
-        Q_ASSERT(mp_game != 0);
-        mp_game->opponentJoinedGame(player);
-    }
-    else
-    {
-        Q_ASSERT(mp_game == 0);
-        GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets);
-        mp_game = new Game(this, gameId, player, &m_serverConnection, x);
-        mp_game->setCreator(creator);
-        mp_game->init();
-        updateActions();
-    }
+    Q_ASSERT(mp_game == 0);
+    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets);
+    mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
+    updateActions();
 }
 
-
-void MainWindow::playerLeavedGame(int gameId, const StructPlayer& player, bool other)
+void MainWindow::exitGameMode()
 {
-    if (other == 0)
-    {
-        mp_game->deleteLater();
-        mp_game = 0; // MEMORY LEAK JAK CIP - TODO
-        updateActions();
-    }
-    else
-    {
-        Q_ASSERT(mp_game != 0);
-        mp_game->opponentLeavedGame(player);
-    }
+    mp_game->deleteLater();
+    mp_game = 0;
+    updateActions();
 }
 
 void MainWindow::paintEvent(QPaintEvent* e)

@@ -21,6 +21,7 @@
 #include "serverconnection.h"
 
 #include "parser/queryget.h"
+#include "util.h"
 
 using namespace client;
 
@@ -31,7 +32,7 @@ JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnecti
     connect(mp_refreshButton, SIGNAL(clicked()),
             this, SLOT(refreshGameList()));
     refreshGameList();
-    doButtons();
+    setButtonsState();
 }
 
 
@@ -42,36 +43,50 @@ JoinGameDialog::~JoinGameDialog()
 void JoinGameDialog::refreshGameList()
 {
     QueryGet* query = mp_serverConnection->queryGet();
-    connect(query, SIGNAL(result(const StructGameList&)),
-            this, SLOT(recievedGameList(const StructGameList&)));
+    connect(query,  SIGNAL(result(const GameInfoListData&)),
+            this,   SLOT(recievedGameList(const GameInfoListData&)));
     query->getGameList();
 }
 
 void JoinGameDialog::loadGameDetails(int gameId)
 {
     QueryGet* query = mp_serverConnection->queryGet();
-    connect(query, SIGNAL(result(const StructGame&, const StructPlayerList&)),
-            this, SLOT(recievedGameDetails(const StructGame&, const StructPlayerList&)));
+    connect(query, SIGNAL(result(const GameInfoData&)),
+            this, SLOT(recievedGame(const GameInfoData&)));
     query->getGame(gameId);
 }
 
-void JoinGameDialog::recievedGameList(const StructGameList& gameList)
+
+void JoinGameDialog::recievedGameList(const GameInfoListData& gameList)
 {
     mp_gameListView->clear();
-    foreach(StructGame game, gameList)
+    foreach(const GameInfoData& gameInfo, gameList)
     {
         QTreeWidgetItem* item = new QTreeWidgetItem(mp_gameListView);
-        item->setData(0, Qt::UserRole, game.id);
-        item->setText(0, game.name);
-        item->setText(1, "TODO");
-        item->setText(2, QString("%1 - %2").arg(game.minPlayers)
-                                               .arg(game.maxPlayers));
+        item->setData(0, Qt::UserRole, gameInfo.id);
+        item->setText(0, gameInfo.name);
+        switch(gameInfo.state) {
+        case GAMESTATE_WAITINGFORPLAYERS:
+            item->setText(1, "Waiting");
+            item->setText(2, QString("%1 / %2").arg(gameInfo.totalPlayersCnt).arg(gameInfo.maxPlayers));
+            break;
+        case GAMESTATE_PLAYING:
+            item->setText(1, "Playing");
+            item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.totalPlayersCnt));
+            break;
+        case GAMESTATE_FINISHED:
+            item->setText(1, "Finished");
+            item->setText(2, "");
+            break;
+        default:
+            NOT_REACHED();
+        }
     }
 }
 
+/*
 void JoinGameDialog::recievedGameDetails(const StructGame& game, const StructPlayerList& playerList)
 {
-    /* TODO: use game? */
     mp_playerListView->clear();
     foreach(StructPlayer player, playerList)
     {
@@ -79,6 +94,7 @@ void JoinGameDialog::recievedGameDetails(const StructGame& game, const StructPla
         item->setText(0, player.name);
     }
 }
+*/
 
 
 void JoinGameDialog::show()
@@ -94,7 +110,7 @@ void JoinGameDialog::on_mp_gameListView_itemClicked(QTreeWidgetItem* item, int)
     loadGameDetails(gameId);
 }
 
-void JoinGameDialog::doButtons()
+void JoinGameDialog::setButtonsState()
 {
     bool ok = (mp_gameListView->currentItem() == 0);
     mp_playButton->setEnabled(!ok);

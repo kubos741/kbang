@@ -35,17 +35,15 @@ class CreateGameDialog : public QDialog, public Ui::CreateGameDialog
 Q_OBJECT
 public:
     CreateGameDialog(QWidget *parent);
-
     ~CreateGameDialog();
 
-
 private slots:
-    void playerRangeChanged();
+    void playerCountsChanged();
     void validateInput();
     void on_pushButtonCreate_clicked();
 
 signals:
-    void createGame(const StructGame&, const StructPlayer&);
+    void createGame(const CreateGameData&, const CreatePlayerData&);
 };
 
 }

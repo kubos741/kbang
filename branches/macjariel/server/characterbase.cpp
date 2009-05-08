@@ -54,6 +54,10 @@ void CharacterBase::useAbility()
     throw BadUsageException();
 }
 
+void CharacterBase::playerDied()
+{
+}
+
 void CharacterBase::useAbility(Player* targetPlayer)
 {
     throw BadUsageException();

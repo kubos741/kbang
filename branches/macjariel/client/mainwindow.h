@@ -61,9 +61,8 @@ private slots:
     void leaveGame();
 
 
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
-
+    void enterGameMode(int gameId, const QString& gameName, ClientType);
+    void exitGameMode();
 
     void serverConnectionStatusChanged();
 

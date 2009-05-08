@@ -51,9 +51,8 @@ public:
 
 signals:
     void result(const StructServerInfo&);
-    void result(const StructGame&);
-    void result(const StructGame&, const StructPlayerList&);
-    void result(const StructGameList&);
+    void result(const GameInfoData&);
+    void result(const GameInfoListData&);
 
 private:
     Parser* mp_parser;

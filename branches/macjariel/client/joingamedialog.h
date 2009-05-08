@@ -44,12 +44,12 @@ public:
 public slots:
     void refreshGameList();
     void loadGameDetails(int gameId);
-    void recievedGameList(const StructGameList&);
-    void recievedGameDetails(const StructGame&, const StructPlayerList&);
+    void recievedGameList(const GameInfoListData&);
+    //void recievedGameDetails(const StructGame&, const StructPlayerList&);
     void on_mp_gameListView_itemClicked(QTreeWidgetItem * item, int column);
     void on_mp_playButton_clicked();
     void on_mp_spectateButton_clicked();
-    void doButtons();
+    void setButtonsState();
 
 signals:
     void joinGame(int gameId, const QString& gamePassword, const QString& playerName);

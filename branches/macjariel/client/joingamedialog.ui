@@ -5,20 +5,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>692</width>
-    <height>277</height>
+    <width>786</width>
+    <height>469</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>Join Game</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" >
      <item>
-      <widget class="QTreeWidget" name="mp_gameListView" >
+      <widget class="QTreeWidget" name="gameListView" >
        <property name="focusPolicy" >
         <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="autoScroll" >
+        <bool>true</bool>
        </property>
        <property name="alternatingRowColors" >
         <bool>true</bool>
@@ -43,7 +52,7 @@
        </property>
        <column>
         <property name="text" >
-         <string>Game</string>
+         <string>Name</string>
         </property>
        </column>
        <column>
@@ -56,65 +65,311 @@
          <string>Players</string>
         </property>
        </column>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTreeWidget" name="mp_playerListView" >
-       <property name="focusPolicy" >
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="editTriggers" >
-        <set>QAbstractItemView::EditKeyPressed</set>
-       </property>
-       <property name="alternatingRowColors" >
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode" >
-        <enum>QAbstractItemView::NoSelection</enum>
-       </property>
-       <property name="indentation" >
-        <number>15</number>
-       </property>
-       <property name="rootIsDecorated" >
-        <bool>false</bool>
-       </property>
-       <property name="itemsExpandable" >
-        <bool>false</bool>
-       </property>
-       <property name="sortingEnabled" >
-        <bool>false</bool>
-       </property>
-       <property name="animated" >
-        <bool>true</bool>
-       </property>
-       <property name="allColumnsShowFocus" >
-        <bool>false</bool>
-       </property>
        <column>
         <property name="text" >
-         <string>Player</string>
+         <string/>
         </property>
        </column>
       </widget>
      </item>
+     <item>
+      <widget class="Line" name="line_2" >
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout" >
+       <item>
+        <widget class="QFrame" name="frame" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2" >
+          <item row="0" column="0" colspan="2" >
+           <widget class="QLabel" name="label_12" >
+            <property name="font" >
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text" >
+             <string>Game Info</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_13" >
+            <property name="text" >
+             <string>Name:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLabel" name="labelName" >
+            <property name="text" >
+             <string>[Name]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="label_14" >
+            <property name="text" >
+             <string>Description:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QLabel" name="labelDescription" >
+            <property name="text" >
+             <string>[Description]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_15" >
+            <property name="text" >
+             <string>State:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="labelState" >
+            <property name="text" >
+             <string>[State]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="label_16" >
+            <property name="text" >
+             <string>Players:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLabel" name="labelPlayers" >
+            <property name="text" >
+             <string>[Players]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" >
+           <widget class="QLabel" name="label_18" >
+            <property name="text" >
+             <string>AI Players:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" >
+           <widget class="QLabel" name="labelAIPlayers" >
+            <property name="text" >
+             <string>[AI Players]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" >
+           <widget class="QLabel" name="label_17" >
+            <property name="text" >
+             <string>Password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1" >
+           <widget class="QLabel" name="labelPassword" >
+            <property name="text" >
+             <string>[Password]</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="playerListView" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy" >
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="editTriggers" >
+          <set>QAbstractItemView::EditKeyPressed</set>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="indentation" >
+          <number>15</number>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="itemsExpandable" >
+          <bool>false</bool>
+         </property>
+         <property name="sortingEnabled" >
+          <bool>false</bool>
+         </property>
+         <property name="animated" >
+          <bool>false</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>false</bool>
+         </property>
+         <property name="headerHidden" >
+          <bool>false</bool>
+         </property>
+         <property name="expandsOnDoubleClick" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Players</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>C</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>AI</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>+</string>
+          </property>
+         </column>
+         <item>
+          <property name="text" >
+           <string>Create new player</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout" >
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_7" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Player Name</string>
+           </property>
+           <property name="buddy" >
+            <cstring>lineEditPlayerName</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QLineEdit" name="lineEditPlayerName" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item rowspan="2" row="0" column="2" >
+          <widget class="QLabel" name="label_10" >
+           <property name="minimumSize" >
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="frameShape" >
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="frameShadow" >
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="text" >
+            <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">[TODO]&lt;br />[portrait]&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_9" >
+           <property name="toolTip" >
+            <string>You can set your password here. This password will be required to reconnect to your player in case of disconnection.</string>
+           </property>
+           <property name="text" >
+            <string>Player Password</string>
+           </property>
+           <property name="buddy" >
+            <cstring>lineEditPlayerPassword</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QLineEdit" name="lineEditPlayerPassword" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
     </layout>
    </item>
    <item>
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout" >
-     <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>Player name:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="mp_playerNameEdit" >
-       <property name="text" >
-        <string>Player</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <spacer name="horizontalSpacer" >
        <property name="orientation" >
@@ -129,28 +384,28 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="mp_refreshButton" >
+      <widget class="QPushButton" name="pushButtonRefresh" >
        <property name="text" >
         <string>Refresh</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="mp_playButton" >
+      <widget class="QPushButton" name="pushButtonPlay" >
        <property name="text" >
         <string>Play</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="mp_spectateButton" >
+      <widget class="QPushButton" name="pushButtonSpectate" >
        <property name="text" >
         <string>Spectate</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="mp_cancelButton" >
+      <widget class="QPushButton" name="pushButtonCancel" >
        <property name="text" >
         <string>Cancel</string>
        </property>
@@ -163,7 +418,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>mp_cancelButton</sender>
+   <sender>pushButtonCancel</sender>
    <signal>clicked()</signal>
    <receiver>JoinGameDialog</receiver>
    <slot>close()</slot>

@@ -24,9 +24,7 @@ void GameContextChangeEvent::run()
     if (requestedPlayer)
         requestedPlayer->setActive(0);
 
-    mp_game->setCurrentPlayerId(m_gameContextData.currentPlayerId);
-    mp_game->setRequestedPlayerId(m_gameContextData.requestedPlayerId);
-    mp_game->setGamePlayState(m_gameContextData.gamePlayState);
+    mp_game->setGameContext(m_gameContextData);
 
     currentPlayer = mp_game->playerWidget(m_gameContextData.currentPlayerId);
     requestedPlayer = mp_game->playerWidget(m_gameContextData.requestedPlayerId);

@@ -81,23 +81,17 @@ void QueryGet::parseResult(XmlNode* node)
         x.read(node);
         emit result(x);
     }
-    if (node->name() == "gamelist")
+    if (node->name() == "games-info")
     {
-        StructGameList x;
-        foreach(XmlNode* game, node->getChildren())
-        {
-            StructGame g;
-            g.read(game);
-            x.append(g);
-        }
-        emit result(x);
+        GameInfoListData gamesInfo;
+        gamesInfo.read(node);
+        emit result(gamesInfo);
     }
-    if (node->name() == StructGame::elementName)
+    if (node->name() == "game-info")
     {
-        StructGame x;
-        StructPlayerList y;
-        x.read(node, &y);
-        emit result(x, y);
+        GameInfoData gameInfo;
+        gameInfo.read(node);
+        emit result(gameInfo);
     }
     if (node->name() == StructServerInfo::elementName)
     {

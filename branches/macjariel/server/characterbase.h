@@ -35,6 +35,9 @@ public:
     virtual void useAbility(QList<PlayingCard*> cards);
 
     virtual void setPlayer(Player* player);
+    virtual void playerDied();
+
+
 
 protected:
     void setCharacterType(CharacterType type);

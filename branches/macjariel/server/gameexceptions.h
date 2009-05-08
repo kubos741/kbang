@@ -51,6 +51,22 @@ private:
     GamePlayState m_current, m_expected;
 };
 
+class BadGamePasswordException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadGamePasswordException");
+    }
+};
+
+class BadPlayerPasswordException: public GameException
+{
+public:
+    virtual void debug() {
+        qDebug("BadPlayerPasswordException");
+    }
+};
+
 
 
 class OneBangPerTurnException: public GameException

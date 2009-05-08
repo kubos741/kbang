@@ -24,7 +24,6 @@
 #include "publicgameview.h"
 #include "parser/parserstructs.h"
 
-
 class Client;
 class Player;
 class GameServer;
@@ -42,6 +41,7 @@ class GameInfo;
 class GameTable;
 class GameCycle;
 class BeerRescue;
+class PlayerReaper;
 
 /**
  * The Game class represents a bang game. Because there is a lot
@@ -69,7 +69,7 @@ public:
      * \param structGame the game structure from parser
      * \see GameServer::createGame()
      */
-    Game(GameServer* parent, const StructGame& structGame);
+    Game(GameServer* parent, int gameId, const CreateGameData&);
     ~Game();
 
   /////////////
@@ -80,7 +80,7 @@ public:
      * Returns the id of the game. Zero value is reserved and interpreted
      * as an invalid game.
      */
-    int id() const;
+    inline int id() const { return m_id; }
 
     /**
      * Returns the count of players in the game.
@@ -94,6 +94,7 @@ public:
      */
     inline int spectatorsCount() const { return 0; } /// @todo Spectators
 
+    inline GameState& gameState() { return m_state; }
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
     inline GameCycle& gameCycle() { return *mp_gameCycle; }
     inline GameTable& gameTable() { return *mp_gameTable; }
@@ -104,7 +105,7 @@ public:
     inline const PublicGameView& publicGameView() const
                                   { return m_publicGameView; }
 
-    bool isFinished() const { return m_state == StateFinished; }
+    bool isFinished() const { return m_state == GAMESTATE_FINISHED; }
 
     /**
      * Returns the list of players, respecting the order
@@ -149,7 +150,11 @@ public:
      * returns the pointer to it. Creating players is reasonable only
      * before the game is started.
      */
-    Player* createPlayer(StructPlayer player, GameEventHandler* gameEventHandler);
+    Player* createPlayer(const CreatePlayerData&, GameEventHandler*);
+
+    void createAI(int count);
+
+    void replacePlayer(Player*, const CreatePlayerData&, GameEventHandler*);
 
     /**
      * Removes a player from the game. Removing players is reasonable only
@@ -161,6 +166,8 @@ public:
 
     void winningSituation(PlayerRole winners);
 
+    void setPlayerReaper(PlayerReaper*);
+    void unsetPlayerReaper();
 
     /**
      * Tries to start the game.
@@ -184,11 +191,8 @@ private:
 
 
 private:
-    enum {
-        StateWaitingForPlayers,
-        StatePlaying,
-        StateFinished
-    } m_state;
+    int       m_id;
+    GameState m_state;
 
     GameInfo*             mp_gameInfo;
     GameTable*            mp_gameTable;
@@ -206,6 +210,8 @@ private:
     int                 m_outlawsCount;
     int                 m_renegadesCount;
     BeerRescue*         mp_beerRescue;
+    PlayerReaper*       mp_defaultPlayerReaper;
+    PlayerReaper*       mp_playerReaper;
     GameLogger*         mp_gameLogger;
 };
 

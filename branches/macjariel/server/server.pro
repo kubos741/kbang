@@ -49,7 +49,9 @@ HEADERS += player.h \
     characterpedroramirez.h \
     characterjessejones.h \
     charactersidketchum.h \
-    characterkitcarlson.h
+    characterkitcarlson.h \
+    playerreaper.h \
+    charactervulturesam.h
 SOURCES += main.cpp \
     player.cpp \
     gameserver.cpp \
@@ -100,7 +102,9 @@ SOURCES += main.cpp \
     characterpedroramirez.cpp \
     characterjessejones.cpp \
     charactersidketchum.cpp \
-    characterkitcarlson.cpp
+    characterkitcarlson.cpp \
+    playerreaper.cpp \
+    charactervulturesam.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

@@ -89,7 +89,7 @@ void ServerConnection::recievedServerInfo(const StructServerInfo& serverInfo)
     emit statusChanged();
 }
 
-void ServerConnection::createGame(const StructGame& game, const StructPlayer& player)
+void ServerConnection::createGame(const CreateGameData& game, const CreatePlayerData& player)
 {
     emit logMessage(tr("Creating game \"%1\".").arg(game.name));
     mp_parser->actionCreateGame(game, player);
@@ -149,6 +149,7 @@ void ServerConnection::playCardWithCard(int cardId, int otherCardId)
     actionPlayCardData.targetCardId = otherCardId;
     mp_parser->actionPlayCard(actionPlayCardData);
 }
+
 
 void ServerConnection::useAbility()
 {
@@ -229,6 +230,10 @@ void ServerConnection::recievedEventLeaveGame(int gameId, const StructPlayer& pl
 
 void ServerConnection::initializeParserConnections()
 {
+    connect(mp_parser, SIGNAL(sigEventEnterGameMode(int,QString,ClientType)),
+            this,      SIGNAL(enterGameMode(int,QString,ClientType)));
+    connect(mp_parser, SIGNAL(sigEventExitGameMode()),
+            this,      SIGNAL(exitGameMode()));
     connect(mp_parser, SIGNAL(sigEventJoinGame(int, const StructPlayer&, bool, bool)),
             this, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool, bool)));
     connect(mp_parser, SIGNAL(sigEventLeaveGame(int, const StructPlayer&, bool)),

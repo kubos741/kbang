@@ -27,13 +27,6 @@ mp_streamWriter(streamWriter), m_id(id), m_sent(0)
 {
 }
 
-void QueryResult::sendData(const StructServerInfo& data)
-{
-    writeStartQuery();
-    data.write(mp_streamWriter);
-    writeEndQuery();
-}
-
 void QueryResult::writeStartQuery()
 {
     mp_streamWriter->writeStartElement("query");
@@ -44,31 +37,4 @@ void QueryResult::writeStartQuery()
 void QueryResult::writeEndQuery()
 {
     mp_streamWriter->writeEndElement();
-}
-
-void QueryResult::sendData(const StructGame& game)
-{
-    writeStartQuery();
-    game.write(mp_streamWriter);
-    writeEndQuery();
-}
-
-void QueryResult::sendData(const StructGame& game, const StructPlayerList& playerList)
-{
-    writeStartQuery();
-    game.write(mp_streamWriter, &playerList);
-    writeEndQuery();
-}
-
-
-void QueryResult::sendData(const StructGameList& gamelist)
-{
-    writeStartQuery();
-    mp_streamWriter->writeStartElement("gamelist");
-    foreach(const StructGame& i, gamelist)
-    {
-        i.write(mp_streamWriter);
-    }
-    mp_streamWriter->writeEndElement();
-    writeEndQuery();
 }

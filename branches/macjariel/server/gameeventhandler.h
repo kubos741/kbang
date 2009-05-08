@@ -43,6 +43,8 @@ public:
     //GameEventHandler();
 
 
+    virtual bool isAI() = 0;
+
     /**
      * This method is created right after the Player is created.
      * The controlling client gets the PlayerCtrl instance that

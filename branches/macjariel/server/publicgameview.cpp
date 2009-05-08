@@ -56,9 +56,33 @@ int PublicGameView::playersCount() const
     return mp_game->playersCount();
 }
 
-StructGame PublicGameView::structGame() const
+GameInfoData PublicGameView::gameInfoData() const
 {
-    return mp_game->gameInfo().structGame();
+    GameInfoData res;
+    res.id          = id();
+    res.name        = name();
+    res.description = description();
+    res.minPlayers  = mp_game->gameInfo().minPlayers();
+    res.maxPlayers  = mp_game->gameInfo().maxPlayers();
+    res.maxSpectators = mp_game->gameInfo().maxSpectators();
+    res.totalPlayersCnt = mp_game->playersCount();
+    res.alivePlayersCnt = mp_game->alivePlayersCount();
+    res.spectatorsCnt   = mp_game->spectatorsCount();
+    //res.AIPlayersCnt    todo
+    res.hasPlayerPassword = mp_game->gameInfo().hasPlayerPassword();
+    res.hasSpectatorPassword = mp_game->gameInfo().hasSpectatorPassword();
+    res.state           = mp_game->gameState();
+    foreach(Player* p, mp_game->playerList()) {
+        PlayerInfoData playerInfo;
+        playerInfo.id = p->id();
+        playerInfo.name = p->name();
+        playerInfo.isAlive = p->isAlive();
+        playerInfo.hasController = (p->gameEventHandler() != 0);
+        // playerInfo.isAI todo
+        playerInfo.hasPassword = 0; // todo
+        res.players.append(playerInfo);
+    }
+    return res;
 }
 
 GameContextData PublicGameView::gameContextData() const
@@ -66,6 +90,10 @@ GameContextData PublicGameView::gameContextData() const
     return mp_game->gameCycle().gameContextData();
 }
 
+GameState PublicGameView::gameState() const
+{
+    return mp_game->gameState();
+}
 /*
 const PlayingCard* PublicGameView::reactionCard() const
 {

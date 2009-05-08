@@ -11,14 +11,17 @@
 
 int VoidAI::sm_playerCounter = 0;
 
-VoidAI::VoidAI(int gameId):
+VoidAI::VoidAI(QObject* parent):
+        QObject(parent),
         m_id(++sm_playerCounter)
 {
-    moveToThread(QApplication::instance()->thread());
-    StructPlayer structPlayer;
-    structPlayer.name = QString("VoidAI #%1").arg(m_id);
-    PlayerCtrl::joinGame(gameId, structPlayer, this);
+    //moveToThread(QApplication::instance()->thread());
+}
 
+CreatePlayerData VoidAI::createPlayerData() const
+{
+    CreatePlayerData res;
+    res.name = QString("VoidAI #%1").arg(m_id);
 }
 
 void VoidAI::onHandlerRegistered(PlayerCtrl* playerCtrl)

@@ -11,6 +11,8 @@ class GameLogger : public GameEventHandler
 public:
     GameLogger();
 
+    virtual bool isAI() { return 1; }
+
     virtual void onHandlerRegistered(PlayerCtrl* playerCtrl);
     virtual void onHandlerUnregistered();
 

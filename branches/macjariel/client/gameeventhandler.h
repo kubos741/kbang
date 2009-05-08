@@ -23,6 +23,10 @@ public slots:
     void onLifePointsChangeEvent(int playerId, int lifePoints);
     void onPlayerDiedEvent(int playerId, PlayerRole role);
 
+    void onPlayerJoinedEvent(const PublicPlayerData&);
+    void onPlayerLeavedEvent(int playerId);
+    void onPlayerControllerChange(int playerId, bool hasController);
+
 private:
     Game*           mp_game;
     GameEventQueue* mp_queue;

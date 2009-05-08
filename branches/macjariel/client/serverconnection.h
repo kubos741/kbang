@@ -54,7 +54,7 @@ public slots:
     void connectToServer(QString serverHost, int serverPort);
     void disconnectFromServer();
 
-    void createGame(const StructGame&, const StructPlayer&);
+    void createGame(const CreateGameData&, const CreatePlayerData&);
     void joinGame(int gameId, const QString& gamePassword, const QString& playerName);
     void leaveGame();
     void startGame();
@@ -107,12 +107,11 @@ signals:
 
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
-
-
+    void enterGameMode(int gameId, const QString& gameName, ClientType);
+    void exitGameMode();
     void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
     void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     void startableChanged(int gameId, bool startable);
-    void gameStarted(const StructGame&, const StructPlayerList&);
     void eventCardMovement(const CardMovementData&);
 
 

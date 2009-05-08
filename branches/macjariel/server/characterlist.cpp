@@ -11,6 +11,7 @@
 #include "characterpropertychange.h"
 #include "charactersidketchum.h"
 #include "charactersuzylafayette.h"
+#include "charactervulturesam.h"
 #include "util.h"
 
 QList<CharacterType> CharacterList::sm_characterTypes;
@@ -60,8 +61,7 @@ CharacterBase* CharacterList::createCharacter(QObject* parent, CharacterType typ
     case CHARACTER_SUZY_LAFAYETTE:
         return new CharacterSuzyLafayette(parent);
     case CHARACTER_VULTURE_SAM:
-        //todo
-        NOT_REACHED();
+        return new CharacterVultureSam(parent);
     case CHARACTER_WILLY_THE_KID:
         return new CharacterPropertyChange(parent, CharacterPropertyChange::WillyTheKid);
     case CHARACTER_UNKNOWN:
@@ -87,6 +87,6 @@ void CharacterList::initCharacterTypes()
     sm_characterTypes.append(CHARACTER_SID_KETCHUM);
     sm_characterTypes.append(CHARACTER_SLAB_THE_KILLER);
     sm_characterTypes.append(CHARACTER_SUZY_LAFAYETTE);
-    //sm_characterTypes.append(CHARACTER_VULTURE_SAM);
+    sm_characterTypes.append(CHARACTER_VULTURE_SAM);
     sm_characterTypes.append(CHARACTER_WILLY_THE_KID);
 }

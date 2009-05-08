@@ -44,10 +44,10 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
             this,       SLOT(onQueryGame(int, QueryResult)));
     connect(mp_parser,  SIGNAL(sigQueryGameList(QueryResult)),
             this,       SLOT(onQueryGameList(QueryResult)));
-    connect(mp_parser,  SIGNAL(sigActionCreateGame(StructGame, StructPlayer)),
-            this,       SLOT(onActionCreateGame(StructGame, StructPlayer)));
-    connect(mp_parser,  SIGNAL(sigActionJoinGame(int, StructPlayer)),
-            this,       SLOT(onActionJoinGame(int, StructPlayer)));
+    connect(mp_parser,  SIGNAL(sigActionCreateGame(const CreateGameData&, const CreatePlayerData&)),
+            this,       SLOT(onActionCreateGame(const CreateGameData&, const CreatePlayerData&)));
+    connect(mp_parser,  SIGNAL(sigActionJoinGame(int, const QString&, CreatePlayerData&)),
+            this,       SLOT(onActionJoinGame(int, const QString&, CreatePlayerData&)));
     connect(mp_parser,  SIGNAL(sigActionLeaveGame()),
             this,       SLOT(onActionLeaveGame()));
     connect(mp_parser,  SIGNAL(sigActionStartGame()),
@@ -78,23 +78,28 @@ int Client::id() const
     return m_id;
 }
 
-void Client::onActionCreateGame(const StructGame& structGame, const StructPlayer& structPlayer)
+void Client::onActionCreateGame(const CreateGameData& createGameData, const CreatePlayerData& createPlayerData)
 {
     if (isInGame()) {
         // TODO: respond with error
         return;
     }
-    PlayerCtrl::createGame(structGame, structPlayer, this);
+    PlayerCtrl::createGame(createGameData, createPlayerData, this);
 }
 
 
-void Client::onActionJoinGame(int gameId, const StructPlayer& structPlayer)
+void Client::onActionJoinGame(int gameId, QString gamePassword, const CreatePlayerData& player)
 {
     if (isInGame()) {
         // TODO: respond with error
         return;
     }
-    PlayerCtrl::joinGame(gameId, structPlayer, this);
+    try {
+        PlayerCtrl::joinGame(gameId, gamePassword, player, this);
+    } catch(GameException& e) {
+        qDebug() << "Client::onActionJoinGame - exception:";
+        e.debug();
+    }
 }
 
 
@@ -267,37 +272,22 @@ void Client::onQueryGame(int gameId, QueryResult result)
 {
     try {
         const PublicGameView& publicGameView = PlayerCtrl::publicGameView(gameId);
-        StructGame structGame = publicGameView.structGame();
-        StructPlayerList structPlayerList;
-        foreach (const PublicPlayerView* publicPlayerView, publicGameView.publicPlayerList()) {
-            structPlayerList.append(publicPlayerView->structPlayer());
-        }
-        result.sendData(structGame, structPlayerList);
+        GameInfoData gameInfoData = publicGameView.gameInfoData();
+        result.sendData(gameInfoData);
     } catch (BadGameException e) {
-        // TODO
-        //result.sendData(e);
     }
 }
 
 void Client::onQueryGameList(QueryResult result)
 {
-    StructGameList structGameList;
+    qDebug("Want game list");
+    GameInfoListData gamesInfo;
     foreach (const PublicGameView* publicGameView, PlayerCtrl::publicGameList()) {
-        structGameList.append(publicGameView->structGame());
+        gamesInfo.append(publicGameView->gameInfoData());
     }
-    result.sendData(structGameList);
+    result.sendData(gamesInfo);
 }
 
-
-
-void Client::startAI() {
-    int id = mp_playerCtrl->publicGameView().id();
-    new VoidAI(id);
-    new VoidAI(id);
-    new VoidAI(id);
-    new VoidAI(id);
-
-}
 
 
 ////////////////////////////////////////////
@@ -308,10 +298,15 @@ void Client::startAI() {
 void Client::onHandlerRegistered(PlayerCtrl* playerCtrl)
 {
     mp_playerCtrl = playerCtrl;
+    mp_parser->eventEnterGameMode(mp_playerCtrl->publicGameView().id(),
+                                  mp_playerCtrl->publicGameView().name(),
+                                  CLIENT_PLAYER); //@todo: spectator
+    onGameSync();
 }
 
 void Client::onHandlerUnregistered()
 {
+    mp_parser->eventExitGameMode();
     mp_playerCtrl = 0;
 }
 
@@ -330,6 +325,10 @@ void Client::onChatMessage(PublicPlayerView& publicPlayerView, const QString& me
 void Client::onGameSync()
 {
     GameSyncData gameSyncData;
+    gameSyncData.id = mp_playerCtrl->publicGameView().id();
+    gameSyncData.name = mp_playerCtrl->publicGameView().name();
+    gameSyncData.isCreator = mp_playerCtrl->privatePlayerView().isCreator();
+    gameSyncData.state = mp_playerCtrl->publicGameView().gameState();
     foreach (const PublicPlayerView* p, mp_playerCtrl->publicGameView().publicPlayerList())
         gameSyncData.players.append(p->publicPlayerData());
     gameSyncData.localPlayer = mp_playerCtrl->privatePlayerView().privatePlayerData();
@@ -340,33 +339,14 @@ void Client::onGameSync()
 
 void Client::onPlayerJoinedGame(PublicPlayerView& publicPlayerView)
 {
-    int gameId = mp_playerCtrl->publicGameView().id();
-    int playerId = publicPlayerView.id();
-    StructPlayer structPlayer;
-    bool isOther;
-    if (playerId == mp_playerCtrl->privatePlayerView().id()) {
-        structPlayer = mp_playerCtrl->privatePlayerView().structPlayer();
-        isOther = 0;
-        if (mp_playerCtrl->privatePlayerView().isCreator())  {
-            QTimer::singleShot(500, this, SLOT(startAI()));
-        }
-    } else {
-        structPlayer = mp_playerCtrl->publicPlayerView(playerId).structPlayer();
-        isOther = 1;
-    }
-    bool isCreator = mp_playerCtrl->privatePlayerView().isCreator();
-    mp_parser->eventJoinGame(gameId, structPlayer, isOther, isCreator);
-
+    if (publicPlayerView.id() == mp_playerCtrl->privatePlayerView().id())
+        return;
+    mp_parser->eventPlayerJoinedGame(publicPlayerView.publicPlayerData());
 }
 
 void Client::onPlayerLeavedGame(PublicPlayerView& leavingPlayer)
 {
-    Q_ASSERT(isInGame());
-    int gameId = mp_playerCtrl->publicGameView().id();
-    int playerId = mp_playerCtrl->publicPlayerView().id();
-    if (leavingPlayer.id() != playerId) {
-        mp_parser->eventLeaveGame(gameId, leavingPlayer.structPlayer(), 1);
-    }
+    mp_parser->eventPlayerLeavedGame(leavingPlayer.id());
 }
 
 void Client::onPlayerDied(PublicPlayerView& player, PublicPlayerView* causedBy)
@@ -380,6 +360,7 @@ void Client::onPlayerDied(PublicPlayerView& player, PublicPlayerView* causedBy)
 
 void Client::onGameStarted()
 {
+    /*
     StructGame structGame = mp_playerCtrl->publicGameView().structGame();
     StructPlayerList structPlayerList;
     const PrivatePlayerView* privatePlayer = &mp_playerCtrl->privatePlayerView();
@@ -389,6 +370,7 @@ void Client::onGameStarted()
         structPlayerList.append(player->structPlayer());
     }
     mp_parser->eventStartGame(structGame, structPlayerList);
+    */
 }
 
 void Client::onPlayerDrawFromDeck(PublicPlayerView& player, QList<const PlayingCard*> cards, bool revealCards)

@@ -51,7 +51,7 @@ public:
     /**
      * Creates new game and returns a pointer to it.
      */
-    Game*               createGame(StructGame);
+    Game*               createGame(const CreateGameData&);
     void                removeGame(Game*);
 
     /**

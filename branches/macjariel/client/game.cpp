@@ -31,44 +31,58 @@
 
 using namespace client;
 
-Game::Game(QObject* parent, int gameId, const StructPlayer& player,
+Game::Game(QObject* parent, int gameId, ClientType clientType,
            ServerConnection* serverConnection, const GameWidgets& gameWidgets):
         QObject(parent),
-        m_playerId(player.id),
-        m_playerName(player.name),
         m_gameId(gameId),
+        m_playerId(0),
+        m_isCreator(0),
+        m_gameState(GAMESTATE_INVALID),
         mp_serverConnection(serverConnection),
-        m_currentPlayerId(0),
-        m_requestedPlayerId(0),
         mp_localPlayerWidget(gameWidgets.localPlayerWidget),
         m_opponentWidgets(gameWidgets.opponentWidget),
         mp_mainWidget(gameWidgets.mainWidget),
         mp_middleWidget(gameWidgets.middleWidget),
         mp_startButton(0),
-        m_creator(0),
         m_cardWidgetFactory(this),
         m_gameObjectClickHandler(this)
 
 {
-    m_players[m_playerId] = mp_localPlayerWidget;
     mp_localPlayerWidget->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
     foreach(OpponentWidget* w, m_opponentWidgets) {
         w->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
     }
     mp_gameEventHandler = new GameEventHandler(this);
+    mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
 }
 
-void Game::init()
+Game::~Game()
 {
-    QueryGet* get = mp_serverConnection->queryGet();
-    connect(get, SIGNAL(result(const StructGame&, const StructPlayerList&)),
-            this, SLOT(initialGameStateRecieved(const StructGame&, const StructPlayerList&)));
-    get->getGame(m_gameId);
-    if (m_creator)
-    {
-        mp_startButton = new QPushButton(mp_middleWidget);
+}
 
-   //     mp_middleWidget->layout()->setAlignment(mp_startButton, Qt::AlignCenter);
+
+void Game::setPlayerId(int playerId)
+{
+    m_playerId = playerId;
+}
+
+void Game::setGameState(const GameState& gameState)
+{
+    m_gameState = gameState;
+}
+
+void Game::setGameContext(const GameContextData& gameContextData)
+{
+    m_gameContextData = gameContextData;
+}
+
+void Game::setIsCreator(bool isCreator)
+{
+    m_isCreator = isCreator;
+    if (m_gameState != GAMESTATE_WAITINGFORPLAYERS)
+        return;
+    if (m_isCreator && mp_startButton == 0) {
+        mp_startButton = new QPushButton(mp_middleWidget);
         QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
         mp_startButton->setText(tr("Start game"));
         mp_startButton->setEnabled(0);
@@ -78,46 +92,26 @@ void Game::init()
                 this, SLOT(startableChanged(int, bool)));
                 l->addStretch(1);
         l->addWidget(mp_startButton);
-        l->addStretch(1);        
+        l->addStretch(1);
         mp_middleWidget->setLayout(l);
-
+        return;
     }
-    mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
-
-    connect(mp_serverConnection, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)),
-            this, SLOT(gameStarted(const StructGame&, const StructPlayerList&)));
-    qDebug("You have entered the game!");
+    if (!m_isCreator && mp_startButton != 0) {
+        mp_startButton->deleteLater();
+        mp_startButton = 0;
+        mp_middleWidget->layout()->deleteLater();
+        return;
+    }
 }
 
-
-Game::~Game()
-{
-
-}
-
-void Game::setCurrentPlayerId(int currentPlayerId)
-{
-    m_currentPlayerId = currentPlayerId;
-}
-
-void Game::setRequestedPlayerId(int requestedPlayerId)
-{
-    m_requestedPlayerId = requestedPlayerId;
-}
-
-void Game::setGamePlayState(const GamePlayState& gamePlayState)
-{
-    m_gamePlayState = gamePlayState;
-}
-
-void Game::opponentJoinedGame(const StructPlayer& player)
+void Game::playerJoinedGame(const PublicPlayerData& player)
 {
     int i;
     for(i = 0; i < m_opponentWidgets.count(); ++i)
     {
         OpponentWidget* w = m_opponentWidgets[i];
         if (w->isVoid()) {
-            w->setPlayer(player);
+            w->setFromPublicData(player);
             m_players[player.id] = w;
             break;
         }
@@ -125,37 +119,20 @@ void Game::opponentJoinedGame(const StructPlayer& player)
     if (i == m_opponentWidgets.count()) {
         qCritical("Too many players connected to the game.");
     }
-    qDebug(qPrintable(QString("[Game]   Player '%1' entered the game!").arg(player.name)));
 }
 
-void Game::opponentLeavedGame(const StructPlayer& player)
+void Game::playerLeavedGame(int playerId)
 {
-    if (m_players.contains(player.id))
+    if (m_players.contains(playerId))
     {
-        m_players[player.id]->clear();
-        m_players.remove(player.id);
+        m_players[playerId]->clear();
+        m_players.remove(playerId);
     }
 }
 
-
-void Game::initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList)
+void Game::startableChanged(bool isStartable)
 {
-    foreach(StructPlayer p, playerList)
-    {
-        if (p.id != m_playerId)
-        {
-            opponentJoinedGame(p);
-        }
-        else
-        {
-            mp_localPlayerWidget->setPlayer(p);
-        }
-    }
-}
-
-void Game::startableChanged(int, bool startable)
-{
-    mp_startButton->setEnabled(startable);
+    mp_startButton->setEnabled(isStartable);
 }
 
 void Game::startButtonClicked()
@@ -165,100 +142,80 @@ void Game::startButtonClicked()
     mp_serverConnection->startGame();
 }
 
-void Game::gameStarted(const StructGame&, const StructPlayerList&)
-{
-    /*
-    int pI;
-    for(pI = 0; pI < playerList.count(); pI++)
-    {
-        if (playerList[pI].id == m_playerId) break;
-    }
-    qDebug() << "player: " << pI;
-    //mp_localPlayerWidget->setPlayer(playerList[pI]);
-    foreach(OpponentWidget* w, m_opponentWidgets)
-    {
-        w->clear();
-    }
-    for (int i = pI + 1; i < playerList.count(); ++i)
-    {
-        int pos = i - (pI + 1);
-        m_players[playerList[i].id] = m_opponentWidgets[pos];
-        m_opponentWidgets[pos]->setPlayer(playerList[i]);
-    }
-    for (int i = pI - 1; i >= 0; --i)
-    {
-        int pos = i - pI + 6;
-        m_players[playerList[i].id] = m_opponentWidgets[pos];
-        m_opponentWidgets[pos]->setPlayer(playerList[i]);
-    }*/
-    if (mp_startButton)
-    {
-        mp_startButton->hide();
-        mp_startButton->deleteLater();
-    }
-
-    mp_deck = new DeckWidget(0);
-    mp_deck->init(&m_cardWidgetFactory);
-    mp_graveyard = new CardPileWidget(0);
-    mp_graveyard->setPocketType(POCKET_GRAVEYARD);
-    mp_selection = new CardList(0);
-    mp_selection->setPocketType(POCKET_SELECTION);
-    mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
-    mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-
-    if (mp_middleWidget->layout() != 0) {
-        delete mp_middleWidget->layout();
-    }
-
-    QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
-    l->addStretch(3);
-    l->addWidget(mp_graveyard);
-    l->addStretch(1);
-    l->addWidget(mp_deck);
-    l->addStretch(3);
-
-    QBoxLayout* l2 = new QBoxLayout(QBoxLayout::LeftToRight);
-    l2->addStretch(3);
-    l2->addWidget(mp_selection);
-    l2->addStretch(3);
-
-    QBoxLayout* l3 = new QVBoxLayout();
-    l3->addLayout(l);
-    l3->addStretch(1);
-    l3->addLayout(l2);
-    mp_middleWidget->setLayout(l3);
-}
+//void Game::gameStarted(const StructGame&, const StructPlayerList&)
+//{
+//    /*
+//    int pI;
+//    for(pI = 0; pI < playerList.count(); pI++)
+//    {
+//        if (playerList[pI].id == m_playerId) break;
+//    }
+//    qDebug() << "player: " << pI;
+//    //mp_localPlayerWidget->setPlayer(playerList[pI]);
+//    foreach(OpponentWidget* w, m_opponentWidgets)
+//    {
+//        w->clear();
+//    }
+//    for (int i = pI + 1; i < playerList.count(); ++i)
+//    {
+//        int pos = i - (pI + 1);
+//        m_players[playerList[i].id] = m_opponentWidgets[pos];
+//        m_opponentWidgets[pos]->setPlayer(playerList[i]);
+//    }
+//    for (int i = pI - 1; i >= 0; --i)
+//    {
+//        int pos = i - pI + 6;
+//        m_players[playerList[i].id] = m_opponentWidgets[pos];
+//        m_opponentWidgets[pos]->setPlayer(playerList[i]);
+//    }*/
+//    if (mp_startButton)
+//    {
+//        mp_startButton->hide();
+//        mp_startButton->deleteLater();
+//    }
+//
+//    mp_deck = new DeckWidget(0);
+//    mp_deck->init(&m_cardWidgetFactory);
+//    mp_graveyard = new CardPileWidget(0);
+//    mp_graveyard->setPocketType(POCKET_GRAVEYARD);
+//    mp_selection = new CardList(0);
+//    mp_selection->setPocketType(POCKET_SELECTION);
+//    mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
+//    mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+//
+//
+//    if (mp_middleWidget->layout() != 0) {
+//        delete mp_middleWidget->layout();
+//    }
+//
+//    QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
+//    l->addStretch(3);
+//    l->addWidget(mp_graveyard);
+//    l->addStretch(1);
+//    l->addWidget(mp_deck);
+//    l->addStretch(3);
+//
+//    QBoxLayout* l2 = new QBoxLayout(QBoxLayout::LeftToRight);
+//    l2->addStretch(3);
+//    l2->addWidget(mp_selection);
+//    l2->addStretch(3);
+//
+//    QBoxLayout* l3 = new QVBoxLayout();
+//    l3->addLayout(l);
+//    l3->addStretch(1);
+//    l3->addLayout(l2);
+//    mp_middleWidget->setLayout(l3);
+//}
 
 CharacterType Game::character() const
 {
     return mp_localPlayerWidget->characterWidget()->character();
 }
 
-void Game::setPlayerId(int playerId)
-{
-    m_playerId = playerId;
-}
 
 void Game::assignPlayerWidget(int playerId, PlayerWidget* playerWidget)
 {
     m_players[playerId] = playerWidget;
 }
-
-
-void Game::test()
-{
-/*
-    new CardMovement(mp_cardMovementParentWidget,
-                     mp_deck->pop(),
-                     mp_graveyard);
-    new CardMovement(mp_cardMovementParentWidget,
-                     mp_deck->pop(),
-                     m_opponentWidgets[2]->hand());
-  */
-
-}
-
-
 
 

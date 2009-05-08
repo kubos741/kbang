@@ -24,7 +24,7 @@
 
 using namespace client;
 
-const int minPlayers = 3, maxPlayers = 7;
+const int minPlayers = 4, maxPlayers = 7;
 
 CreateGameDialog::CreateGameDialog(QWidget *parent)
  : QDialog(parent), Ui::CreateGameDialog()
@@ -37,26 +37,22 @@ CreateGameDialog::CreateGameDialog(QWidget *parent)
 
     spinBoxMinPlayers->setRange(minPlayers, maxPlayers);
     spinBoxMaxPlayers->setRange(minPlayers, maxPlayers);
+    spinBoxAIPlayers->setRange(0, maxPlayers - 1);
+
+    ///@todo: load last values from config file
     spinBoxMinPlayers->setValue(minPlayers);
     spinBoxMaxPlayers->setValue(maxPlayers);
-
-    lineEditPlayerPassword->setEnabled(0);
+    spinBoxAIPlayers->setValue(0);
 
     connect(spinBoxMinPlayers, SIGNAL(valueChanged(int)),
-            this, SLOT(playerRangeChanged()));
+            this, SLOT(playerCountsChanged()));
+    connect(spinBoxMaxPlayers, SIGNAL(valueChanged(int)),
+            this, SLOT(playerCountsChanged()));
 
-    connect(checkBoxEnablePlayerPassword, SIGNAL(toggled(bool)),
-            lineEditPlayerPassword, SLOT(setEnabled(bool)));
-
-    connect(lineEditGameName, SIGNAL(textChanged(const QString&)),
+    connect(lineEditGameName,   SIGNAL(textChanged(const QString&)),
             this, SLOT(validateInput()));
     connect(lineEditPlayerName, SIGNAL(textChanged(const QString&)),
             this, SLOT(validateInput()));
-
-    connect(checkBoxEnablePlayerPassword, SIGNAL(clicked(bool)),
-            lineEditPlayerPassword, SLOT(setEnabled(bool)));
-
-
 }
 
 
@@ -64,34 +60,38 @@ CreateGameDialog::~CreateGameDialog()
 {
 }
 
-void CreateGameDialog::playerRangeChanged()
+void CreateGameDialog::playerCountsChanged()
 {
     spinBoxMinPlayers->setMaximum(spinBoxMaxPlayers->value());
     spinBoxMaxPlayers->setMinimum(spinBoxMinPlayers->value());
+    spinBoxAIPlayers->setMaximum(spinBoxMaxPlayers->value() - 1);
 }
 
 void CreateGameDialog::validateInput()
 {
-    if(lineEditGameName->text().isEmpty() ||
-       lineEditPlayerName->text().isEmpty()) pushButtonCreate->setEnabled(0);
-    else pushButtonCreate->setEnabled(1);
+    pushButtonCreate->setEnabled(!lineEditGameName->text().isEmpty() &&
+                                 !lineEditPlayerName->text().isEmpty());
 }
 
 void CreateGameDialog::on_pushButtonCreate_clicked()
 {
-    StructGame game;
-    game.name = lineEditGameName->text();
-    game.description = lineEditGameDescription->text();
-    game.minPlayers = spinBoxMinPlayers->value();
-    game.maxPlayers = spinBoxMaxPlayers->value();
-    game.hasPlayerPassword = checkBoxEnablePlayerPassword->isChecked();
-    if (game.hasPlayerPassword)
-        game.playerPassword = lineEditPlayerPassword->text();
-    game.flagShufflePlayers = checkBoxShufflePlayers->isChecked();
+    CreateGameData createGameData;
+    createGameData.name                 = lineEditGameName->text();
+    createGameData.description          = lineEditGameDescription->text();
+    createGameData.minPlayers           = spinBoxMinPlayers->value();
+    createGameData.maxPlayers           = spinBoxMaxPlayers->value();
+    createGameData.maxSpectators        = spinBoxMaxSpectators->value();
+    createGameData.AIPlayers            = spinBoxAIPlayers->value();
+    createGameData.playerPassword       = lineEditGamePasswordPlayers->text();
+    createGameData.spectatorPassword    = lineEditGamePasswordSpectators->text();
+    createGameData.flagShufflePlayers   = radioButtonOrderRandom->isChecked();
 
-    StructPlayer player;
-    player.name = lineEditPlayerName->text();
-    emit createGame(game, player);
+    CreatePlayerData createPlayerData;
+    createPlayerData.name               = lineEditPlayerName->text();
+    createPlayerData.password           = lineEditPlayerPassword->text();
+    ///@todo send avatar
+
+    emit createGame(createGameData, createPlayerData);
     close();
 }
 

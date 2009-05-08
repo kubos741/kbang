@@ -31,19 +31,19 @@ class QueryResult
 {
 public:
     QueryResult(QXmlStreamWriter* streamWriter, const QString& id);
-    //virtual ~QueryResult();
 
-public:
-    void sendData(const StructServerInfo&);
-    void sendData(const StructGameList&);
-    void sendData(const StructGame&);
-    void sendData(const StructGame&, const StructPlayerList&);
+    template<class T>
+    void sendData(const T& data)
+    {
+        writeStartQuery();
+        data.write(mp_streamWriter);
+        writeEndQuery();
+    }
 
 private:
     void writeStartQuery();
     void writeEndQuery();
 
-private:
     QXmlStreamWriter* mp_streamWriter;
     QString m_id;
     bool    m_sent;

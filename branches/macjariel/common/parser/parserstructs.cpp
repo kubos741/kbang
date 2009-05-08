@@ -378,6 +378,10 @@ void GameSyncData::read(XmlNode* node)
 {
     Q_ASSERT(node->name() == "game-sync");
     Q_ASSERT(node->getChildren()[0]->name() == "players");
+    id = node->attribute("id").toInt();
+    name = node->attribute("name");
+    isCreator = node->attribute("is-creator") == "true";
+    state = StringToGameState(node->attribute("state"));
     players.clear();
     foreach(XmlNode* player, node->getFirstChild()->getChildren()) {
         PublicPlayerData publicPlayerData;
@@ -391,6 +395,11 @@ void GameSyncData::read(XmlNode* node)
 void GameSyncData::write(QXmlStreamWriter* writer) const
 {
     writer->writeStartElement("game-sync");
+
+    writer->writeAttribute("id", QString::number(id));
+    writer->writeAttribute("name", name);
+    writer->writeAttribute("is-creator", isCreator ? "true" : "false");
+    writer->writeAttribute("state", GameStateToString(state));
 
     writer->writeStartElement("players");
     foreach (const PublicPlayerData& p, players)
@@ -426,6 +435,198 @@ QString pocketTypeToString(const PocketType& p)
     return "";
 }
 
+
+GameState StringToGameState(const QString& s)
+{
+    if (s == "WaitingForPlayers")   return GAMESTATE_WAITINGFORPLAYERS;
+    if (s == "Playing")             return GAMESTATE_PLAYING;
+    if (s == "Finished")            return GAMESTATE_FINISHED;
+    return GAMESTATE_INVALID;
+}
+
+QString GameStateToString(const GameState& s)
+{
+    switch(s) {
+    case GAMESTATE_WAITINGFORPLAYERS:   return "WaitingForPlayers";
+    case GAMESTATE_PLAYING:             return "Playing";
+    case GAMESTATE_FINISHED:            return "Finished";
+    default:                            break;
+    }
+    return "Invalid";
+}
+
+ClientType StringToClientType(const QString& s) {
+    if (s == "player") return CLIENT_PLAYER;
+    else return CLIENT_SPECTATOR;
+}
+
+QString ClientTypeToString(const ClientType& t) {
+    switch(t) {
+    case CLIENT_PLAYER:     return "player";
+    case CLIENT_SPECTATOR:  return "spectator";
+    }
+    return "";
+}
+
+
+
+void PlayerInfoData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "player");
+    id              = node->attribute("id").toInt();
+    name            = node->attribute("name");
+    hasPassword     = node->attribute("hasPassword") == "true";
+    hasController   = node->attribute("hasController") == "true";
+    isAI            = node->attribute("isAI") == "true";
+}
+
+void PlayerInfoData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("player");
+    writer->writeAttribute("id",            QString::number(id));
+    writer->writeAttribute("name",          name);
+    writer->writeAttribute("hasPassword",   hasPassword ? "true" : "false");
+    writer->writeAttribute("hasController", hasController ? "true" : "false");
+    writer->writeAttribute("isAI",          isAI ? "true" : "false");
+    writer->writeEndElement();
+}
+
+void CreatePlayerData::read(XmlNode* node)
+{
+    name        = node->attribute("name");
+    password    = node->attribute("password");
+}
+
+void CreatePlayerData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("player");
+    writer->writeAttribute("name", name);
+    if (!password.isNull())
+        writer->writeAttribute("password", password);
+    writer->writeEndElement();
+}
+
+void CreateGameData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "game");
+    name                = node->attribute("name");
+    description         = node->attribute("description");
+    minPlayers          = node->attribute("minPlayers").toInt();
+    maxPlayers          = node->attribute("maxPlayers").toInt();
+    maxSpectators       = node->attribute("maxSpectators").toInt();
+    AIPlayers           = node->attribute("AIPlayers").toInt();
+    playerPassword      = node->attribute("playerPassword");
+    spectatorPassword   = node->attribute("spectatorPassword");
+    flagShufflePlayers  = node->attribute("shufflePlayers") == "true";
+}
+
+void CreateGameData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("game");
+    writer->writeAttribute("name",                  name);
+    writer->writeAttribute("description",           description);
+    writer->writeAttribute("minPlayers",            QString::number(minPlayers));
+    writer->writeAttribute("maxPlayers",            QString::number(maxPlayers));
+    writer->writeAttribute("maxSpectators",         QString::number(maxSpectators));
+    writer->writeAttribute("AIPlayers",             QString::number(AIPlayers));
+    if (!playerPassword.isNull())
+        writer->writeAttribute("playerPassword",        playerPassword);
+    if (!spectatorPassword.isNull())
+        writer->writeAttribute("spectatorPassword",     spectatorPassword);
+    writer->writeAttribute("shufflePlayers",        flagShufflePlayers ? "true" : "false");
+    writer->writeEndElement();
+}
+
+
+void GameInfoData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "game-info");
+    id                  = node->attribute("id").toInt();
+    name                = node->attribute("name");
+    description         = node->attribute("description");
+    minPlayers          = node->attribute("minPlayers").toInt();
+    maxPlayers          = node->attribute("maxPlayers").toInt();
+    maxSpectators       = node->attribute("maxSpectators").toInt();
+    alivePlayersCnt     = node->attribute("alivePlayersCnt").toInt();
+    totalPlayersCnt     = node->attribute("totalPlayersCnt").toInt();
+    spectatorsCnt       = node->attribute("spectatorsCnt").toInt();
+    AIPlayersCnt        = node->attribute("AIPlayersCnt").toInt();
+    hasPlayerPassword   = node->attribute("hasPlayerpassword") == "true";
+    hasSpectatorPassword= node->attribute("hasSpectatorPassword") == "true";
+    state               = StringToGameState(node->attribute("state"));
+    players.clear();
+    foreach(XmlNode* child, node->getChildren()) {
+        PlayerInfoData playerInfo;
+        if (playerInfo.name != "player") continue;
+        playerInfo.read(child);
+        players.append(playerInfo);
+    }
+}
+
+void GameInfoData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("game-info");
+    writer->writeAttribute("id",                    QString::number(id));
+    writer->writeAttribute("name",                  name);
+    writer->writeAttribute("description",           description);
+    writer->writeAttribute("minPlayers",            QString::number(minPlayers));
+    writer->writeAttribute("maxPlayers",            QString::number(maxPlayers));
+    writer->writeAttribute("maxSpectators",         QString::number(maxSpectators));
+    writer->writeAttribute("alivePlayersCnt",       QString::number(alivePlayersCnt));
+    writer->writeAttribute("totalPlayersCnt",       QString::number(totalPlayersCnt));
+    writer->writeAttribute("spectatorsCnt",         QString::number(spectatorsCnt));
+    writer->writeAttribute("AIPlayersCnt",          QString::number(AIPlayersCnt));
+    writer->writeAttribute("hasPlayerPassword",     hasPlayerPassword ? "true" : "false");
+    writer->writeAttribute("hasSpectatorPassword",  hasPlayerPassword ? "true" : "false");
+    writer->writeAttribute("state",                 GameStateToString(state));
+    foreach(const PlayerInfoData& playerInfo, players) {
+        playerInfo.write(writer);
+    }
+    writer->writeEndElement();
+}
+
+void GameInfoListData::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "games-info");
+    clear();
+    foreach(XmlNode* child, node->getChildren()) {
+        GameInfoData gameInfoData;
+        if (child->name() != "game-info")
+            continue;
+        gameInfoData.read(child);
+        append(gameInfoData);
+    }
+}
+
+void GameInfoListData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("games-info");
+    foreach(const GameInfoData& gameInfoData, *this) {
+        gameInfoData.write(writer);
+    }
+    writer->writeEndElement();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 QString StructServerInfo::elementName("serverinfo");
 
 void StructServerInfo::read(XmlNode* node)
@@ -444,7 +645,7 @@ void StructServerInfo::write(QXmlStreamWriter* writer) const
 
 QString StructGame::elementName("game");
 
-void StructGame::read(XmlNode* node, StructPlayerList* playerList)
+void StructGame::read(XmlNode* node)
 {
     id = node->attribute("id").toInt();
     creatorId = node->attribute("creatorId").toInt();
@@ -458,6 +659,7 @@ void StructGame::read(XmlNode* node, StructPlayerList* playerList)
     hasPlayerPassword = (node->attribute("hasPlayerPassword") == "1");
     hasSpectatorPassword = (node->attribute("hasSpectatorPassword") == "1");
     flagShufflePlayers = (node->attribute("flagShufflePlayers") == "1");
+    /*
     if (playerList)
     {
         XmlNode* players = node->getFirstChild();
@@ -471,9 +673,10 @@ void StructGame::read(XmlNode* node, StructPlayerList* playerList)
             }
         }
     }
+    */
 }
 
-void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerlist) const
+void StructGame::write(QXmlStreamWriter* writer) const
 {
     writer->writeStartElement("game");
     if (id != 0) writer->writeAttribute("id", QString::number(id));
@@ -484,6 +687,7 @@ void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerl
     writer->writeAttribute("hasPlayerPassword", hasPlayerPassword ? "1" : "0");
     writer->writeAttribute("hasSpectatorPassword", hasPlayerPassword ? "1" : "0");
     writer->writeAttribute("flagShufflePlayers", flagShufflePlayers ? "1" : "0");
+    /*
     if (playerlist)
     {
         writer->writeStartElement("players");
@@ -497,6 +701,7 @@ void StructGame::write(QXmlStreamWriter* writer, const StructPlayerList* playerl
         }
         writer->writeEndElement();
     }
+    */
     writer->writeEndElement();
 }
 

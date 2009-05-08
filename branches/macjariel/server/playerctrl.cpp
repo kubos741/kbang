@@ -7,6 +7,7 @@
 #include "gametable.h"
 #include "playingcard.h"
 #include "characterbase.h"
+#include "gameinfo.h"
 
 
 PlayerCtrl::PlayerCtrl(Player* player):
@@ -124,30 +125,47 @@ const PrivatePlayerView& PlayerCtrl::privatePlayerView() const
 
 
 
-
-
-
-
-void PlayerCtrl::createGame(const StructGame& structGame,
-                                   const StructPlayer& structPlayer,
-                                   GameEventHandler* gameEventHandler)
+void PlayerCtrl::createGame(const CreateGameData& game, const CreatePlayerData& player, GameEventHandler* handler)
 {
-    Game* newGame = GameServer::instance().createGame(structGame);
+    Game* newGame = GameServer::instance().createGame(game);
     Q_ASSERT(newGame != 0);
-    Player* newPlayer = newGame->createPlayer(structPlayer, gameEventHandler);
+    Player* newPlayer = newGame->createPlayer(player, handler);
     Q_ASSERT(newPlayer != 0);
 }
 
-void PlayerCtrl::joinGame(int gameId,
-                                 const StructPlayer& structPlayer,
-                                 GameEventHandler* gameEventHandler)
+void PlayerCtrl::joinGame(int gameId, const QString& gamePassword,
+                          const CreatePlayerData& player, GameEventHandler* handler)
 {
     Game* game = GameServer::instance().game(gameId);
     if (game == 0)
         throw BadGameException();
-    Player* newPlayer = game->createPlayer(structPlayer, gameEventHandler);
+
+    if (!game->gameInfo().comparePlayerPassword(gamePassword))
+        throw BadGamePasswordException();
+
+    Player* newPlayer = game->createPlayer(player, handler);
     Q_ASSERT(newPlayer != 0);
 }
+
+
+void PlayerCtrl::replacePlayer(int gameId, int playerId, const QString& gamePassword,
+                                const CreatePlayerData& createPlayerData,
+                                GameEventHandler* gameEventHandler)
+{
+    Game* game = GameServer::instance().game(gameId);
+    if (game == 0)
+        throw BadGameException();
+
+    if (!game->gameInfo().comparePlayerPassword(gamePassword))
+        throw BadGamePasswordException();
+
+    Player* player = game->player(playerId);
+    if (player == 0)
+        throw BadTargetPlayerException();
+
+    game->replacePlayer(player, createPlayerData, gameEventHandler);
+}
+
 
 StructServerInfo PlayerCtrl::structServerInfo()
 {

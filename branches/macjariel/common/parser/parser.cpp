@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 
+#include "parserstructs.h"
 #include "parser.h"
 #include "queryget.h"
 #include "util.h"
@@ -284,35 +285,24 @@ void Parser::processStanza()
         if (!action) return;
         if (action->name() == "create-game")
         {
-            XmlNode* gameElem = 0;
-            XmlNode* playerElem = 0;
-            foreach(XmlNode* child, action->getChildren())
-            {
-                if (child->name() == "game" && gameElem == 0)
-                {
-                    gameElem = child;
-                }
-                if (child->name() == "player" && playerElem == 0)
-                {
-                    playerElem = child;
-                }
-            }
-            if (!gameElem || !playerElem) return; // TODO: error handling
-            StructGame game;
-            game.read(gameElem);
-            StructPlayer player;
-            player.read(playerElem);
-            emit sigActionCreateGame(game, player);
+            XmlNode* game = action->getChildren()[0];
+            XmlNode* player = action->getChildren()[1];
+            CreateGameData createGameData;
+            createGameData.read(game);
+            CreatePlayerData createPlayerData;
+            createPlayerData.read(player);
+            emit sigActionCreateGame(createGameData, createPlayerData);
             return;
         }
         if (action->name() == "join-game")
         {
-            int gameId = action->attribute("gameId").toInt();
+            int         gameId = action->attribute("gameId").toInt();
+            QString     gamePassword = action->attribute("gamePassword");
             XmlNode* player = action->getFirstChild();
-            if (!player) return; // Malformed join-game action
-            StructPlayer p;
-            p.read(player);
-            emit sigActionJoinGame(gameId, p);
+            if (!player) return;
+            CreatePlayerData createPlayerData;
+            createPlayerData.read(player);
+            emit sigActionJoinGame(gameId, gamePassword, createPlayerData);
             return;
         }
         if (action->name() == "leave-game")
@@ -369,27 +359,30 @@ void Parser::processStanza()
     {
         XmlNode* event = mp_parsedStanza->getFirstChild();
         if (!event) return;
+        if (event->name() == "enter-game-mode") {
+            int gameId       = event->attribute("id").toInt();
+            QString gameName = event->attribute("name");
+            ClientType type  = StringToClientType(event->attribute("type"));
+            emit sigEventEnterGameMode(gameId, gameName, type);
+            return;
+        }
+        if (event->name() == "exit-game-mode") {
+            emit sigEventExitGameMode();
+            return;
+        }
         if (event->name() == "join-game")
         {
             XmlNode* player = event->getFirstChild();
             if (!player) return;
-            int gameId = event->attribute("gameId").toInt();
-            bool other = !event->attribute("other").isEmpty();
-            bool creator = !event->attribute("creator").isEmpty();
-            StructPlayer p;
-            p.read(player);
-            emit sigEventJoinGame(gameId, p, other, creator);
+            PublicPlayerData publicPlayerData;
+            publicPlayerData.read(player);
+            emit sigEventPlayerJoinedGame(publicPlayerData);
             return;
         }
         if (event->name() == "leave-game")
         {
-            XmlNode* player = event->getFirstChild();
-            if (!player) return;
-            StructPlayer p;
-            p.read(player);
-            int gameId = event->attribute("gameId").toInt();
-            bool other = !event->attribute("other").isEmpty();
-            emit sigEventLeaveGame(gameId, p, other);
+            int playerId = event->attribute("player-id").toInt();
+            emit sigEventPlayerLeavedGame(playerId);
             return;
         }
         if (event->name() == "game-startable")
@@ -397,15 +390,6 @@ void Parser::processStanza()
             int gameId = event->attribute("gameId").toInt();
             bool startable = event->attribute("startable") == "1";
             emit sigEventGameStartable(gameId, startable);
-            return;
-        }
-        if (event->name() == "start-game")
-        {
-            XmlNode* game = event->getFirstChild();
-            StructGame x;
-            StructPlayerList y;
-            x.read(game, &y);
-            emit sigEventStartGame(x, y);
             return;
         }
         if (event->name() == "game-sync") {
@@ -442,6 +426,11 @@ void Parser::processStanza()
             int senderId = event->attribute("senderId").toInt();
             QString senderName = event->attribute("senderName");
             emit sigEventMessage(senderId, senderName, messageNode->text());
+        }
+        if (event->name() == "game-state") {
+            GameState gameState = StringToGameState(event->attribute("state"));
+            emit sigEventGameStateChange(gameState);
+            return;
         }
         if (event->name() == "game-context") {
             GameContextData gameContextData;
@@ -482,21 +471,39 @@ QueryGet* Parser::queryGet()
     return query;
 }
 
-void Parser::eventJoinGame(int gameId, const StructPlayer& player, bool other, bool creator)
+void Parser::eventEnterGameMode(int gameId, const QString& gameName, ClientType type)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("enter-game-mode");
+    mp_streamWriter->writeAttribute("id", QString::number(gameId));
+    mp_streamWriter->writeAttribute("name", gameName);
+    mp_streamWriter->writeAttribute("type", ClientTypeToString(type));
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventExitGameMode()
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("exit-game-mode");
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventPlayerJoinedGame(const PublicPlayerData& publicPlayerData)
 {
     eventStart();
     mp_streamWriter->writeStartElement("join-game");
-    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
-    if (other)
-    {
-        mp_streamWriter->writeAttribute("other", "1");
-    }
-    if (creator)
-    {
+    publicPlayerData.write(mp_streamWriter);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
 
-        mp_streamWriter->writeAttribute("creator", "1");
-    }
-    player.write(mp_streamWriter);
+void Parser::eventPlayerLeavedGame(int playerId)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("leave-game");
+    mp_streamWriter->writeAttribute("player-id", QString::number(playerId));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -516,32 +523,6 @@ void Parser::eventEnd()    { mp_streamWriter->writeEndElement();           }
 void Parser::actionStart() { mp_streamWriter->writeStartElement("action"); }
 void Parser::actionEnd()   { mp_streamWriter->writeEndElement();           }
 
-
-void Parser::eventLeaveGame(int gameId, const StructPlayer& player, bool other)
-{
-    ASSERT_SOCKET;
-    eventStart();
-    mp_streamWriter->writeStartElement("leave-game");
-    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
-    if (other)
-    {
-        mp_streamWriter->writeAttribute("other", "1");
-    }
-    player.write(mp_streamWriter);
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void Parser::eventStartGame(const StructGame& game, const StructPlayerList& players)
-{
-    ASSERT_SOCKET;
-    eventStart();
-    mp_streamWriter->writeStartElement("start-game");
-    game.write(mp_streamWriter, &players);
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
 void Parser::eventMessage(int senderId, const QString& senderName, const QString& message)
 {
     ASSERT_SOCKET;
@@ -550,6 +531,16 @@ void Parser::eventMessage(int senderId, const QString& senderName, const QString
     mp_streamWriter->writeAttribute("senderId", QString::number(senderId));
     mp_streamWriter->writeAttribute("senderName", senderName);
     mp_streamWriter->writeCharacters(message);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventGameStateChange(const GameState& state)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    mp_streamWriter->writeStartElement("game-state");
+    mp_streamWriter->writeAttribute("state", GameStateToString(state));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -609,26 +600,26 @@ void Parser::streamError()
     m_readerState = S_Error;
 }
 
-void Parser::actionCreateGame(const StructGame& game , const StructPlayer& player)
+void Parser::actionCreateGame(const CreateGameData& createGameData, const CreatePlayerData& createPlayerData)
 {
     ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("create-game");
-    game.write(mp_streamWriter);
-    player.write(mp_streamWriter, 1);
+    createGameData.write(mp_streamWriter);
+    createPlayerData.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();
     actionEnd();
 }
 
 
-void Parser::actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player)
+void Parser::actionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData& player)
 {
     ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("join-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
     if (!gamePassword.isEmpty()) mp_streamWriter->writeAttribute("gamePassword", gamePassword);
-    player.write(mp_streamWriter, 1);
+    player.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();
     actionEnd();
 }

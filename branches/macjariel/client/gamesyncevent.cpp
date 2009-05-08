@@ -19,6 +19,7 @@ GameSyncEvent::~GameSyncEvent()
 
 void GameSyncEvent::run()
 {
+    qDebug("GameSyncEvent");
     int index = 0;
     Q_ASSERT(m_gameSyncData.players.size() <= 7);
     while (index < m_gameSyncData.players.size() &&
@@ -26,7 +27,11 @@ void GameSyncEvent::run()
         ++index;
     Q_ASSERT(index < m_gameSyncData.players.size());
 
+
     mp_game->setPlayerId(m_gameSyncData.localPlayer.id);
+    mp_game->setGameState(m_gameSyncData.state);
+    mp_game->setGameContext(m_gameSyncData.gameContext);
+    mp_game->setIsCreator(m_gameSyncData.isCreator);
 
     mp_game->localPlayerWidget()->setFromPublicData(m_gameSyncData.players[index]);
     mp_game->localPlayerWidget()->setFromPrivateData(m_gameSyncData.localPlayer);

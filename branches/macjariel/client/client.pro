@@ -34,7 +34,8 @@ HEADERS += gameloop.h \
     cardactionswidget.h \
     cardwidgetfactory.h \
     gameobjectclickhandler.h \
-    playerdiedevent.h
+    playerdiedevent.h \
+    playerevent.h
 FORMS += connecttoserverdialog.ui \
     mainwindow.ui \
     joingamedialog.ui \
@@ -74,10 +75,11 @@ SOURCES += gameloop.cpp \
     cardwidgetfactory.cpp \
     gameobjectclickhandler.cpp \
     cardpocket.cpp \
-    playerdiedevent.cpp
+    playerdiedevent.cpp \
+    playerevent.cpp
 QT += network \
     xml
-RESOURCES += client.qrc 
+RESOURCES += client.qrc
 INCLUDEPATH += ../common
 LIBS += ../common/libcommon.a
 TARGETDEPS += ../common/libcommon.a

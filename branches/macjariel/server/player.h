@@ -67,9 +67,8 @@ public:
      * @param id        the player's id. It's Game's responsibility to set this unique.
      * @param name      the name of the player
      * @param password  the password for reconnecting into player
-     * @param handler   the gameEventHandler, that will control the player
      */
-    Player(Game* game, int id, const QString& name, const QString& password, GameEventHandler* handler);
+    Player(Game* game, int id, const CreatePlayerData&);
     ~Player();
     typedef QList<PlayingCard*> CardList;
 

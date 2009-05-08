@@ -11,8 +11,12 @@ class VoidAI : public QObject, public GameEventHandler
 {
 Q_OBJECT;
 public:
-    VoidAI(int gameId);
+    VoidAI(QObject* parent);
     virtual ~VoidAI() {}
+
+    CreatePlayerData createPlayerData() const;
+
+    virtual bool isAI() { return 1; }
 
     virtual void onHandlerRegistered(PlayerCtrl* playerCtrl);
     virtual void onHandlerUnregistered() {}

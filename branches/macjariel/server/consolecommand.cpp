@@ -77,7 +77,7 @@ CMDDEF(console_create_test_player)
         console.Cout() << QString("The game id %1 does not exist.").arg(gameId);
         return 1;
     }
-    new VoidAI(gameId);
+
     return 0;
 }
 

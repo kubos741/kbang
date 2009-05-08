@@ -70,8 +70,8 @@ public slots:
 //    void queryGameList();
 //    void queryGameInfo(int gameId);
 
-    void actionCreateGame(const StructGame&, const StructPlayer&);
-    void actionJoinGame(int gameId, const QString& gamePassword, const StructPlayer& player);
+    void actionCreateGame(const CreateGameData&, const CreatePlayerData&);
+    void actionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData&);
     void actionLeaveGame();
     void actionStartGame();
     void actionMessage(const QString& message);
@@ -89,10 +89,14 @@ signals:
     //void sigResultGameList(const StructGameList&);
     //void sigResultGameInfo(const StructGame&);
 
-    void sigEventJoinGame(int gameId, const StructPlayer&, bool other, bool creator);
-    void sigEventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
-    void sigEventStartGame(const StructGame&, const StructPlayerList&);
+    void sigEventEnterGameMode(int gameId, const QString& gameName, ClientType);
+    void sigEventExitGameMode();
+    void sigEventPlayerJoinedGame(const PublicPlayerData&);
+    void sigEventPlayerLeavedGame(int playerId);
+
     void sigEventGameStartable(int gameId, bool startable);
+
+    void sigEventGameStateChange(const GameState&);
     void sigEventGameContextChange(const GameContextData&);
     void sigEventGameSync(const GameSyncData&);
     void sigEventLifePointsChange(int playerId, int lifePoints);
@@ -105,10 +109,12 @@ signals:
     /// SERVER ///
     //////////////
 public slots:
-    void eventJoinGame(int gameId, const StructPlayer&, bool other = 1, bool creator = 0);
-    void eventLeaveGame(int gameId, const StructPlayer&, bool other = 1);
-    void eventStartGame(const StructGame&, const StructPlayerList&);
+    void eventEnterGameMode(int gameId, const QString& gameName, ClientType);
+    void eventExitGameMode();
+    void eventPlayerJoinedGame(const PublicPlayerData&);
+    void eventPlayerLeavedGame(int playerId);
     void eventMessage(int senderId, const QString& senderName, const QString& message);
+    void eventGameStateChange(const GameState&);
     void eventGameContextChange(const GameContextData&);
     void eventGameSync(const GameSyncData&);
     void eventCardMovement(const CardMovementData&);
@@ -132,8 +138,8 @@ signals:
     //void sigQueryGameList();
     //void sigQueryGameInfo(int gameId);
 
-    void sigActionCreateGame(StructGame game, StructPlayer player);
-    void sigActionJoinGame(int gameId, StructPlayer player);
+    void sigActionCreateGame(const CreateGameData&, const CreatePlayerData&);
+    void sigActionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData&);
     void sigActionLeaveGame();
     void sigActionStartGame();
     void sigActionMessage(const QString& message);

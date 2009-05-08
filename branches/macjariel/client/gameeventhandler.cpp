@@ -8,6 +8,7 @@
 #include "gamesyncevent.h"
 #include "lifepointschangeevent.h"
 #include "playerdiedevent.h"
+#include "playerevent.h"
 
 using namespace client;
 
@@ -30,7 +31,10 @@ void GameEventHandler::connectSlots(QObject* signalEmitter)
             this,               SLOT(onLifePointsChangeEvent(int, int)));
     connect(signalEmitter,      SIGNAL(sigEventPlayerDied(int, PlayerRole)),
             this,               SLOT(onPlayerDiedEvent(int, PlayerRole)));
-
+    connect(signalEmitter,      SIGNAL(sigEventPlayerJoinedGame(const PublicPlayerData&)),
+            this,               SLOT(onPlayerJoinedEvent(const PublicPlayerData&)));
+    connect(signalEmitter,      SIGNAL(sigEventPlayerLeavedGame(int)),
+            this,               SLOT(onPlayerLeavedEvent(int)));
 }
 
 void GameEventHandler::onCardMovementEvent(const CardMovementData& cardMovementData)
@@ -57,3 +61,19 @@ void GameEventHandler::onPlayerDiedEvent(int playerId, PlayerRole role)
 {
     mp_queue->add(new PlayerDiedEvent(mp_game, playerId, role));
 }
+
+void GameEventHandler::onPlayerJoinedEvent(const PublicPlayerData& player)
+{
+    mp_queue->add((new PlayerEvent(mp_game))->playerJoined(player));
+}
+
+void GameEventHandler::onPlayerLeavedEvent(int playerId)
+{
+    mp_queue->add((new PlayerEvent(mp_game))->playerLeaved(playerId));
+}
+
+void GameEventHandler::onPlayerControllerChange(int playerId, bool hasController)
+{
+    mp_queue->add((new PlayerEvent(mp_game))->playerControllerChanged(playerId, hasController));
+}
+

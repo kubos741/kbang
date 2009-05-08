@@ -61,12 +61,12 @@ StructServerInfo GameServer::structServerInfo() const
     return m_structServerInfo;
 }
 
-Game* GameServer::createGame(StructGame x)
+Game* GameServer::createGame(const CreateGameData& createGameData)
 {
     while (!m_nextGameId || m_games.contains(m_nextGameId)) m_nextGameId++;
-    x.id = m_nextGameId++;
-    Game* newGame = new Game(this, x);
-    m_games[x.id] = newGame;
+    int gameId = m_nextGameId++;
+    Game* newGame = new Game(this, gameId, createGameData);
+    m_games[gameId] = newGame;
     return newGame;
 }
 

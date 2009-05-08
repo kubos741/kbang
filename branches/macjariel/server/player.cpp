@@ -29,15 +29,11 @@
 #include "gamecycle.h"
 
 
-Player::Player(Game* game,
-               int id,
-               const QString& name,
-               const QString& password,
-               GameEventHandler* gameEventHandler):
+Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         QObject(game),
         m_id(id),
-        m_name(name),
-        m_password(password),
+        m_name(createPlayerData.name),
+        m_password(createPlayerData.password),
         m_role(ROLE_UNKNOWN),
         mp_character(0),
         m_isAlive(1),
@@ -53,7 +49,6 @@ Player::Player(Game* game,
         m_privatePlayerView(this)
 {
     mp_playerCtrl = new PlayerCtrl(this);
-    registerGameEventHandler(gameEventHandler);
     m_predrawChecks.append(0);
 }
 
@@ -152,6 +147,8 @@ void Player::setWeaponRange(int weaponRange)
 void Player::setAlive(bool isAlive)
 {
     m_isAlive = isAlive;
+    if (isAlive == 0)
+        mp_character->playerDied();
 }
 
 void Player::appendCardToHand(PlayingCard * card)

@@ -28,15 +28,14 @@
 class GameInfo
 {
 public:
-    GameInfo(const StructGame& structGame);
+    GameInfo(const CreateGameData&);
 
-
-    inline int      id()                    const { return m_id; }
     inline QString  name()                  const { return m_name; }
     inline QString  description()           const { return m_description; }
     inline int      minPlayers()            const { return m_minPlayers; }
     inline int      maxPlayers()            const { return m_maxPlayers; }
     inline int      maxSpectators()         const { return m_maxSpectators; }
+    inline int      AIPlayers()             const { return m_AIPlayers; }
     inline bool     hasPlayerPassword()     const { return !m_playerPassword.isNull(); }
     inline bool     hasSpectatorPassword()  const { return !m_spectatorPassword.isNull(); }
     inline int      creatorId()             const { return m_creatorId; }
@@ -50,7 +49,7 @@ public:
         return (password == m_playerPassword || password == m_spectatorPassword);
     }
 
-    StructGame structGame() const;
+    //StructGame structGame() const;
 
     void setCreatorId(int creatorId) {
         m_creatorId = creatorId;
@@ -58,18 +57,16 @@ public:
 
 
 private:
-    int     m_id;
     QString m_name;
     QString m_description;
     int     m_creatorId;
     int     m_minPlayers;
     int     m_maxPlayers;
     int     m_maxSpectators;
+    int     m_AIPlayers;
     QString m_playerPassword;
     QString m_spectatorPassword;
     bool    m_shufflePlayersFlag;
-
-
 };
 
 #endif // GAMEINFO_H

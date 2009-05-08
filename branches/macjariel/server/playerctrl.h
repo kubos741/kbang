@@ -99,8 +99,7 @@ public:
      * \param game The game structure.
      * \param player The player structure.
      */
-    static void createGame(const StructGame& game, const StructPlayer& player,
-                                  GameEventHandler* gameEventHandler);
+    static void createGame(const CreateGameData&, const CreatePlayerData&, GameEventHandler*);
 
     /**
      * Puts the player to the game.
@@ -112,9 +111,9 @@ public:
      * \throws BadGameException The game does not exist.
      * \throws BadGameStateException The game has already started.
      */
-    static void joinGame(int gameId, const StructPlayer& player,
-                                GameEventHandler* gameEventHandler);
+    static void joinGame(int gameId, const QString& gamePassword, const CreatePlayerData&, GameEventHandler*);
 
+    static void replacePlayer(int gameId, int playerId, const QString& password, const CreatePlayerData&, GameEventHandler*);
 
 
     /**

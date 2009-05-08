@@ -40,23 +40,29 @@
 #include "gamelogger.h"
 #include "characterbase.h"
 #include "characterlist.h"
+#include "playerreaper.h"
+#include "voidai.h"
 
 
 
-Game::Game(GameServer* parent, const StructGame& structGame):
+Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData):
     QObject(parent),
-    m_state(StateWaitingForPlayers),
+    m_id(gameId),
+    m_state(GAMESTATE_WAITINGFORPLAYERS),
     m_publicGameView(this),
     m_nextUnusedPlayerId(0),
     m_startable(0)
 {
-    mp_gameInfo = new GameInfo(structGame);
+    mp_gameInfo = new GameInfo(createGameData);
     mp_gameTable = new GameTable(this);
     mp_gameCycle = new GameCycle(this);
     mp_gameEventBroadcaster = new GameEventBroadcaster();
     mp_beerRescue = new BeerRescue(this);
+    mp_defaultPlayerReaper = new PlayerReaper(this);
+    mp_playerReaper = mp_defaultPlayerReaper;
     mp_gameLogger = new GameLogger();
     mp_gameEventBroadcaster->registerHandler(mp_gameLogger, 0);
+    createAI(mp_gameInfo->AIPlayers());
 }
 
 Game::~Game()
@@ -65,12 +71,8 @@ Game::~Game()
     delete mp_gameTable;
     delete mp_gameCycle;
     delete mp_gameEventBroadcaster;
+    delete mp_defaultPlayerReaper;
     delete mp_gameLogger;
-}
-
-int Game::id() const
-{
-    return mp_gameInfo->id();
 }
 
 int Game::alivePlayersCount() const
@@ -137,29 +139,50 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
     return baseDistance;
 }
 
-Player* Game::createPlayer(StructPlayer structPlayer,
-                              GameEventHandler* gameEventHandler)
+Player* Game::createPlayer(const CreatePlayerData& createPlayerData, GameEventHandler* handler)
 {
-    if (m_state != StateWaitingForPlayers) {
+    if (m_state != GAMESTATE_WAITINGFORPLAYERS) {
         throw BadGameStateException();
     }
     while ((m_nextUnusedPlayerId == 0) || m_playerMap.contains(m_nextUnusedPlayerId))
     {
         m_nextUnusedPlayerId++;
     }
-    Player* newPlayer = new Player(this, m_nextUnusedPlayerId, structPlayer.name, structPlayer.password, gameEventHandler);
+    Player* newPlayer = new Player(this, m_nextUnusedPlayerId, createPlayerData);
     m_playerMap[m_nextUnusedPlayerId] = newPlayer;
     m_playerList.append(newPlayer);
     m_publicPlayerList.append(&newPlayer->publicView());
 
-    // The first connected player is the creator and can start the game
-    if (mp_gameInfo->creatorId() == 0) {
+    // The first connected nonAI player is the creator and can start the game
+    if (mp_gameInfo->creatorId() == 0 && !handler->isAI()) {
         mp_gameInfo->setCreatorId(m_nextUnusedPlayerId);
     }
 
     gameEventBroadcaster().onPlayerJoinedGame(newPlayer);
+
+    newPlayer->registerGameEventHandler(handler);
     checkStartable();
     return newPlayer;
+}
+
+void Game::createAI(int count)
+{
+    for(int i = 0; i < count; ++i) {
+        VoidAI* ai = new VoidAI(this);
+        createPlayer(ai->createPlayerData(), ai);
+    }
+}
+
+void Game::replacePlayer(Player* player, const CreatePlayerData& createPlayerData,
+                         GameEventHandler* gameEventHandler)
+{
+    Q_ASSERT(m_playerList.contains(player));
+    if (player->gameEventHandler() != 0)
+        throw BadTargetPlayerException();
+    if (player->password() != createPlayerData.password)
+        throw BadPlayerPasswordException();
+    ///@todo: rename player
+    player->registerGameEventHandler(gameEventHandler);
 }
 
 /**
@@ -173,7 +196,7 @@ void Game::removePlayer(Player* player)
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
 
-    if (player->isCreator() && m_state == StateWaitingForPlayers) {
+    if (player->isCreator() && m_state == GAMESTATE_WAITINGFORPLAYERS) {
         foreach(Player* p, m_playerList) {
             p->unregisterGameEventHandler();
         }
@@ -186,7 +209,7 @@ void Game::removePlayer(Player* player)
 
     player->unregisterGameEventHandler();
     gameEventBroadcaster().onPlayerLeavedGame(player);
-    if (m_state == StateWaitingForPlayers)
+    if (m_state == GAMESTATE_WAITINGFORPLAYERS)
         checkStartable();
     player->deleteLater();
 }
@@ -197,12 +220,7 @@ void Game::buryPlayer(Player* player, Player* causedBy)
     Q_ASSERT(player->isAlive());
     player->setAlive(0);
 
-    foreach(PlayingCard* card, player->hand())
-        gameTable().cancelCard(card);
-
-    foreach(PlayingCard* card, player->table())
-        gameTable().cancelCard(card);
-
+    mp_playerReaper->cleanUpCards(player);
 
     gameEventBroadcaster().onPlayerDied(player, causedBy);
 
@@ -243,23 +261,34 @@ void Game::buryPlayer(Player* player, Player* causedBy)
 
 void Game::winningSituation(PlayerRole winners)
 {
-    m_state = StateFinished;
+    m_state = GAMESTATE_FINISHED;
 
     /// @todo: announce game over
 }
+
+void Game::setPlayerReaper(PlayerReaper* playerReaper)
+{
+    mp_playerReaper = playerReaper;
+}
+
+void Game::unsetPlayerReaper()
+{
+    mp_playerReaper = mp_defaultPlayerReaper;
+}
+
 
 void Game::startGame(Player* player)
 {
     if (player->id() != mp_gameInfo->creatorId()) {
         throw BadPlayerException(player->id());
     }
-    if (m_state != StateWaitingForPlayers) {
+    if (m_state != GAMESTATE_WAITINGFORPLAYERS) {
         throw BadGameStateException();
     }
     if (!m_startable) {
         throw BadGameStateException();
     }
-    m_state = StatePlaying;
+    m_state = GAMESTATE_PLAYING;
     if (mp_gameInfo->hasShufflePlayers())
         shufflePlayers();
 
@@ -333,7 +362,7 @@ void Game::setRolesAndCharacters()
 
 QList<PlayerRole> Game::getRoleList()
 {
-    static char* roleSets[] = {"", "S", "SB", "SVB", "SVBR", "SVBBR", "SVVBBR", "SVVBBBR"};
+    static char* roleSets[] = {"", "S", "SB", "SRB", "SBBR", "SVBBR", "SVVBBR", "SVVBBBR"};
     QList<PlayerRole> res;
     char* i = roleSets[m_playerList.count()];
     while(*i != '\0')

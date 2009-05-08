@@ -46,17 +46,24 @@ class GameEventHandler;
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, const StructPlayer&, ServerConnection*, const GameWidgets&);
-
-    /* for MainWindow */
-    void init();
+    Game(QObject* parent, int gameId, ClientType, ServerConnection*, const GameWidgets&);
     virtual ~Game();
 
-    void setCreator(bool creator) { m_creator = creator; }
+    void setPlayerId(int playerId);
+    void setGameState(const GameState&);
+    void setGameContext(const GameContextData&);
+    void setIsCreator(bool isCreator);
 
-    void setCurrentPlayerId(int currentPlayerId);
-    void setRequestedPlayerId(int requestedPlayerId);
-    void setGamePlayState(const GamePlayState&);
+public slots:
+    void playerJoinedGame(const PublicPlayerData& player);
+    void playerLeavedGame(int playerId);
+    void startableChanged(bool isStartable);
+    void startButtonClicked();
+
+public:
+
+
+
 
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline CardPileWidget* graveyard() const          { return mp_graveyard; }
@@ -66,17 +73,17 @@ public:
                            localPlayerWidget() const  { return mp_localPlayerWidget; }
     inline QWidget*        mainWidget() const         { return mp_mainWidget; }
 
-    inline int             currentPlayerId() const    { return m_currentPlayerId; }
-    inline int             requestedPlayerId() const  { return m_requestedPlayerId; }
-    inline GamePlayState   gamePlayState() const      { return m_gamePlayState; }
-    inline bool            isAbleToRequest() const    { return m_requestedPlayerId == m_playerId; }
+    inline int             currentPlayerId() const    { return m_gameContextData.currentPlayerId; }
+    inline int             requestedPlayerId() const  { return m_gameContextData.requestedPlayerId; }
+    inline GamePlayState   gamePlayState() const      { return m_gameContextData.gamePlayState; }
+    inline bool            isAbleToRequest() const    { return requestedPlayerId() == m_playerId; }
 
     inline int playerId() const { return m_playerId; }
     CharacterType character() const;
 
     inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
 
-    void setPlayerId(int playerId);
+
 
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
@@ -89,14 +96,13 @@ private:
 
 
 private:
-    int m_playerId;
-    const QString m_playerName;
-    const int m_gameId;
-    ServerConnection* mp_serverConnection;
+    int             m_gameId;
+    int             m_playerId;
+    bool            m_isCreator;
+    GameState       m_gameState;
+    GameContextData m_gameContextData;
 
-    int m_currentPlayerId;
-    int m_requestedPlayerId;
-    GamePlayState m_gamePlayState;
+    ServerConnection* mp_serverConnection;
 
 
 /*  Visual elements - provided by MainWindow */
@@ -105,12 +111,13 @@ private:
     QWidget*                  mp_mainWidget;
     QWidget*                  mp_middleWidget;
 
+
+
     QHash<int, PlayerWidget*> m_players;
     QPushButton*              mp_startButton;
     DeckWidget*               mp_deck;
     CardPileWidget*           mp_graveyard;
     CardList*                 mp_selection;
-    bool                      m_creator;
     QQueue<CardMovementData> m_cardMovementQueue;
 
     GameEventHandler*         mp_gameEventHandler;
@@ -119,18 +126,6 @@ private:
 
 
 
-public slots:
-    void opponentJoinedGame(const StructPlayer& player);
-    void opponentLeavedGame(const StructPlayer& player);
-    void startableChanged(int gameId, bool startable);
-    void startButtonClicked();
-    void gameStarted(const StructGame&, const StructPlayerList&);
-
-    void initialGameStateRecieved(const StructGame&, const StructPlayerList& playerList);
-
-
-
-    void test();
 };
 }
 #endif

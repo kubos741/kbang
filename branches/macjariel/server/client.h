@@ -53,6 +53,8 @@ public:
     Client(QObject* parent, int id, QTcpSocket* socket);
     virtual ~Client();
 
+    virtual bool isAI() { return 0; }
+
     /**
      * Returns the id of the client.
      * \note The id = 0 is reserved and cannot be used.
@@ -61,8 +63,8 @@ public:
 
 
 public slots: // These slots are connected to parser
-    void onActionCreateGame(const StructGame& structGame, const StructPlayer& structPlayer);
-    void onActionJoinGame(int gameId, const StructPlayer& structPlayer);
+    void onActionCreateGame(const CreateGameData&, const CreatePlayerData&);
+    void onActionJoinGame(int gameId, QString gamePassword, const CreatePlayerData&);
     void onActionLeaveGame();
     void onActionStartGame();
     void onActionDrawCard(int numCards, bool revealCard);
@@ -108,9 +110,6 @@ public: /* The GameEventHandler interface */
     virtual void onDeckRegenerate();
 
     virtual void onActionRequest(ActionRequestType requestType);
-
-public slots:
-    void startAI();
 
 signals:
     void disconnected(int clientId);

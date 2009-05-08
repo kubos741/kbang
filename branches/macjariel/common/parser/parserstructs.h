@@ -142,6 +142,11 @@ enum ReactionType {
     REACTION_LASTSAVE
 };
 
+enum ClientType {
+    CLIENT_PLAYER,
+    CLIENT_SPECTATOR
+};
+
 
 struct ActionPlayCardData {
     int playedCardId;
@@ -185,8 +190,16 @@ struct CardData {
 };
 
 struct PublicPlayerData {
-    int id;
+    int     id;
     QString name;
+
+    ///@todo: send these
+    bool    hasPassword;
+    bool    hasController;
+    bool    isAI;
+    bool    isAlive;
+
+    ///@todo: portrait
     CharacterType character;
     int lifePoints;
     bool isSheriff;
@@ -212,6 +225,61 @@ enum GamePlayState {
     GAMEPLAYSTATE_DISCARD
 };
 
+enum GameState {
+    GAMESTATE_INVALID = 0,
+    GAMESTATE_WAITINGFORPLAYERS,
+    GAMESTATE_PLAYING,
+    GAMESTATE_FINISHED
+};
+
+struct PlayerInfoData
+{
+    int     id;
+    QString name;
+    bool    hasPassword;
+    bool    hasController;
+    bool    isAI;
+    bool    isAlive;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct CreatePlayerData
+{
+    QString name, password;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct CreateGameData
+{
+    QString name, description;
+    int minPlayers, maxPlayers, maxSpectators, AIPlayers;
+    QString playerPassword, spectatorPassword;
+    bool flagShufflePlayers;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct GameInfoData
+{
+    int id;
+    QString name, description;
+    int minPlayers, maxPlayers, maxSpectators;
+    int alivePlayersCnt, totalPlayersCnt, spectatorsCnt, AIPlayersCnt;
+    bool hasPlayerPassword, hasSpectatorPassword;
+    GameState state;
+    QList<PlayerInfoData> players;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
+struct GameInfoListData: public QList<GameInfoData>
+{
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
+};
+
 struct GameContextData {
     int             currentPlayerId;
     int             requestedPlayerId;
@@ -222,10 +290,17 @@ struct GameContextData {
     void write(QXmlStreamWriter*) const;
 };
 
+
+
 struct GameSyncData {
+    int                     id;
+    QString                 name;
+    bool                    isCreator;
     QList<PublicPlayerData> players;
     PrivatePlayerData       localPlayer;
     GameContextData         gameContext;
+    GameState               state;
+    CardData                graveyard;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };
@@ -267,7 +342,6 @@ struct StructPlayer
     StructPlayer();
 };
 
-typedef QList<StructPlayer> StructPlayerList;
 
 struct StructGame
 {
@@ -277,12 +351,11 @@ struct StructGame
     QString playerPassword, spectatorPassword;
     bool hasPlayerPassword, hasSpectatorPassword;
     bool flagShufflePlayers;
-    void read(XmlNode*, StructPlayerList* playerList = 0);
-    void write(QXmlStreamWriter*, const StructPlayerList* playerlist = 0) const;
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
     static QString elementName;
 };
 
-typedef QList<StructGame> StructGameList;
 
 PlayerRole StringToPlayerRole(const QString& s);
 QString PlayerRoleToString(const PlayerRole& r);
@@ -291,5 +364,11 @@ QString PlayerRoleToString(const PlayerRole& r);
 QString GamePlayStateToString(const GamePlayState& s);
 QString PlayingCardTypeToString(const PlayingCardType& c);
 QString CharacterTypeToString(const CharacterType& t);
+
+QString ClientTypeToString(const ClientType& t);
+ClientType StringToClientType(const QString& s);
+
+GameState StringToGameState(const QString& s);
+QString GameStateToString(const GameState& s);
 
 #endif
