@@ -238,6 +238,12 @@ bool GameTable::isEmptyGraveyard() const
     return m_graveyard.isEmpty();
 }
 
+PlayingCard* GameTable::graveyardTop() const
+{
+    if (m_graveyard.isEmpty()) return 0;
+    return m_graveyard.last();
+}
+
 void GameTable::generateCards(CardFactory* cardFactory)
 {
     m_cards = cardFactory->generateCards(mp_game);

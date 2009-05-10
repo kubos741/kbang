@@ -64,7 +64,7 @@ public:
 
 public slots: // These slots are connected to parser
     void onActionCreateGame(const CreateGameData&, const CreatePlayerData&);
-    void onActionJoinGame(int gameId, QString gamePassword, const CreatePlayerData&);
+    void onActionJoinGame(int gameId, int playerId, QString gamePassword, const CreatePlayerData&);
     void onActionLeaveGame();
     void onActionStartGame();
     void onActionDrawCard(int numCards, bool revealCard);
@@ -77,6 +77,8 @@ public slots: // These slots are connected to parser
     void onQueryServerInfo(QueryResult result);
     void onQueryGame(int gameId, QueryResult result);
     void onQueryGameList(QueryResult result);
+
+    void onParserTerminated();
 
 public: /* The GameEventHandler interface */
     virtual void onHandlerRegistered(PlayerCtrl* playerCtrl);

@@ -158,10 +158,9 @@ void LocalPlayerWidget::updateWidgets()
 {
     if (isVoid()) {
         mp_labelPlayerName->setText("");
-        //mp_characterWidget->hide();
+        mp_characterWidget->setCharacter(CHARACTER_UNKNOWN);
     } else {
         mp_labelPlayerName->setText(name());
-        mp_characterWidget->show();
     }
     mp_roleCardWidget->setPlayerRole(m_role);
     mp_roleCardWidget->validate();

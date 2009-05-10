@@ -271,16 +271,18 @@ void ActionUseAbilityData::write(QXmlStreamWriter* writer) const
 
 void CardData::read(XmlNode* node)
 {
-    Q_ASSERT(node->name() == "card");
     id          = node->attribute("id").toInt();
     type        = StringToPlayingCardType(node->attribute("type"));
     suit        = StringToCardSuit(node->attribute("suit"));
     rank        = node->attribute("rank").toInt();
 }
 
-void CardData::write(QXmlStreamWriter* writer) const
+void CardData::write(QXmlStreamWriter* writer, QString elementName) const
 {
-    writer->writeStartElement("card");
+    if (elementName.isNull())
+        writer->writeStartElement("card");
+    else
+        writer->writeStartElement(elementName);
     writer->writeAttribute("id",        QString::number(id));
     writer->writeAttribute("type",      PlayingCardTypeToString(type));
     writer->writeAttribute("suit",      CardSuitToString(suit));
@@ -390,6 +392,7 @@ void GameSyncData::read(XmlNode* node)
     }
     localPlayer.read(node->getChildren()[1]);
     gameContext.read(node->getChildren()[2]);
+    graveyard.read(node->getChildren()[3]);
 }
 
 void GameSyncData::write(QXmlStreamWriter* writer) const
@@ -409,6 +412,8 @@ void GameSyncData::write(QXmlStreamWriter* writer) const
     localPlayer.write(writer);
 
     gameContext.write(writer);
+
+    graveyard.write(writer, "graveyard");
 
     writer->writeEndElement();
 }
@@ -557,7 +562,7 @@ void GameInfoData::read(XmlNode* node)
     players.clear();
     foreach(XmlNode* child, node->getChildren()) {
         PlayerInfoData playerInfo;
-        if (playerInfo.name != "player") continue;
+        if (child->name() != "player") continue;
         playerInfo.read(child);
         players.append(playerInfo);
     }
@@ -746,8 +751,11 @@ void CardMovementData::read(XmlNode* node)
     pocketTypeTo   = stringToPocketType(node->attribute("pocketTypeTo"));
     playerFrom     = node->attribute("playerFrom").toInt();
     playerTo       = node->attribute("playerTo").toInt();
-    if (node->getFirstChild() && node->getFirstChild()->name() == "card") {
-        card.read(node->getFirstChild());
+    foreach(XmlNode* child, node->getChildren()) {
+        if (child->name() == "card")
+            card.read(child);
+        else if (child->name() == "second-card")
+            secondCard.read(child);
     }
 }
 
@@ -765,6 +773,8 @@ void CardMovementData::write(QXmlStreamWriter* writer) const
 
     if (card.id != 0)
         card.write(writer);
+    if (secondCard.id != 0)
+        secondCard.write(writer, "second-card");
 
     writer->writeEndElement();
 }

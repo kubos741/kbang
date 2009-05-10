@@ -78,11 +78,12 @@ public:
      */
     inline int playersCount() const;
 
+    bool canBeStarted() const;
+
     GameInfoData    gameInfoData() const;
     GameContextData gameContextData() const;
     GameState       gameState() const;
-
-    //const PlayingCard* reactionCard() const;
+    PlayingCard*    graveyardTop() const;
 
     QList<PlayingCard*> selection() const;
 

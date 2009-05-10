@@ -42,10 +42,12 @@ PlayingCard::~PlayingCard()
 CardData PlayingCard::cardData() const
 {
     CardData result;
-    result.id = id();
-    result.type = type();
-    result.suit = suit();
-    result.rank = rank();
+    if (this != 0) {
+        result.id = id();
+        result.type = type();
+        result.suit = suit();
+        result.rank = rank();
+    }
     return result;
 }
 

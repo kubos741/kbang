@@ -186,7 +186,7 @@ struct CardData {
     CardData(): id(0), type(CARD_UNKNOWN) {}
 
     void read(XmlNode*);
-    void write(QXmlStreamWriter*) const;
+    void write(QXmlStreamWriter*, QString elementName = QString()) const;
 };
 
 struct PublicPlayerData {
@@ -320,6 +320,7 @@ struct CardMovementData {
     int               playerFrom;
     int               playerTo;
     CardData          card;
+    CardData          secondCard;
     CardMovementType  type;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;

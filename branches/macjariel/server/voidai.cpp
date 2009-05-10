@@ -22,6 +22,7 @@ CreatePlayerData VoidAI::createPlayerData() const
 {
     CreatePlayerData res;
     res.name = QString("VoidAI #%1").arg(m_id);
+    return res;
 }
 
 void VoidAI::onHandlerRegistered(PlayerCtrl* playerCtrl)

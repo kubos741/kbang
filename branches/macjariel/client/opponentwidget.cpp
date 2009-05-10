@@ -74,6 +74,12 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
 
+    for(int i = 0; i < publicPlayerData.handSize; ++i) {
+        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
+        card->validate();
+        mp_hand->push(card);
+    }
+
     foreach (const CardData& cardData, publicPlayerData.table) {
         CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
         card->setCardData(cardData);
@@ -130,14 +136,13 @@ void OpponentWidget::updateWidgets()
 {
     if (isVoid()) {
         mp_labelPlayerName->setText("");
-        mp_characterWidget->hide();
+        mp_characterWidget->setCharacter(CHARACTER_UNKNOWN);
         if (mp_roleCard)
             mp_roleCard->hide();
         if (mp_sheriffBadge)
             mp_sheriffBadge->hide();
     } else {
         mp_labelPlayerName->setText(name());
-        mp_characterWidget->show();
         if (isSheriff()) {
             //if (m_sheriffBadgePixmap.isNull())
             m_sheriffBadgePixmap.load(":/misc/gfx/misc/sheriff-badge.png");

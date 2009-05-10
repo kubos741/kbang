@@ -6,26 +6,23 @@
     <x>0</x>
     <y>0</y>
     <width>564</width>
-    <height>381</height>
+    <height>372</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize" >
-   <size>
-    <width>220</width>
-    <height>220</height>
-   </size>
   </property>
   <property name="windowTitle" >
    <string>Opponent Widget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" >
    <property name="margin" >
+    <number>0</number>
+   </property>
+   <property name="spacing" >
     <number>0</number>
    </property>
    <item row="0" column="0" >
@@ -40,8 +37,17 @@
       <number>0</number>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4" >
+      <property name="spacing" >
+       <number>3</number>
+      </property>
+      <property name="margin" >
+       <number>1</number>
+      </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout" >
+        <property name="spacing" >
+         <number>1</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout" >
           <property name="spacing" >
@@ -164,6 +170,9 @@ font: oblique 7pt "DejaVu Sans";</string>
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Maximum</enum>
+          </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>10</width>
@@ -186,6 +195,12 @@ font: oblique 7pt "DejaVu Sans";</string>
           </property>
           <item>
            <widget class="QLabel" name="mp_labelPlayerName" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="maximumSize" >
              <size>
               <width>16777215</width>
@@ -253,12 +268,6 @@ font: oblique 7pt "DejaVu Sans";</string>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize" >
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
          </widget>
         </item>
         <item>
@@ -267,12 +276,12 @@ font: oblique 7pt "DejaVu Sans";</string>
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Preferred</enum>
+           <enum>QSizePolicy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
-            <height>10</height>
+            <height>5</height>
            </size>
           </property>
          </spacer>
@@ -284,12 +293,6 @@ font: oblique 7pt "DejaVu Sans";</string>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
           </property>
          </widget>
         </item>

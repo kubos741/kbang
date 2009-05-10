@@ -105,6 +105,7 @@ public:
     inline const PublicGameView& publicGameView() const
                                   { return m_publicGameView; }
 
+    bool canBeStarted() const { return m_startable; }
     bool isFinished() const { return m_state == GAMESTATE_FINISHED; }
 
     /**

@@ -41,6 +41,7 @@ public:
 
     void init(CardWidgetFactory* cardWidgetFactory);
 
+
     inline CharacterType character() const { return m_character; }
     inline int     lifePoints() const { return m_lifePoints; }
 
@@ -71,6 +72,7 @@ private:
 
     static QTimer sm_timer;
     static int    sm_countAnimaton;
+    static int    sm_lifeLevels[];
     //QSize         m_sizeHint;
 
     CardWidgetFactory*  mp_cardWidgetFactory;

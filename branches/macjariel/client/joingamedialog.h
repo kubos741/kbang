@@ -38,24 +38,40 @@ Q_OBJECT
 public:
     JoinGameDialog(QWidget *parent, ServerConnection* serverConnection);
     ~JoinGameDialog();
+
+    void updateGameListView();
+    void updateGameView();
+
+public slots:
+    void refreshGameList();
+public:
+    void refreshGame(int gameId);
+    void selectGame(int gameId);
+
     virtual void show();
 
 
 public slots:
-    void refreshGameList();
-    void loadGameDetails(int gameId);
-    void recievedGameList(const GameInfoListData&);
-    //void recievedGameDetails(const StructGame&, const StructPlayerList&);
-    void on_mp_gameListView_itemClicked(QTreeWidgetItem * item, int column);
-    void on_mp_playButton_clicked();
-    void on_mp_spectateButton_clicked();
+    void updateGameList(const GameInfoListData&);
+    void updateGame(const GameInfoData&);
+
+    void on_gameListView_itemClicked(QTreeWidgetItem * item, int column);
+    void on_playerListView_itemClicked(QTreeWidgetItem * item, int column);
+    void on_pushButtonPlay_clicked();
+    void on_pushButtonSpectate_clicked();
     void setButtonsState();
 
 signals:
-    void joinGame(int gameId, const QString& gamePassword, const QString& playerName);
+    void joinGame(int gameId, int playerId, const QString& password, const CreatePlayerData&);
 
 private:
-    ServerConnection* mp_serverConnection;
+    const GameInfoData* gameInfoData(int gameId);
+
+    ServerConnection*           mp_serverConnection;
+    GameInfoListData            m_gameList;
+    int                         m_currentGameId;
+    int                         m_currentPlayerId;
+
 
 };
 }

@@ -313,8 +313,9 @@ void Game::checkStartable()
         newStartable = 1;
     else
         newStartable = 0;
-    if (m_startable != newStartable)
+    if (m_startable != newStartable && mp_gameInfo->creatorId() != 0) {
         m_playerMap[mp_gameInfo->creatorId()]->gameEventHandler()->onGameStartabilityChanged(newStartable);
+    }
     m_startable = newStartable;
 }
 

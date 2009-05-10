@@ -95,12 +95,11 @@ void ServerConnection::createGame(const CreateGameData& game, const CreatePlayer
     mp_parser->actionCreateGame(game, player);
 }
 
-void ServerConnection::joinGame(int gameId, const QString& gamePassword, const QString& playerName)
+void ServerConnection::joinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData& player)
+
 {
-    emit logMessage(tr("Joining game id %1.").arg(gameId));
-    StructPlayer x;
-    x.name = playerName;
-    mp_parser->actionJoinGame(gameId, gamePassword, x);
+    emit logMessage(tr("Joining game."));
+    mp_parser->actionJoinGame(gameId, playerId, gamePassword, player);
 }
 
 void ServerConnection::leaveGame()
@@ -240,8 +239,8 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
-    connect(mp_parser, SIGNAL(sigEventGameStartable(int, bool)),
-            this, SIGNAL(startableChanged(int, bool)));
+    connect(mp_parser, SIGNAL(sigEventGameCanBeStarted(bool)),
+            this, SIGNAL(gameCanBeStarted(bool)));
     connect(mp_parser, SIGNAL(incomingData(const QByteArray&)),
             this, SIGNAL(incomingData(const QByteArray&)));
     connect(mp_parser, SIGNAL(outgoingData(const QByteArray&)),

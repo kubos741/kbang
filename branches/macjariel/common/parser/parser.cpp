@@ -297,12 +297,13 @@ void Parser::processStanza()
         if (action->name() == "join-game")
         {
             int         gameId = action->attribute("gameId").toInt();
+            int         playerId = action->attribute("playerId").toInt();
             QString     gamePassword = action->attribute("gamePassword");
             XmlNode* player = action->getFirstChild();
             if (!player) return;
             CreatePlayerData createPlayerData;
             createPlayerData.read(player);
-            emit sigActionJoinGame(gameId, gamePassword, createPlayerData);
+            emit sigActionJoinGame(gameId, playerId, gamePassword, createPlayerData);
             return;
         }
         if (action->name() == "leave-game")
@@ -387,9 +388,8 @@ void Parser::processStanza()
         }
         if (event->name() == "game-startable")
         {
-            int gameId = event->attribute("gameId").toInt();
-            bool startable = event->attribute("startable") == "1";
-            emit sigEventGameStartable(gameId, startable);
+            bool canBeStarted = event->attribute("is-startable") == "true";
+            emit sigEventGameCanBeStarted(canBeStarted);
             return;
         }
         if (event->name() == "game-sync") {
@@ -508,16 +508,6 @@ void Parser::eventPlayerLeavedGame(int playerId)
     eventEnd();
 }
 
-void Parser::eventGameStartable(int gameId, bool startable)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("game-startable");
-    mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
-    mp_streamWriter->writeAttribute("startable", startable ? "1" : "0");
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
 void Parser::eventStart()  { mp_streamWriter->writeStartElement("event");  }
 void Parser::eventEnd()    { mp_streamWriter->writeEndElement();           }
 void Parser::actionStart() { mp_streamWriter->writeStartElement("action"); }
@@ -593,6 +583,16 @@ void Parser::eventPlayerDied(int playerId, PlayerRole role)
     eventEnd();
 }
 
+void Parser::eventGameCanBeStarted(bool canBeStared)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("game-startable");
+    mp_streamWriter->writeAttribute("is-startable", canBeStared ? "true" : "false");
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+
 void Parser::streamError()
 {
     if (mp_streamReader->error() == QXmlStreamReader::PrematureEndOfDocumentError) return;
@@ -612,12 +612,14 @@ void Parser::actionCreateGame(const CreateGameData& createGameData, const Create
 }
 
 
-void Parser::actionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData& player)
+void Parser::actionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData& player)
 {
     ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("join-game");
     mp_streamWriter->writeAttribute("gameId", QString::number(gameId));
+    if (playerId != 0)
+        mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
     if (!gamePassword.isEmpty()) mp_streamWriter->writeAttribute("gamePassword", gamePassword);
     player.write(mp_streamWriter);
     mp_streamWriter->writeEndElement();

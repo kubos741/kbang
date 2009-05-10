@@ -19,6 +19,7 @@ friend class Game;
 public:
     bool isClickable(CardWidget*);
     bool onCardClicked(CardWidget*);
+    void onCardRightClicked(CardWidget*);
     void onPlayerClicked(PlayerWidget*);
     void onEndTurnClicked();
     void onPassClicked();

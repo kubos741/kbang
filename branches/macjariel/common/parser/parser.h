@@ -71,7 +71,7 @@ public slots:
 //    void queryGameInfo(int gameId);
 
     void actionCreateGame(const CreateGameData&, const CreatePlayerData&);
-    void actionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData&);
+    void actionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
     void actionLeaveGame();
     void actionStartGame();
     void actionMessage(const QString& message);
@@ -94,7 +94,7 @@ signals:
     void sigEventPlayerJoinedGame(const PublicPlayerData&);
     void sigEventPlayerLeavedGame(int playerId);
 
-    void sigEventGameStartable(int gameId, bool startable);
+    void sigEventGameCanBeStarted(bool canBeStarted);
 
     void sigEventGameStateChange(const GameState&);
     void sigEventGameContextChange(const GameContextData&);
@@ -120,7 +120,7 @@ public slots:
     void eventCardMovement(const CardMovementData&);
     void eventLifePointsChange(int playerId, int lifePoints);
     void eventPlayerDied(int playerId, PlayerRole role);
-    void eventGameStartable(int gameId, bool startable);
+    void eventGameCanBeStarted(bool canBeStarted);
 
 
 
@@ -139,7 +139,7 @@ signals:
     //void sigQueryGameInfo(int gameId);
 
     void sigActionCreateGame(const CreateGameData&, const CreatePlayerData&);
-    void sigActionJoinGame(int gameId, const QString& gamePassword, const CreatePlayerData&);
+    void sigActionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
     void sigActionLeaveGame();
     void sigActionStartGame();
     void sigActionMessage(const QString& message);

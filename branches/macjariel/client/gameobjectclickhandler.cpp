@@ -2,6 +2,8 @@
 #include "game.h"
 #include "playerwidget.h"
 #include "serverconnection.h"
+#include "cardwidget.h"
+#include "cardzoomwidget.h"
 
 using namespace client;
 
@@ -86,6 +88,13 @@ bool GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
     }
 
     return 1;
+}
+
+void GameObjectClickHandler::onCardRightClicked(CardWidget* cardWidget)
+{
+    if (!mp_game->isAbleToRequest())
+        return;
+    new CardZoomWidget(mp_game, cardWidget);
 }
 
 void GameObjectClickHandler::onPlayerClicked(PlayerWidget* playerWidget)

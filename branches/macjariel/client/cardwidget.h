@@ -54,6 +54,7 @@ public:
 
     void setType(Card::Type);
 
+    void clone(CardWidget*);
     void setCardData(const CardData&);
     void setPocketType(const PocketType&);
     void setOwnerId(int ownerId);
@@ -64,6 +65,7 @@ public:
     void setSize(Size size);
     void validate();
 
+
     inline void setShadowMode()    { m_shadowMode = 1; }
     inline void unsetShadowMode()  { m_shadowMode = 0; }
 
@@ -73,6 +75,7 @@ public:
     inline Size  size()  const { return m_size; }
     inline QSize qsize() const { return m_qsize; }
     inline bool  hasHighlight() const { return m_hasHighlight; }
+    QPoint center() const;
 
 
     inline static QSize smallSize()  { return sm_qsizeSmall;  }
@@ -81,7 +84,7 @@ public:
     static QSize qSize(Size size);
 
 protected:
-    void mousePressEvent(QMouseEvent *ev);
+    virtual void mousePressEvent(QMouseEvent *ev);
 
 private:
     virtual void paintEvent (QPaintEvent *event);

@@ -31,6 +31,7 @@
 #include "card.h"
 
 #include <QPainter>
+#include <QPaintEvent>
 
 using namespace client;
 
@@ -90,8 +91,8 @@ void MainWindow::showCreateGameDialog()
     if (!mp_createGameDialog)
     {
         mp_createGameDialog = new CreateGameDialog(this);
-        connect(mp_createGameDialog,SIGNAL(createGame(const StructGame&, const StructPlayer&)),
-                &m_serverConnection, SLOT(createGame(const StructGame&, const StructPlayer&)));
+        connect(mp_createGameDialog,SIGNAL(createGame(CreateGameData,CreatePlayerData)),
+                &m_serverConnection, SLOT(createGame(CreateGameData,CreatePlayerData)));
     }
     mp_createGameDialog->show();
 }
@@ -102,8 +103,8 @@ void MainWindow::showJoinGameDialog()
     if (!mp_joinGameDialog)
     {
         mp_joinGameDialog = new JoinGameDialog(this, &m_serverConnection);
-        connect(mp_joinGameDialog, SIGNAL(joinGame(int, const QString&, const QString&)),
-                &m_serverConnection, SLOT(joinGame(int, const QString&, const QString&)));
+        connect(mp_joinGameDialog, SIGNAL(joinGame(int,int,QString,CreatePlayerData)),
+                &m_serverConnection, SLOT(joinGame(int,int,QString,CreatePlayerData)));
     }
     mp_joinGameDialog->show();
 }

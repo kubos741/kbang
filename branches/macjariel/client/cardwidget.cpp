@@ -69,6 +69,14 @@ void CardWidget::setType(Card::Type cardType)
     m_cardType = cardType;
 }
 
+void CardWidget::clone(CardWidget* other)
+{
+    m_cardType = other->type();
+    m_playerRole = other->m_playerRole;
+    m_characterType = other->character();
+    m_cardData = other->cardData();
+}
+
 void CardWidget::setCardData(const CardData& cardData)
 {
     m_cardData = cardData;
@@ -242,12 +250,28 @@ void CardWidget::setHighlight(bool hasHighlight)
     update();
 }
 
+QPoint CardWidget::center() const
+{
+    return QPoint((int)(QWidget::size().width() / 2),
+                          (int)(QWidget::size().height() / 2));
+}
+
 void CardWidget::mousePressEvent(QMouseEvent* e)
 {
     if (mp_gameObjectClickHandler) {
-        bool handled = mp_gameObjectClickHandler->onCardClicked(this);
-        if (!handled)
-            QLabel::mousePressEvent(e);
+        switch(e->button()) {
+        case Qt::LeftButton: {
+            bool handled = mp_gameObjectClickHandler->onCardClicked(this);
+            if (!handled)
+                QLabel::mousePressEvent(e);
+            break;
+        }
+        case Qt::RightButton:
+            mp_gameObjectClickHandler->onCardRightClicked(this);
+            break;
+        }
+        default:
+            break;
     }
 }
 

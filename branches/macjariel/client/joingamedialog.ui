@@ -210,7 +210,7 @@
           <bool>true</bool>
          </property>
          <property name="selectionMode" >
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <property name="indentation" >
           <number>15</number>
@@ -244,33 +244,9 @@
            <string>Players</string>
           </property>
          </column>
-         <column>
-          <property name="text" >
-           <string>C</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>AI</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>+</string>
-          </property>
-         </column>
          <item>
           <property name="text" >
            <string>Create new player</string>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-          <property name="text" >
-           <string/>
           </property>
          </item>
         </widget>

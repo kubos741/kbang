@@ -28,7 +28,6 @@
 #include <QPushButton>
 #include "parser/parserstructs.h"
 #include "common.h"
-#include "deckwidget.h"
 #include "playerwidget.h"
 
 #include "cardwidgetfactory.h"
@@ -39,6 +38,8 @@ namespace client {
 class ServerConnection;
 class GameEventHandler;
 
+class DeckWidget;
+class GraveyardWidget;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -53,20 +54,18 @@ public:
     void setGameState(const GameState&);
     void setGameContext(const GameContextData&);
     void setIsCreator(bool isCreator);
+    void setGraveyard(const CardData&);
+    void validate();
 
 public slots:
     void playerJoinedGame(const PublicPlayerData& player);
     void playerLeavedGame(int playerId);
-    void startableChanged(bool isStartable);
+    void gameCanBeStarted(bool);
     void startButtonClicked();
 
 public:
-
-
-
-
     inline DeckWidget*     deck() const               { return mp_deck; }
-    inline CardPileWidget* graveyard() const          { return mp_graveyard; }
+    inline GraveyardWidget*graveyard() const          { return mp_graveyard; }
     inline CardList*       selection() const          { return mp_selection; }
     inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
     inline LocalPlayerWidget*
@@ -76,6 +75,7 @@ public:
     inline int             currentPlayerId() const    { return m_gameContextData.currentPlayerId; }
     inline int             requestedPlayerId() const  { return m_gameContextData.requestedPlayerId; }
     inline GamePlayState   gamePlayState() const      { return m_gameContextData.gamePlayState; }
+    inline bool            isCreator() const          { return m_isCreator; }
     inline bool            isAbleToRequest() const    { return requestedPlayerId() == m_playerId; }
 
     inline int playerId() const { return m_playerId; }
@@ -92,7 +92,11 @@ public:
     inline ServerConnection* serverConnection() { return mp_serverConnection; }
 
 private:
-
+    void loadCreatorInterface();
+    void unloadCreatorInterface();
+    void loadGameInterface();
+    void unloadGameInterface();
+    void unloadInterface();
 
 
 private:
@@ -101,6 +105,12 @@ private:
     bool            m_isCreator;
     GameState       m_gameState;
     GameContextData m_gameContextData;
+
+    enum {
+        NoInterface = 0,
+        CreatorInterface,
+        GameInterface
+    } m_interface;
 
     ServerConnection* mp_serverConnection;
 
@@ -116,7 +126,7 @@ private:
     QHash<int, PlayerWidget*> m_players;
     QPushButton*              mp_startButton;
     DeckWidget*               mp_deck;
-    CardPileWidget*           mp_graveyard;
+    GraveyardWidget*          mp_graveyard;
     CardList*                 mp_selection;
     QQueue<CardMovementData> m_cardMovementQueue;
 

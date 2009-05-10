@@ -4,7 +4,6 @@
 #include "opponentwidget.h"
 
 
-
 using namespace client;
 
 GameSyncEvent::GameSyncEvent(Game* game, const GameSyncData& gameSyncData):
@@ -32,6 +31,9 @@ void GameSyncEvent::run()
     mp_game->setGameState(m_gameSyncData.state);
     mp_game->setGameContext(m_gameSyncData.gameContext);
     mp_game->setIsCreator(m_gameSyncData.isCreator);
+    mp_game->validate();
+
+    mp_game->setGraveyard(m_gameSyncData.graveyard);
 
     mp_game->localPlayerWidget()->setFromPublicData(m_gameSyncData.players[index]);
     mp_game->localPlayerWidget()->setFromPrivateData(m_gameSyncData.localPlayer);

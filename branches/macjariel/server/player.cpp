@@ -48,6 +48,7 @@ Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         m_publicPlayerView(this),
         m_privatePlayerView(this)
 {
+
     mp_playerCtrl = new PlayerCtrl(this);
     m_predrawChecks.append(0);
 }
@@ -63,6 +64,11 @@ CharacterType Player::characterType() const
     if (mp_character == 0)
         return CHARACTER_UNKNOWN;
     return mp_character->characterType();
+}
+
+bool Player::isAI() const
+{
+    return mp_gameEventHandler != 0 && mp_gameEventHandler->isAI();
 }
 
 bool Player::isCreator() const

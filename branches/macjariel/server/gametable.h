@@ -89,6 +89,8 @@ public:
 
     bool isEmptyGraveyard() const;
 
+    PlayingCard* graveyardTop() const;
+
     PlayingCard* card(int cardId) const {
         return (m_cards.contains(cardId)) ? m_cards[cardId] : 0;
     }

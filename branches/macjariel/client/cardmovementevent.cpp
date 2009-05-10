@@ -27,6 +27,8 @@
 #include "cardlist.h"
 #include "game.h"
 #include "parser/parserstructs.h"
+#include "deckwidget.h"
+#include "graveyardwidget.h"
 
 #include <math.h>
 
@@ -59,6 +61,7 @@ bool CardMovementEvent::isReadyRun()
 {
     if (!m_cardAndPocketIsSet)
         setCardAndPocket();
+    if (mp_card == 0) return 1;
     return (mp_card->isVisible() && mp_destPocket->isVisible());
 }
 
@@ -81,6 +84,9 @@ void CardMovementEvent::setCardAndPocket()
         mp_card = mp_game->deck()->pop();
         break;
     case POCKET_GRAVEYARD:
+        if (m_cardMovementData.secondCard.id != 0) {
+            mp_game->graveyard()->setSecondCard(m_cardMovementData.secondCard);
+        }
         mp_card = mp_game->graveyard()->pop();
         break;
     case POCKET_HAND:
@@ -152,9 +158,14 @@ void CardMovementEvent::setCardAndPocket()
 
 void CardMovementEvent::startTransition()
 {
+    if (mp_card == 0) {
+        GameEvent::finish();
+        return;
+    }
     Q_ASSERT(mp_destPocket->isVisible());
     Q_ASSERT(mp_card->isVisible());
     Q_ASSERT(!sm_timer.isActive());
+
 
     if (mp_card->parent() != mp_game->mainWidget())
     {

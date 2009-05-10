@@ -18,7 +18,7 @@ PlayerCtrl::PlayerCtrl(Player* player):
 
 void PlayerCtrl::disconnect()
 {
-    mp_player->game()->removePlayer(mp_player);
+    mp_player->unregisterGameEventHandler();
 }
 
 void PlayerCtrl::startGame()

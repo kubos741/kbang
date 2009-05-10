@@ -101,7 +101,7 @@ public:
     inline int                  bangPower()        const { return m_bangPower;         }
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
     inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
-
+    bool                        isAI()             const;
 
     /**
      * Returns the distance-in modificator. The player is seen by all other

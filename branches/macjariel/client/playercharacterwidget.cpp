@@ -25,8 +25,12 @@
 
 using namespace client;
 
+
+
 QTimer PlayerCharacterWidget::sm_timer;
 int    PlayerCharacterWidget::sm_countAnimaton = 0;
+
+int PlayerCharacterWidget::sm_lifeLevels[6] = {0, 21, 34, 49, 64, 77};
 
 double pixelsPerSecond =  25;
 const int timerInterval = 100;
@@ -36,13 +40,16 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
         QWidget(parent),
         m_character(CHARACTER_UNKNOWN),
         m_lifePoints(0),
+        mp_backCard(0),
+        mp_characterCard(0),
         m_isAnimating(0),
         mp_cardWidgetFactory(0)
 {
         QSize widgetSize(CardWidget::qSize(CardWidget::SIZE_SMALL).width(),
-                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() * 2));
+                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() + sm_lifeLevels[5]));
         setMinimumSize(widgetSize);
         setMaximumSize(widgetSize);
+        resize(widgetSize);
 }
 
 PlayerCharacterWidget::~PlayerCharacterWidget()
@@ -54,13 +61,13 @@ void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
     mp_backCard = cardWidgetFactory->createCharacterCard(this);
     mp_backCard->validate();
     mp_backCard->move(0,0);
-    mp_backCard->show();
+    mp_backCard->hide();
 
     mp_characterCard = cardWidgetFactory->createCharacterCard(this);
     mp_characterCard->setCharacterType(m_character);
     mp_characterCard->validate();
     mp_characterCard->move(0,0);
-    mp_characterCard->show();
+    mp_characterCard->hide();
 }
 
 void PlayerCharacterWidget::setOwnerId(int ownerId)
@@ -71,8 +78,13 @@ void PlayerCharacterWidget::setOwnerId(int ownerId)
 void PlayerCharacterWidget::setCharacter(CharacterType character)
 {
     m_character = character;
-    mp_characterCard->setCharacterType(m_character);
-    mp_characterCard->validate();
+    if (mp_characterCard) {
+        mp_characterCard->setCharacterType(m_character);
+        mp_characterCard->validate();
+        mp_characterCard->setVisible(m_character != CHARACTER_UNKNOWN);
+    }
+    if (mp_backCard)
+        mp_backCard->setVisible(m_character != CHARACTER_UNKNOWN);
 }
 
 void PlayerCharacterWidget::setLifePoints(int lifePoints)
@@ -95,9 +107,8 @@ void PlayerCharacterWidget::unset()
 
 void PlayerCharacterWidget::lifePointsChanged()
 {
-    static int levels[6] = {0, 21, 34, 49, 64, 77};
     m_sourceY = mp_characterCard->y();
-    m_targetY = mp_backCard->y() + levels[m_lifePoints];
+    m_targetY = mp_backCard->y() + sm_lifeLevels[m_lifePoints];
     m_time.start();
     if (m_isAnimating) return;
     m_isAnimating = 1;

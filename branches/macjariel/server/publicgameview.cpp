@@ -56,6 +56,11 @@ int PublicGameView::playersCount() const
     return mp_game->playersCount();
 }
 
+bool PublicGameView::canBeStarted() const
+{
+    return mp_game->canBeStarted();
+}
+
 GameInfoData PublicGameView::gameInfoData() const
 {
     GameInfoData res;
@@ -78,7 +83,7 @@ GameInfoData PublicGameView::gameInfoData() const
         playerInfo.name = p->name();
         playerInfo.isAlive = p->isAlive();
         playerInfo.hasController = (p->gameEventHandler() != 0);
-        // playerInfo.isAI todo
+        playerInfo.isAI = p->isAI();
         playerInfo.hasPassword = 0; // todo
         res.players.append(playerInfo);
     }
@@ -93,6 +98,11 @@ GameContextData PublicGameView::gameContextData() const
 GameState PublicGameView::gameState() const
 {
     return mp_game->gameState();
+}
+
+PlayingCard* PublicGameView::graveyardTop() const
+{
+    return mp_game->gameTable().graveyardTop();
 }
 /*
 const PlayingCard* PublicGameView::reactionCard() const
