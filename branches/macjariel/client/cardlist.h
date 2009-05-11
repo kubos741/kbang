@@ -46,6 +46,8 @@ public:
 
     virtual void paintEvent(QPaintEvent* event);
 
+    void clear();
+
 protected:
     QList<CardWidget*> m_cards;
 

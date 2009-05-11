@@ -36,16 +36,22 @@ public:
     ConnectToServerDialog(QWidget *parent = 0);
     ~ConnectToServerDialog();
 
+    void reloadServerList();
+
 private slots:
-    void on_mp_buttonSaveFavorite_clicked();
-    void on_mp_favoriteList_itemClicked(QTreeWidgetItem * item, int column);
-    void on_mp_favoriteList_itemDoubleClicked(QTreeWidgetItem * item, int column);
-    void on_mp_connectButton_clicked();
-    void setConnectButtonStatus();
+    void on_serverList_currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+    void on_serverList_itemDoubleClicked (QTreeWidgetItem*, int);
+    void on_pushButtonAddServer_clicked();
+    void on_pushButtonEditServer_clicked();
+    void on_pushButtonDeleteServer_clicked();
+    void on_pushButtonConnect_clicked();
 
 signals:
-    void connectToServer(QString serverAddress, int serverPort, QString nickname);
+    void connectToServer(QString serverHost, int serverPort);
 
+private:
+    void loadConfigValues();
+    void saveConfigValues();
 };
 }
 #endif

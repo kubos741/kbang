@@ -22,6 +22,7 @@
 
 #include <QString>
 #include <QList>
+#include <QImage>
 
 class XmlNode;
 class QXmlStreamWriter;
@@ -193,13 +194,12 @@ struct PublicPlayerData {
     int     id;
     QString name;
 
-    ///@todo: send these
     bool    hasPassword;
     bool    hasController;
     bool    isAI;
     bool    isAlive;
 
-    ///@todo: portrait
+    QImage avatar;
     CharacterType character;
     int lifePoints;
     bool isSheriff;
@@ -247,6 +247,7 @@ struct PlayerInfoData
 struct CreatePlayerData
 {
     QString name, password;
+    QImage avatar;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };

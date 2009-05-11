@@ -22,6 +22,7 @@
 #include "../util.h"
 #include "xmlnode.h"
 #include <QXmlStreamWriter>
+#include <QBuffer>
 #include <QtDebug>
 
 CardSuit StringToCardSuit(const QString& s)
@@ -190,6 +191,35 @@ QString GamePlayStateToString(const GamePlayState& s)
     return "invalid";
 }
 
+
+void readAvatar(XmlNode* node, QImage& avatar)
+{
+    QByteArray bytes = QByteArray::fromBase64(node->getFirstChild()->text().toAscii());
+    if (!avatar.loadFromData(bytes)) {
+        qWarning("Cannot load image from network.");
+    }
+
+}
+
+void writeAvatar(QXmlStreamWriter* writer, const QImage& avatar)
+{
+    qDebug() << "writeAvatar" << avatar.isNull();
+    if (!avatar.isNull()) {
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        buffer.open(QIODevice::WriteOnly);
+        avatar.save(&buffer, "PNG");
+        writer->writeStartElement("avatar");
+        writer->writeCharacters(bytes.toBase64());
+        writer->writeEndElement();
+        QImage a;
+        qDebug("???");
+        if (!a.loadFromData(bytes)) {
+            qDebug("NO LOAD");
+        }
+     }
+}
+
 //----------------------------------------------------------------------------
 
 
@@ -294,18 +324,27 @@ void PublicPlayerData::read(XmlNode* node)
 {
     Q_ASSERT(node->name() == "public-player");
     Q_ASSERT(node->getFirstChild()->name() == "cards-table");
-    id          = node->attribute("id").toInt();
-    name        = node->attribute("name");
-    character   = StringToCharacterType(node->attribute("character"));
-    lifePoints  = node->attribute("lifePoints").toInt();
-    isSheriff   = (node->attribute("isSheriff") == "true");
-    handSize    = node->attribute("handSize").toInt();
-    XmlNode* cards = node->getFirstChild();
-    table.clear();
-    foreach(XmlNode* card, cards->getChildren()) {
-        CardData cardData;
-        cardData.read(card);
-        table.append(cardData);
+    id              = node->attribute("id").toInt();
+    name            = node->attribute("name");
+    character       = StringToCharacterType(node->attribute("character"));
+    lifePoints      = node->attribute("lifePoints").toInt();
+    isSheriff       = (node->attribute("isSheriff") == "true");
+    handSize        = node->attribute("handSize").toInt();
+    hasPassword     = node->attribute("hasPassword") == "true";
+    hasController   = node->attribute("hasController") == "true";
+    isAI            = node->attribute("isAI") == "true";
+    isAlive         = node->attribute("isAlive") == "true";
+    foreach(XmlNode* child, node->getChildren()) {
+        if (child->name() == "cards-table") {
+            table.clear();
+            foreach(XmlNode* card, child->getChildren()) {
+                CardData cardData;
+                cardData.read(card);
+                table.append(cardData);
+            }
+        } else if (child->name() == "avatar") {
+            readAvatar(child, avatar);
+        }
     }
 }
 
@@ -318,10 +357,15 @@ void PublicPlayerData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("lifePoints",        QString::number(lifePoints));
     writer->writeAttribute("isSheriff",         isSheriff ? "true" : "false");
     writer->writeAttribute("handSize",          QString::number(handSize));
+    writer->writeAttribute("hasPassword",       hasPassword ? "true" : "false");
+    writer->writeAttribute("hasController",     hasController ? "true" : "false");
+    writer->writeAttribute("isAI",              isAI ? "true" : "false");
+    writer->writeAttribute("isAlive",           isAlive ? "true" : "false");
     writer->writeStartElement("cards-table");
     foreach(const CardData& cardData, table)
         cardData.write(writer);
     writer->writeEndElement();
+    writeAvatar(writer, avatar);
     writer->writeEndElement();
 }
 
@@ -500,6 +544,10 @@ void CreatePlayerData::read(XmlNode* node)
 {
     name        = node->attribute("name");
     password    = node->attribute("password");
+    XmlNode* avatarNode = node->getFirstChild();
+    if (avatarNode && avatarNode->name() == "avatar") {
+        readAvatar(avatarNode, avatar);
+    }
 }
 
 void CreatePlayerData::write(QXmlStreamWriter* writer) const
@@ -508,6 +556,7 @@ void CreatePlayerData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("name", name);
     if (!password.isNull())
         writer->writeAttribute("password", password);
+    writeAvatar(writer, avatar);
     writer->writeEndElement();
 }
 

@@ -66,6 +66,9 @@ signals:
 
 private:
     const GameInfoData* gameInfoData(int gameId);
+    void loadConfigValues();
+    void saveConfigValues();
+
 
     ServerConnection*           mp_serverConnection;
     GameInfoListData            m_gameList;

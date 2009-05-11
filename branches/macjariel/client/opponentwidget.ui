@@ -70,7 +70,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label" >
+           <widget class="QLabel" name="mp_labelAvatar" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
               <horstretch>0</horstretch>
@@ -95,7 +95,7 @@ color: white;
 font: oblique 7pt "DejaVu Sans";</string>
             </property>
             <property name="text" >
-             <string>TODO</string>
+             <string/>
             </property>
             <property name="textFormat" >
              <enum>Qt::LogText</enum>

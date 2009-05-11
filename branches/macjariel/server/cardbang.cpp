@@ -95,6 +95,7 @@ void CardBang::respondCard(PlayingCard* targetCard)
     default:
         break;
     }
+    qDebug("CardBang::respondCard - exception");
     throw BadCardException();
 }
 

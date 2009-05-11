@@ -131,10 +131,12 @@ void Client::joinGame(Game* game, const StructPlayer& player)
 
 void Client::onActionLeaveGame()
 {
+    qDebug() << "TU";
     if (!isInGame()) {
         // TODO: error
         return;
     }
+    qDebug() << "GA";
     mp_playerCtrl->disconnect();
 }
 

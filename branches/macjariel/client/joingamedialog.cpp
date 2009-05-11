@@ -25,6 +25,7 @@ c *   (at your option) any later version.                                   *
 
 #include "parser/queryget.h"
 #include "util.h"
+#include "config.h"
 
 using namespace client;
 
@@ -44,6 +45,7 @@ JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnecti
     updateGameView();
     updateGameListView();
     refreshGameList();
+    loadConfigValues();
 }
 
 
@@ -57,6 +59,7 @@ QString gameState(GameState g)
         case GAMESTATE_WAITINGFORPLAYERS: return QObject::tr("waiting");
         case GAMESTATE_PLAYING: return QObject::tr("playing");
         case GAMESTATE_FINISHED: return QObject::tr("finished");
+        default: break;
     }
     return "";
 }
@@ -280,8 +283,10 @@ void JoinGameDialog::on_pushButtonPlay_clicked()
     CreatePlayerData playerData;
     playerData.name     = lineEditPlayerName->text();
     playerData.password = lineEditPlayerPassword->text();
+    playerData.avatar   = selectPlayerIconWidget->image();
 
     emit joinGame(m_currentGameId, m_currentPlayerId, password, playerData);
+    saveConfigValues();
     close();
 }
 
@@ -306,6 +311,23 @@ const GameInfoData* JoinGameDialog::gameInfoData(int gameId)
     return 0;
 }
 
+void JoinGameDialog::loadConfigValues()
+{
+    Config& cfg = Config::instance();
+    cfg.refresh();
+    lineEditPlayerName->setText(cfg.readString("player", "name"));
+    lineEditPlayerPassword->setText(cfg.readString("player", "password"));
+    selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
+    setButtonsState();
+}
 
+void JoinGameDialog::saveConfigValues()
+{
+    Config& cfg = Config::instance();
+    cfg.writeString("player", "name", lineEditPlayerName->text());
+    cfg.writeString("player", "password", lineEditPlayerPassword->text());
+    cfg.writeString("player", "image", selectPlayerIconWidget->imageFileName());
+    cfg.store();
+}
 
 

@@ -20,6 +20,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "util.h"
+
 #include <QtCore>
 
 /**
@@ -27,29 +29,64 @@
  * arguments. This class is a singleton.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
 */
-class Config{
-private:
-    Config();
-    Config(const Config&);
-    Config& operator=(Config&);
-
-    static Config* smp_instance;
-
-    bool loadCfg(const QString& filePath);
-
-    QHash<QPair<QString, QString>, QString> m_values;
+class Config: private NonCopyable {
 
 public:
-    static inline Config& instance()
-    {
-        if (!smp_instance) smp_instance = new Config();
+    QString         readString(QString group, QString varName);
+    QStringList  readStringList(QString group, QString varName);
+    int             readInt(QString group, QString varName);
+    QList<int>      readIntList(QString group, QString varName);
+
+    void writeString(QString group, QString varName, QString varValue);
+    void writeStringList(QString group, QString varName, QStringList varValue);
+    void writeInt(QString group, QString varName, int varValue);
+    void writeIntList(QString group, QString varName, QList<int> varValue);
+
+    bool hasGroup(QString group);
+
+    void refresh();
+    void store();
+
+    static inline Config& instance() {
+        if (!smp_instance)
+            smp_instance = new Config();
         return *smp_instance;
     }
 
-    int getInt(const QString& group, const QString& key);
-    QString getString(const QString& group, const QString& key);
-
+private:
+    Config();
     ~Config();
+
+    enum ConfigRecordType {
+        CONFIG_RECORD_SINGLE,
+        CONFIG_RECORD_LIST
+    };
+
+    struct ConfigRecord {
+        ConfigRecord() {}
+        ConfigRecord(QString n, ConfigRecordType t, QString vs, QStringList vl = QStringList()):
+                name(n), type(t), valueSingle(vs), valueList(vl) {}
+        QString name;
+        ConfigRecordType type;
+        QString valueSingle;
+        QStringList valueList;
+    };
+
+    struct ConfigGroup {
+        ConfigGroup() {}
+        ConfigGroup(QString n): name(n) {}
+        QString name;
+        QMap<QString, ConfigRecord> records;
+    };
+
+    void createGroupIfNeeded(QString group);
+    void createDefaultConfig();
+    ConfigRecord* configRecord(QString group, QString varName);
+
+    QString m_configFileName;
+    QMap<QString, ConfigGroup> m_groups;
+    static Config* smp_instance;
+
 };
 
 #endif

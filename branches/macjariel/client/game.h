@@ -56,6 +56,7 @@ public:
     void setIsCreator(bool isCreator);
     void setGraveyard(const CardData&);
     void validate();
+    void clean();
 
 public slots:
     void playerJoinedGame(const PublicPlayerData& player);

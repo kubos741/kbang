@@ -34,6 +34,7 @@ Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         m_id(id),
         m_name(createPlayerData.name),
         m_password(createPlayerData.password),
+        m_avatar(createPlayerData.avatar),
         m_role(ROLE_UNKNOWN),
         mp_character(0),
         m_isAlive(1),

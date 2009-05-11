@@ -532,10 +532,25 @@
             <property name="sizeHint" stdset="0" >
              <size>
               <width>15</width>
-              <height>15</height>
+              <height>5</height>
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="mp_statusLabel" >
+            <property name="font" >
+             <font>
+              <pointsize>13</pointsize>
+             </font>
+            </property>
+            <property name="text" >
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -618,20 +633,13 @@
     <addaction name="mp_actionLeaveGame" />
     <addaction name="mp_actionExit" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>Tools</string>
-    </property>
-    <addaction name="actionConfigure_Profile" />
-   </widget>
    <addaction name="menuGame" />
-   <addaction name="menuTools" />
   </widget>
   <widget class="QStatusBar" name="mp_statusbar" />
   <action name="mp_actionConnectToServer" >
    <property name="icon" >
     <iconset resource="client.qrc" >
-     <normaloff>:/icons/gfx/icons/icon-connect.svg</normaloff>:/icons/gfx/icons/icon-connect.svg</iconset>
+     <normaloff>:/icons/gfx/icons/connect.png</normaloff>:/icons/gfx/icons/connect.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Connect to Server</string>
@@ -643,6 +651,10 @@
    </property>
   </action>
   <action name="mp_actionDisconnectFromServer" >
+   <property name="icon" >
+    <iconset resource="client.qrc" >
+     <normaloff>:/icons/gfx/icons/disconnect.png</normaloff>:/icons/gfx/icons/disconnect.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Disconnect from Server</string>
    </property>
@@ -655,11 +667,6 @@
   <action name="mp_actionLeaveGame" >
    <property name="text" >
     <string>&amp;Leave Game</string>
-   </property>
-  </action>
-  <action name="actionConfigure_Profile" >
-   <property name="text" >
-    <string>Configure Profile</string>
    </property>
   </action>
   <action name="actionCreateGame" >

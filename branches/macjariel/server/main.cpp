@@ -25,8 +25,6 @@
 
 #include "parser/parserstructs.h"
 
-#include "qtc-gdbmacros/gdbmacros.cpp"
-
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);

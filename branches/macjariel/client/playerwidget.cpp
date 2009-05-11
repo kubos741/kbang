@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "playerwidget.h"
 #include "gameobjectclickhandler.h"
-#include <QtDebug>
+#include <QMouseEvent>
 
 
 using namespace client;
@@ -69,7 +69,7 @@ void PlayerWidget::setSheriff(bool isSheriff)
 
 void PlayerWidget::mousePressEvent(QMouseEvent *ev)
 {
-    if (mp_gameObjectClickHandler)
+    if (mp_gameObjectClickHandler && ev->button() == Qt::LeftButton)
         mp_gameObjectClickHandler->onPlayerClicked(this);
 }
 

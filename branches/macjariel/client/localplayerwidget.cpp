@@ -44,9 +44,10 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
-    //m_baseStyleSheet = mainFrame->styleSheet();
+
     setActive(0);
     updateWidgets();
+
 
     connect(mp_buttonEndTurn, SIGNAL(clicked()),
             this,             SLOT(onEndTurnClicked()));
@@ -77,9 +78,15 @@ void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerDa
     mp_characterWidget->setOwnerId(id());
     setSheriff(publicPlayerData.isSheriff);
 
+    QPixmap avatar;
+    if (!publicPlayerData.avatar.isNull())
+        avatar = QPixmap::fromImage(publicPlayerData.avatar);
+    mp_labelAvatar->setPixmap(avatar);
+
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
 
+    mp_table->clear();
     foreach (const CardData& cardData, publicPlayerData.table) {
         CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
         card->setCardData(cardData);
@@ -94,6 +101,7 @@ void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlaye
 {
     Q_ASSERT(id() == privatePlayerData.id);
     m_role = privatePlayerData.role;
+    mp_hand->clear();
     foreach (const CardData& cardData, privatePlayerData.hand) {
         CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
         card->setCardData(cardData);
@@ -159,11 +167,20 @@ void LocalPlayerWidget::updateWidgets()
     if (isVoid()) {
         mp_labelPlayerName->setText("");
         mp_characterWidget->setCharacter(CHARACTER_UNKNOWN);
+        mp_roleCardWidget->setEmpty();
+        mp_roleCardWidget->validate();
+        mp_hand->clear();
+        mp_table->clear();
+        mp_labelAvatar->setPixmap(QPixmap());
     } else {
         mp_labelPlayerName->setText(name());
+        if (m_role != ROLE_UNKNOWN) {
+            mp_roleCardWidget->setPlayerRole(m_role);
+        } else {
+            mp_roleCardWidget->setEmpty();
+        }
+        mp_roleCardWidget->validate();
     }
-    mp_roleCardWidget->setPlayerRole(m_role);
-    mp_roleCardWidget->validate();
 }
 
 

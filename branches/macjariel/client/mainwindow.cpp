@@ -75,7 +75,7 @@ void MainWindow::connectToServer()
     if (!mp_connectToServerDialog)
     {
         mp_connectToServerDialog = new ConnectToServerDialog(this);
-        connect(mp_connectToServerDialog, SIGNAL(connectToServer(QString, int, QString)),
+        connect(mp_connectToServerDialog, SIGNAL(connectToServer(QString, int)),
                 &m_serverConnection, SLOT(connectToServer(QString, int)));
     }
     mp_connectToServerDialog->show();
@@ -229,6 +229,7 @@ void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType c
 
 void MainWindow::exitGameMode()
 {
+    mp_game->clean();
     mp_game->deleteLater();
     mp_game = 0;
     updateActions();

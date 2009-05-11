@@ -6,7 +6,6 @@ HEADERS += player.h \
     client.h \
     tcpserver.h \
     common.h \
-    config.h \
     publicgameview.h \
     publicplayerview.h \
     privateplayerview.h \
@@ -60,7 +59,6 @@ SOURCES += main.cpp \
     consolecommand.cpp \
     client.cpp \
     tcpserver.cpp \
-    config.cpp \
     common.cpp \
     publicgameview.cpp \
     publicplayerview.cpp \

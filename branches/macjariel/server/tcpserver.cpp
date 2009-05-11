@@ -20,6 +20,7 @@
 #include "common.h"
 #include "tcpserver.h"
 #include "gameserver.h"
+#include "config.h"
 
 
 /**
@@ -28,9 +29,9 @@
  */
 TcpServer::TcpServer(GameServer* parent)
  : QTcpServer(parent),
-   m_hostAddress(QHostAddress(Config::instance().getString("network","server_bind_ip"))),
-   m_hostAddressString(Config::instance().getString("network","server_bind_ip")),
-   m_port(Config::instance().getInt("network", "server_port"))
+   m_hostAddress(QHostAddress(Config::instance().readString("network","server_bind_ip"))),
+   m_hostAddressString(Config::instance().readString("network","server_bind_ip")),
+   m_port(Config::instance().readInt("network", "server_port"))
 {
     connect(this, SIGNAL(newConnection()),
             parent, SLOT(createClient()));

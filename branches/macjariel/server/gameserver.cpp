@@ -25,6 +25,7 @@
 
 #include "gameinfo.h"
 #include "cardfactory.h"
+#include "config.h"
 
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
@@ -39,9 +40,9 @@ GameServer::GameServer():
 {
     mp_tcpServer = new TcpServer(this);
     m_structServerInfo.name =
-            Config::instance().getString("network", "server_name");
+            Config::instance().readString("network", "server_name");
     m_structServerInfo.description =
-            Config::instance().getString("network", "server_description");
+            Config::instance().readString("network", "server_description");
     mp_cardFactory = new CardFactory();
 }
 

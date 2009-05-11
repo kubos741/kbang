@@ -101,39 +101,6 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QLabel" name="label_8" >
-     <property name="text" >
-      <string>Number of AI Players</string>
-     </property>
-     <property name="buddy" >
-      <cstring>spinBoxAIPlayers</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" colspan="4" >
-    <widget class="QSpinBox" name="spinBoxAIPlayers" />
-   </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QLabel" name="label_12" >
-     <property name="text" >
-      <string>Max. Number of Spectators</string>
-     </property>
-     <property name="buddy" >
-      <cstring>spinBoxMaxSpectators</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2" colspan="4" >
-    <widget class="QSpinBox" name="spinBoxMaxSpectators" >
-     <property name="specialValueText" >
-      <string>Infinity</string>
-     </property>
-     <property name="minimum" >
-      <number>-1</number>
-     </property>
-    </widget>
-   </item>
    <item rowspan="2" row="5" column="2" colspan="4" >
     <widget class="QLineEdit" name="lineEditGamePasswordPlayers" >
      <property name="sizePolicy" >
@@ -141,39 +108,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2" >
-    <widget class="QLabel" name="label_11" >
-     <property name="toolTip" >
-      <string>This is the password that is required to join the game as a spectator.</string>
-     </property>
-     <property name="text" >
-      <string>Password for Spectators</string>
-     </property>
-     <property name="buddy" >
-      <cstring>lineEditGamePasswordSpectators</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2" colspan="4" >
-    <widget class="QLineEdit" name="lineEditGamePasswordSpectators" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="2" >
-    <widget class="QLabel" name="label_6" >
-     <property name="text" >
-      <string>Order of Players</string>
-     </property>
-     <property name="buddy" >
-      <cstring>radioButtonOrderChronological</cstring>
      </property>
     </widget>
    </item>
@@ -198,83 +132,8 @@
      </item>
     </layout>
    </item>
-   <item row="9" column="0" colspan="6" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0" >
-    <widget class="QLabel" name="label_7" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>Player Name</string>
-     </property>
-     <property name="buddy" >
-      <cstring>lineEditPlayerName</cstring>
-     </property>
-    </widget>
-   </item>
    <item row="10" column="1" colspan="4" >
     <widget class="QLineEdit" name="lineEditPlayerName" />
-   </item>
-   <item rowspan="3" row="10" column="5" >
-    <widget class="QLabel" name="label_10" >
-     <property name="minimumSize" >
-      <size>
-       <width>64</width>
-       <height>64</height>
-      </size>
-     </property>
-     <property name="maximumSize" >
-      <size>
-       <width>64</width>
-       <height>64</height>
-      </size>
-     </property>
-     <property name="frameShape" >
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text" >
-      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">[TODO]&lt;br />[portrait]&lt;/p>&lt;/body>&lt;/html></string>
-     </property>
-    </widget>
-   </item>
-   <item row="12" column="0" >
-    <widget class="QLabel" name="label_9" >
-     <property name="toolTip" >
-      <string>You can set your password here. This password will be required to reconnect to your player in case of disconnection.</string>
-     </property>
-     <property name="text" >
-      <string>Player Password</string>
-     </property>
-     <property name="buddy" >
-      <cstring>lineEditPlayerPassword</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="12" column="1" colspan="4" >
-    <widget class="QLineEdit" name="lineEditPlayerPassword" />
-   </item>
-   <item row="13" column="0" colspan="6" >
-    <widget class="Line" name="line_2" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
    <item row="14" column="0" colspan="3" >
     <spacer name="horizontalSpacer" >
@@ -306,6 +165,135 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="QLabel" name="label_8" >
+     <property name="text" >
+      <string>Number of AI Players</string>
+     </property>
+     <property name="buddy" >
+      <cstring>spinBoxAIPlayers</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="4" >
+    <widget class="QSpinBox" name="spinBoxAIPlayers" />
+   </item>
+   <item row="10" column="0" >
+    <widget class="QLabel" name="label_7" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>Player Name</string>
+     </property>
+     <property name="buddy" >
+      <cstring>lineEditPlayerName</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" >
+    <widget class="QLabel" name="label_9" >
+     <property name="toolTip" >
+      <string>You can set your password here. This password will be required to reconnect to your player in case of disconnection.</string>
+     </property>
+     <property name="text" >
+      <string>Player Password</string>
+     </property>
+     <property name="buddy" >
+      <cstring>lineEditPlayerPassword</cstring>
+     </property>
+    </widget>
+   </item>
+   <item rowspan="3" row="10" column="5" >
+    <widget class="client::SelectPlayerIconWidget" name="selectPlayerIconWidget" >
+     <property name="frameShape" >
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text" >
+      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Avatar&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1" colspan="4" >
+    <widget class="QLineEdit" name="lineEditPlayerPassword" />
+   </item>
+   <item row="13" column="0" colspan="6" >
+    <widget class="Line" name="line_2" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2" >
+    <widget class="QLabel" name="label_11" >
+     <property name="toolTip" >
+      <string>This is the password that is required to join the game as a spectator.</string>
+     </property>
+     <property name="text" >
+      <string>Password for Spectators</string>
+     </property>
+     <property name="buddy" >
+      <cstring>lineEditGamePasswordSpectators</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2" colspan="4" >
+    <widget class="QLineEdit" name="lineEditGamePasswordSpectators" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="4" >
+    <widget class="QSpinBox" name="spinBoxMaxSpectators" >
+     <property name="specialValueText" >
+      <string>Infinity</string>
+     </property>
+     <property name="minimum" >
+      <number>-1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="2" >
+    <widget class="QLabel" name="label_6" >
+     <property name="text" >
+      <string>Order of Players</string>
+     </property>
+     <property name="buddy" >
+      <cstring>radioButtonOrderChronological</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2" >
+    <widget class="QLabel" name="label_12" >
+     <property name="text" >
+      <string>Max. Number of Spectators</string>
+     </property>
+     <property name="buddy" >
+      <cstring>spinBoxMaxSpectators</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0" colspan="6" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
    <item rowspan="2" row="5" column="0" colspan="2" >
     <widget class="QLabel" name="label_5" >
      <property name="toolTip" >
@@ -320,26 +308,37 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
   </layout>
+  <zorder>label</zorder>
+  <zorder>lineEditGameName</zorder>
+  <zorder>label_2</zorder>
+  <zorder>lineEditGameDescription</zorder>
+  <zorder>label_3</zorder>
+  <zorder>lineEditGamePasswordPlayers</zorder>
+  <zorder>lineEditPlayerName</zorder>
+  <zorder>pushButtonCreate</zorder>
+  <zorder>pushButtonCancel</zorder>
   <zorder>label_8</zorder>
   <zorder>spinBoxAIPlayers</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>radioButtonOrderChronological</zorder>
-  <zorder>radioButtonOrderRandom</zorder>
   <zorder>label_7</zorder>
   <zorder>label_9</zorder>
-  <zorder>label_10</zorder>
+  <zorder>selectPlayerIconWidget</zorder>
   <zorder>lineEditPlayerPassword</zorder>
   <zorder>line_2</zorder>
   <zorder>label_11</zorder>
   <zorder>lineEditGamePasswordSpectators</zorder>
-  <zorder>spinBoxAIPlayers_2</zorder>
-  <zorder>label_12</zorder>
   <zorder>spinBoxMaxSpectators</zorder>
   <zorder>label_6</zorder>
   <zorder>label_12</zorder>
   <zorder>line</zorder>
   <zorder>label_5</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>client::SelectPlayerIconWidget</class>
+   <extends>QLabel</extends>
+   <header>selectplayericonwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>lineEditGameName</tabstop>
   <tabstop>lineEditGameDescription</tabstop>

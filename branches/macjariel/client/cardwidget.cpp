@@ -50,6 +50,7 @@ CardWidget::CardWidget(QWidget* parent, Card::Type cardType):
         m_qsize(sm_qsizeSmall),
         m_shadowMode(0),
         m_hasHighlight(0),
+        m_isEmpty(0),
         mp_gameObjectClickHandler(0)
 {
     show();
@@ -80,6 +81,7 @@ void CardWidget::clone(CardWidget* other)
 void CardWidget::setCardData(const CardData& cardData)
 {
     m_cardData = cardData;
+    m_isEmpty = 0;
 }
 
 void CardWidget::setSize(Size size)
@@ -90,29 +92,29 @@ void CardWidget::setSize(Size size)
 
 void CardWidget::validate()
 {
-    const Card* card;
-    switch(m_cardType) {
+    if (m_isEmpty) {
+        setPixmap(QPixmap());
+    } else {
+        const Card* card;
+        switch(m_cardType) {
         case Card::Playing:
-        card = Card::findPlayingCard(m_cardData.type);
-        break;
-    case Card::Role:
-        card = Card::findRoleCard(m_playerRole);
-        break;
-    case Card::Character:
-        card = Card::findCharacterCard(m_characterType);
-        break;
+            card = Card::findPlayingCard(m_cardData.type);
+            break;
+        case Card::Role:
+            card = Card::findRoleCard(m_playerRole);
+            break;
+        case Card::Character:
+            card = Card::findCharacterCard(m_characterType);
+            break;
+        }
+        if (card == 0) {
+            qFatal("Cannot look-up the card!");
+        }
+        if (card->image().isNull()) {
+            qWarning(qPrintable(QString("Card '%1' has null pixmap.").arg(card->name())));
+        }
+        setPixmap(card->image().scaled(m_qsize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
-
-    if (card == 0) {
-        qWarning("Cannot look-up the card!");
-        return;
-    }
-
-    if (card->image().isNull()) {
-        qWarning(qPrintable(QString("Card '%1' has null pixmap.").arg(card->name())));
-    }
-
-    setPixmap(card->image().scaled(m_qsize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     setMinimumSize(m_qsize);
     setMaximumSize(m_qsize);
     resize(m_qsize);
@@ -237,11 +239,18 @@ void CardWidget::setOwnerId(int ownerId)
 void CardWidget::setPlayerRole(PlayerRole playerRole)
 {
     m_playerRole = playerRole;
+    m_isEmpty = 0;
 }
 
 void CardWidget::setCharacterType(CharacterType characterType)
 {
     m_characterType = characterType;
+    m_isEmpty = 0;
+}
+
+void CardWidget::setEmpty()
+{
+    m_isEmpty = 1;
 }
 
 void CardWidget::setHighlight(bool hasHighlight)
@@ -269,9 +278,9 @@ void CardWidget::mousePressEvent(QMouseEvent* e)
         case Qt::RightButton:
             mp_gameObjectClickHandler->onCardRightClicked(this);
             break;
-        }
         default:
             break;
+        }
     }
 }
 

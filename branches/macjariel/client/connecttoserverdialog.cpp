@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "connecttoserverdialog.h"
+#include "newserverdialog.h"
+#include "config.h"
 
 using namespace client;
 
@@ -25,8 +27,7 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
  : QDialog(parent)
 {
     setupUi(this);
-    connect(mp_cancelButton, SIGNAL(clicked()),
-            this, SLOT(close()));
+    loadConfigValues();
 }
 
 
@@ -34,58 +35,91 @@ ConnectToServerDialog::~ConnectToServerDialog()
 {
 }
 
-void ConnectToServerDialog::on_mp_buttonSaveFavorite_clicked()
+void ConnectToServerDialog::reloadServerList()
 {
-    QString profileName = mp_lineEditProfileName->text();
-    QString hostName = mp_lineEditHostName->text();
-    QString nickName = mp_lineEditNickName->text();
-    int port = mp_spinBoxPort->value();
-    QList<QTreeWidgetItem *> results = mp_favoriteList->findItems(profileName, Qt::MatchExactly);
-    if (results.size() == 0)
-    {
-        QStringList strings;
-        strings << profileName << hostName << QString(port) << nickName;
-        mp_favoriteList->addTopLevelItem(new QTreeWidgetItem(mp_favoriteList, strings));
-    }
-    else
-    {
-        foreach (QTreeWidgetItem* result , results)
-        {
-            result->setText(1, hostName);
-            result->setText(2, QString::number(port));
-            result->setText(3, nickName);
-        }
-    }
-
 }
 
-void ConnectToServerDialog::on_mp_favoriteList_itemClicked(QTreeWidgetItem * item, int)
+void ConnectToServerDialog::on_serverList_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
-    mp_lineEditProfileName->setText(item->text(0));
-    mp_lineEditHostName->setText(item->text(1));
-    mp_spinBoxPort->setValue(item->text(2).toInt());
-    mp_lineEditNickName->setText(item->text(3));
-
+    Q_UNUSED(previous);
+    pushButtonConnect->setEnabled(current != 0);
 }
 
-void ConnectToServerDialog::on_mp_favoriteList_itemDoubleClicked(QTreeWidgetItem * item, int column)
+void ConnectToServerDialog::on_serverList_itemDoubleClicked (QTreeWidgetItem*, int)
 {
-    on_mp_favoriteList_itemClicked(item, column);
-    on_mp_connectButton_clicked();
+    on_pushButtonConnect_clicked();
 }
 
-void ConnectToServerDialog::on_mp_connectButton_clicked()
+void ConnectToServerDialog::on_pushButtonAddServer_clicked()
 {
-    emit connectToServer(mp_lineEditHostName->text(), mp_spinBoxPort->value(), mp_lineEditNickName->text());
+    NewServerDialog dialog(this);
+    dialog.setupForNewServer();
+    if (!dialog.exec())
+        return;
+    QStringList strings;
+    strings << dialog.host() << QString::number(dialog.port());
+    serverList->addTopLevelItem(new QTreeWidgetItem(serverList, strings));
+    saveConfigValues();
+}
+
+void ConnectToServerDialog::on_pushButtonEditServer_clicked()
+{
+    QTreeWidgetItem* item = serverList->currentItem();
+    Q_ASSERT(item != 0);
+
+    NewServerDialog dialog(this);
+    dialog.setupForEditServer(item->text(0), item->text(1).toInt());
+    if (!dialog.exec())
+        return;
+
+    item->setText(0, dialog.host());
+    item->setText(1, QString::number(dialog.port()));
+    saveConfigValues();
+}
+
+void ConnectToServerDialog::on_pushButtonDeleteServer_clicked()
+{
+    QTreeWidgetItem* item = serverList->currentItem();
+    Q_ASSERT(item != 0);
+    delete item;
+}
+
+void ConnectToServerDialog::on_pushButtonConnect_clicked()
+{
+    Q_ASSERT(serverList->currentItem() != 0);
+    QString host = serverList->currentItem()->text(0);
+    int port = serverList->currentItem()->text(1).toInt();
+    emit connectToServer(host, port);
     close();
 }
 
-void ConnectToServerDialog::setConnectButtonStatus()
+void ConnectToServerDialog::loadConfigValues()
 {
-
+    Config& cfg = Config::instance();
+    cfg.refresh();
+    QStringList hosts = cfg.readStringList("server-list", "hostname");
+    qDebug() << "Hosts: " << hosts;
+    QList<int>  ports = cfg.readIntList("server-list", "port");
+    int n = hosts.size() < ports.size() ? hosts.size() : ports.size();
+    serverList->clear();
+    for (int i = 0; i < n; ++i) {
+        QStringList strings;
+        strings << hosts[i] << QString::number(ports[i]);
+        serverList->addTopLevelItem(new QTreeWidgetItem(serverList, strings));
+    }
 }
 
-
-
-
-
+void ConnectToServerDialog::saveConfigValues()
+{
+    Config& cfg = Config::instance();
+    cfg.refresh();
+    QStringList hosts;
+    QList<int> ports;
+    for(int i = 0; i < serverList->topLevelItemCount(); ++i) {
+        hosts.append(serverList->topLevelItem(i)->text(0));
+        ports.append(serverList->topLevelItem(i)->text(1).toInt());
+    }
+    cfg.writeStringList("server-list", "hostname", hosts);
+    cfg.writeIntList("server-list", "port", ports);
+    cfg.store();
+}

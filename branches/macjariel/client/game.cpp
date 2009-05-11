@@ -114,6 +114,14 @@ void Game::validate()
     }
 }
 
+void Game::clean()
+{
+    unloadInterface();
+    mp_localPlayerWidget->clear();
+    foreach(OpponentWidget* opponentWidget, m_opponentWidgets)
+        opponentWidget->clear();
+}
+
 void Game::loadCreatorInterface()
 {
     Q_ASSERT(mp_startButton == 0);

@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QImage>
+
 #include "publicplayerview.h"
 #include "player.h"
 #include "playingcard.h"
@@ -106,11 +108,16 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     res.lifePoints  = lifePoints();
     res.isSheriff   = isSheriff();
     res.handSize    = handSize();
+    res.avatar      = mp_player->avatar();
     foreach (PlayingCard* card, table()) {
         CardData cardData;
         cardData.id = card->id();
         cardData.type = card->type();
         res.table.append(cardData);
     }
+    res.hasPassword = !mp_player->password().isEmpty();
+    res.hasController = mp_player->gameEventHandler() != 0;
+    res.isAI = mp_player->isAI();
+    res.isAlive = mp_player->isAlive();
     return res;
 }

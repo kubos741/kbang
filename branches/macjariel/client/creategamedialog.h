@@ -44,6 +44,10 @@ private slots:
 
 signals:
     void createGame(const CreateGameData&, const CreatePlayerData&);
+
+private:
+    void loadConfigValues();
+    void saveConfigValues(const CreateGameData&);
 };
 
 }

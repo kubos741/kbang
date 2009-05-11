@@ -4,7 +4,8 @@
 #include "gamecycle.h"
 
 CharacterJourdonnais::CharacterJourdonnais(QObject* parent):
-        CharacterBase(parent, CHARACTER_JOURDONNAIS)
+        CharacterBase(parent, CHARACTER_JOURDONNAIS),
+        mp_integratedBarrel(0)
 {
 }
 

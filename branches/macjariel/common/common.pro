@@ -11,13 +11,15 @@ HEADERS += parser/ioproxy.h \
     parser/parserstructs.h \
     parser/queryget.h \
     parser/queryresult.h \
-    parser/xmlnode.h
+    parser/xmlnode.h \
+    config.h
 SOURCES += parser/ioproxy.cpp \
     parser/parser.cpp \
     parser/parserstructs.cpp \
     parser/queryget.cpp \
     parser/queryresult.cpp \
-    parser/xmlnode.cpp
+    parser/xmlnode.cpp \
+    config.cpp
 
 # #######
 # MISC #

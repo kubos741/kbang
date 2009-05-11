@@ -108,6 +108,12 @@ void CardList::paintEvent(QPaintEvent* event)
     painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 16));
 }
 
+void CardList::clear()
+{
+    foreach(CardWidget* card, m_cards)
+        card->deleteLater();
+    m_cards.clear();
+}
 
 void CardList::reorder()
 {

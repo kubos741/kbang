@@ -45,7 +45,7 @@ void ServerConnection::connectToServer(QString serverHost, int serverPort)
 {
     if (mp_tcpSocket->state() == QAbstractSocket::UnconnectedState)
     {
-        emit logMessage(tr("Connecting to %1.").arg(serverHost));
+        emit logMessage(tr("Connecting to <i>%1</i>...").arg(serverHost));
         mp_tcpSocket->connectToHost(serverHost, serverPort);
         m_serverHost = serverHost;
     }
@@ -55,7 +55,6 @@ void ServerConnection::disconnectFromServer()
 {
     if (mp_tcpSocket->state() != QAbstractSocket::UnconnectedState)
     {
-        emit logMessage(tr("Disconnecting from %1.").arg(m_serverHost));
         mp_parser->terminate();
     }
 }
@@ -63,7 +62,7 @@ void ServerConnection::disconnectFromServer()
 void ServerConnection::connected()
 {
     emit statusChanged();
-    emit logMessage(tr("Connected to %1.").arg(m_serverHost));
+    emit logMessage(tr("Connected to <i>%1</i>.").arg(m_serverHost));
     mp_parser = new Parser(this, mp_tcpSocket);
     initializeParserConnections();
     mp_parser->initializeStream();
@@ -79,7 +78,8 @@ void ServerConnection::disconnected()
     mp_parser->deleteLater();
     mp_parser = 0;
     emit statusChanged();
-    emit logMessage(tr("Disconnected."));
+    emit logMessage(tr("Disconnected from <i>%1</i>.").arg(m_serverHost));
+    m_serverHost = "";
 }
 
 void ServerConnection::recievedServerInfo(const StructServerInfo& serverInfo)
@@ -233,10 +233,6 @@ void ServerConnection::initializeParserConnections()
             this,      SIGNAL(enterGameMode(int,QString,ClientType)));
     connect(mp_parser, SIGNAL(sigEventExitGameMode()),
             this,      SIGNAL(exitGameMode()));
-    connect(mp_parser, SIGNAL(sigEventJoinGame(int, const StructPlayer&, bool, bool)),
-            this, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool, bool)));
-    connect(mp_parser, SIGNAL(sigEventLeaveGame(int, const StructPlayer&, bool)),
-            this, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)));
     connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     connect(mp_parser, SIGNAL(sigEventGameCanBeStarted(bool)),

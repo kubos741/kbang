@@ -21,6 +21,7 @@
 #define PLAYER_H
 
 #include <QtCore>
+#include <QImage>
 
 #include "publicplayerview.h"
 #include "privateplayerview.h"
@@ -84,6 +85,7 @@ public:
     inline PlayerCtrl*          playerCtrl()       const { return mp_playerCtrl;       }
     inline QString              name()             const { return m_name;              }
     inline QString              password()         const { return m_password;          }
+    inline QImage               avatar()           const { return m_avatar;            }
     inline Game*                game()             const { return mp_game;             }
     inline int                  lifePoints()       const { return m_lifePoints;        }
     inline int                  maxLifePoints()    const { return m_maxLifePoints;     }
@@ -102,6 +104,7 @@ public:
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
     inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
     bool                        isAI()             const;
+
 
     /**
      * Returns the distance-in modificator. The player is seen by all other
@@ -233,6 +236,7 @@ private:
     QList<PlayingCard*>       m_selection;
     QString                   m_name;
     QString                   m_password;
+    QImage                    m_avatar;
     PlayerRole                m_role;
     CharacterBase*            mp_character;
     bool                      m_isAlive;

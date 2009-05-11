@@ -71,15 +71,23 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     mp_characterWidget->setOwnerId(id());
     setSheriff(publicPlayerData.isSheriff);
 
+    QPixmap avatar;
+    if (!publicPlayerData.avatar.isNull())
+        avatar = QPixmap::fromImage(publicPlayerData.avatar);
+    mp_labelAvatar->setPixmap(avatar);
+
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
 
+
+    mp_hand->clear();
     for(int i = 0; i < publicPlayerData.handSize; ++i) {
         CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
         card->validate();
         mp_hand->push(card);
     }
 
+    mp_table->clear();
     foreach (const CardData& cardData, publicPlayerData.table) {
         CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
         card->setCardData(cardData);
@@ -141,6 +149,9 @@ void OpponentWidget::updateWidgets()
             mp_roleCard->hide();
         if (mp_sheriffBadge)
             mp_sheriffBadge->hide();
+        mp_hand->clear();
+        mp_table->clear();
+        mp_labelAvatar->setPixmap(QPixmap());
     } else {
         mp_labelPlayerName->setText(name());
         if (isSheriff()) {

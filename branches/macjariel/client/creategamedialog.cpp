@@ -21,6 +21,7 @@
 #include <QRegExpValidator>
 #include <QRegExp>
 #include "creategamedialog.h"
+#include "config.h"
 
 using namespace client;
 
@@ -31,18 +32,20 @@ CreateGameDialog::CreateGameDialog(QWidget *parent)
 {
     setupUi(this);
 
-    lineEditPlayerPassword->setEnabled(0);
     pushButtonCreate->setEnabled(0);
-
 
     spinBoxMinPlayers->setRange(minPlayers, maxPlayers);
     spinBoxMaxPlayers->setRange(minPlayers, maxPlayers);
     spinBoxAIPlayers->setRange(0, maxPlayers - 1);
 
-    ///@todo: load last values from config file
-    spinBoxMinPlayers->setValue(minPlayers);
-    spinBoxMaxPlayers->setValue(maxPlayers);
-    spinBoxAIPlayers->setValue(0);
+    if (Config::instance().hasGroup("create-game-dialog")) {
+        loadConfigValues();
+    } else {
+        spinBoxMinPlayers->setValue(minPlayers);
+        spinBoxMaxPlayers->setValue(maxPlayers);
+        spinBoxAIPlayers->setValue(0);
+        spinBoxMaxSpectators->setValue(-1);
+    }
 
     connect(spinBoxMinPlayers, SIGNAL(valueChanged(int)),
             this, SLOT(playerCountsChanged()));
@@ -89,10 +92,53 @@ void CreateGameDialog::on_pushButtonCreate_clicked()
     CreatePlayerData createPlayerData;
     createPlayerData.name               = lineEditPlayerName->text();
     createPlayerData.password           = lineEditPlayerPassword->text();
-    ///@todo send avatar
+    createPlayerData.avatar             = selectPlayerIconWidget->image();
+
+    saveConfigValues(createGameData);
 
     emit createGame(createGameData, createPlayerData);
     close();
 }
 
+
+void CreateGameDialog::loadConfigValues()
+{
+    Config& cfg = Config::instance();
+    cfg.refresh();
+    QString grp("create-game-dialog");
+    lineEditGameName->setText(cfg.readString(grp, "name"));
+    lineEditGameDescription->setText(cfg.readString(grp, "description"));
+    spinBoxMinPlayers->setValue(cfg.readInt(grp, "min-players"));
+    spinBoxMaxPlayers->setValue(cfg.readInt(grp, "max-players"));
+    spinBoxMaxSpectators->setValue(cfg.readInt(grp, "max-spectators"));
+    spinBoxAIPlayers->setValue(cfg.readInt(grp, "ai-players"));
+    int shufflePlayers = cfg.readInt(grp, "flag-shuffle-players");
+    if (shufflePlayers)
+        radioButtonOrderRandom->setChecked(1);
+    else
+        radioButtonOrderChronological->setChecked(1);
+    lineEditPlayerName->setText(cfg.readString("player", "name"));
+    lineEditPlayerPassword->setText(cfg.readString("player", "password"));
+    selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
+    validateInput();
+}
+
+void CreateGameDialog::saveConfigValues(const CreateGameData& game)
+{
+    Config& cfg = Config::instance();
+    QString grp("create-game-dialog");
+    cfg.writeString(grp, "name", game.name);
+    cfg.writeString(grp, "description", game.description);
+    cfg.writeInt(grp, "min-players", game.minPlayers);
+    cfg.writeInt(grp, "max-players", game.maxPlayers);
+    cfg.writeInt(grp, "max-spectators", game.maxSpectators);
+    cfg.writeInt(grp, "ai-players", game.AIPlayers);
+    cfg.writeInt(grp, "flag-shuffle-players", game.flagShufflePlayers);
+
+    cfg.writeString("player", "name", lineEditPlayerName->text());
+    cfg.writeString("player", "password", lineEditPlayerPassword->text());
+    cfg.writeString("player", "image", selectPlayerIconWidget->imageFileName());
+
+    cfg.store();
+}
 

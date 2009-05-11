@@ -61,6 +61,7 @@ public:
 
     void setPlayerRole(PlayerRole);
     void setCharacterType(CharacterType);
+    void setEmpty();
 
     void setSize(Size size);
     void validate();
@@ -101,6 +102,7 @@ private:
     QSize       m_qsize;
     bool        m_shadowMode;
     bool        m_hasHighlight;
+    bool        m_isEmpty;
     GameObjectClickHandler* mp_gameObjectClickHandler;
 
     const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
