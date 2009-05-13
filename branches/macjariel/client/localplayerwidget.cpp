@@ -55,6 +55,9 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     connect(mp_buttonDiscard, SIGNAL(toggled(bool)),
             this,             SLOT(onDiscardClicked()));
 
+    mp_buttonEndTurn->setEnabled(0);
+    mp_buttonPass->setEnabled(0);
+    mp_buttonDiscard->setEnabled(0);
 }
 
 LocalPlayerWidget::~LocalPlayerWidget()
@@ -67,6 +70,9 @@ void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, Car
     mp_characterWidget->init(mp_cardWidgetFactory);
     mp_cardWidgetFactory->registerCard(mp_roleCardWidget);
     m_role = ROLE_UNKNOWN;
+    mp_buttonEndTurn->setEnabled(0);
+    mp_buttonPass->setEnabled(0);
+    mp_buttonDiscard->setEnabled(0);
 }
 
 void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -191,17 +197,20 @@ void LocalPlayerWidget::paintEvent(QPaintEvent* event)
 
 void LocalPlayerWidget::onEndTurnClicked()
 {
-    mp_gameObjectClickHandler->onEndTurnClicked();
+    if (mp_gameObjectClickHandler != 0)
+        mp_gameObjectClickHandler->onEndTurnClicked();
 }
 
 void LocalPlayerWidget::onPassClicked()
 {
-    mp_gameObjectClickHandler->onPassClicked();
+    if (mp_gameObjectClickHandler != 0)
+        mp_gameObjectClickHandler->onPassClicked();
 }
 
 void LocalPlayerWidget::onDiscardClicked()
 {
-    mp_gameObjectClickHandler->setDiscardMode(mp_buttonDiscard->isChecked());
+    if (mp_gameObjectClickHandler != 0)
+        mp_gameObjectClickHandler->setDiscardMode(mp_buttonDiscard->isChecked());
 }
 
 
