@@ -15,6 +15,9 @@ public:
     GameEventQueue(QObject* parent);
     void add(GameEvent*);
 
+    void pause();
+    void resume();
+
 public slots:
     void onGameEventFinished(GameEvent*);
 
@@ -23,6 +26,8 @@ private slots:
 
 private:
     QQueue<GameEvent*> m_queue;
+    bool m_paused;
+    bool m_eventOnHold;
 
 };
 }

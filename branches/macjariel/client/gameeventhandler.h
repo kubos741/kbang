@@ -16,6 +16,9 @@ public:
     GameEventHandler(Game* game);
     void connectSlots(QObject* signalEmitter);
 
+    void pause();
+    void resume();
+
 public slots:
     void onCardMovementEvent(const CardMovementData&);
     void onGameContextChangeEvent(const GameContextData&);
@@ -25,7 +28,11 @@ public slots:
 
     void onPlayerJoinedEvent(const PublicPlayerData&);
     void onPlayerLeavedEvent(int playerId);
-    void onPlayerControllerChange(int playerId, bool hasController);
+    void onPlayerUpdateEvent(const PublicPlayerData&);
+
+    void onGameMessageEvent(const GameMessage&);
+
+
 
 private:
     Game*           mp_game;

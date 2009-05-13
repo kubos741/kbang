@@ -18,7 +18,7 @@ PlayerCtrl::PlayerCtrl(Player* player):
 
 void PlayerCtrl::disconnect()
 {
-    mp_player->unregisterGameEventHandler();
+    mp_player->game()->removePlayer(mp_player);
 }
 
 void PlayerCtrl::startGame()
@@ -79,6 +79,11 @@ void PlayerCtrl::playCard(PlayingCard* card, PlayingCard* targetCard)
 void PlayerCtrl::pass()
 {
     mp_player->game()->gameCycle().pass(mp_player);
+}
+
+void PlayerCtrl::sendChatMessage(const QString& message)
+{
+    mp_player->game()->sendChatMessage(mp_player, message);
 }
 
 

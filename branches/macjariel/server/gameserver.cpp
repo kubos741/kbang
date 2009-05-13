@@ -111,7 +111,7 @@ bool GameServer::listen()
     }
     else
     {
-        qDebug("Listening on %s:%d", mp_tcpServer->hostAddressString().toAscii().data(), mp_tcpServer->port());
+        qWarning("Listening on %s:%d", mp_tcpServer->hostAddressString().toAscii().data(), mp_tcpServer->port());
     }
     return 1;
 }

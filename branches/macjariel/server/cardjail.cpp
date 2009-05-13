@@ -20,11 +20,7 @@ void CardJail::play()
     gameCycle()->assertDraw();
     assertOnTable();
     owner()->predrawCheck(PredrawCheck);
-    bool check = gameTable()->playerCheckDeck(owner(), this, *CardJail::checkJail);
-    gameTable()->playerDiscardCard(this);
-    if (!check) {
-        gameCycle()->skipPlayersTurn();
-    }
+    gameCycle()->checkDeck(owner(), this, *CardJail::checkJail, this);
 }
 
 
@@ -42,6 +38,15 @@ void CardJail::play(Player* targetPlayer)
     }
     gameTable()->playerPlayCardOnTable(this, targetPlayer);
 }
+
+void CardJail::checkResult(bool result)
+{            
+    gameTable()->playerDiscardCard(this);
+    if (!result) {
+        gameCycle()->skipPlayersTurn();
+    }
+}
+
 
 void CardJail::registerPlayer(Player* player)
 {

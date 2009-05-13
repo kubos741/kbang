@@ -5,6 +5,7 @@
 #include "parser/parserstructs.h"
 
 class PlayingCard;
+class Player;
 
 class ReactionHandler
 {
@@ -16,6 +17,7 @@ public:
     virtual void dismiss();
 
     virtual ReactionType reactionType() const = 0;
+    virtual Player* causedBy() const= 0;
 };
 
 #endif // REACTIONHANDLER_H

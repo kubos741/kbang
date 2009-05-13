@@ -74,7 +74,7 @@ public slots:
     void actionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
     void actionLeaveGame();
     void actionStartGame();
-    void actionMessage(const QString& message);
+    void actionChatMessage(const QString& message);
     void actionDrawCard(int numCards, bool revealCard);
     void actionPlayCard(const ActionPlayCardData&);
     void actionUseAbility(const ActionUseAbilityData&);
@@ -93,6 +93,7 @@ signals:
     void sigEventExitGameMode();
     void sigEventPlayerJoinedGame(const PublicPlayerData&);
     void sigEventPlayerLeavedGame(int playerId);
+    void sigEventPlayerUpdate(const PublicPlayerData&);
 
     void sigEventGameCanBeStarted(bool canBeStarted);
 
@@ -102,7 +103,8 @@ signals:
     void sigEventLifePointsChange(int playerId, int lifePoints);
     void sigEventPlayerDied(int playerId, PlayerRole role);
     void sigEventCardMovement(const CardMovementData&);
-    void sigEventMessage(int senderId, const QString& senderName, const QString& message);
+    void sigEventChatMessage(int senderId, const QString& senderName, const QString& message);
+    void sigEventGameMessage(const GameMessage&);
 
 
     //////////////
@@ -113,7 +115,9 @@ public slots:
     void eventExitGameMode();
     void eventPlayerJoinedGame(const PublicPlayerData&);
     void eventPlayerLeavedGame(int playerId);
-    void eventMessage(int senderId, const QString& senderName, const QString& message);
+    void eventPlayerUpdate(const PublicPlayerData&);
+    void eventChatMessage(int senderId, const QString& senderName, const QString& message);
+    void eventGameMessage(const GameMessage&);
     void eventGameStateChange(const GameState&);
     void eventGameContextChange(const GameContextData&);
     void eventGameSync(const GameSyncData&);
@@ -142,7 +146,7 @@ signals:
     void sigActionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
     void sigActionLeaveGame();
     void sigActionStartGame();
-    void sigActionMessage(const QString& message);
+    void sigActionChatMessage(const QString& message);
     void sigActionDrawCard(int numCards, bool revealCard);
     void sigActionPlayCard(const ActionPlayCardData&);
     void sigActionUseAbility(const ActionUseAbilityData&);

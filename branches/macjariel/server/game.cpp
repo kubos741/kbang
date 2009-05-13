@@ -56,12 +56,12 @@ Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData)
     mp_gameInfo = new GameInfo(createGameData);
     mp_gameTable = new GameTable(this);
     mp_gameCycle = new GameCycle(this);
-    mp_gameEventBroadcaster = new GameEventBroadcaster();
+    mp_gameEventBroadcaster = new GameEventBroadcaster(this);
     mp_beerRescue = new BeerRescue(this);
     mp_defaultPlayerReaper = new PlayerReaper(this);
     mp_playerReaper = mp_defaultPlayerReaper;
     mp_gameLogger = new GameLogger();
-    mp_gameEventBroadcaster->registerHandler(mp_gameLogger, 0);
+    mp_gameEventBroadcaster->registerSupervisor(mp_gameLogger);
     createAI(mp_gameInfo->AIPlayers());
 }
 
@@ -177,12 +177,15 @@ void Game::replacePlayer(Player* player, const CreatePlayerData& createPlayerDat
                          GameEventHandler* gameEventHandler)
 {
     Q_ASSERT(m_playerList.contains(player));
-    if (player->gameEventHandler() != 0)
+    if (player->hasController() && !player->isAI())
         throw BadTargetPlayerException();
     if (player->password() != createPlayerData.password)
         throw BadPlayerPasswordException();
-    ///@todo: rename player
+    player->update(createPlayerData);
+    if (player->hasController())
+        player->unregisterGameEventHandler();
     player->registerGameEventHandler(gameEventHandler);
+    gameEventBroadcaster().onPlayerUpdated(player);
 }
 
 /**
@@ -203,15 +206,28 @@ void Game::removePlayer(Player* player)
         GameServer::instance().removeGame(this);
         return;
     }
-    m_publicPlayerList.removeAll(&player->publicView());
-    m_playerList.removeAll(player);
-    m_playerMap.remove(playerId);
+    if (m_state == GAMESTATE_WAITINGFORPLAYERS) {
+        m_publicPlayerList.removeAll(&player->publicView());
+        m_playerList.removeAll(player);
+        m_playerMap.remove(playerId);
+        player->unregisterGameEventHandler();
+        gameEventBroadcaster().onPlayerLeavedGame(player);
+        if (m_state == GAMESTATE_WAITINGFORPLAYERS)
+            checkStartable();
+        player->deleteLater();
+        return;
+    }
 
     player->unregisterGameEventHandler();
-    gameEventBroadcaster().onPlayerLeavedGame(player);
-    if (m_state == GAMESTATE_WAITINGFORPLAYERS)
-        checkStartable();
-    player->deleteLater();
+    gameEventBroadcaster().onPlayerUpdated(player);
+    bool emptyGame = 1;
+    foreach(Player* p, m_playerList) {
+        if (p->hasController())
+            emptyGame = 0;
+    }
+    if (emptyGame) {
+        GameServer::instance().removeGame(this);
+    }
 }
 
 void Game::buryPlayer(Player* player, Player* causedBy)
@@ -300,7 +316,7 @@ void Game::startGame(Player* player)
 }
 
 
-void Game::sendMessage(Player* player, const QString& message)
+void Game::sendChatMessage(Player* player, const QString& message)
 {
     gameEventBroadcaster().onChatMessage(player, message);
 }

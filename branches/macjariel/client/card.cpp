@@ -21,6 +21,9 @@
 #include <QtDebug>
 #include "card.h"
 
+#include <QPainter>
+#include <QFont>
+
 using namespace client;
 
 QMap<PlayingCardType, Card*> Card::sm_playingCards;
@@ -67,6 +70,50 @@ Card::Card(const QString& name, CharacterType character, const QString& imageFil
     loadPixmap();
     sm_characterCards[character] = this;
 }
+
+QPixmap Card::image(const CardSuit& suit, const CardRank& rank) const
+{
+
+        QPoint posRank(35, 590);
+
+        QFont font;
+        font.setPixelSize(60);
+        QPixmap  result = image();
+        QPainter painter(&result);
+
+        QString textRank = rankToString(rank);
+        QChar   textSuit = suitToChar(suit);
+        QColor  suitColor = suitToColor(suit);
+
+        QPainterPath path1;
+        QPainterPath path2;
+        //timesFont.setStyleStrategy(QFont::ForceOutline);
+        path1.addText(posRank, font, textRank);
+        QPoint posSuit = posRank + QPoint((int)(font.pixelSize() * 2 * textRank.size() / 3), 0);
+        path2.addText(posSuit, font, textSuit);
+
+        painter.setRenderHint(QPainter::Antialiasing);
+/*
+        painter.setPen(QPen(Qt::white, 2, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+
+        painter.setBrush(Qt::black);
+        painter.drawPath(path1);
+        painter.drawPath(path2);
+*/
+        painter.setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+
+        painter.setBrush(Qt::black);
+    painter.drawPath(path1);
+
+        painter.setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap,
+                         Qt::RoundJoin));
+        painter.setBrush(suitColor);
+        painter.drawPath(path2);
+        return result;
+}
+
 
 void Card::loadDefaultRuleset()
 {
@@ -135,6 +182,70 @@ const Card* Card::findCharacterCard(CharacterType id)
 {
     return (sm_characterCards.contains(id) ? sm_characterCards[id] : 0);
 }
+
+QString Card::rankToString(CardRank rank)
+{
+    if (rank <= 9) {
+        return QString::number(rank);
+    } else if (rank == 10) {
+        return "10";
+    } else if (rank == 11) {
+        return "J";
+    } else if (rank == 12) {
+        return "Q";
+    } else if (rank == 13) {
+        return "K";
+    } else if (rank == 14) {
+        return "A";
+    }
+    return "";
+}
+
+QChar Card::suitToChar(CardSuit suit)
+{
+    switch (suit) {
+    case SUIT_CLUBS:    return 0x2663;
+    case SUIT_DIAMONDS: return 0x2666;
+    case SUIT_HEARTS:   return 0x2665;
+    case SUIT_SPADES:   return 0x2660;
+    }
+    NOT_REACHED();
+    return QChar();
+}
+
+QColor Card::suitToColor(CardSuit suit)
+{
+    switch (suit) {
+    case SUIT_CLUBS:    return Qt::black;
+    case SUIT_DIAMONDS: return Qt::red;
+    case SUIT_HEARTS:   return Qt::red;
+    case SUIT_SPADES:   return Qt::black;
+    }
+    NOT_REACHED();
+    return QColor();
+}
+
+QString Card::suitToColorString(CardSuit suit)
+{
+
+    QString color;
+    switch (suit) {
+    case SUIT_CLUBS:
+        color = "black";
+        break;
+    case SUIT_DIAMONDS:
+        color = "red";
+        break;
+    case SUIT_HEARTS:
+        color = "red";
+        break;
+    case SUIT_SPADES:
+        color = "black";
+        break;
+    }
+    return QString("<font color=\"%1\">%2</font>").arg(color).arg(suitToChar(suit));
+}
+
 
 void Card::loadPixmap()
 {

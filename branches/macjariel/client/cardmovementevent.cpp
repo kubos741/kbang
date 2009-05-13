@@ -133,9 +133,6 @@ void CardMovementEvent::setCardAndPocket()
     case POCKET_TABLE:
         mp_destPocket = destPlayer != 0 ? destPlayer->table() : 0;
         break;
-    case POCKET_PLAYED:
-        mp_destPocket = mp_game->graveyard();
-        break;
     case POCKET_SELECTION:
         mp_destPocket = mp_game->selection();
         break;
@@ -199,9 +196,9 @@ void CardMovementEvent::stopTransition()
 {
     sm_timer.stop();
     int real     = m_time.elapsed();
-    int expected = (m_length * 1000 / pixelsPerSecond);
-    if (real - expected > 30) {
-        qDebug("Animation should take %d ms, but took %d ms.", expected, real);
+    int expected = (int)(m_length * 1000 / pixelsPerSecond);
+    if (real - expected > 50) {
+        qDebug("Card movement should take %d ms, but took %d ms.", expected, real);
     }
     mp_card->setCardData(m_cardMovementData.card);
     mp_card->validate();

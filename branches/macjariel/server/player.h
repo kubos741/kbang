@@ -99,6 +99,7 @@ public:
     CharacterType               characterType()    const;
     inline bool                 isAlive()          const { return m_isAlive;           }
     inline int                  weaponRange()      const { return m_weaponRange;       }
+    inline bool                 hasController()    const { return mp_gameEventHandler != 0; }
     inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
     inline int                  bangPower()        const { return m_bangPower;         }
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
@@ -194,6 +195,8 @@ public:
     void registerPredrawCheck(int checkId);
     void unregisterPredrawCheck(int checkId);
     void predrawCheck(int checkId);
+
+    void update(const CreatePlayerData&);
 
 
     /**

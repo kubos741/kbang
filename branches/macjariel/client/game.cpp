@@ -45,6 +45,7 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
         m_opponentWidgets(gameWidgets.opponentWidget),
         mp_mainWidget(gameWidgets.mainWidget),
         mp_middleWidget(gameWidgets.middleWidget),
+        mp_statusLabel(gameWidgets.statusLabel),
         mp_startButton(0),
         mp_deck(0),
         mp_graveyard(0),
@@ -78,7 +79,111 @@ void Game::setGameState(const GameState& gameState)
 
 void Game::setGameContext(const GameContextData& gameContextData)
 {
+    if (m_gameState != GAMESTATE_PLAYING && m_gameState != GAMESTATE_FINISHED)
+        return;
+
+    PlayerWidget* currentPlayer = playerWidget(currentPlayerId());
+    PlayerWidget* requestedPlayer = playerWidget(requestedPlayerId());
+    if (currentPlayer) {
+        currentPlayer->setCurrent(0);
+        currentPlayer->update();
+    }
+
+    if (requestedPlayer) {
+        requestedPlayer->setRequested(0);
+        requestedPlayer->update();
+    }
+    GamePlayState oldGamePlayState = m_gameContextData.gamePlayState;
     m_gameContextData = gameContextData;
+    currentPlayer = playerWidget(currentPlayerId());
+    requestedPlayer = playerWidget(requestedPlayerId());
+
+    if (currentPlayer) {
+        currentPlayer->setCurrent(1);
+        currentPlayer->update();
+    } else {
+        qWarning("Cannot set active player.");
+    }
+
+    if (requestedPlayer) {
+        requestedPlayer->setRequested(1);
+        requestedPlayer->update();
+    } else {
+        qWarning("Cannot set requested player.");
+    }
+
+    mp_localPlayerWidget->setGameButtonState(gameContextData);
+
+//    if (oldGamePlayState != m_gameContextData.gamePlayState) {
+//        switch(m_gameContextData.gamePlayState) {
+//        case GAMEPLAYSTATE_DRAW:
+//            emit emitLogMessage(tr("<i>%1</i> is on turn.").arg(currentPlayer->name()));
+//            break;
+//        case GAMEPLAYSTATE_
+//
+//        }
+//
+//    }
+
+
+    if (!requestedPlayer || !requestedPlayer->isLocalPlayer()) {
+        unsetTextInfo();
+        return;
+    }
+
+    if (gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
+        PlayerWidget* causedBy = gameContextData.causedBy ? playerWidget(gameContextData.causedBy) : 0;
+        QString causedByName = causedBy ? causedBy->name() : "";
+        QString message;
+        switch(gameContextData.reactionType) {
+        case REACTION_BANG:
+            message = tr("<i>%1</i> played Bang! on you!").arg(causedByName);
+            break;
+        case REACTION_DUEL:
+            message = tr("You are in duel with <i>%1</i>.").arg(causedByName);
+            break;
+        case REACTION_GATLING:
+            message = tr("<i>%1</i> played Gatling.").arg(causedByName);
+            break;
+        case REACTION_GENERALSTORE:
+            message = tr("Shopping time. Please pick a card.").arg(causedByName);
+            break;
+        case REACTION_INDIANS:
+            message = tr("The Indians lead by <i>%1</i> are in town.").arg(causedByName);
+            break;
+        case REACTION_LASTSAVE:
+            message = tr("You've just got the fatal shot. Ya have beer?");
+            break;
+        case REACTION_KITCARLSON:
+            message = tr("Pick two cards from selection.");
+            break;
+        case REACTION_LUCKYDUKE:
+            message = tr("Feelin' lucky? Pick a card to respond with.");
+            break;
+        case REACTION_NONE:
+            NOT_REACHED();
+        }
+        setTextInfo(message);
+    } else if (gamePlayState() == GAMEPLAYSTATE_DRAW) {
+        setTextInfo(tr("It's your turn. Good luck!"));
+    } else if (gamePlayState() == GAMEPLAYSTATE_DISCARD) {
+        setTextInfo(tr("You need to discard some cards!"));
+    } else{
+        unsetTextInfo();
+    }
+}
+
+void Game::setSelection(QList<CardData> cards)
+{
+    if (m_gameState != GAMESTATE_PLAYING && m_gameState != GAMESTATE_FINISHED)
+        return;
+
+    mp_selection->clear();
+    foreach(const CardData& card, cards) {
+        CardWidget* cardWidget = m_cardWidgetFactory.createPlayingCard(0);
+        cardWidget->setCardData(card);
+        mp_selection->push(cardWidget);
+    }
 }
 
 void Game::setIsCreator(bool isCreator)
@@ -95,6 +200,7 @@ void Game::setGraveyard(const CardData& data)
 
 void Game::validate()
 {
+    qDebug() << "Validate: " << m_gameState;
     switch(m_gameState) {
     case GAMESTATE_INVALID:
     case GAMESTATE_WAITINGFORPLAYERS:
@@ -120,6 +226,17 @@ void Game::clean()
     mp_localPlayerWidget->clear();
     foreach(OpponentWidget* opponentWidget, m_opponentWidgets)
         opponentWidget->clear();
+    unsetTextInfo();
+}
+
+void Game::setTextInfo(const QString& text)
+{
+    mp_statusLabel->setText(text);
+}
+
+void Game::unsetTextInfo()
+{
+    mp_statusLabel->setText("");
 }
 
 void Game::loadCreatorInterface()
@@ -157,6 +274,7 @@ void Game::loadGameInterface()
     Q_ASSERT(mp_graveyard == 0);
     Q_ASSERT(mp_selection == 0);
     Q_ASSERT(mp_middleWidget->layout() == 0);
+    qDebug("---- loading game interface ----");
     mp_deck = new DeckWidget(0);
     mp_deck->init(&m_cardWidgetFactory);
     mp_graveyard = new GraveyardWidget(0);
@@ -192,6 +310,7 @@ void Game::unloadGameInterface()
     Q_ASSERT(mp_graveyard != 0);
     Q_ASSERT(mp_selection != 0);
     Q_ASSERT(mp_middleWidget->layout() != 0);
+    qDebug("---- unloading game interface ----");
     mp_deck->deleteLater();
     mp_graveyard->deleteLater();
     mp_selection->deleteLater();
@@ -237,6 +356,15 @@ void Game::playerLeavedGame(int playerId)
         m_players[playerId]->clear();
         m_players.remove(playerId);
     }
+}
+
+void Game::playerUpdate(const PublicPlayerData& player)
+{
+
+    if (m_players.contains(player.id)) {
+        m_players[player.id]->setFromPublicData(player);
+    }
+
 }
 
 void Game::gameCanBeStarted(bool canBeStarted)
@@ -327,4 +455,18 @@ void Game::assignPlayerWidget(int playerId, PlayerWidget* playerWidget)
     m_players[playerId] = playerWidget;
 }
 
+void Game::sendLogMessage(const QString& message)
+{
+    emit emitLogMessage(message);
+}
+
+void Game::pauseGameEvents()
+{
+    mp_gameEventHandler->pause();
+}
+
+void Game::resumeGameEvents()
+{
+    mp_gameEventHandler->resume();
+}
 

@@ -49,7 +49,8 @@ public:
     virtual void dieAndRevealRole(const PlayerRole& role);
     virtual void clear();
 
-    virtual void setActive(uint8_t progress);
+    void setGameButtonState(const GameContextData&);
+
 
     virtual CardList*               hand()            { return mp_hand; }
     virtual CardList*               table()           { return mp_table; }

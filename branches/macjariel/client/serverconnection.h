@@ -104,13 +104,10 @@ signals:
     void incomingData(const QByteArray&);
     void outgoingData(const QByteArray&);
 
-
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
     void enterGameMode(int gameId, const QString& gameName, ClientType);
     void exitGameMode();
-    void playerJoinedGame(int gameId, const StructPlayer& player, bool other, bool creator);
-    void playerLeavedGame(int gameId, const StructPlayer& player, bool other);
     void gameCanBeStarted(bool canBeStarted);
     void eventCardMovement(const CardMovementData&);
 

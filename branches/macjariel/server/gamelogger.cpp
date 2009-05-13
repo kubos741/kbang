@@ -1,5 +1,11 @@
 #include "gamelogger.h"
 #include "publicplayerview.h"
+#include "publicgameview.h"
+#include "parser/parserstructs.h"
+#include "playingcard.h"
+
+#include <QListIterator>
+#include <QDateTime>
 
 using namespace std;
 
@@ -7,115 +13,216 @@ GameLogger::GameLogger()
 {
 }
 
-void GameLogger::onHandlerRegistered(PlayerCtrl* playerCtrl)
+void GameLogger::onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtrl* playerCtrl)
 {
-    mp_playerCtrl = playerCtrl;
+    Q_UNUSED(playerCtrl);
+    mp_publicGameView = publicGameView;
 }
 
 void GameLogger::onHandlerUnregistered()
 {
-    mp_playerCtrl = 0;
+    mp_publicGameView = 0;
 }
 
 void GameLogger::onGameStarted()
 {
-    qDebug() << "Creating log file.";
     Q_ASSERT(m_logFile.is_open() == 0);
-    m_logFile.open("game.log", std::ios::out | std::ios::trunc);
+
+
+    QString logFileName = QString("game-%1.log").
+                          arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+
+    m_logFile.open(qPrintable(logFileName), std::ios::out | std::ios::trunc);
+
+
+
+    foreach (const PublicPlayerView* p, mp_publicGameView->publicPlayerList()) {
+        QString msg = QString("onPlayerCreated(id=%1, name=\"%2\", role=\"%3\", character=\"%4\")").
+                      arg(p->id()).
+                      arg(p->name()).
+                      arg(PlayerRoleToString(p->role())).
+                      arg(CharacterTypeToString(p->character()));
+        m_logFile << msg.toStdString() << endl;
+    }
 }
 
 
 void GameLogger::onPlayerDied(PublicPlayerView& p, PublicPlayerView* causedBy)
 {
-    m_logFile << "onPlayerDied (player=" << p.id() << ", causedBy=" << causedBy->id() << ")" << endl;
+    QString msg = QString("onPlayerDied(player=%1, causedBy=%2)").
+                  arg(p.id()).
+                  arg(causedBy->id());
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerDrawFromDeck(PublicPlayerView& p, QList<const PlayingCard*>, bool)
+void GameLogger::onPlayerDrawFromDeck(PublicPlayerView& p, QList<const PlayingCard*> l, bool)
 {
-    m_logFile << "onPlayerDrawFromDeck (player=" << p.id() << ", cards=todo)" << endl;
+    QString msg = QString("onPlayerDrawFromDeck(player=%1, cards=%2)").
+                  arg(p.id()).
+                  arg(cardListToString(l));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerDrawFromGraveyard(PublicPlayerView& p, const PlayingCard*, const PlayingCard*)
+void GameLogger::onPlayerDrawFromGraveyard(PublicPlayerView& p, const PlayingCard* c, const PlayingCard*)
 {
-    m_logFile << "onPlayerDrawFromGraveyard (player=" << p.id() << ", cards=todo)" << endl;
+    QString msg = QString("onPlayerDrawFromGraveyard(player=%1, card=%2)").
+                  arg(p.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerDiscardCard(PublicPlayerView& p, const PlayingCard*, PocketType)
+void GameLogger::onPlayerDiscardCard(PublicPlayerView& p, const PlayingCard* c, PocketType)
 {
-    m_logFile << "onPlayerDiscardCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerDiscardCard(player=%1, card=%2)").
+                  arg(p.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard*)
+void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard* c)
 {
-    m_logFile << "onPlayerPlayCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPlayCard(player=%1, card=%2)").
+                  arg(p.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard*, PublicPlayerView&)
+void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard* c, PublicPlayerView& tp)
 {
-    m_logFile << "onPlayerPlayCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPlayCard(player=%1, card=%2, targetPlayer=%3)").
+                  arg(p.id()).
+                  arg(cardToString(c)).
+                  arg(tp.id());
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard*, const PlayingCard*)
+void GameLogger::onPlayerPlayCard(PublicPlayerView& p, const PlayingCard* c, const PlayingCard* tc, PublicPlayerView* tp)
 {
-    m_logFile << "onPlayerPlayCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPlayCard(player=%1, card=%2, targetPlayer=%3, targetCard=%4)").
+                  arg(p.id()).
+                  arg(cardToString(c)).
+                  arg(tp->id()).
+                  arg(cardToString(tc));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerPlayCardOnTable(PublicPlayerView& p, const PlayingCard*, PublicPlayerView&)
+void GameLogger::onPlayerPlayCardOnTable(PublicPlayerView& p, const PlayingCard* c, PublicPlayerView& tp)
 {
-    m_logFile << "onPlayerPlayCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPlayCardOnTable(player=%1, card=%2, targetPlayer=%3)").
+                  arg(p.id()).
+                  arg(cardToString(c)).
+                  arg(tp.id());
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPassTableCard(PublicPlayerView& p, const PlayingCard*, PublicPlayerView&)
+void GameLogger::onPassTableCard(PublicPlayerView& p, const PlayingCard* c, PublicPlayerView& tp)
 {
-    m_logFile << "onPlayerPlayCardOnTable (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPassTableCard(player=%1, card=%2, targetPlayer=%3)").
+                  arg(p.id()).
+                  arg(cardToString(c)).
+                  arg(tp.id());
+    m_logFile << msg.toStdString() << endl;
+}
+
+void GameLogger::onPlayerRespondWithCard(PublicPlayerView& p, const PlayingCard* c)
+{
+    QString msg = QString("onPlayerRespondWithCard(player=%1, card=%2)").
+                  arg(p.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
 void GameLogger::onPlayerPass(PublicPlayerView& p)
 {
-    m_logFile << "onPlayerPass (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPass(player=%1)").
+                  arg(p.id());
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onDrawIntoSelection(QList<const PlayingCard*>)
+void GameLogger::onDrawIntoSelection(QList<const PlayingCard*> l)
 {
-    m_logFile << "onDrawIntoSelection ()" << endl;
+    QString msg = QString("onDrawIntoSelection(cards=%1)").
+                  arg(cardListToString(l));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerPickFromSelection(PublicPlayerView& p, const PlayingCard*)
+void GameLogger::onPlayerPickFromSelection(PublicPlayerView& p, const PlayingCard* c)
 {
-    m_logFile << "onPlayerPickFromSelection (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerPickFromSelection(player=%1, card=%2)").
+                  arg(p.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
 void GameLogger::onUndrawFromSelection(const PlayingCard* card)
 {
-    m_logFile << "onUndrawFromSelection ()" << endl;
+    //m_logFile << "onUndrawFromSelection ()" << endl;
 }
 
-void GameLogger::onPlayerCheckDeck(PublicPlayerView& p, const PlayingCard*, const PlayingCard*, bool)
+void GameLogger::onPlayerCheckDeck(PublicPlayerView& p, const PlayingCard* c, const PlayingCard* cb, bool res)
 {
-    m_logFile << "onPlayerCheckDeck (player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerCheckDeck(player=%1, checkedCard=%2, causedBy=%3, result=\"%4\")").
+                  arg(p.id()).
+                  arg(cardToString(c)).
+                  arg(cardToString(cb)).
+                  arg(res ? "true" : "false");
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerStealCard(PublicPlayerView& p, PublicPlayerView&, PocketType, const PlayingCard*)
+void GameLogger::onPlayerStealCard(PublicPlayerView& p, PublicPlayerView& tp, PocketType, const PlayingCard* c)
 {
-    m_logFile << "onPlayerStealCard(player=" << p.id() << ")" << endl;
+    QString msg = QString("onPlayerStealCard(player=%1, targetPlayer=%2, card=%3)").
+                  arg(p.id()).
+                  arg(tp.id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
-void GameLogger::onPlayerCancelCard(PublicPlayerView& p, PocketType, const PlayingCard*, PublicPlayerView*)
+void GameLogger::onCancelCard(PocketType, const PlayingCard* c, PublicPlayerView* tp, PublicPlayerView* p)
 {
-    m_logFile << "onPlayerCancelCard (player=" << p.id() << ")" << endl;
+    QString msg = QString("onCancelCard(player=%1, targetPlayer=%2, card=%3)").
+                  arg(p->id()).
+                  arg(tp->id()).
+                  arg(cardToString(c));
+    m_logFile << msg.toStdString() << endl;
 }
 
 void GameLogger::onGameContextChange(const GameContextData&)
 {
-    m_logFile << "onGameContextChange ()" << endl;
+    m_logFile << "onGameContextChange()" << endl;
 }
 
 void GameLogger::onLifePointsChange(PublicPlayerView& p, int lifePoints, PublicPlayerView*)
 {
-    m_logFile << "onLifePointsChange (player=" << p.id() << ", lifePoints=" << lifePoints << ")" << endl;
+    m_logFile << "onLifePointsChange(player=" << p.id() << ", lifePoints=" << lifePoints << ")" << endl;
 }
 
 void GameLogger::onDeckRegenerate()
 {
     m_logFile << "onDeckRegenerate()" << endl;
+}
+
+void GameLogger::onPlayerUseAbility(PublicPlayerView& p)
+{
+    m_logFile << "onPlayerUseAbility(player=" << p.id() << ")" << endl;
+}
+
+QString GameLogger::cardToString(const PlayingCard* card)
+{
+    if (card == 0) return "card()";
+    return "card(" + PlayingCardTypeToString(card->type()) + "," +
+            QString::number(card->rank()) + "," + CardSuitToString(card->suit()) + ")";
+}
+
+QString GameLogger::cardListToString(QList<const PlayingCard*> l)
+{
+    QString res = "[";
+    QListIterator<const PlayingCard*> it(l);
+    while(it.hasNext()) {
+        res += cardToString(it.next());
+        if (it.hasNext())
+            res += ",";
+    }
+    res += "]";
+    return res;
 }

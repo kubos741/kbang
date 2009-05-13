@@ -29,7 +29,6 @@ void GameSyncEvent::run()
 
     mp_game->setPlayerId(m_gameSyncData.localPlayer.id);
     mp_game->setGameState(m_gameSyncData.state);
-    mp_game->setGameContext(m_gameSyncData.gameContext);
     mp_game->setIsCreator(m_gameSyncData.isCreator);
     mp_game->validate();
 
@@ -64,9 +63,11 @@ void GameSyncEvent::run()
         mp_game->opponentWidget(i)->clear();
     }
 
+    mp_game->setGameContext(m_gameSyncData.gameContext);
+    mp_game->setSelection(m_gameSyncData.selection);
+
     /// \todo Make sure unused opponentWidgets are clear
 
-    /// \todo Use gameContext
     emit finished(this);
 }
 

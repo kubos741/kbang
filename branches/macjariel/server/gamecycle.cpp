@@ -17,6 +17,10 @@ GameCycle::GameCycle(Game* game):
 {
 }
 
+GameCycle::~GameCycle()
+{
+}
+
 void GameCycle::assertDraw() const
 {
     if (!isDraw())
@@ -49,17 +53,26 @@ GameContextData GameCycle::gameContextData() const
     res.requestedPlayerId = requestedPlayer()->id();
     res.turnNumber        = turnNumber();
     res.gamePlayState     = gamePlayState();
+    if (gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
+        res.reactionType = reactionHandler()->reactionType();
+        Player* causedBy = reactionHandler()->causedBy();
+        res.causedBy = causedBy ? causedBy->id() : 0;
+
+    } else {
+        res.reactionType = REACTION_NONE;
+        res.causedBy     = 0;
+    }
     return res;
 }
 
 void GameCycle::start()
 {
+    m_contextDirty = 0;
     Player* player;
     foreach (player, mp_game->playerList())
         if (player->role() == ROLE_SHERIFF)
             break;
     Q_ASSERT(player->role() == ROLE_SHERIFF);
-    qDebug("Starting game cycle.");
     m_turnNum = 0;
     startTurn(player);
     sendRequest();
@@ -67,35 +80,37 @@ void GameCycle::start()
 
 void GameCycle::startTurn(Player* player)
 {
-
-    qDebug(qPrintable(QString("GameCycle: startTurn(%1)").arg(player->id())));
+    m_contextDirty = 1;
     if (player->role() == ROLE_SHERIFF)
         m_turnNum++;
     mp_currentPlayer = mp_requestedPlayer = player;
     m_state = GAMEPLAYSTATE_DRAW;
     mp_currentPlayer->onTurnStart();
-    announceContextChange();
     m_drawCardCount = 0;
     m_drawCardMax = 2;
 }
 
 void GameCycle::draw(Player* player, bool specialDraw)
 {
+    m_contextDirty = 0;
     checkPlayerAndState(player, GAMEPLAYSTATE_DRAW);
     player->predrawCheck(0);
-    player->character()->draw(specialDraw);
     m_state = GAMEPLAYSTATE_TURN;
+    player->character()->draw(specialDraw);
+    m_contextDirty = 1;
     sendRequest();
 }
 
 
 void GameCycle::skipPlayersTurn()
 {
+    m_contextDirty = 0;
     startTurn(mp_game->nextPlayer(mp_currentPlayer));
 }
 
 void GameCycle::finishTurn(Player* player)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -111,6 +126,7 @@ void GameCycle::finishTurn(Player* player)
 
 void GameCycle::discardCard(Player* player, PlayingCard* card)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -130,6 +146,7 @@ void GameCycle::discardCard(Player* player, PlayingCard* card)
 
 void GameCycle::playCard(Player* player, PlayingCard* card)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -147,6 +164,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
 
 void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -166,6 +184,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card, Player* targetPlayer
 
 void GameCycle::playCard(Player* player, PlayingCard* card, PlayingCard* targetCard)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -183,6 +202,7 @@ void GameCycle::playCard(Player* player, PlayingCard* card, PlayingCard* targetC
 
 void GameCycle::pass(Player* player)
 {
+    m_contextDirty = 0;
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
@@ -193,21 +213,32 @@ void GameCycle::pass(Player* player)
     sendRequest();
 }
 
+void GameCycle::checkDeck(Player* player, PlayingCard* causedBy,
+                          bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler* resultHandler)
+{
+    player->character()->checkDeck(causedBy, checkFunc, resultHandler);
+}
 
-void GameCycle::setResponseMode(ReactionHandler* reactionHandler, Player* player)
+
+void GameCycle::setResponseMode(ReactionHandler* reactionHandler, Player* player, bool skipQueue)
 {
     if (m_reactionHandlers.isEmpty()) {
         Q_ASSERT(m_state != GAMEPLAYSTATE_RESPONSE);
         m_lastState = m_state;
     }
 
-    m_reactionHandlers.enqueue(reactionHandler);
-    m_reactionPlayers.enqueue(player);
+    if (skipQueue) {
+        m_reactionHandlers.prepend(reactionHandler);
+        m_reactionPlayers.prepend(player);
+    } else {
+        m_reactionHandlers.enqueue(reactionHandler);
+        m_reactionPlayers.enqueue(player);
+    }
 
-    if (m_reactionHandlers.size() == 1) {
+    if (m_reactionHandlers.size() == 1 || skipQueue) {
         mp_requestedPlayer = player;
         m_state = GAMEPLAYSTATE_RESPONSE;
-        announceContextChange();
+        m_contextDirty = 1;
     }
 }
 
@@ -222,7 +253,7 @@ void GameCycle::unsetResponseMode()
         mp_requestedPlayer = mp_currentPlayer;
         m_state = m_lastState;
     }
-    announceContextChange();
+    m_contextDirty = 1;
 }
 
 void GameCycle::sendRequest()
@@ -252,9 +283,12 @@ void GameCycle::sendRequest()
         default:
             NOT_REACHED();
     }
-    qDebug(qPrintable(QString("GameCycle: sendRequest to #%1 (%2)").arg(mp_requestedPlayer->id()).arg(mp_requestedPlayer->name())));
-
-    mp_requestedPlayer->gameEventHandler()->onActionRequest(requestType);
+    if (m_contextDirty) {
+        announceContextChange();
+    }
+    GameEventHandler* handler = mp_requestedPlayer->gameEventHandler();
+    if (handler)
+        handler->onActionRequest(requestType);
 }
 
 void GameCycle::checkPlayerAndState(Player* player, GamePlayState state)

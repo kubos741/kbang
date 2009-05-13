@@ -24,7 +24,6 @@
 #include "cardwidgetfactory.h"
 #include "gameobjectclickhandler.h"
 
-
 #include <QtDebug>
 #include <QPainter>
 #include <QPaintEvent>
@@ -37,6 +36,7 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
         m_role(ROLE_UNKNOWN)
 {
     setupUi(this);
+    setContentsMargins(5, 5, 5, 5);
     mp_roleCardWidget->setType(Card::Role);
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
@@ -45,7 +45,6 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
 
-    setActive(0);
     updateWidgets();
 
 
@@ -53,7 +52,7 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
             this,             SLOT(onEndTurnClicked()));
     connect(mp_buttonPass,    SIGNAL(clicked()),
             this,             SLOT(onPassClicked()));
-    connect(mp_buttonDiscard, SIGNAL(clicked()),
+    connect(mp_buttonDiscard, SIGNAL(toggled(bool)),
             this,             SLOT(onDiscardClicked()));
 
 }
@@ -67,6 +66,7 @@ void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, Car
     PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
     mp_characterWidget->init(mp_cardWidgetFactory);
     mp_cardWidgetFactory->registerCard(mp_roleCardWidget);
+    m_role = ROLE_UNKNOWN;
 }
 
 void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -80,7 +80,8 @@ void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerDa
 
     QPixmap avatar;
     if (!publicPlayerData.avatar.isNull())
-        avatar = QPixmap::fromImage(publicPlayerData.avatar);
+        avatar = QPixmap::fromImage(publicPlayerData.avatar).scaled(mp_labelAvatar->size(),
+                                                                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
     mp_labelAvatar->setPixmap(avatar);
 
     mp_hand->setOwnerId(id());
@@ -113,6 +114,7 @@ void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlaye
 
 void LocalPlayerWidget::dieAndRevealRole(const PlayerRole& role)
 {
+    Q_UNUSED(role);
 }
 
 
@@ -123,26 +125,68 @@ void LocalPlayerWidget::clear()
     updateWidgets();
 }
 
-void LocalPlayerWidget::setActive(uint8_t progress)
+void LocalPlayerWidget::setGameButtonState(const GameContextData& gameContext)
 {
-    if (progress == 0) {
-        mainFrame->setStyleSheet(m_baseStyleSheet);
-    } else {
-        mainFrame->setStyleSheet(
-                m_baseStyleSheet + " QFrame#mainFrame {"
-                "background-clip: content;"
-                "border-left-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.9, y2:0, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
-                "border-right-color: qlineargradient(spread:reflect, x1:0.1, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 64), stop:1 rgba(0, 0, 0, 0));"
-                "border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
-                "border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:0, y2:0.1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64))""}");
+    qDebug() << "setGameButtonState" << gameContext.requestedPlayerId;
+    if (gameContext.requestedPlayerId != id()) {
+        qDebug() << "A";
+        mp_buttonPass->setEnabled(0);
+        mp_buttonEndTurn->setEnabled(0);
+        mp_buttonDiscard->setEnabled(0);
+        mp_buttonDiscard->setChecked(0);
+        return;
+    }
+    switch(gameContext.gamePlayState) {
+    case GAMEPLAYSTATE_DRAW:
+        qDebug() << "B";
+        mp_buttonPass->setEnabled(0);
+        mp_buttonEndTurn->setEnabled(0);
+        mp_buttonDiscard->setEnabled(0);
+        mp_buttonDiscard->setChecked(0);
+        break;
+    case GAMEPLAYSTATE_TURN:
+        qDebug() << "C";
+        mp_buttonPass->setEnabled(0);
+        mp_buttonEndTurn->setEnabled(1);
+        mp_buttonDiscard->setEnabled(1);
+        mp_buttonDiscard->setChecked(0);
+        break;
+    case GAMEPLAYSTATE_RESPONSE:
+        mp_buttonPass->setEnabled(1);
+        mp_buttonEndTurn->setEnabled(0);
+        mp_buttonDiscard->setEnabled(0);
+        mp_buttonDiscard->setChecked(0);
+        break;
+    case GAMEPLAYSTATE_DISCARD:
+        mp_buttonPass->setEnabled(0);
+        mp_buttonEndTurn->setEnabled(0);
+        mp_buttonDiscard->setEnabled(0);
+        mp_buttonDiscard->setChecked(1);
+        break;
+    case GAMEPLAYSTATE_INVALID:
+        break;
     }
 }
-
 
 void LocalPlayerWidget::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    painter.fillRect(event->rect(), QColor(0, 0, 0, 32));
+    painter.setClipRect(event->rect());
+    painter.fillRect(contentsRect(), QColor(0, 0, 0, 32));
+
+    if (m_isCurrent) {
+        painter.setPen(Qt::blue);
+        painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
+    }
+
+    if (m_isRequested) {
+        QPen pen;
+        pen.setColor(Qt::red);
+        pen.setWidth(2);
+        pen.setStyle(Qt::DashLine);
+        painter.setPen(pen);
+        painter.drawRect(rect().adjusted(1, 1, -2, -2));
+    }
 }
 
 void LocalPlayerWidget::onEndTurnClicked()

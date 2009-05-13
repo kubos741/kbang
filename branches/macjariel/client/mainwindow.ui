@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>639</width>
-    <height>765</height>
+    <width>714</width>
+    <height>802</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -480,31 +480,31 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" >
+       <layout class="QVBoxLayout" name="verticalLayout_11" >
         <property name="spacing" >
          <number>0</number>
         </property>
         <item>
-         <spacer name="horizontalSpacer" >
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType" >
-           <enum>QSizePolicy::Minimum</enum>
-          </property>
-          <property name="sizeHint" stdset="0" >
-           <size>
-            <width>60</width>
-            <height>15</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3" >
+         <layout class="QHBoxLayout" name="horizontalLayout" >
           <property name="spacing" >
            <number>0</number>
           </property>
+          <item>
+           <spacer name="horizontalSpacer" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+            <property name="sizeHint" stdset="0" >
+             <size>
+              <width>30</width>
+              <height>237</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item>
            <widget class="client::LocalPlayerWidget" native="1" name="mp_localPlayerWidget" >
             <property name="sizePolicy" >
@@ -522,53 +522,59 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer_2" >
+           <spacer name="horizontalSpacer_2" >
             <property name="orientation" >
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType" >
              <enum>QSizePolicy::Minimum</enum>
             </property>
             <property name="sizeHint" stdset="0" >
              <size>
-              <width>15</width>
-              <height>5</height>
+              <width>30</width>
+              <height>237</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QLabel" name="mp_statusLabel" >
-            <property name="font" >
-             <font>
-              <pointsize>13</pointsize>
-             </font>
-            </property>
-            <property name="text" >
-             <string>TextLabel</string>
-            </property>
-            <property name="alignment" >
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
-         <spacer name="horizontalSpacer_2" >
+         <spacer name="verticalSpacer_2" >
           <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
            <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
-            <width>60</width>
-            <height>15</height>
+            <width>10</width>
+            <height>0</height>
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="mp_statusLabel" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -614,7 +620,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>639</width>
+     <width>714</width>
      <height>24</height>
     </rect>
    </property>
@@ -635,7 +641,6 @@
    </widget>
    <addaction name="menuGame" />
   </widget>
-  <widget class="QStatusBar" name="mp_statusbar" />
   <action name="mp_actionConnectToServer" >
    <property name="icon" >
     <iconset resource="client.qrc" >

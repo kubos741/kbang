@@ -13,7 +13,6 @@ CharacterKitCarlson::CharacterKitCarlson(QObject *parent):
 void CharacterKitCarlson::useAbility()
 {
     gameCycle().draw(mp_player, 1);
-    gameCycle().setResponseMode(this, mp_player);
 }
 
 
@@ -23,6 +22,7 @@ void CharacterKitCarlson::draw(bool specialDraw)
         notifyAbilityUse();
         gameTable().drawIntoSelection(3, mp_player);
         Q_ASSERT(gameTable().selection().size() == 3);
+        gameCycle().setResponseMode(this, mp_player);
     } else {
         CharacterBase::draw(0);
     }

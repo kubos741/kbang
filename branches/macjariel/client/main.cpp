@@ -20,15 +20,18 @@
 
 #include <QApplication>
 #include <QDialog>
+#include <cstdlib>
+#include <time.h>
 #include "mainwindow.h"
-
-
-
 
 using namespace client;
 
 int main(int argc, char *argv[])
 {
+    time_t sec;
+    time(&sec);
+    srand((unsigned int) sec);
+
     QApplication app(argc, argv);
     MainWindow mainWindow;
     mainWindow.show();

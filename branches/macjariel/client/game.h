@@ -53,14 +53,20 @@ public:
     void setPlayerId(int playerId);
     void setGameState(const GameState&);
     void setGameContext(const GameContextData&);
+    void setSelection(QList<CardData>);
     void setIsCreator(bool isCreator);
     void setGraveyard(const CardData&);
     void validate();
     void clean();
 
-public slots:
+    void setTextInfo(const QString&);
+    void unsetTextInfo();
+
+
     void playerJoinedGame(const PublicPlayerData& player);
     void playerLeavedGame(int playerId);
+    void playerUpdate(const PublicPlayerData& player);
+public slots:
     void gameCanBeStarted(bool);
     void startButtonClicked();
 
@@ -84,13 +90,19 @@ public:
 
     inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
 
-
-
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
     inline GameObjectClickHandler* cardWidgetClickHandler() { return &m_gameObjectClickHandler; }
 
     inline ServerConnection* serverConnection() { return mp_serverConnection; }
+
+    void sendLogMessage(const QString&);
+
+    void pauseGameEvents();
+    void resumeGameEvents();
+
+signals:
+    void emitLogMessage(const QString&);
 
 private:
     void loadCreatorInterface();
@@ -121,6 +133,7 @@ private:
     QList<OpponentWidget*>    m_opponentWidgets;
     QWidget*                  mp_mainWidget;
     QWidget*                  mp_middleWidget;
+    QLabel*                   mp_statusLabel;
 
 
 

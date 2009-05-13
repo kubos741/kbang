@@ -32,6 +32,7 @@
 Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         QObject(game),
         m_id(id),
+        m_lifePoints(0),
         m_name(createPlayerData.name),
         m_password(createPlayerData.password),
         m_avatar(createPlayerData.avatar),
@@ -231,6 +232,13 @@ void Player::predrawCheck(int checkId)
     m_currentPredraw = m_predrawChecks[index - 1];
 }
 
+void Player::update(const CreatePlayerData& createPlayerData)
+{
+    m_name = createPlayerData.name;
+    m_password = createPlayerData.password;
+    m_avatar = createPlayerData.avatar;
+}
+
 void Player::onBangPlayed()
 {
     m_lastBangTurn = mp_game->gameCycle().turnNumber();
@@ -247,14 +255,12 @@ void Player::registerGameEventHandler(GameEventHandler* gameEventHandler)
     Q_ASSERT(mp_gameEventHandler == 0);
     mp_gameEventHandler = gameEventHandler;
     mp_game->gameEventBroadcaster().registerHandler(mp_gameEventHandler, this);
-    mp_gameEventHandler->onHandlerRegistered(mp_playerCtrl);
 }
 
 void Player::unregisterGameEventHandler()
 {
     if (mp_gameEventHandler == 0) return;
-    mp_game->gameEventBroadcaster().unregisterHandler(mp_gameEventHandler, this);
-    mp_gameEventHandler->onHandlerUnregistered();
+    mp_game->gameEventBroadcaster().unregisterHandler(mp_gameEventHandler);
     mp_gameEventHandler = 0;
 }
 
@@ -262,7 +268,6 @@ void Player::unregisterGameEventHandler()
 void Player::checkEmptyHand()
 {
     if (m_hand.size() == 0) {
-        qDebug() << "onEmptyHand()";
         emit onEmptyHand();
     }
 }

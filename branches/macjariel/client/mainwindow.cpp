@@ -58,11 +58,6 @@ MainWindow::MainWindow():
             this,                SLOT(enterGameMode(int, const QString&, ClientType)));
     connect(&m_serverConnection, SIGNAL(exitGameMode()),
             this,                SLOT(exitGameMode()));
-
-    connect(&m_serverConnection, SIGNAL(playerJoinedGame(int, const StructPlayer&, bool, bool)),
-            this, SLOT(playerJoinedGame(int, const StructPlayer&, bool, bool)));
-    connect(&m_serverConnection, SIGNAL(playerLeavedGame(int, const StructPlayer&, bool)),
-            this, SLOT(playerLeavedGame(int, const StructPlayer&, bool)));
 }
 
 
@@ -115,7 +110,7 @@ void MainWindow::createStatusBar()
 {
     mp_labelStatusBarServerState = new QLabel;
     serverConnectionStatusChanged();
-    statusBar()->addPermanentWidget(mp_labelStatusBarServerState);
+    //statusBar()->addPermanentWidget(mp_labelStatusBarServerState);
 }
 
 void MainWindow::serverConnectionStatusChanged()
@@ -180,7 +175,7 @@ void MainWindow::updateActions()
         mp_actionDisconnectFromServer->setEnabled(0);
         actionCreateGame->setEnabled(0);
         mp_actionJoinGame->setEnabled(0);
-        mp_actionLeaveGame->setEnabled(0);
+        mp_actionLeaveGame->setEnabled(mp_game != 0);
     }
 }
 
@@ -215,15 +210,20 @@ void MainWindow::createWidgets()
 
 void MainWindow::leaveGame()
 {
-    m_serverConnection.leaveGame();
+    if (m_serverConnection.isConnected())
+        m_serverConnection.leaveGame();
+    else
+        exitGameMode();
 }
 
 
 void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
 {
     Q_ASSERT(mp_game == 0);
-    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets);
+    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets, mp_statusLabel);
     mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
+    connect(mp_game, SIGNAL(emitLogMessage(const QString&)),
+            mp_logWidget, SLOT(appendLogMessage(const QString&)));
     updateActions();
 }
 

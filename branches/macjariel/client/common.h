@@ -23,6 +23,7 @@
 
 #include <QtDebug>
 #include <QList>
+#include <QLabel>
 
 class QGridLayout;
 
@@ -37,8 +38,11 @@ struct GameWidgets
     QWidget* middleWidget;
     LocalPlayerWidget* localPlayerWidget;
     QList<OpponentWidget*> opponentWidget;
-    GameWidgets(QWidget* main, QWidget* middle, LocalPlayerWidget* p, const QList<OpponentWidget*>& o):
-        mainWidget(main), middleWidget(middle), localPlayerWidget(p), opponentWidget(o) {}
+    QLabel*  statusLabel;
+    GameWidgets(QWidget* main, QWidget* middle, LocalPlayerWidget* p,
+                const QList<OpponentWidget*>& o, QLabel* s):
+        mainWidget(main), middleWidget(middle), localPlayerWidget(p), opponentWidget(o),
+        statusLabel(s){}
 };
 
 }

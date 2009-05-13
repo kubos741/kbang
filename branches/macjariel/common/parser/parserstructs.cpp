@@ -31,7 +31,6 @@ CardSuit StringToCardSuit(const QString& s)
     if (s == "hearts")      return SUIT_HEARTS;
     if (s == "diamonds")    return SUIT_DIAMONDS;
     if (s == "clubs")       return SUIT_CLUBS;
-    qWarning(qPrintable(QString("Invalid suit: %1").arg(s)));
     return SUIT_SPADES;
 }
 
@@ -191,6 +190,34 @@ QString GamePlayStateToString(const GamePlayState& s)
     return "invalid";
 }
 
+ReactionType StringToReactionType(const QString& s)
+{
+    if (s == "bang")            return REACTION_BANG;
+    if (s == "gatling")         return REACTION_GATLING;
+    if (s == "indians")         return REACTION_INDIANS;
+    if (s == "duel")            return REACTION_DUEL;
+    if (s == "general-store")   return REACTION_GENERALSTORE;
+    if (s == "last-save")       return REACTION_LASTSAVE;
+    if (s == "lucky-duke")      return REACTION_LUCKYDUKE;
+    if (s == "kit-carlson")     return REACTION_KITCARLSON;
+    return REACTION_NONE;
+}
+
+QString ReactionTypeToString(const ReactionType& r)
+{
+    switch(r) {
+    case REACTION_BANG:         return "bang";
+    case REACTION_GATLING:      return "gatling";
+    case REACTION_INDIANS:      return "indians";
+    case REACTION_DUEL:         return "duel";
+    case REACTION_GENERALSTORE: return "general-store";
+    case REACTION_LASTSAVE:     return "last-save";
+    case REACTION_LUCKYDUKE:    return "lucky-duke";
+    case REACTION_KITCARLSON:   return "kit-carlson";
+    case REACTION_NONE:         return "";
+    }
+    return "";
+}
 
 void readAvatar(XmlNode* node, QImage& avatar)
 {
@@ -203,7 +230,6 @@ void readAvatar(XmlNode* node, QImage& avatar)
 
 void writeAvatar(QXmlStreamWriter* writer, const QImage& avatar)
 {
-    qDebug() << "writeAvatar" << avatar.isNull();
     if (!avatar.isNull()) {
         QByteArray bytes;
         QBuffer buffer(&bytes);
@@ -212,11 +238,6 @@ void writeAvatar(QXmlStreamWriter* writer, const QImage& avatar)
         writer->writeStartElement("avatar");
         writer->writeCharacters(bytes.toBase64());
         writer->writeEndElement();
-        QImage a;
-        qDebug("???");
-        if (!a.loadFromData(bytes)) {
-            qDebug("NO LOAD");
-        }
      }
 }
 
@@ -334,6 +355,7 @@ void PublicPlayerData::read(XmlNode* node)
     hasController   = node->attribute("hasController") == "true";
     isAI            = node->attribute("isAI") == "true";
     isAlive         = node->attribute("isAlive") == "true";
+    role            = StringToPlayerRole(node->attribute("role"));
     foreach(XmlNode* child, node->getChildren()) {
         if (child->name() == "cards-table") {
             table.clear();
@@ -361,6 +383,7 @@ void PublicPlayerData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("hasController",     hasController ? "true" : "false");
     writer->writeAttribute("isAI",              isAI ? "true" : "false");
     writer->writeAttribute("isAlive",           isAlive ? "true" : "false");
+    writer->writeAttribute("role",              PlayerRoleToString(role));
     writer->writeStartElement("cards-table");
     foreach(const CardData& cardData, table)
         cardData.write(writer);
@@ -408,6 +431,8 @@ void GameContextData::read(XmlNode* node)
     requestedPlayerId   = node->attribute("requestedPlayerId").toInt();
     turnNumber          = node->attribute("turnNumber").toInt();
     gamePlayState       = StringToGamePlayState(node->attribute("gamePlayState"));
+    reactionType        = StringToReactionType(node->attribute("reaction-type"));
+    causedBy            = node->attribute("caused-by").toInt();
 }
 
 void GameContextData::write(QXmlStreamWriter* writer) const
@@ -417,6 +442,8 @@ void GameContextData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("requestedPlayerId", QString::number(requestedPlayerId));
     writer->writeAttribute("turnNumber",        QString::number(turnNumber));
     writer->writeAttribute("gamePlayState",     GamePlayStateToString(gamePlayState));
+    writer->writeAttribute("reaction-type",     ReactionTypeToString(reactionType));
+    writer->writeAttribute("caused-by",         QString::number(causedBy));
     writer->writeEndElement();
 }
 
@@ -437,6 +464,14 @@ void GameSyncData::read(XmlNode* node)
     localPlayer.read(node->getChildren()[1]);
     gameContext.read(node->getChildren()[2]);
     graveyard.read(node->getChildren()[3]);
+
+    selection.clear();
+    foreach(XmlNode* cardNode, node->getChildren()[4]->getChildren()) {
+        CardData card;
+        card.read(cardNode);
+        selection.append(card);
+    }
+
 }
 
 void GameSyncData::write(QXmlStreamWriter* writer) const
@@ -459,6 +494,11 @@ void GameSyncData::write(QXmlStreamWriter* writer) const
 
     graveyard.write(writer, "graveyard");
 
+    writer->writeStartElement("selection");
+    foreach (const CardData& c, selection)
+        c.write(writer);
+    writer->writeEndElement();
+
     writer->writeEndElement();
 }
 
@@ -468,7 +508,6 @@ PocketType stringToPocketType(const QString& s)
     if (s == "graveyard") return POCKET_GRAVEYARD;
     if (s == "hand")      return POCKET_HAND;
     if (s == "table")     return POCKET_TABLE;
-    if (s == "played")    return POCKET_PLAYED;
     if (s == "selection") return POCKET_SELECTION;
     return POCKET_INVALID;
 }
@@ -479,7 +518,6 @@ QString pocketTypeToString(const PocketType& p)
     if (p == POCKET_GRAVEYARD)  return "graveyard";
     if (p == POCKET_HAND)       return "hand";
     if (p == POCKET_TABLE)      return "table";
-    if (p == POCKET_PLAYED)     return "played";
     if (p == POCKET_SELECTION)  return "selection";
     return "";
 }
@@ -515,6 +553,92 @@ QString ClientTypeToString(const ClientType& t) {
     case CLIENT_SPECTATOR:  return "spectator";
     }
     return "";
+}
+
+GameMessageType StringToGameMessageType(const QString& s) {
+    if (s == "game-started")                return GAMEMESSAGE_GAMESTARTED;
+    if (s == "player-draw-from-deck")       return GAMEMESSAGE_PLAYERDRAWFROMDECK;
+    if (s == "player-draw-from-graveyard")  return GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD;
+    if (s == "player-discard-card")         return GAMEMESSAGE_PLAYERDISCARDCARD;
+    if (s == "player-play-card")            return GAMEMESSAGE_PLAYERPLAYCARD;
+    if (s == "player-respond-with-card")    return GAMEMESSAGE_PLAYERRESPONDWITHCARD;
+    if (s == "player-pass")                 return GAMEMESSAGE_PLAYERPASS;
+    if (s == "player-pick-from-selection")  return GAMEMESSAGE_PLAYERPICKFROMSELECTION;
+    if (s == "player-check-deck")           return GAMEMESSAGE_PLAYERCHECKDECK;
+    if (s == "player-steal-card")           return GAMEMESSAGE_PLAYERSTEALCARD;
+    if (s == "player-cancel-card")          return GAMEMESSAGE_PLAYERCANCELCARD;
+    if (s == "deck-regenerate")             return GAMEMESSAGE_DECKREGENERATE;
+    if (s == "player-died")                 return GAMEMESSAGE_PLAYERDIED;
+    return GAMEMESSAGE_INVALID;
+}
+
+QString GameMessageTypeToString(const GameMessageType& g) {
+    switch(g) {
+    case GAMEMESSAGE_GAMESTARTED:               return "game-started";
+    case GAMEMESSAGE_PLAYERDRAWFROMDECK:        return "player-draw-from-deck";
+    case GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD:   return "player-draw-from-graveyard";
+    case GAMEMESSAGE_PLAYERDISCARDCARD:         return "player-discard-card";
+    case GAMEMESSAGE_PLAYERPLAYCARD:            return "player-play-card";
+    case GAMEMESSAGE_PLAYERRESPONDWITHCARD:     return "player-respond-with-card";
+    case GAMEMESSAGE_PLAYERPASS:                return "player-pass";
+    case GAMEMESSAGE_PLAYERPICKFROMSELECTION:   return "player-pick-from-selection";
+    case GAMEMESSAGE_PLAYERCHECKDECK:           return "player-check-deck";
+    case GAMEMESSAGE_PLAYERSTEALCARD:           return "player-steal-card";
+    case GAMEMESSAGE_PLAYERCANCELCARD:          return "player-cancel-card";
+    case GAMEMESSAGE_DECKREGENERATE:            return "deck-regenerate";
+    case GAMEMESSAGE_PLAYERDIED:                return "player-died";
+    case GAMEMESSAGE_INVALID:                   return "";
+    }
+    return "";
+}
+
+void GameMessage::read(XmlNode* node)
+{
+    Q_ASSERT(node->name() == "game-message");
+    type            = StringToGameMessageType(node->attribute("type"));
+    player          = node->attribute("player").toInt();
+    targetPlayer    = node->attribute("targetPlayer").toInt();
+    causedBy        = node->attribute("causedBy").toInt();
+    checkResult     = node->attribute("checkResult") == "true";
+    cards.clear();
+    foreach(XmlNode* child, node->getChildren()) {
+        if (child->name() == "card")
+            card.read(child);
+        else if (child->name() == "targetCard")
+            targetCard.read(child);
+        else if (child->name() == "cards") {
+            foreach (XmlNode* cardNode, child->getChildren()) {
+                CardData cardData;
+                cardData.read(cardNode);
+                cards.append(cardData);
+            }
+        }
+    }
+}
+
+void GameMessage::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement("game-message");
+    writer->writeAttribute("type", GameMessageTypeToString(type));
+    if (player)
+        writer->writeAttribute("player", QString::number(player));
+    if (targetPlayer)
+        writer->writeAttribute("targetPlayer", QString::number(targetPlayer));
+    if (causedBy)
+        writer->writeAttribute("causedBy", QString::number(causedBy));
+    if (type == GAMEMESSAGE_PLAYERCHECKDECK)
+        writer->writeAttribute("checkResult", checkResult ? "true" : "false");
+    if (card.id)
+        card.write(writer, "card");
+    if (targetCard.id)
+        targetCard.write(writer, "targetCard");
+    if (cards.size() > 0) {
+        writer->writeStartElement("cards");
+        foreach(const CardData& cardData, cards)
+            cardData.write(writer);
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
 }
 
 

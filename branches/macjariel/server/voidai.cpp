@@ -8,8 +8,13 @@
 #include <QDebug>
 #include <QTimer>
 #include <QApplication>
+#include <cstdlib>
 
 int VoidAI::sm_playerCounter = 0;
+
+int minActionDelay = 200;
+int maxActionDelay = 1500;
+
 
 VoidAI::VoidAI(QObject* parent):
         QObject(parent),
@@ -22,10 +27,11 @@ CreatePlayerData VoidAI::createPlayerData() const
 {
     CreatePlayerData res;
     res.name = QString("VoidAI #%1").arg(m_id);
+    res.password = "void";
     return res;
 }
 
-void VoidAI::onHandlerRegistered(PlayerCtrl* playerCtrl)
+void VoidAI::onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtrl* playerCtrl)
 {
     mp_playerCtrl = playerCtrl;
 }
@@ -33,7 +39,8 @@ void VoidAI::onHandlerRegistered(PlayerCtrl* playerCtrl)
 void VoidAI::onActionRequest(ActionRequestType requestType)
 {
     m_requestType = requestType;
-    QTimer::singleShot(1, this, SLOT(requestWithAction()));
+    //int randomDelay = (rand() % (maxActionDelay - minActionDelay)) + minActionDelay;
+    QTimer::singleShot(200, this, SLOT(requestWithAction()));
 }
 
 void VoidAI::requestWithAction()

@@ -13,7 +13,8 @@ public:
     virtual void draw(bool specialDraw);
 
     virtual void respondCard(PlayingCard* targetCard);
-    virtual ReactionType reactionType() const { return REACTION_CHOOSECARD; }
+    virtual ReactionType reactionType() const { return REACTION_KITCARLSON; }
+    virtual Player* causedBy() const { return 0; }
 };
 
 #endif // CHARACTERKITCARLSON_H

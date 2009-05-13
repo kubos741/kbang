@@ -22,11 +22,18 @@
 #include "console.h"
 #include "common.h"
 #include <QCoreApplication>
+#include "util.h"
+
+#include <cstdlib>
+#include <time.h>
 
 #include "parser/parserstructs.h"
 
 int main(int argc, char* argv[])
 {
+    time_t sec;
+    time(&sec);
+    srand((unsigned int) sec);
     QCoreApplication app(argc, argv);
     GameServer& server = GameServer::instance();
     server.listen();

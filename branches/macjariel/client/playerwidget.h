@@ -48,7 +48,7 @@ public:
 
     virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
 
-    void setPlayer(const StructPlayer&);
+    //void setPlayer(const StructPlayer&);
     virtual void setFromPublicData(const PublicPlayerData&) = 0;
     virtual void dieAndRevealRole(const PlayerRole& role) = 0;
     virtual void clear() = 0;
@@ -58,7 +58,9 @@ public:
     virtual PlayerCharacterWidget* characterWidget() = 0;
 
     virtual bool isLocalPlayer() = 0;
-    virtual void setActive(uint8_t progress) = 0;
+    void setCurrent(bool);
+    void setRequested(bool);
+
 
 protected:
     void setId(int id);
@@ -69,6 +71,11 @@ protected:
 
     GameObjectClickHandler* mp_gameObjectClickHandler;
     CardWidgetFactory*      mp_cardWidgetFactory;
+
+protected:
+    bool        m_isCurrent;
+    bool        m_isRequested;
+
 
 private:
     int         m_id;

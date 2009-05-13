@@ -7,6 +7,7 @@
 #include "characterjessejones.h"
 #include "characterjourdonnais.h"
 #include "characterkitcarlson.h"
+#include "characterluckyduke.h"
 #include "characterpedroramirez.h"
 #include "characterpropertychange.h"
 #include "charactersidketchum.h"
@@ -46,8 +47,7 @@ CharacterBase* CharacterList::createCharacter(QObject* parent, CharacterType typ
     case CHARACTER_KIT_CARLSON:
         return new CharacterKitCarlson(parent);
     case CHARACTER_LUCKY_DUKE:
-        //todo
-        NOT_REACHED();
+        return new CharacterLuckyDuke(parent);
     case CHARACTER_PAUL_REGRET:
         return new CharacterPropertyChange(parent, CharacterPropertyChange::PaulRegret);
     case CHARACTER_PEDRO_RAMIREZ:
@@ -80,7 +80,7 @@ void CharacterList::initCharacterTypes()
     sm_characterTypes.append(CHARACTER_JESSE_JONES);
     sm_characterTypes.append(CHARACTER_JOURDONNAIS);
     sm_characterTypes.append(CHARACTER_KIT_CARLSON);
-    //sm_characterTypes.append(CHARACTER_LUCKY_DUKE);
+    sm_characterTypes.append(CHARACTER_LUCKY_DUKE);
     sm_characterTypes.append(CHARACTER_PAUL_REGRET);
     sm_characterTypes.append(CHARACTER_PEDRO_RAMIREZ);
     sm_characterTypes.append(CHARACTER_ROSE_DOOLAN);

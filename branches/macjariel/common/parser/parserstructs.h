@@ -58,7 +58,6 @@ enum PocketType {
     POCKET_GRAVEYARD,
     POCKET_HAND,
     POCKET_TABLE,
-    POCKET_PLAYED,
     POCKET_SELECTION
 };
 
@@ -135,12 +134,15 @@ enum CharacterType {
 };
 
 enum ReactionType {
+    REACTION_NONE,
     REACTION_BANG,
     REACTION_GATLING,
     REACTION_INDIANS,
     REACTION_DUEL,
-    REACTION_CHOOSECARD,
-    REACTION_LASTSAVE
+    REACTION_GENERALSTORE,
+    REACTION_LASTSAVE,
+    REACTION_LUCKYDUKE,
+    REACTION_KITCARLSON
 };
 
 enum ClientType {
@@ -205,6 +207,7 @@ struct PublicPlayerData {
     bool isSheriff;
     int handSize;
     QList<CardData> table;
+    PlayerRole role; // for dead players
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };
@@ -230,6 +233,38 @@ enum GameState {
     GAMESTATE_WAITINGFORPLAYERS,
     GAMESTATE_PLAYING,
     GAMESTATE_FINISHED
+};
+
+enum GameMessageType {
+    GAMEMESSAGE_INVALID = 0,
+    GAMEMESSAGE_GAMESTARTED,
+    GAMEMESSAGE_PLAYERDRAWFROMDECK,
+    GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD,
+    GAMEMESSAGE_PLAYERDISCARDCARD,
+    GAMEMESSAGE_PLAYERPLAYCARD,
+    GAMEMESSAGE_PLAYERRESPONDWITHCARD,
+    GAMEMESSAGE_PLAYERPASS,
+    GAMEMESSAGE_PLAYERPICKFROMSELECTION,
+    GAMEMESSAGE_PLAYERCHECKDECK,
+    GAMEMESSAGE_PLAYERSTEALCARD,
+    GAMEMESSAGE_PLAYERCANCELCARD,
+    GAMEMESSAGE_DECKREGENERATE,
+    GAMEMESSAGE_PLAYERDIED,
+};
+
+struct GameMessage {
+    GameMessage(): type(GAMEMESSAGE_INVALID), player(0), targetPlayer(0), causedBy(0) {}
+    GameMessageType type;
+    int player;
+    int targetPlayer;
+    int causedBy;
+    CardData card;
+    CardData targetCard;
+    QList<CardData> cards;
+    bool checkResult;
+
+    void read(XmlNode*);
+    void write(QXmlStreamWriter*) const;
 };
 
 struct PlayerInfoData
@@ -286,7 +321,8 @@ struct GameContextData {
     int             requestedPlayerId;
     int             turnNumber;
     GamePlayState   gamePlayState;
-
+    ReactionType    reactionType;
+    int             causedBy;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };
@@ -302,6 +338,7 @@ struct GameSyncData {
     GameContextData         gameContext;
     GameState               state;
     CardData                graveyard;
+    QList<CardData>         selection;
     void read(XmlNode*);
     void write(QXmlStreamWriter*) const;
 };
@@ -372,5 +409,8 @@ ClientType StringToClientType(const QString& s);
 
 GameState StringToGameState(const QString& s);
 QString GameStateToString(const GameState& s);
+
+CardSuit StringToCardSuit(const QString& s);
+QString CardSuitToString(const CardSuit& suit);
 
 #endif

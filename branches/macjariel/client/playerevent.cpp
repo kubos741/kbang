@@ -22,11 +22,10 @@ PlayerEvent* PlayerEvent::playerLeaved(int playerId)
     return this;
 }
 
-PlayerEvent* PlayerEvent::playerControllerChanged(int playerId, bool hasController)
+PlayerEvent* PlayerEvent::playerUpdate(const PublicPlayerData& publicPlayerData)
 {
-    m_type = PlayerControllerChanged;
-    m_playerId = playerId;
-    m_hasController = hasController;
+    m_type = PlayerUpdate;
+    m_publicPlayerData = publicPlayerData;
     return this;
 }
 
@@ -37,6 +36,7 @@ PlayerEvent::~PlayerEvent()
 
 void PlayerEvent::run()
 {
+    GameEvent::run();
     switch(m_type) {
     case PlayerJoined:
         mp_game->playerJoinedGame(m_publicPlayerData);
@@ -44,9 +44,10 @@ void PlayerEvent::run()
     case PlayerLeaved:
         mp_game->playerLeavedGame(m_playerId);
         break;
-    case PlayerControllerChanged:
-        ///@todo
+    case PlayerUpdate:
+        mp_game->playerUpdate(m_publicPlayerData);
         break;
     }
+    GameEvent::finish();
 }
 

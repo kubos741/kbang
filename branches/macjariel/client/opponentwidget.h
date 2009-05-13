@@ -48,18 +48,13 @@ public:
     virtual void dieAndRevealRole(const PlayerRole& role);
     virtual void clear();
 
-    virtual void setActive(uint8_t progress);
-
     virtual CardList*               hand()            { return mp_hand; }
     virtual CardList*               table()           { return mp_table; }
     virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
     virtual bool                    isLocalPlayer()   { return 0; }
-    virtual QSize                   sizeHint() const;
-
-
-
 
 private:
+    void setAvatarPixmap();
     void updateWidgets();
     void setSeriff(bool isSheriff);
 
@@ -67,10 +62,13 @@ private:
     QString m_baseStyleSheet;
     QPixmap m_sheriffBadgePixmap;
     QLabel* mp_sheriffBadge;
+    QLabel* mp_disconnectIcon;
 
     bool        m_isDead;
+    bool        m_hasController;
     PlayerRole  m_role;
     CardWidget* mp_roleCard;
+    QPixmap     m_avatar;
 };
 }
 #endif

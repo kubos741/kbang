@@ -11,14 +11,16 @@
 class GameEventHandler;
 class Player;
 class PlayingCard;
+class Game;
 
 
 class GameEventBroadcaster
 {
 public:
-    GameEventBroadcaster();
+    GameEventBroadcaster(Game*);
     void registerHandler(GameEventHandler*, Player* player = 0);
-    void unregisterHandler(GameEventHandler*, Player* player = 0);
+    void registerSupervisor(GameEventHandler*);
+    void unregisterHandler(GameEventHandler*);
 
 
     void onChatMessage(Player*, const QString& message);
@@ -28,6 +30,8 @@ public:
     void onPlayerJoinedGame(Player*);
 
     void onPlayerLeavedGame(Player*);
+
+    void onPlayerUpdated(Player*);
 
     void onPlayerDied(Player*, Player* causedBy);
 
@@ -51,6 +55,8 @@ public:
 
     void onPassTableCard(Player*, PlayingCard*, Player* targetPlayer);
 
+    void onPlayerRespondWithCard(Player*, PlayingCard*);
+
     void onPlayerPass(Player*);
 
     void onDrawIntoSelection(Player* selectionOwner, QList<const PlayingCard*>);
@@ -71,10 +77,22 @@ public:
 
     void onDeckRegenerate();
 
+    void onPlayerUseAbility(Player*);
+
+    struct Handler {
+
+        Handler(): handler(0), player(0), isSupervisor(0) {}
+        Handler(GameEventHandler* h, Player* p, bool s = 0):
+                handler(h), player(p), isSupervisor(s) {}
+        GameEventHandler* handler;
+        Player*           player;
+        bool              isSupervisor;
+    };
+
 
 private:
-    typedef QPair<GameEventHandler*, Player*> HandlerPair;
-    QList<HandlerPair> m_handlers;
+    Game*           mp_game;
+    QList<Handler*> m_handlers;
 
 };
 

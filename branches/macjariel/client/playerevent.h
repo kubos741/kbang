@@ -15,14 +15,14 @@ public:
     enum Type {
         PlayerJoined,
         PlayerLeaved,
-        PlayerControllerChanged
+        PlayerUpdate
     };
 
     PlayerEvent(Game* game);
 
     PlayerEvent* playerJoined(const PublicPlayerData&);
     PlayerEvent* playerLeaved(int playerId);
-    PlayerEvent* playerControllerChanged(int playerId, bool hasController);
+    PlayerEvent* playerUpdate(const PublicPlayerData&);
 
     virtual ~PlayerEvent();
     virtual void run();
@@ -30,7 +30,6 @@ private:
     Type                m_type;
     int                 m_playerId;
     PublicPlayerData    m_publicPlayerData;
-    bool                m_hasController;
 };
 }
 

@@ -28,6 +28,8 @@ PlayerWidget::PlayerWidget(QWidget* parent):
         QWidget(parent),
         mp_gameObjectClickHandler(0),
         mp_cardWidgetFactory(0),
+        m_isCurrent(0),
+        m_isRequested(0),
         m_id(0),
         m_isSheriff(0)
 {
@@ -39,16 +41,26 @@ void PlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidg
     mp_cardWidgetFactory = cardWidgetFactory;
 }
 
-void PlayerWidget::setPlayer(const StructPlayer& structPlayer)
+//void PlayerWidget::setPlayer(const StructPlayer& structPlayer)
+//{
+//    PublicPlayerData data;
+//    data.id = structPlayer.id;
+//    data.name = structPlayer.name;
+//    data.isSheriff = 0;
+//    data.lifePoints = 0;
+//    data.handSize = 0;
+//    // data.character
+//    setFromPublicData(data);
+//}
+
+void PlayerWidget::setCurrent(bool isCurrent)
 {
-    PublicPlayerData data;
-    data.id = structPlayer.id;
-    data.name = structPlayer.name;
-    data.isSheriff = 0;
-    data.lifePoints = 0;
-    data.handSize = 0;
-    // data.character
-    setFromPublicData(data);
+    m_isCurrent = isCurrent;
+}
+
+void PlayerWidget::setRequested(bool isRequested)
+{
+    m_isRequested = isRequested;
 }
 
 void PlayerWidget::setId(int id)

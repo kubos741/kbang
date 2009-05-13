@@ -92,8 +92,6 @@ bool GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
 
 void GameObjectClickHandler::onCardRightClicked(CardWidget* cardWidget)
 {
-    if (!mp_game->isAbleToRequest())
-        return;
     new CardZoomWidget(mp_game, cardWidget);
 }
 

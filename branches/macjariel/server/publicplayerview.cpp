@@ -72,6 +72,11 @@ int PublicPlayerView::handSize() const
     return mp_player->handSize();
 }
 
+CharacterType PublicPlayerView::character() const
+{
+    return mp_player->characterType();
+}
+
 /**
  * Returns the role of the player. In case
  * the player is still alive and is not sheriff,
@@ -110,14 +115,12 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     res.handSize    = handSize();
     res.avatar      = mp_player->avatar();
     foreach (PlayingCard* card, table()) {
-        CardData cardData;
-        cardData.id = card->id();
-        cardData.type = card->type();
-        res.table.append(cardData);
+        res.table.append(card->cardData());
     }
     res.hasPassword = !mp_player->password().isEmpty();
     res.hasController = mp_player->gameEventHandler() != 0;
     res.isAI = mp_player->isAI();
     res.isAlive = mp_player->isAlive();
+    res.role = role();
     return res;
 }

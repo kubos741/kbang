@@ -2,15 +2,16 @@
 #define CARDDYNAMITE_H
 
 #include "tablecard.h"
+#include "checkdeckresulthandler.h"
 
-class CardDynamite : public TableCard
+class CardDynamite : public TableCard, public CheckDeckResultHandler
 {
 public:
     CardDynamite(Game *game, int id, CardSuit, CardRank);
     virtual ~CardDynamite();
 
     virtual void play();
-    void checkResult(bool result);
+    virtual void checkResult(bool result);
     virtual void registerPlayer(Player* player);
     virtual void unregisterPlayer(Player* player);
 

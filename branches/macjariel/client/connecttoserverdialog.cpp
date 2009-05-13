@@ -98,7 +98,6 @@ void ConnectToServerDialog::loadConfigValues()
     Config& cfg = Config::instance();
     cfg.refresh();
     QStringList hosts = cfg.readStringList("server-list", "hostname");
-    qDebug() << "Hosts: " << hosts;
     QList<int>  ports = cfg.readIntList("server-list", "port");
     int n = hosts.size() < ports.size() ? hosts.size() : ports.size();
     serverList->clear();

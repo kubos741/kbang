@@ -6,6 +6,9 @@
 #include "game.h"
 #include "gametable.h"
 #include "gameexceptions.h"
+#include "gameeventbroadcaster.h"
+#include "checkdeckresulthandler.h"
+#include "gameeventbroadcaster.h"
 
 CharacterBase::CharacterBase(QObject *parent, CharacterType characterType):
         QObject(parent),
@@ -58,6 +61,15 @@ void CharacterBase::playerDied()
 {
 }
 
+void CharacterBase::checkDeck(PlayingCard* causedBy,
+                              bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler* resultHandler)
+{
+    PlayingCard* checkedCard = gameTable().checkDeck();
+    bool checkResult = (*checkFunc)(checkedCard);
+    mp_player->game()->gameEventBroadcaster().onPlayerCheckDeck(mp_player, checkedCard, causedBy, checkResult);
+    resultHandler->checkResult(checkResult);
+}
+
 void CharacterBase::useAbility(Player* targetPlayer)
 {
     throw BadUsageException();
@@ -80,8 +92,7 @@ void CharacterBase::setCharacterType(CharacterType type)
 
 void CharacterBase::notifyAbilityUse()
 {
-    ///@todo: send notification to clients about using the ability
-    ///       can be implemented on client by blinking with the character card
+    mp_player->game()->gameEventBroadcaster().onPlayerUseAbility(mp_player);
 }
 
 GameTable& CharacterBase::gameTable()

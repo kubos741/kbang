@@ -10,7 +10,8 @@ public:
     ~CardGeneralStore();
     virtual void play();
     virtual void respondCard(PlayingCard* targetCard);
-    virtual ReactionType reactionType() const { return REACTION_CHOOSECARD; }
+    virtual ReactionType reactionType() const { return REACTION_GENERALSTORE; }
+    virtual Player* causedBy() const { return mp_firstPlayer; }
 
 private:
     void requestNext();

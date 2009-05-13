@@ -182,7 +182,7 @@ public:
     /**
      * Sends a chat message by name of player.
      */
-    void sendMessage(Player* player, const QString& message);
+    void sendChatMessage(Player* player, const QString& message);
 
 private:
     void checkStartable();

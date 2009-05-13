@@ -316,11 +316,11 @@ void Parser::processStanza()
             emit sigActionStartGame();
             return;
         }
-        if (action->name() == "message")
+        if (action->name() == "chat-message")
         {
             XmlNode* messageNode = action->getFirstChild();
             if (!messageNode || !messageNode->isTextElement()) return;
-            emit sigActionMessage(messageNode->text());
+            emit sigActionChatMessage(messageNode->text());
             return;
         }
         if (action->name() == "draw-card") {
@@ -386,6 +386,15 @@ void Parser::processStanza()
             emit sigEventPlayerLeavedGame(playerId);
             return;
         }
+        if (event->name() == "player-update")
+        {
+            XmlNode* player = event->getFirstChild();
+            if (!player) return;
+            PublicPlayerData publicPlayerData;
+            publicPlayerData.read(player);
+            emit sigEventPlayerUpdate(publicPlayerData);
+            return;
+        }
         if (event->name() == "game-startable")
         {
             bool canBeStarted = event->attribute("is-startable") == "true";
@@ -419,13 +428,19 @@ void Parser::processStanza()
             emit sigEventCardMovement(x);
             return;
         }
-        if (event->name() == "message")
+        if (event->name() == "chat-message")
         {
             XmlNode* messageNode = event->getFirstChild();
             if (!messageNode || !messageNode->isTextElement()) return;
             int senderId = event->attribute("senderId").toInt();
             QString senderName = event->attribute("senderName");
-            emit sigEventMessage(senderId, senderName, messageNode->text());
+            emit sigEventChatMessage(senderId, senderName, messageNode->text());
+        }
+        if (event->name() == "game-message")
+        {
+            GameMessage gameMessage;
+            gameMessage.read(event);
+            emit sigEventGameMessage(gameMessage);
         }
         if (event->name() == "game-state") {
             GameState gameState = StringToGameState(event->attribute("state"));
@@ -508,20 +523,37 @@ void Parser::eventPlayerLeavedGame(int playerId)
     eventEnd();
 }
 
+void Parser::eventPlayerUpdate(const PublicPlayerData& publicPlayerData)
+{
+    eventStart();
+    mp_streamWriter->writeStartElement("player-update");
+    publicPlayerData.write(mp_streamWriter);
+    mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
 void Parser::eventStart()  { mp_streamWriter->writeStartElement("event");  }
 void Parser::eventEnd()    { mp_streamWriter->writeEndElement();           }
 void Parser::actionStart() { mp_streamWriter->writeStartElement("action"); }
 void Parser::actionEnd()   { mp_streamWriter->writeEndElement();           }
 
-void Parser::eventMessage(int senderId, const QString& senderName, const QString& message)
+void Parser::eventChatMessage(int senderId, const QString& senderName, const QString& message)
 {
     ASSERT_SOCKET;
     eventStart();
-    mp_streamWriter->writeStartElement("message");
+    mp_streamWriter->writeStartElement("chat-message");
     mp_streamWriter->writeAttribute("senderId", QString::number(senderId));
     mp_streamWriter->writeAttribute("senderName", senderName);
     mp_streamWriter->writeCharacters(message);
     mp_streamWriter->writeEndElement();
+    eventEnd();
+}
+
+void Parser::eventGameMessage(const GameMessage& gameMessage)
+{
+    ASSERT_SOCKET;
+    eventStart();
+    gameMessage.write(mp_streamWriter);
     eventEnd();
 }
 
@@ -643,11 +675,11 @@ void Parser::actionLeaveGame()
     actionEnd();
 }
 
-void Parser::actionMessage(const QString& message)
+void Parser::actionChatMessage(const QString& message)
 {
     ASSERT_SOCKET;
     actionStart();
-    mp_streamWriter->writeStartElement("message");
+    mp_streamWriter->writeStartElement("chat-message");
     mp_streamWriter->writeCharacters(message);
     mp_streamWriter->writeEndElement();
     actionEnd();

@@ -3,6 +3,8 @@
 
 #include "tablecard.h"
 
+class CheckDeckResultHandler;
+
 class CardBarrel : public TableCard
 {
 Q_OBJECT;
@@ -14,7 +16,7 @@ public:
     virtual void registerPlayer(Player* player);
     virtual void unregisterPlayer(Player* player);
 
-    bool check();
+    void check(CheckDeckResultHandler*);
 
     static bool checkBarrel(PlayingCard*);
 };

@@ -2,8 +2,9 @@
 #define CARDJAIL_H
 
 #include "tablecard.h"
+#include "checkdeckresulthandler.h"
 
-class CardJail : public TableCard
+class CardJail : public TableCard, public CheckDeckResultHandler
 {
 public:
     CardJail(Game *game, int id, CardSuit, CardRank);
@@ -11,6 +12,8 @@ public:
 
     virtual void play();
     virtual void play(Player* targetPlayer);
+
+    virtual void checkResult(bool result);
 
     virtual void registerPlayer(Player* player);
     virtual void unregisterPlayer(Player* player);

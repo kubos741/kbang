@@ -9,12 +9,14 @@ class Game;
 class Player;
 class PlayingCard;
 class ReactionHandler;
+class CheckDeckResultHandler;
 
 
 class GameCycle
 {
 public:
     GameCycle(Game* game);
+    ~GameCycle();
 
     inline  GamePlayState   gamePlayState()   const { return m_state; }
     inline  Player*         currentPlayer()   const { return mp_currentPlayer; }
@@ -67,8 +69,9 @@ public:
     void playCard(Player* player, PlayingCard* card, PlayingCard* targetCard);
     void pass(Player* player);
 
+    void checkDeck(Player* player, PlayingCard* causedBy, bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler*);
 
-    void setResponseMode(ReactionHandler* reactionHandler, Player* requestedPlayer);
+    void setResponseMode(ReactionHandler* reactionHandler, Player* requestedPlayer, bool skipQueue = 0);
     void unsetResponseMode();
 
 private:
@@ -83,6 +86,7 @@ private:
     int     m_drawCardCount;
     int     m_drawCardMax;
     int     m_turnNum;
+    bool    m_contextDirty;
 
 private:
     void    sendRequest();

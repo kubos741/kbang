@@ -81,6 +81,8 @@ public slots:
     void pass();
 
 
+    void sendChatMessage(const QString&);
+
 public:
     PlayingCard* card(int cardId) const;
 

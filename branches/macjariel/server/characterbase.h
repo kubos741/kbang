@@ -11,6 +11,7 @@ class PlayingCard;
 class ReactionHandler;
 class GameTable;
 class GameCycle;
+class CheckDeckResultHandler;
 
 class CharacterBase : public QObject
 {
@@ -37,6 +38,7 @@ public:
     virtual void setPlayer(Player* player);
     virtual void playerDied();
 
+    virtual void checkDeck(PlayingCard* causedBy, bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler*);
 
 
 protected:

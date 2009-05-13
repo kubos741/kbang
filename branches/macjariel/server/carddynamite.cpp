@@ -19,8 +19,8 @@ void CardDynamite::play()
     if (gameCycle()->isDraw()) {
         assertOnTable();
         owner()->predrawCheck(PredrawCheck);
-        gameTable()->playerCheckDeck(owner(), this, *CardDynamite::checkDynamite);
-        // TODO
+        gameCycle()->checkDeck(owner(), this, *CardDynamite::checkDynamite, this);
+        return;
     } else {
         gameCycle()->assertTurn();
         assertInHand();

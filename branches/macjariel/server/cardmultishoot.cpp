@@ -4,6 +4,7 @@
 #include "game.h"
 #include "player.h"
 #include "gameexceptions.h"
+#include "cardbarrel.h"
 
 CardMultiShoot::CardMultiShoot(Game* game, int id, CardMultiShoot::Type type, CardSuit cardSuit, CardRank cardRank):
         ReactionCard(game, id, CARD_UNKNOWN, cardSuit, cardRank),
@@ -29,13 +30,15 @@ void CardMultiShoot::play()
     gameCycle()->assertTurn();
     mp_shootingPlayer = owner();
     mp_requestedPlayer = owner();
+    m_usedBarrels.clear();
     gameTable()->playerPlayCard(this);
     requestNext();
 }
 
 void CardMultiShoot::respondPass()
 {
-    game()->gameCycle().unsetResponseMode();
+    gameCycle()->unsetResponseMode();
+    gameTable()->playerPass(mp_requestedPlayer);
     mp_requestedPlayer->modifyLifePoints(-1, mp_shootingPlayer);
     requestNext();
 }
@@ -47,7 +50,7 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
         if (m_type != Indians)
             break;
         targetCard->assertInHand();
-        gameTable()->playerPlayCard(targetCard);
+        gameTable()->playerRespondWithCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
         return;
@@ -56,38 +59,40 @@ void CardMultiShoot::respondCard(PlayingCard* targetCard)
         if (m_type != Gatling)
             break;
         targetCard->assertInHand();
-        gameTable()->playerPlayCard(targetCard);
+        gameTable()->playerRespondWithCard(targetCard);
         game()->gameCycle().unsetResponseMode();
         requestNext();
         return;
-
-/*
-    case CARD_BEER:
-        if (mp_requestedPlayer->lifePoints() == 1) {
-            mp_requestedPlayer->modifyLifePoints(-1, mp_shootingPlayer, 1);
-            gameTable()->playCard(targetCard);
-            mp_requestedPlayer->modifyLifePoints(1, mp_shootingPlayer, 1);
-            game()->gameCycle().unsetResponseMode();
-            requestNext();
-            return;
-        }
-        break;
-*/
-
+    case CARD_BARREL: {
+        if (m_type != Gatling)
+            break;
+        if (m_usedBarrels.contains(targetCard))
+            break;
+        targetCard->assertOnTable();
+        m_usedBarrels.append(targetCard);
+        CardBarrel* barrel = qobject_cast<CardBarrel*>(targetCard);
+        barrel->check(this);
+        return;
+    }
     default:
         break;
     }
     throw BadCardException();
 }
 
+void CardMultiShoot::checkResult(bool result)
+{
+    Q_ASSERT(m_type == Gatling);
+    if (result) {
+        game()->gameCycle().unsetResponseMode();
+        requestNext();
+    }
+}
+
+
 ReactionType CardMultiShoot::reactionType() const
 {
-    switch(m_type) {
-    case Indians:
-        return REACTION_INDIANS;
-    case Gatling:
-        return REACTION_GATLING;
-    }
+    return (m_type == Indians) ? REACTION_INDIANS : REACTION_GATLING;
 }
 
 void CardMultiShoot::requestNext()

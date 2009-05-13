@@ -50,7 +50,9 @@ HEADERS += player.h \
     charactersidketchum.h \
     characterkitcarlson.h \
     playerreaper.h \
-    charactervulturesam.h
+    charactervulturesam.h \
+    checkdeckresulthandler.h \
+    characterluckyduke.h
 SOURCES += main.cpp \
     player.cpp \
     gameserver.cpp \
@@ -102,7 +104,8 @@ SOURCES += main.cpp \
     charactersidketchum.cpp \
     characterkitcarlson.cpp \
     playerreaper.cpp \
-    charactervulturesam.cpp
+    charactervulturesam.cpp \
+    characterluckyduke.cpp
 TEMPLATE = app
 CONFIG -= release
 CONFIG += debug

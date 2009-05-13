@@ -21,9 +21,11 @@
 #include "cardwidget.h"
 #include "cardlist.h"
 
+#include <QMovie>
 #include <QtDebug>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QRect>
 
 #include "cardpilewidget.h"
 #include "cardwidgetfactory.h"
@@ -33,9 +35,11 @@ using namespace client;
 OpponentWidget::OpponentWidget(QWidget *parent):
         PlayerWidget(parent),
         mp_sheriffBadge(0),
+        mp_disconnectIcon(0),
         m_isDead(0),
         m_role(ROLE_UNKNOWN),
         mp_roleCard(0)
+
 {
     setupUi(this);
     setContentsMargins(5, 5, 5, 5);
@@ -47,8 +51,6 @@ OpponentWidget::OpponentWidget(QWidget *parent):
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
 
-    m_baseStyleSheet = frame->styleSheet();
-    setActive(0);
     updateWidgets();
 }
 
@@ -56,10 +58,13 @@ OpponentWidget::~OpponentWidget()
 {
 }
 
+
 void OpponentWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
 {
     PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
     mp_characterWidget->init(mp_cardWidgetFactory);
+    m_isDead = 0;
+    m_hasController = 1;
 }
 
 void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -71,10 +76,16 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     mp_characterWidget->setOwnerId(id());
     setSheriff(publicPlayerData.isSheriff);
 
-    QPixmap avatar;
-    if (!publicPlayerData.avatar.isNull())
-        avatar = QPixmap::fromImage(publicPlayerData.avatar);
-    mp_labelAvatar->setPixmap(avatar);
+
+
+
+    if (!publicPlayerData.avatar.isNull()) {
+        m_avatar = QPixmap::fromImage(publicPlayerData.avatar).scaled(mp_labelAvatar->size(),
+                                                                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    setAvatarPixmap();
+
+    m_hasController = publicPlayerData.hasController;
 
     mp_hand->setOwnerId(id());
     mp_table->setOwnerId(id());
@@ -94,14 +105,30 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
         card->validate();
         mp_table->push(card);
     }
-
+    m_isDead = !publicPlayerData.isAlive;
+    m_role = publicPlayerData.role;
     updateWidgets();
 }
 
 void OpponentWidget::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+    painter.setClipRegion(event->rect());
+    painter.fillRect(contentsRect(), QColor(0, 0, 0, 32));
+
+    if (m_isCurrent) {
+        painter.setPen(Qt::blue);
+        painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
+    }
+
+    if (m_isRequested) {
+        QPen pen;
+        pen.setColor(Qt::red);
+        pen.setWidth(2);
+        pen.setStyle(Qt::DashLine);
+        painter.setPen(pen);
+        painter.drawRect(rect().adjusted(1, 1, -2, -2));
+    }
 }
 
 
@@ -120,10 +147,9 @@ void OpponentWidget::clear()
 }
 
 
-void OpponentWidget::setActive(uint8_t progress)
-{
+    /*
     if (progress == 0) {
-        frame->setStyleSheet(m_baseStyleSheet);
+        //frame->setStyleSheet(m_baseStyleSheet);
     } else {
         frame->setStyleSheet(
                 m_baseStyleSheet + " QFrame#frame {"
@@ -132,13 +158,18 @@ void OpponentWidget::setActive(uint8_t progress)
                 "border-top-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.9, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64));"
                 "border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:0, y2:0.1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(255, 255, 255, 64))""}");
     }
+    */
+
+void OpponentWidget::setAvatarPixmap()
+{
+    QPixmap avatar = m_avatar;
+    if (!m_hasController && !avatar.isNull()) {
+        QPainter painter(&avatar);
+        painter.fillRect(avatar.rect(), QColor(0, 0, 0, 128));
+    }
+    mp_labelAvatar->setPixmap(avatar);
 }
 
-QSize OpponentWidget::sizeHint() const
-{
-    return QWidget::sizeHint();
-    //    return QSize(220, 220);
-}
 
 void OpponentWidget::updateWidgets()
 {
@@ -155,13 +186,13 @@ void OpponentWidget::updateWidgets()
     } else {
         mp_labelPlayerName->setText(name());
         if (isSheriff()) {
-            //if (m_sheriffBadgePixmap.isNull())
             m_sheriffBadgePixmap.load(":/misc/gfx/misc/sheriff-badge.png");
             Q_ASSERT(!m_sheriffBadgePixmap.isNull());
             if (mp_sheriffBadge == 0) {
                 mp_sheriffBadge = new QLabel(this);
                 mp_sheriffBadge->setPixmap(m_sheriffBadgePixmap.scaled(48, 48, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
                 mp_sheriffBadge->resize(48, 48);
+                mp_sheriffBadge->setToolTip(tr("This player is sheriff."));
             }
             mp_sheriffBadge->move(width() - mp_sheriffBadge->width(), 0);
             mp_sheriffBadge->show();
@@ -181,6 +212,25 @@ void OpponentWidget::updateWidgets()
             mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
                               (int)(height() / 2 - mp_roleCard->height() / 2));
             mp_roleCard->show();
+        }
+        if (m_hasController) {
+            if (mp_disconnectIcon)
+                mp_disconnectIcon->hide();
+            setAvatarPixmap();
+        } else {
+            if (!mp_disconnectIcon) {
+                mp_disconnectIcon = new QLabel(this);
+                QPixmap pixmap(":/icons/gfx/icons/disconnect.png");
+                mp_disconnectIcon->setPixmap(pixmap);
+                mp_disconnectIcon->resize(pixmap.size());
+                QPoint pos = mp_labelAvatar->pos();
+                QSize s = (mp_labelAvatar->size() - mp_disconnectIcon->size()) / 2;
+                pos += QPoint(s.width(), s.height());
+                mp_disconnectIcon->move(pos);mp_labelAvatar->pos();
+            }
+            mp_disconnectIcon->raise();
+            mp_disconnectIcon->show();
+            setAvatarPixmap();
         }
     }
 }

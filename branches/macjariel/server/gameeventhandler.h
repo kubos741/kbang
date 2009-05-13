@@ -28,6 +28,7 @@
 
 class PlayingCard;
 class PublicPlayerView;
+class PublicGameView;
 class PlayerCtrl;
 
 /**
@@ -40,9 +41,6 @@ class PlayerCtrl;
 class GameEventHandler
 {
 public:
-    //GameEventHandler();
-
-
     virtual bool isAI() = 0;
 
     /**
@@ -51,7 +49,7 @@ public:
      * is used to control player and can do some caching of persistent
      * members (for example PublicGameView, PrivatePlayerView objects).
      */
-    virtual void onHandlerRegistered(PlayerCtrl* playerCtrl) = 0;
+    virtual void onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtrl* playerCtrl) = 0;
     virtual void onHandlerUnregistered() = 0;
 
 
@@ -71,6 +69,8 @@ public:
 
     virtual void onPlayerLeavedGame(PublicPlayerView&) = 0;
 
+    virtual void onPlayerUpdated(PublicPlayerView&) = 0;
+
     virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy) = 0;
 
     virtual void onGameStarted() = 0;
@@ -89,11 +89,13 @@ public:
 
     virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target) = 0;
 
-    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* target) = 0;
+    virtual void onPlayerPlayCard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* target, PublicPlayerView* targetPlayer) = 0;
 
     virtual void onPlayerPlayCardOnTable(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& target) = 0;
 
     virtual void onPassTableCard(PublicPlayerView&, const PlayingCard* card, PublicPlayerView& targetPlayer) = 0;
+
+    virtual void onPlayerRespondWithCard(PublicPlayerView&, const PlayingCard* card) = 0;
 
     virtual void onPlayerPass(PublicPlayerView&) = 0;
 
@@ -107,13 +109,15 @@ public:
 
     virtual void onPlayerStealCard(PublicPlayerView&, PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card) = 0;
 
-    virtual void onPlayerCancelCard(PublicPlayerView& targetPlayer, PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* p) = 0;
+    virtual void onCancelCard(PocketType pocketFrom, const PlayingCard* card, PublicPlayerView* targetPlayer, PublicPlayerView* causedBy) = 0;
 
     virtual void onGameContextChange(const GameContextData&) = 0;
 
     virtual void onLifePointsChange(PublicPlayerView&, int lifePoints, PublicPlayerView* causedBy) = 0;
 
     virtual void onDeckRegenerate() = 0;
+
+    virtual void onPlayerUseAbility(PublicPlayerView&) = 0;
 
     virtual void onActionRequest(ActionRequestType requestType) = 0;
 

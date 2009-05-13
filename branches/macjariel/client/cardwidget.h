@@ -83,6 +83,7 @@ public:
     inline static QSize normalSize() { return sm_qsizeNormal; }
     inline static QSize bigSize()    { return sm_qsizeBig;    }
     static QSize qSize(Size size);
+    static int lifeLevel(int lifePoints);
 
 protected:
     virtual void mousePressEvent(QMouseEvent *ev);
@@ -106,6 +107,7 @@ private:
     GameObjectClickHandler* mp_gameObjectClickHandler;
 
     const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
+    static int sm_lifeLevels[];
 };
 }
 

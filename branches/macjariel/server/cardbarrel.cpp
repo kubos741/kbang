@@ -32,9 +32,9 @@ void CardBarrel::unregisterPlayer(Player*)
 }
 
 
-bool CardBarrel::check()
+void CardBarrel::check(CheckDeckResultHandler* resultHandler)
 {
-    return gameTable()->playerCheckDeck(owner(), this, *CardBarrel::checkBarrel);
+    gameCycle()->checkDeck(owner(), this, *CardBarrel::checkBarrel, resultHandler);
 }
 
 bool CardBarrel::checkBarrel(PlayingCard* card)

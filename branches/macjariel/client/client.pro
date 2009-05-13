@@ -39,7 +39,8 @@ HEADERS += gameloop.h \
     graveyardwidget.h \
     cardzoomwidget.h \
     newserverdialog.h \
-    selectplayericonwidget.h
+    selectplayericonwidget.h \
+    gamemessageevent.h
 FORMS += connecttoserverdialog.ui \
     mainwindow.ui \
     joingamedialog.ui \
@@ -85,7 +86,8 @@ SOURCES += gameloop.cpp \
     graveyardwidget.cpp \
     cardzoomwidget.cpp \
     newserverdialog.cpp \
-    selectplayericonwidget.cpp
+    selectplayericonwidget.cpp \
+    gamemessageevent.cpp
 QT += network \
     xml
 RESOURCES += client.qrc

@@ -8,6 +8,7 @@ class TableCard;
 class Player;
 class Game;
 class CardFactory;
+class CheckDeckResultHandler;
 
 
 class GameTable
@@ -58,6 +59,10 @@ public:
      */
     void passTableCard(TableCard*, Player* targetPlayer);
 
+    void playerPass(Player* player);
+
+    void playerRespondWithCard(PlayingCard* card);
+
     /**
      * The specified amount of cards is drawn to the card selection. If selectionOwner
      * is NULL, the cards are revealed to everyone. Otherwise only for that player.
@@ -74,7 +79,9 @@ public:
     /**
      * The player checks the deck and returns the result.
      */
-    bool playerCheckDeck(Player*, PlayingCard* reasonCard, bool (*checkFunc)(PlayingCard*));
+    //void playerCheckDeck(Player*, PlayingCard*, bool (*)(PlayingCard*), CheckDeckResultHandler*);
+
+    PlayingCard* checkDeck();
 
     /**
      * The player steals a card from other player.
@@ -86,6 +93,8 @@ public:
      * he is the one that initiated the cancelation.
      */
     void cancelCard(PlayingCard*, Player* player = 0);
+
+    void cancelSelection();
 
     bool isEmptyGraveyard() const;
 

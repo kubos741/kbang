@@ -65,8 +65,8 @@ void CardBang::play(Player *targetPlayer)
 void CardBang::respondPass()
 {
     Q_ASSERT(mp_attackedPlayer != 0);
-    /// @todo announce pass
-    game()->gameCycle().unsetResponseMode();
+    gameCycle()->unsetResponseMode();
+    gameTable()->playerPass(mp_attackedPlayer);
     mp_attackedPlayer->modifyLifePoints(-1, mp_attackingPlayer);
 
 }
@@ -77,7 +77,7 @@ void CardBang::respondCard(PlayingCard* targetCard)
     case CARD_MISSED:
         targetCard->assertInHand();
         game()->gameCycle().unsetResponseMode();
-        gameTable()->playerPlayCard(targetCard);
+        gameTable()->playerRespondWithCard(targetCard);
         missed();
         return;
     case CARD_BARREL: {
@@ -86,17 +86,21 @@ void CardBang::respondCard(PlayingCard* targetCard)
         targetCard->assertOnTable();
         m_usedBarrels.append(targetCard);
         CardBarrel* barrel = qobject_cast<CardBarrel*>(targetCard);
-        if (barrel->check()) {
-            game()->gameCycle().unsetResponseMode();
-            missed();
-        }
+        barrel->check(this);
         return;
         }
     default:
         break;
     }
-    qDebug("CardBang::respondCard - exception");
     throw BadCardException();
+}
+
+void CardBang::checkResult(bool result)
+{
+    if (result) {
+        game()->gameCycle().unsetResponseMode();
+        missed();
+    }
 }
 
 void CardBang::missed()

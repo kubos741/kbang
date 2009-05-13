@@ -20,7 +20,7 @@
 #include "cardlist.h"
 #include "cardwidget.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <QSize>
 #include <QPainter>
@@ -89,7 +89,7 @@ CardWidget* CardList::take(int cardId)
         }
         qCritical("Cannot find card id %d in CardList. Taking random card.", cardId);
     }
-    int cardIndex = (int)random() % (int)m_cards.size();
+    int cardIndex = (int)rand() % (int)m_cards.size();
     CardWidget* res = m_cards.takeAt(cardIndex);
     reorder();
     return res;
@@ -105,7 +105,7 @@ CardWidget* CardList::pop()
 void CardList::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 16));
+    painter.fillRect(event->rect(), QColor(0, 0, 0, 16));
 }
 
 void CardList::clear()

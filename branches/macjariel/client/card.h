@@ -77,6 +77,7 @@ public:
     inline QString name()  const { return m_name;  } ///< Returns card name.
     inline Type    type()  const { return m_type;  } ///< Returns card type. @see Card::Type
     inline QPixmap image() const { return m_image; } ///< Returns image pixmap.
+    QPixmap image(const CardSuit&, const CardRank&) const;
 
 public: /* static */
     static void loadDefaultRuleset();  ///< Loads default ruleset. To be replaced with ruleset manager.
@@ -84,6 +85,11 @@ public: /* static */
     static const Card* findPlayingCard(PlayingCardType);
     static const Card* findRoleCard(PlayerRole);
     static const Card* findCharacterCard(CharacterType);
+
+    static QString rankToString(CardRank);
+    static QChar   suitToChar(CardSuit);
+    static QColor  suitToColor(CardSuit);
+    static QString suitToColorString(CardSuit);
 
 private:
     void loadPixmap();

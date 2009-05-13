@@ -72,7 +72,6 @@ private:
 
     static QTimer sm_timer;
     static int    sm_countAnimaton;
-    static int    sm_lifeLevels[];
     //QSize         m_sizeHint;
 
     CardWidgetFactory*  mp_cardWidgetFactory;

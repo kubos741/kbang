@@ -54,10 +54,7 @@ PrivatePlayerData PrivatePlayerView::privatePlayerData() const
     res.id          = id();
     res.role        = role();
     foreach (PlayingCard* card, hand()) {
-        CardData cardData;
-        cardData.id = card->id();
-        cardData.type = card->type();
-        res.hand.append(cardData);
+        res.hand.append(card->cardData());
     }
     return res;
 }

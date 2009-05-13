@@ -2,6 +2,7 @@
 #include "cards.h"
 
 #include <QSet>
+#include <cstdlib>
 
 struct CardFactory::CardFactoryImp
 {
@@ -108,7 +109,6 @@ struct CardFactory::CardFactoryImp
         foreach(PlayingCard* card, list) {
             res[card->id()] = card;
         }
-        qDebug("Number of playing cards: %d", list.size());
     }
 
 
@@ -116,7 +116,7 @@ struct CardFactory::CardFactoryImp
     {
         int cardId;
         do {
-            cardId = (int)random();
+            cardId = (int)rand();
         } while(m_ids.contains(cardId));
         m_ids.insert(cardId);
         return cardId;

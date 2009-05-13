@@ -115,7 +115,7 @@ void ServerConnection::startGame()
 
 void ServerConnection::sendChatMessage(const QString& message)
 {
-    mp_parser->actionMessage(message);
+    mp_parser->actionChatMessage(message);
 }
 
 void ServerConnection::drawCard(int numCards, bool revealCard)
@@ -233,7 +233,7 @@ void ServerConnection::initializeParserConnections()
             this,      SIGNAL(enterGameMode(int,QString,ClientType)));
     connect(mp_parser, SIGNAL(sigEventExitGameMode()),
             this,      SIGNAL(exitGameMode()));
-    connect(mp_parser, SIGNAL(sigEventMessage(int, const QString&, const QString&)),
+    connect(mp_parser, SIGNAL(sigEventChatMessage(int, const QString&, const QString&)),
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     connect(mp_parser, SIGNAL(sigEventGameCanBeStarted(bool)),
             this, SIGNAL(gameCanBeStarted(bool)));
@@ -241,8 +241,6 @@ void ServerConnection::initializeParserConnections()
             this, SIGNAL(incomingData(const QByteArray&)));
     connect(mp_parser, SIGNAL(outgoingData(const QByteArray&)),
             this, SIGNAL(outgoingData(const QByteArray&)));
-    connect(mp_parser, SIGNAL(sigEventStartGame(const StructGame&, const StructPlayerList&)),
-            this, SIGNAL(gameStarted(const StructGame&, const StructPlayerList&)));
     connect(mp_parser, SIGNAL(sigEventCardMovement(const CardMovementData&)),
             this, SIGNAL(eventCardMovement(const CardMovementData&)));
 }

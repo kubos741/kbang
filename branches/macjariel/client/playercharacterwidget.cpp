@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <QtDebug>
+#include <QPainter>
+
 #include "playercharacterwidget.h"
 #include "cardwidgetfactory.h"
 
@@ -29,8 +31,6 @@ using namespace client;
 
 QTimer PlayerCharacterWidget::sm_timer;
 int    PlayerCharacterWidget::sm_countAnimaton = 0;
-
-int PlayerCharacterWidget::sm_lifeLevels[6] = {0, 21, 34, 49, 64, 77};
 
 double pixelsPerSecond =  25;
 const int timerInterval = 100;
@@ -46,7 +46,7 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
         mp_cardWidgetFactory(0)
 {
         QSize widgetSize(CardWidget::qSize(CardWidget::SIZE_SMALL).width(),
-                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() + sm_lifeLevels[5]));
+                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() + CardWidget::lifeLevel(5)));
         setMinimumSize(widgetSize);
         setMaximumSize(widgetSize);
         resize(widgetSize);
@@ -108,7 +108,7 @@ void PlayerCharacterWidget::unset()
 void PlayerCharacterWidget::lifePointsChanged()
 {
     m_sourceY = mp_characterCard->y();
-    m_targetY = mp_backCard->y() + sm_lifeLevels[m_lifePoints];
+    m_targetY = mp_backCard->y() + CardWidget::lifeLevel(m_lifePoints);
     m_time.start();
     if (m_isAnimating) return;
     m_isAnimating = 1;
@@ -128,7 +128,7 @@ void PlayerCharacterWidget::onTimeout()
     if (progress >= 1) {
         currentY = m_targetY;
     } else {
-        currentY = m_sourceY + (m_targetY - m_sourceY) * progress;
+        currentY = m_sourceY + (int)((m_targetY - m_sourceY) * progress);
     }
     //qDebug() << m_time.elapsed() << ", " << pixelsPerSecond << ", " << progress << ", " << m_sourceY << ", " << m_targetY << ", " << currentY;
     mp_characterCard->move(mp_characterCard->x(), currentY);

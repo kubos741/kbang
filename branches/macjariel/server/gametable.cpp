@@ -1,6 +1,5 @@
 #include "gametable.h"
 #include "common.h"
-#include "cards.h"
 #include "player.h"
 #include "util.h"
 #include "gameeventbroadcaster.h"
@@ -8,6 +7,8 @@
 #include "game.h"
 #include "tablecard.h"
 #include "cardfactory.h"
+#include "checkdeckresulthandler.h"
+
 
 GameTable::GameTable(Game* game):
         mp_game(game)
@@ -140,6 +141,22 @@ void GameTable::passTableCard(TableCard* card, Player* targetPlayer)
     mp_game->gameEventBroadcaster().onPassTableCard(owner, card, targetPlayer);
 }
 
+void GameTable::playerPass(Player* player)
+{
+    mp_game->gameEventBroadcaster().onPlayerPass(player);
+}
+
+void GameTable::playerRespondWithCard(PlayingCard* card)
+{
+    if (card->isVirtual())
+        card = card->master();
+    Q_ASSERT(card->pocket() == POCKET_HAND);
+    Player* owner = card->owner();
+    moveCardToGraveyard(card);
+    mp_game->gameEventBroadcaster().onPlayerRespondWithCard(owner, card);
+    owner->checkEmptyHand();
+}
+
 void GameTable::drawIntoSelection(int count, Player* selectionOwner)
 {
     Q_ASSERT(m_selection.isEmpty());
@@ -179,19 +196,32 @@ void GameTable::undrawFromSelection(PlayingCard* card)
     mp_game->gameEventBroadcaster().onUndrawFromSelection(card, owner);
 }
 
-
-bool GameTable::playerCheckDeck(Player* player, PlayingCard* reasonCard, bool (*checkFunc)(PlayingCard*))
+/*
+void GameTable::playerCheckDeck(Player* player, PlayingCard* causedBy, bool (*checkFunc)(PlayingCard*),
+                                CheckDeckResultHandler* resultHandler)
 {
-    if (reasonCard->isVirtual())
-        reasonCard = 0;
+    if (causedBy->isVirtual())
+        causedBy = 0;
     PlayingCard* checkedCard = popCardFromDeck();
     Q_ASSERT(!checkedCard->isVirtual());
     putCardToGraveyard(checkedCard);
     checkedCard->setOwner(0);
     checkedCard->setPocket(POCKET_GRAVEYARD);
     bool checkResult = (*checkFunc)(checkedCard);
-    mp_game->gameEventBroadcaster().onPlayerCheckDeck(player, checkedCard, reasonCard, checkResult);
-    return checkResult;
+    mp_game->gameEventBroadcaster().onPlayerCheckDeck(player, checkedCard, causedBy, checkResult);
+    resultHandler->checkResult(checkResult);
+}
+*/
+
+PlayingCard* GameTable::checkDeck()
+{
+    PlayingCard* checkedCard = popCardFromDeck();
+    Q_ASSERT(!checkedCard->isVirtual());
+    putCardToGraveyard(checkedCard);
+    checkedCard->setOwner(0);
+    checkedCard->setPocket(POCKET_GRAVEYARD);
+    mp_game->gameEventBroadcaster().onCancelCard(0, POCKET_DECK, checkedCard, 0);
+    return checkedCard;
 }
 
 void GameTable::playerStealCard(Player* player, PlayingCard* card)
@@ -230,7 +260,15 @@ void GameTable::cancelCard(PlayingCard* card, Player* player)
     moveCardToGraveyard(card);
 
     mp_game->gameEventBroadcaster().onCancelCard(owner, pocket, card, player);
-    owner->checkEmptyHand();
+    if (owner != 0 && pocket == POCKET_HAND)
+        owner->checkEmptyHand();
+}
+
+void GameTable::cancelSelection()
+{
+    while(!m_selection.isEmpty()) {
+        cancelCard(m_selection.first());
+    }
 }
 
 bool GameTable::isEmptyGraveyard() const
@@ -298,6 +336,10 @@ void GameTable::moveCardToGraveyard(PlayingCard* card)
     case POCKET_SELECTION:
         m_selection.removeAll(card);
         break;
+    case POCKET_DECK:
+        if (!m_deck.isEmpty() && m_deck.first() == card) {
+            popCardFromDeck();
+        }
     default:
         NOT_REACHED();
     }

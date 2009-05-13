@@ -44,6 +44,7 @@ CardZoomWidget::CardZoomWidget(Game* game, CardWidget* cardWidget):
     raise();
     show();
     grabMouse();
+    mp_game->pauseGameEvents();
     m_time.start();
 }
 
@@ -62,6 +63,7 @@ void CardZoomWidget::mouseMoveEvent(QMouseEvent *ev)
 void CardZoomWidget::terminate()
 {
     releaseMouse();
+    mp_game->resumeGameEvents();
     deleteLater();
 }
 
