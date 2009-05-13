@@ -1,7 +1,5 @@
 #summary Info about testing package
 
-MacJariel at gmail.com
-
 = Win32 =
 [http://disk.jabbim.cz/macjariel@jabber.cz/kbang.zip kbang.zip]
 
@@ -24,4 +22,7 @@ cd client
 }}}
 
 When you find a bug, please fill it into the Issue tracker here on Google Code.
-Thanx, MacJariel
+
+Thanx,
+
+ MacJariel
