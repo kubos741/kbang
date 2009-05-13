@@ -195,7 +195,9 @@ void Game::removePlayer(Player* player)
 {
     Q_ASSERT(player->game() == this);
     int playerId = player->id();
-    Q_ASSERT(m_playerMap.contains(playerId));
+    if (!m_playerMap.contains(playerId))
+        return;
+    Q_ASSERT(m_playerMap.contains(playerId)); // THIS ASSERTED @todo: examine
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
 
@@ -324,6 +326,7 @@ void Game::sendChatMessage(Player* player, const QString& message)
 void Game::checkStartable()
 {
     bool newStartable;
+    qDebug() << "CheckStartable";
     if (m_playerList.count() >= mp_gameInfo->minPlayers() &&
             m_playerList.count() <= mp_gameInfo->maxPlayers())
         newStartable = 1;
