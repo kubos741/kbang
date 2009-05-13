@@ -14,10 +14,10 @@ If you have Jail or Dynamite in front of you, you need to check a card from deck
 == Main Turn Phase ==
 After drawing, you can play cards in your hands. You can play card by clicking the card. If the card needs to specify a target (player or card), you must click on target player/card. The card is played only if right player(card) is selected, so make sure you can really use Panic! and Bang!, before filling a bug.
 
-As soon as you are done with your turn, you can press the [T]urn button to end your turn. If you have more cards in your hands than your life points, you need to discard some cards. Press the [D] button and select the cards to discard. As soon as you discard enough cards, your turn automatically ends.
+As soon as you are done with your turn, you can press the *T*urn button to end your turn. If you have more cards in your hands than your life points, you need to discard some cards. Press the *D* button and select the cards to discard. As soon as you discard enough cards, your turn automatically ends.
 
 == Reactions ==
-When some other player plays some card on you, you can react. You can either react with a card in your hands (by clicking on it) or you can decide not to react (by clicking the [P]ass button). In case of Bang and Gatling you can also click on the Barrel in front of you to use its ability.
+When some other player plays some card on you, you can react. You can either react with a card in your hands (by clicking on it) or you can decide not to react (by clicking the *P*ass button). In case of Bang and Gatling you can also click on the Barrel in front of you to use its ability.
 
 == General Store and selecting cards ==
 If someone plays General Store, some cards from deck are gathered in the middle of the ta ble and players in row choose a card. You can take a card by clicking on it.
@@ -42,4 +42,4 @@ If you click with the right mouse button on a card, it zooms in and stays zoomed
 
 This document is maybe too brief, but I hope it makes everythink clear. If you are still on doubts about something, don't hesitate and leave me a message.
 
-MacJariel (at) gmail.com
+MacJariel at gmail.com
