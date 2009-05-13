@@ -1,0 +1,45 @@
+#summary This is the tutorial how to play KBang.
+
+This tutorial assumes, that you know the rules of the Bang! game. Otherwise I recommend you to read the rules. There are available on http://www.bang.cz/index.php?op=bang&lang=eng.
+
+
+= Basic game actions =
+
+== Drawing ==
+In the beginning of your turn, you can draw your two cards by clicking on the deck. Note, that you need to click on the deck only in the beginning of the turn. In all other cases when you recieve cards (for example as the effect of Wells Fargo), cards are given to you automatically.
+
+== Predrawing ==
+If you have Jail or Dynamite in front of you, you need to check a card from deck. You can do it by clicking on the Jail (or Dynamite). If you have both cards in front of you, you first check the Dynamite, then check the Jail.
+
+== Main Turn Phase ==
+After drawing, you can play cards in your hands. You can play card by clicking the card. If the card needs to specify a target (player or card), you must click on target player/card. The card is played only if right player(card) is selected, so make sure you can really use Panic! and Bang!, before filling a bug.
+
+As soon as you are done with your turn, you can press the [T]urn button to end your turn. If you have more cards in your hands than your life points, you need to discard some cards. Press the [D] button and select the cards to discard. As soon as you discard enough cards, your turn automatically ends.
+
+== Reactions ==
+When some other player plays some card on you, you can react. You can either react with a card in your hands (by clicking on it) or you can decide not to react (by clicking the [P]ass button). In case of Bang and Gatling you can also click on the Barrel in front of you to use its ability.
+
+== General Store and selecting cards ==
+If someone plays General Store, some cards from deck are gathered in the middle of the ta ble and players in row choose a card. You can take a card by clicking on it.
+
+== Special abilities ==
+In the beginning of the game you are given a character card that has a special ability. Some abilities are automatical, others need to be triggered by you. For example, Pedro Ramirez can take the first card from the discard pile. You can use this ability by clicking on your character card.
+
+= Game interface =
+== Connecting to server ==
+You can connect to a server through menu. When you are connected to server, you can either
+create a new game or join to an existing game.
+
+== Passwords ==
+There are two kinds of passwords in KBang.
+Game password prevents unwanted players to join your game.
+Player password allows you to reconnect to the game after you have disconnected (for example by connection fault).
+
+== Zooming card ==
+If you click with the right mouse button on a card, it zooms in and stays zoomed as long as you keep the button pressed.
+
+
+
+This document is maybe too brief, but I hope it makes everythink clear. If you are still on doubts about something, don't hesitate and leave me a message.
+
+MacJariel (at) gmail.com
