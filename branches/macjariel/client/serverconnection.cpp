@@ -53,6 +53,8 @@ void ServerConnection::connectToServer(QString serverHost, int serverPort)
 
 void ServerConnection::disconnectFromServer()
 {
+    if (mp_parser == 0)
+        return;
     if (mp_tcpSocket->state() != QAbstractSocket::UnconnectedState)
     {
         mp_parser->terminate();
@@ -75,6 +77,8 @@ void ServerConnection::connected()
 
 void ServerConnection::disconnected()
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->deleteLater();
     mp_parser = 0;
     emit statusChanged();
@@ -91,40 +95,53 @@ void ServerConnection::recievedServerInfo(const StructServerInfo& serverInfo)
 
 void ServerConnection::createGame(const CreateGameData& game, const CreatePlayerData& player)
 {
+    if (mp_parser == 0)
+        return;
     emit logMessage(tr("Creating game \"%1\".").arg(game.name));
     mp_parser->actionCreateGame(game, player);
 }
 
 void ServerConnection::joinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData& player)
-
 {
+    if (mp_parser == 0)
+        return;
     emit logMessage(tr("Joining game."));
     mp_parser->actionJoinGame(gameId, playerId, gamePassword, player);
 }
 
 void ServerConnection::leaveGame()
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionLeaveGame();
 }
 
 void ServerConnection::startGame()
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionStartGame();
 }
 
 
 void ServerConnection::sendChatMessage(const QString& message)
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionChatMessage(message);
 }
 
 void ServerConnection::drawCard(int numCards, bool revealCard)
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionDrawCard(numCards, revealCard);
 }
 
 void ServerConnection::playCard(int cardId)
 {
+    if (mp_parser == 0)
+        return;
     ActionPlayCardData actionPlayCardData;
     actionPlayCardData.playedCardId = cardId;
     actionPlayCardData.type = ActionPlayCardData::PLAYCARD_SIMPLE;
@@ -133,6 +150,8 @@ void ServerConnection::playCard(int cardId)
 
 void ServerConnection::playCardWithPlayer(int cardId, int playerId)
 {
+    if (mp_parser == 0)
+        return;
     ActionPlayCardData actionPlayCardData;
     actionPlayCardData.playedCardId = cardId;
     actionPlayCardData.type = ActionPlayCardData::PLAYCARD_PLAYER;
@@ -142,6 +161,8 @@ void ServerConnection::playCardWithPlayer(int cardId, int playerId)
 
 void ServerConnection::playCardWithCard(int cardId, int otherCardId)
 {
+    if (mp_parser == 0)
+        return;
     ActionPlayCardData actionPlayCardData;
     actionPlayCardData.playedCardId = cardId;
     actionPlayCardData.type = ActionPlayCardData::PLAYCARD_CARD;
@@ -152,6 +173,8 @@ void ServerConnection::playCardWithCard(int cardId, int otherCardId)
 
 void ServerConnection::useAbility()
 {
+    if (mp_parser == 0)
+        return;
     ActionUseAbilityData actionUseAbilityData;
     actionUseAbilityData.type = ActionUseAbilityData::TypeSimple;
     mp_parser->actionUseAbility(actionUseAbilityData);
@@ -159,6 +182,8 @@ void ServerConnection::useAbility()
 
 void ServerConnection::useAbility(int playerId)
 {
+    if (mp_parser == 0)
+        return;
     ActionUseAbilityData actionUseAbilityData;
     actionUseAbilityData.type = ActionUseAbilityData::TypePlayer;
     actionUseAbilityData.targetPlayerId = playerId;
@@ -167,6 +192,8 @@ void ServerConnection::useAbility(int playerId)
 
 void ServerConnection::useAbility(QList<int> cards)
 {
+    if (mp_parser == 0)
+        return;
     ActionUseAbilityData actionUseAbilityData;
     actionUseAbilityData.type = ActionUseAbilityData::TypeCards;
     actionUseAbilityData.targetCardsId = cards;
@@ -176,16 +203,22 @@ void ServerConnection::useAbility(QList<int> cards)
 
 void ServerConnection::endTurn()
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionEndTurn();
 }
 
 void ServerConnection::pass()
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionPass();
 }
 
 void ServerConnection::discardCard(int cardId)
 {
+    if (mp_parser == 0)
+        return;
     mp_parser->actionDiscard(cardId);
 }
 
