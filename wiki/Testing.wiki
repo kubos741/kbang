@@ -1,0 +1,26 @@
+#summary Info about testing package
+
+MacJariel at gmail.com
+
+= Win32 =
+[http://disk.jabbim.cz/macjariel@jabber.cz/kbang.zip kbang.zip]
+All libraries are included. Just simply unzip the archive somewhere and run client.exe. In case you have problems with running KBang, send me an email.
+
+= Linux =
+You have to compile the project yourself. You need Qt-4.4.2 or newer. Just check-out
+my branch (soon I will move it to the trunk)
+{{{
+svn checkout http://kbang.googlecode.com/svn/branches/macjariel/ kbang
+cd kbang
+qmake
+make
+}}}
+
+Then you can run the client.
+{{{
+cd client
+./client
+}}}
+
+When you find a bug, please fill it into the Issue tracker here on Google Code.
+Thanx, MacJariel
