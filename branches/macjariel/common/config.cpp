@@ -236,6 +236,14 @@ void Config::createDefaultConfig()
         group.records["name"] = ConfigRecord("name", CONFIG_RECORD_SINGLE, "Player");
         group.records["password"] = ConfigRecord("password", CONFIG_RECORD_SINGLE, "");
     }
+    {
+        ConfigGroup& group = m_groups["server-list"];
+        group.name = "server-list";
+        group.records["hostname"] = ConfigRecord("hostname", CONFIG_RECORD_LIST, QString(), QStringList() <<
+                                                 "alderan.cz");
+        group.records["port"] = ConfigRecord("port", CONFIG_RECORD_LIST, QString(), QStringList() <<
+                                                 "6543");
+    }
 }
 
 Config::ConfigRecord* Config::configRecord(QString group, QString varName) {

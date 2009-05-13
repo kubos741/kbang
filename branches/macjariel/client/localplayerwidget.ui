@@ -175,7 +175,7 @@ font: oblique 7pt "DejaVu Sans";</string>
           <string notr="true" >color: white;</string>
          </property>
          <property name="frameShape" >
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <property name="text" >
           <string>{PLAYERNAME}</string>

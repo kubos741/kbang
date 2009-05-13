@@ -69,7 +69,7 @@
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>25</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -142,12 +142,12 @@
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Preferred</enum>
+           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>25</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -198,12 +198,12 @@
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>25</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -249,7 +249,7 @@
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>25</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -300,12 +300,12 @@
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Preferred</enum>
+           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>2</height>
            </size>
           </property>
          </spacer>
@@ -318,13 +318,20 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize" >
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_11" >
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>15</width>
+            <height>2</height>
            </size>
           </property>
-         </widget>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -411,12 +418,12 @@
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType" >
-           <enum>QSizePolicy::Preferred</enum>
+           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>2</height>
            </size>
           </property>
          </spacer>
@@ -436,6 +443,19 @@
            </size>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_12" >
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>15</width>
+            <height>2</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -462,7 +482,7 @@
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>5</height>
            </size>
           </property>
          </spacer>
@@ -594,7 +614,7 @@
           <property name="sizeHint" stdset="0" >
            <size>
             <width>15</width>
-            <height>15</height>
+            <height>5</height>
            </size>
           </property>
          </spacer>
