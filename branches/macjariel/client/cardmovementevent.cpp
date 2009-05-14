@@ -55,6 +55,8 @@ CardMovementEvent::CardMovementEvent(Game* game, const CardMovementData& cardMov
 
 CardMovementEvent::~CardMovementEvent()
 {
+    if (mp_card)
+        mp_card->deleteLater();
 }
 
 bool CardMovementEvent::isReadyRun()
@@ -161,7 +163,8 @@ void CardMovementEvent::startTransition()
     }
     Q_ASSERT(mp_destPocket->isVisible());
     Q_ASSERT(mp_card->isVisible());
-    Q_ASSERT(!sm_timer.isActive());
+    if (sm_timer.isActive())
+        sm_timer.stop();
 
 
     if (mp_card->parent() != mp_game->mainWidget())
@@ -204,11 +207,13 @@ void CardMovementEvent::stopTransition()
     mp_card->validate();
     mp_card->unsetShadowMode();
     mp_destPocket->push(mp_card);
+    
     if (mp_card->cardData().id != 0 && (mp_card->pocketType() == POCKET_HAND &&
                                         mp_card->ownerId() != mp_game->playerId() ||
                                         mp_card->pocketType() == POCKET_DECK)) {
         QTimer::singleShot(500, this, SLOT(unrevealCard()));
     } else {
+        mp_card = 0;
         GameEvent::finish();
     }
 }
@@ -217,5 +222,6 @@ void CardMovementEvent::unrevealCard()
 {
     mp_card->setCardData(CardData());
     mp_card->validate();
+    mp_card = 0;
     GameEvent::finish();
 }

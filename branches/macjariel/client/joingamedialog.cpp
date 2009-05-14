@@ -162,6 +162,17 @@ void JoinGameDialog::updateGameView()
         if (p.id == m_currentPlayerId)
             playerListView->setCurrentItem(item);
         item->setText(0, p.name);
+        if (p.hasController) {
+            item->setIcon(1, QIcon(":/icons/gfx/icons/connect.png"));
+        } else {
+            item->setIcon(1, QIcon(":/icons/gfx/icons/connect.png"));
+        }
+
+        if (p.hasController && !p.isAI) {
+            item->setDisabled(1);
+        } else {
+            item->setDisabled(0);
+        }
     }
     if (gameInfo->state == GAMESTATE_WAITINGFORPLAYERS &&
             gameInfo->totalPlayersCnt < gameInfo->maxPlayers) {

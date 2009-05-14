@@ -232,6 +232,7 @@ void MainWindow::exitGameMode()
     mp_game->clean();
     mp_game->deleteLater();
     mp_game = 0;
+    mp_chatWidget->clear();
     updateActions();
 }
 

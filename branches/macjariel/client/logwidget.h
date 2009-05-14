@@ -33,8 +33,10 @@ class LogWidget : public QWidget, public Ui::LogWidget
 Q_OBJECT
 public:
     LogWidget(QWidget *parent = 0);
-
     ~LogWidget();
+
+protected:
+    virtual void paintEvent(QPaintEvent* event);
 
 public slots:
     void appendLogMessage(QString message);

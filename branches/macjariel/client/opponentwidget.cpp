@@ -65,6 +65,8 @@ void OpponentWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWi
     mp_characterWidget->init(mp_cardWidgetFactory);
     m_isDead = 0;
     m_hasController = 1;
+    m_isCurrent = 0;
+    m_isRequested = 0;
 }
 
 void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -143,6 +145,9 @@ void OpponentWidget::clear()
 {
     setId(0);
     setName("");
+    m_avatar = QPixmap();
+    m_isCurrent = 0;
+    m_isRequested = 0;
     updateWidgets();
 }
 
@@ -183,6 +188,8 @@ void OpponentWidget::updateWidgets()
         mp_hand->clear();
         mp_table->clear();
         mp_labelAvatar->setPixmap(QPixmap());
+        if (mp_disconnectIcon)
+            mp_disconnectIcon->hide();
     } else {
         mp_labelPlayerName->setText(name());
         if (isSheriff()) {
@@ -233,4 +240,5 @@ void OpponentWidget::updateWidgets()
             setAvatarPixmap();
         }
     }
+    update();
 }

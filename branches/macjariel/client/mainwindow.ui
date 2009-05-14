@@ -8,12 +8,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>714</width>
-    <height>802</height>
+    <width>388</width>
+    <height>378</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>MainWindow</string>
+   <string>KBang Client</string>
   </property>
   <property name="autoFillBackground" >
    <bool>false</bool>
@@ -640,7 +640,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>714</width>
+     <width>388</width>
      <height>24</height>
     </rect>
    </property>

@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "logwidget.h"
+#include <QPainter>
+#include <QPaintEvent>
 
 using namespace client;
 
@@ -39,6 +41,13 @@ LogWidget::LogWidget(QWidget *parent)
 LogWidget::~LogWidget()
 {
 }
+
+void LogWidget::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+}
+
 
 void LogWidget::appendLogMessage(QString message)
 {

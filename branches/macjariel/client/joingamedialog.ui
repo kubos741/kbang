@@ -244,9 +244,17 @@
            <string>Players</string>
           </property>
          </column>
+         <column>
+          <property name="text" >
+           <string>x</string>
+          </property>
+         </column>
          <item>
           <property name="text" >
            <string>Create new player</string>
+          </property>
+          <property name="text" >
+           <string/>
           </property>
          </item>
         </widget>

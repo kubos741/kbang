@@ -30,6 +30,28 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
+  <property name="styleSheet" >
+   <string notr="true" >QToolButton {
+	width: 20px;
+	height: 20px
+	border: 1px solid gray;
+	border-radius: 4px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
+}
+QToolButton:pressed {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
+ }
+
+ QToolButton:flat {
+     border: none; /* no border for a flat push button */
+ }
+
+ QToolButton:default {
+     border-color: navy; 
+}</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3" >
    <property name="spacing" >
     <number>4</number>
@@ -125,6 +147,9 @@ font: oblique 7pt "DejaVu Sans";</string>
       <layout class="QHBoxLayout" name="horizontalLayout_2" >
        <item>
         <widget class="QToolButton" name="mp_buttonEndTurn" >
+         <property name="toolTip" >
+          <string>Turn</string>
+         </property>
          <property name="text" >
           <string>T</string>
          </property>
@@ -132,6 +157,9 @@ font: oblique 7pt "DejaVu Sans";</string>
        </item>
        <item>
         <widget class="QToolButton" name="mp_buttonPass" >
+         <property name="toolTip" >
+          <string>Pass</string>
+         </property>
          <property name="text" >
           <string>P</string>
          </property>
@@ -139,6 +167,9 @@ font: oblique 7pt "DejaVu Sans";</string>
        </item>
        <item>
         <widget class="QToolButton" name="mp_buttonDiscard" >
+         <property name="toolTip" >
+          <string>Discard</string>
+         </property>
          <property name="text" >
           <string>D</string>
          </property>
@@ -175,7 +206,7 @@ font: oblique 7pt "DejaVu Sans";</string>
           <string notr="true" >color: white;</string>
          </property>
          <property name="frameShape" >
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="text" >
           <string>{PLAYERNAME}</string>

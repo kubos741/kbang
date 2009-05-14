@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>517</height>
+    <width>401</width>
+    <height>473</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -16,7 +16,15 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>ChatWidget</string>
+  </property>
+  <property name="styleSheet" >
+   <string notr="true" >QTextBrowser, QLineEdit {
+  background-color: rgba(0, 0, 0, 32);
+  border: 1px solid gray;
+}
+
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="spacing" >
@@ -24,6 +32,9 @@
    </property>
    <item>
     <widget class="QTextBrowser" name="mp_chatView" >
+     <property name="frameShape" >
+      <enum>QFrame::StyledPanel</enum>
+     </property>
      <property name="horizontalScrollBarPolicy" >
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
@@ -31,8 +42,14 @@
    </item>
    <item>
     <widget class="QLineEdit" name="mp_messageBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="frame" >
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>

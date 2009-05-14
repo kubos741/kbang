@@ -36,6 +36,7 @@ public:
     ChatWidget(QWidget *parent = 0);
     ~ChatWidget();
     virtual void paintEvent(QPaintEvent* event);
+    void clear();
 
 public slots:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
