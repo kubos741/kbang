@@ -268,7 +268,7 @@ void Game::buryPlayer(Player* player, Player* causedBy)
     } else if (player->role() == ROLE_OUTLAW && causedBy != 0) {
         /// killer draws 3 cards for killing an outlaw
         mp_gameTable->playerDrawFromDeck(causedBy, 3);
-    } else if (player->role() == ROLE_DEPUTY && causedBy->role() == ROLE_SHERIFF) {
+    } else if (player->role() == ROLE_DEPUTY && causedBy != 0 && causedBy->role() == ROLE_SHERIFF) {
         /// sheriff killed his deputy and has to cancel all his cards
         foreach(PlayingCard* card, causedBy->hand())
             gameTable().cancelCard(card);

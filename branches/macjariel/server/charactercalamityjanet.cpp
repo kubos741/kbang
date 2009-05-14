@@ -33,7 +33,7 @@ void CharacterCalamityJanet::playCard(PlayingCard* card, Player* targetPlayer)
 {
     try {
         card->play(targetPlayer);
-    } catch (BadCardException& e) {
+    } catch (BadUsageException& e) {
         PlayingCard* swapped = swapCards(card);
         if (swapped) {
             swapped->play(targetPlayer);
