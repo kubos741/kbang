@@ -1,30 +1,36 @@
 TEMPLATE = lib
-CONFIG += staticlib \
-    debug
+UI_DIR = uics/common
+MOC_DIR = mocs/common
+OBJECTS_DIR = obj/common
+
+#CONFIG += staticlib release
+CONFIG += staticlib debug
+
 QT += xml
 
-# #########
-# PARSER #
-# #########
-HEADERS += parser/ioproxy.h \
-    parser/parser.h \
-    parser/parserstructs.h \
-    parser/queryget.h \
-    parser/queryresult.h \
-    parser/xmlnode.h \
-    config.h
-SOURCES += parser/ioproxy.cpp \
-    parser/parser.cpp \
-    parser/parserstructs.cpp \
-    parser/queryget.cpp \
-    parser/queryresult.cpp \
-    parser/xmlnode.cpp \
-    config.cpp
+INCLUDEPATH +=  src/common
 
-# #######
-# MISC #
-# #######
-HEADERS += util.h
-SOURCES += util.cpp
-CONFIG -= release
+HEADERS += \
+                src/common/parser/ioproxy.h \
+                src/common/parser/parser.h \
+                src/common/parser/parserstructs.h \
+                src/common/parser/queryget.h \
+                src/common/parser/queryresult.h \
+                src/common/parser/xmlnode.h \
+                src/common/config.h \
+                src/common/util.h
+
+
+SOURCES += \
+                src/common/parser/ioproxy.cpp \
+                src/common/parser/parser.cpp \
+                src/common/parser/parserstructs.cpp \
+                src/common/parser/queryget.cpp \
+                src/common/parser/queryresult.cpp \
+                src/common/parser/xmlnode.cpp \
+                src/common/config.cpp \
+                src/common/util.cpp
+
+TARGET = lib/kbang_common
+
 QMAKE_CXXFLAGS_DEBUG += -Wall

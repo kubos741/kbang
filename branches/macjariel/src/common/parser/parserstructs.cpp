@@ -651,6 +651,7 @@ void PlayerInfoData::read(XmlNode* node)
     hasPassword     = node->attribute("hasPassword") == "true";
     hasController   = node->attribute("hasController") == "true";
     isAI            = node->attribute("isAI") == "true";
+    isAlive         = node->attribute("isAlive") == "true";
 }
 
 void PlayerInfoData::write(QXmlStreamWriter* writer) const
@@ -661,6 +662,7 @@ void PlayerInfoData::write(QXmlStreamWriter* writer) const
     writer->writeAttribute("hasPassword",   hasPassword ? "true" : "false");
     writer->writeAttribute("hasController", hasController ? "true" : "false");
     writer->writeAttribute("isAI",          isAI ? "true" : "false");
+    writer->writeAttribute("isAlive",       isAlive ? "true" : "false");
     writer->writeEndElement();
 }
 

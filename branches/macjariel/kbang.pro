@@ -1,10 +1,3 @@
-
 TEMPLATE = subdirs
-
 CONFIG += ordered
-
-SUBDIRS += common \
-           server \
-           servertester \
-    	   tests/testparser \
-	   client
+SUBDIRS += common.pro server.pro client.pro

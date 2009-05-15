@@ -193,7 +193,7 @@ void OpponentWidget::updateWidgets()
     } else {
         mp_labelPlayerName->setText(name());
         if (isSheriff()) {
-            m_sheriffBadgePixmap.load(":/misc/gfx/misc/sheriff-badge.png");
+            m_sheriffBadgePixmap.load(":/misc/sheriff-badge.png");
             Q_ASSERT(!m_sheriffBadgePixmap.isNull());
             if (mp_sheriffBadge == 0) {
                 mp_sheriffBadge = new QLabel(this);
@@ -227,7 +227,7 @@ void OpponentWidget::updateWidgets()
         } else {
             if (!mp_disconnectIcon) {
                 mp_disconnectIcon = new QLabel(this);
-                QPixmap pixmap(":/icons/gfx/icons/disconnect.png");
+                QPixmap pixmap(":/icons/disconnect.png");
                 mp_disconnectIcon->setPixmap(pixmap);
                 mp_disconnectIcon->resize(pixmap.size());
                 QPoint pos = mp_labelAvatar->pos();

@@ -176,26 +176,26 @@ void JoinGameDialog::updateGameView()
             playerListView->setCurrentItem(item);
         item->setText(0, p.name);
         if (p.hasController) {
-            item->setIcon(1, QIcon(":/icons/gfx/icons/connect.png"));
+            item->setIcon(1, QIcon(":/icons/connect.png"));
             item->setData(1, Qt::ToolTipRole, tr("Connected"));
         } else {
-            item->setIcon(1, QIcon(":/icons/gfx/icons/disconnect.png"));
+            item->setIcon(1, QIcon(":/icons/disconnect.png"));
             item->setData(1, Qt::ToolTipRole, tr("Disconnected"));
         }
 
         if (p.isAI) {
-            item->setIcon(2, QIcon(":/icons/gfx/icons/ai.png"));
+            item->setIcon(2, QIcon(":/icons/ai.png"));
             item->setData(2, Qt::ToolTipRole, tr("Artifical Intelligence"));
         } else {
-            item->setIcon(2, QIcon(":/icons/gfx/icons/human.png"));
+            item->setIcon(2, QIcon(":/icons/human.png"));
             item->setData(2, Qt::ToolTipRole, tr("Human Player"));
         }
 
         if (p.isAlive) {
-            item->setIcon(3, QIcon(":/icons/gfx/icons/alive.png"));
+            item->setIcon(3, QIcon(":/icons/alive.png"));
             item->setData(3, Qt::ToolTipRole, tr("Player is Alive"));
         } else {
-            item->setIcon(3, QIcon(":/icons/gfx/icons/dead.png"));
+            item->setIcon(3, QIcon(":/icons/dead.png"));
             item->setData(3, Qt::ToolTipRole, tr("Player is Dead"));
         }
 

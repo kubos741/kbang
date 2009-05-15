@@ -664,7 +664,7 @@
   <action name="mp_actionConnectToServer" >
    <property name="icon" >
     <iconset resource="client.qrc" >
-     <normaloff>:/icons/gfx/icons/connect.png</normaloff>:/icons/gfx/icons/connect.png</iconset>
+     <normaloff>:/icons/connect.png</normaloff>:/icons/connect.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Connect to Server</string>
@@ -678,7 +678,7 @@
   <action name="mp_actionDisconnectFromServer" >
    <property name="icon" >
     <iconset resource="client.qrc" >
-     <normaloff>:/icons/gfx/icons/disconnect.png</normaloff>:/icons/gfx/icons/disconnect.png</iconset>
+     <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Disconnect from Server</string>
