@@ -122,11 +122,18 @@ SOURCES += \
 
 INCLUDEPATH += src/server src/common
 DEPENDPATH += src/server src/common
-LIBPATH += lib
 
+unix {
+    LIBPATH += lib
+    TARGETDEPS += lib/libkbang_common.a
+}
+
+win32 {
+    debug:LIBPATH += debug/lib
+    release:LIBPATH += release/lib
+}
 
 LIBS += -lkbang_common
-TARGETDEPS += lib/libkbang_common.a
 
 TARGET = kbang-server
 QMAKE_CXXFLAGS_DEBUG += -Wall

@@ -11,7 +11,6 @@ QT += network xml
 RESOURCES += src/client/resources/client.qrc
 INCLUDEPATH += src/client src/common
 DEPENDPATH += src/client src/common
-LIBPATH += lib
 
 # Input
 HEADERS += \
@@ -102,10 +101,17 @@ SOURCES += \
     src/client/selectplayericonwidget.cpp \
     src/client/gamemessageevent.cpp
 
+unix {
+    LIBPATH += lib
+    TARGETDEPS += lib/libkbang_common.a
+}
 
+win32 {
+    debug:LIBPATH += debug/lib
+    release:LIBPATH += release/lib
+}
 
 LIBS += -lkbang_common
-TARGETDEPS += lib/libkbang_common.a
 
 TARGET = kbang-client
 QMAKE_CXXFLAGS_DEBUG += -Wall
