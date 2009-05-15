@@ -68,6 +68,8 @@ void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
     mp_characterCard->validate();
     mp_characterCard->move(0,0);
     mp_characterCard->hide();
+
+    m_lifePoints = 0;
 }
 
 void PlayerCharacterWidget::setOwnerId(int ownerId)
@@ -81,15 +83,16 @@ void PlayerCharacterWidget::setCharacter(CharacterType character)
     if (mp_characterCard) {
         mp_characterCard->setCharacterType(m_character);
         mp_characterCard->validate();
-        mp_characterCard->setVisible(m_character != CHARACTER_UNKNOWN);
+        mp_characterCard->setVisible(!isEmpty());
     }
     if (mp_backCard)
-        mp_backCard->setVisible(m_character != CHARACTER_UNKNOWN);
+        mp_backCard->setVisible(!isEmpty());
 }
 
 void PlayerCharacterWidget::setLifePoints(int lifePoints)
 {
     if (lifePoints < 0 || lifePoints > 5) return;
+
     int oldLifePoints = m_lifePoints;
     m_lifePoints = lifePoints;
     if (oldLifePoints != m_lifePoints)
@@ -98,11 +101,9 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
         emit animationFinished();
 }
 
-void PlayerCharacterWidget::unset()
+bool PlayerCharacterWidget::isEmpty() const
 {
-    mp_characterCard->setOwnerId(0);
-    mp_characterCard->hide();
-    mp_backCard->hide();
+    return m_character == CHARACTER_UNKNOWN;
 }
 
 void PlayerCharacterWidget::lifePointsChanged()
@@ -123,18 +124,21 @@ void PlayerCharacterWidget::lifePointsChanged()
 
 void PlayerCharacterWidget::onTimeout()
 {
-    qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / abs(m_sourceY - m_targetY);
-    int currentY;
-    if (progress >= 1) {
-        currentY = m_targetY;
-    } else {
-        currentY = m_sourceY + (int)((m_targetY - m_sourceY) * progress);
+    qreal progress;
+    if (!isEmpty()) {
+        progress = (m_time.elapsed() * pixelsPerSecond / 1000) / abs(m_sourceY - m_targetY);
+        int currentY;
+        if (progress >= 1) {
+            currentY = m_targetY;
+        } else {
+            currentY = m_sourceY + (int)((m_targetY - m_sourceY) * progress);
+        }
+        //qDebug() << m_time.elapsed() << ", " << pixelsPerSecond << ", " << progress << ", " << m_sourceY << ", " << m_targetY << ", " << currentY;
+        mp_characterCard->move(mp_characterCard->x(), currentY);
+        mp_characterCard->show();
     }
-    //qDebug() << m_time.elapsed() << ", " << pixelsPerSecond << ", " << progress << ", " << m_sourceY << ", " << m_targetY << ", " << currentY;
-    mp_characterCard->move(mp_characterCard->x(), currentY);
-    mp_characterCard->show();
 
-    if (progress >= 1)
+    if (progress >= 1 || isEmpty())
     {
         sm_countAnimaton--;
         m_isAnimating = 0;

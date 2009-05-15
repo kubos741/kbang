@@ -28,13 +28,6 @@ LogWidget::LogWidget(QWidget *parent)
 {
     setupUi(this);
     mp_xmlView->setFontPointSize(8);
-
-    QPalette palette = QApplication::palette();
-    palette.setColor(QPalette::Base, QColor(0, 0, 0, 16));
-    mp_xmlView->setPalette(palette);
-    mp_logView->setPalette(palette);
-    setPalette(palette);
-
 }
 
 

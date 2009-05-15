@@ -128,6 +128,8 @@ void LocalPlayerWidget::clear()
 {
     setId(0);
     setName("");
+    m_isRequested = 0;
+    m_isCurrent = 0;
     updateWidgets();
 }
 
@@ -234,6 +236,7 @@ void LocalPlayerWidget::updateWidgets()
         }
         mp_roleCardWidget->validate();
     }
+    update();
 }
 
 

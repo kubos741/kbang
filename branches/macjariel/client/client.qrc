@@ -1,10 +1,15 @@
 <RCC>
-  <qresource prefix="/misc" >
-    <file>gfx/misc/background.png</file>
-    <file>gfx/misc/sheriff-badge.png</file>
-  </qresource>
-  <qresource prefix="/icons" >
-    <file>gfx/icons/connect.png</file>
-    <file>gfx/icons/disconnect.png</file>
-  </qresource>
+    <qresource prefix="/misc" >
+        <file>gfx/misc/background.png</file>
+        <file>gfx/misc/sheriff-badge.png</file>
+    </qresource>
+    <qresource prefix="/icons" >
+        <file>gfx/icons/connect.png</file>
+        <file>gfx/icons/disconnect.png</file>
+        <file>gfx/icons/ai.png</file>
+        <file>gfx/icons/alive.png</file>
+        <file>gfx/icons/dead.png</file>
+        <file>gfx/icons/human.png</file>
+        <file>gfx/icons/sheriff.png</file>
+    </qresource>
 </RCC>

@@ -78,6 +78,8 @@ void MainWindow::connectToServer()
 
 void MainWindow::disconnectFromServer()
 {
+    if (mp_game != 0)
+        exitGameMode();
     m_serverConnection.disconnectFromServer();
 }
 
@@ -224,6 +226,7 @@ void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType c
     mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
     connect(mp_game, SIGNAL(emitLogMessage(const QString&)),
             mp_logWidget, SLOT(appendLogMessage(const QString&)));
+    mp_logWidget->appendLogMessage(tr("You have joined <i>%1</i>.").arg(gameName));
     updateActions();
 }
 

@@ -48,7 +48,7 @@ public:
     void setOwnerId(int ownerId);
     void setCharacter(CharacterType character);
     void setLifePoints(int lifePoints);
-    void unset();
+    bool isEmpty() const;
 
 private:
     void lifePointsChanged();
