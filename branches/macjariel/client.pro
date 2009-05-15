@@ -107,5 +107,5 @@ SOURCES += \
 LIBS += -lkbang_common
 TARGETDEPS += lib/libkbang_common.a
 
-TARGET = bin/client
+TARGET = client
 QMAKE_CXXFLAGS_DEBUG += -Wall
