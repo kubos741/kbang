@@ -128,5 +128,5 @@ LIBPATH += lib
 LIBS += -lkbang_common
 TARGETDEPS += lib/libkbang_common.a
 
-TARGET = server
+TARGET = kbang-server
 QMAKE_CXXFLAGS_DEBUG += -Wall
