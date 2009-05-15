@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS += common.pro server.pro client.pro
+SUBDIRS += kbang_common.pro kbang_server.pro kbang_client.pro
