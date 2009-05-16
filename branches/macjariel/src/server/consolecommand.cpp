@@ -19,12 +19,17 @@
  ***************************************************************************/
 
 #include <QTextStream>
+#include <QStringList>
 #include "consolecommand.h"
 #include "console.h"
 #include "gameserver.h"
 #include "game.h"
+#include "gameinfo.h"
+#include "player.h"
+#include "client.h"
 
 #include "voidai.h"
+
 
 
 #define CMDDEF(name) bool name(const QStringList& args, Console& console)
@@ -57,36 +62,79 @@ CMDDEF(console_quit)
 {
     (void) args;
     (void) console;
+    qDebug() << "QUIT";
     GameServer::instance().exit();
     return 1;
 }
 
-CMDDEF(console_create_test_player)
+CMDDEF(console_list_games)
 {
-    CMD_ASSERT_ARG_CNT(2);
-
-    int gameId;
-    bool ok;
-    gameId = args[0].toInt(&ok);
-    if (!ok) {
-        console.Cout() << QString("Expected int as the first argument.");
-        return 1;
+    Q_UNUSED(args);
+    foreach(Game* game, GameServer::instance().gameList()) {
+        console.Cout() << "--------------------------------------------------------------------------------" << endl;
+        console.Cout() << " " << game->gameInfo().name() << " (id: " << game->id() << ")" << endl;
+        console.Cout() << "--------------------------------------------------------------------------------" << endl;
+        foreach(Player* player, game->playerList()) {
+            console.Cout() << "  " << player->id() << ": " << player->name() << endl;
+        }
+        console.Cout() << endl << endl;
     }
+    return 0;
+}
+
+CMDDEF(console_list_clients)
+{
+    Q_UNUSED(args);
+    foreach(Client* client, GameServer::instance().clientList()) {
+        console.Cout() << "  " << client->id() << ", " << client->address() << ", ";
+        if (client->gameId() == 0) {
+            console.Cout() << "not in game";
+        } else {
+            Game* game = GameServer::instance().game(client->gameId());
+            Q_ASSERT(game);
+            console.Cout() << QString("in %1 (%2)").arg(game->gameInfo().name()).arg(game->id());
+            if (client->playerId()) {
+                Player* player = game->player(client->playerId());
+                console.Cout() << QString("as %1 (%2)").arg(player->name()).arg(player->id());
+            }
+            return 1;
+        }
+        console.Cout() << endl;
+    }
+    return 0;
+}
+
+
+
+CMDDEF(console_set_player_password)
+{
+    CMD_ASSERT_ARG_CNT(3);
+    int gameId = args[0].toInt();
+    int playerId = args[1].toInt();
+
     Game* game = GameServer::instance().game(gameId);
     if (game == 0) {
         console.Cout() << QString("The game id %1 does not exist.").arg(gameId);
         return 1;
     }
-
+    Player* player = game->player(playerId);
+    if (player == 0) {
+        console.Cout() << QString("The player id %1 in game %2 does not exist.").arg(playerId).arg(game->gameInfo().name());
+        return 1;
+    }
+    player->setPassword(args[2]);
     return 0;
 }
-
 
 void console_register_commands()
 {
     CMDREG("help", &console_help);
     CMDREG("quit", &console_quit);
-    CMDREG("create_test_player", &console_create_test_player);
+    CMDREG("list-games", &console_list_games);
+    CMDREG("list-clients", &console_list_clients);
+    CMDREG("set-player-password", &console_set_player_password);
+
+
     CMDALIAS("exit", "quit");
 }
 

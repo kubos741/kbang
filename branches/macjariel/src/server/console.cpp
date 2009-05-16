@@ -23,15 +23,23 @@
 #include <QIODevice>
 
 Console::Console(GameServer* gameServer, FILE* in, FILE* out):
-QThread(gameServer), m_cin(in, QIODevice::ReadOnly), m_cout(out, QIODevice::WriteOnly)
+        QThread(gameServer),
+        m_cin(in, QIODevice::ReadOnly),
+        m_cout(out, QIODevice::WriteOnly),
+        mp_gameServer(gameServer)
 {
-    qDebug("Creating Console.");
 }
 
 
 Console::~Console()
 {
-    qDebug("Destroying Console.");
+    if (!isFinished()) {
+        exit(0);
+        if (!wait(200)) {
+            terminate();
+            wait(500);
+        }
+    }
 }
 
 void Console::run()
@@ -48,7 +56,7 @@ void Console::run()
 void Console::initConsole()
 {
     console_register_commands();
-    m_cout << "Welcome to KBang Server version 12345\n" << endl;
+    m_cout << QString("Welcome to KBang Server version %1.").arg(mp_gameServer->version()) << endl;
 }
 
 QString Console::readLine()

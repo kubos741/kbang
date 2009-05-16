@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
     server.listen();
     Console* console = new Console(&server, stdin, stdout);
     console->start();
+//    QObject::connect(&app, SIGNAL(aboutToQuit()),
+//                     console, SLOT(terminate()));
     return app.exec();
 }
 

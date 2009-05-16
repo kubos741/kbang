@@ -30,6 +30,8 @@
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
 
+QString GameServer::sm_version("0.1.0-r2");
+
 GameServer* GameServer::sm_instance = 0;
 
 GameServer::GameServer():
@@ -49,6 +51,7 @@ GameServer::GameServer():
 GameServer::~GameServer()
 {
     delete mp_cardFactory;
+    QCoreApplication::quit();
 }
 
 GameServer& GameServer::instance()
@@ -118,7 +121,7 @@ bool GameServer::listen()
 
 void GameServer::exit()
 {
-
+    deleteLater();
 }
 
 void GameServer::createClient()

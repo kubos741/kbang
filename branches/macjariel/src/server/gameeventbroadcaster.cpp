@@ -57,8 +57,10 @@ void GameEventBroadcaster::onGameSync()
 
 void GameEventBroadcaster::onPlayerJoinedGame(Player* p)
 {
+    // Do not send to the player that just joined
     foreach(Handler* h, m_handlers) {
-        h->handler->onPlayerJoinedGame(p->publicView());
+        if (h->player != p)
+            h->handler->onPlayerJoinedGame(p->publicView());
     }
 }
 

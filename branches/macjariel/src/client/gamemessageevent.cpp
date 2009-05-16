@@ -31,12 +31,12 @@ void GameMessageEvent::run()
         msg = tr("The game has finished.");
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:
-        msg = tr("<i>%1</i> drawed %2 from the deck.").
+        msg = tr("<i>%1</i> drew %2 from the deck.").
                     arg(playerName).
                     arg(cardListToString(m_gameMessage.cards));
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD:
-        msg = tr("<i>%1</i> drawed %2 from the discard pile.").
+        msg = tr("<i>%1</i> drew %2 from the discard pile.").
                     arg(playerName).
                     arg(cardToString(m_gameMessage.card));
         break;
@@ -47,14 +47,14 @@ void GameMessageEvent::run()
         break;
     case GAMEMESSAGE_PLAYERPLAYCARD:
         if (m_gameMessage.targetCard.id) {
-            msg = tr("<i>%1</i> played %2 on %3%4.").
+            msg = tr("<i>%1</i> played %2 on <i>%3</i>%4.").
                         arg(playerName).
                         arg(cardToString(m_gameMessage.card)).
                         arg(cardToString(m_gameMessage.targetCard)).
                         arg(m_gameMessage.targetPlayer ?
                                 tr(" owned by <i>%1</i>").arg(targetPlayerName) : "");
         } else if (m_gameMessage.targetPlayer) {
-            msg = tr("<i>%1</i> played %2 on %3.").
+            msg = tr("<i>%1</i> played %2 on <i>%3</i>.").
                         arg(playerName).
                         arg(cardToString(m_gameMessage.card)).
                         arg(targetPlayerName);
@@ -124,11 +124,11 @@ QString GameMessageEvent::cardToString(const CardData& cardData, bool withRankAn
     if (card == 0)
         return "";
 
-    QString res = card->name();
+    QString res = "<i>" + card->name() + "</i>";
     if (withRankAndSuit)
         res += " (" + Card::rankToString(cardData.rank) +
                Card::suitToColorString(cardData.suit) + ")";
-    return "<i>" + res + "</i>";
+    return res;
 }
 
 QString GameMessageEvent::cardListToString(QList<CardData> cardList)

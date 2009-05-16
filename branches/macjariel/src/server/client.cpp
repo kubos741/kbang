@@ -32,11 +32,10 @@
 Client::Client(QObject* parent, int id, QTcpSocket* socket):
         QObject(parent),
         m_id(id),
-        mp_playerCtrl(0)
+        mp_playerCtrl(0),
+        mp_socket(socket)
 {
     Q_ASSERT(m_id != 0);
-    qDebug("Client #%d connected from %s.", m_id, qPrintable(socket->peerAddress().toString()));
-
     mp_parser = new Parser(this, socket);
     connect(mp_parser,  SIGNAL(terminated()),
             this,       SLOT(onParserTerminated()));
@@ -74,14 +73,32 @@ Client::~Client()
 {
     if (mp_playerCtrl)
         mp_playerCtrl->disconnect();
-
     emit disconnected(m_id);
-    qDebug("%s:%d: Client #%d disconnected.", __FILE__, __LINE__, m_id);
+    mp_socket->deleteLater();
 }
 
 int Client::id() const
 {
     return m_id;
+}
+
+int Client::gameId() const
+{
+    if (!mp_playerCtrl)
+        return 0;
+    return mp_playerCtrl->publicGameView().id();
+}
+
+int Client::playerId() const
+{
+    if (!mp_playerCtrl)
+        return 0;
+    return mp_playerCtrl->privatePlayerView().id();
+}
+
+QString Client::address() const
+{
+    return mp_socket->peerAddress().toString();
 }
 
 void Client::onActionCreateGame(const CreateGameData& createGameData, const CreatePlayerData& createPlayerData)

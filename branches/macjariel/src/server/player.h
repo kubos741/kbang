@@ -177,6 +177,8 @@ public:
     void appendCardToTable(PlayingCard* card);
     void appendCardToSelection(PlayingCard* card);
 
+    void setPassword(const QString&);
+
     /**
      * Removes the given card from player's hand. Returns
      * true if player has this card in his hand.

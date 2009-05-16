@@ -164,9 +164,9 @@ Player* Game::createPlayer(const CreatePlayerData& createPlayerData, GameEventHa
         mp_gameInfo->setCreatorId(m_nextUnusedPlayerId);
     }
 
-    gameEventBroadcaster().onPlayerJoinedGame(newPlayer);
 
     newPlayer->registerGameEventHandler(handler);
+    gameEventBroadcaster().onPlayerJoinedGame(newPlayer);
     checkStartable();
     return newPlayer;
 }

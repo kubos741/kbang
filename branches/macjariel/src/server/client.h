@@ -61,6 +61,19 @@ public:
      */
     int id() const;
 
+    /**
+     * If the client is in a game, returns the id of the game,
+     * otherwise returns 0.
+     */
+    int gameId() const;
+
+    /**
+     * If the client is a player in a game, returns the id of that
+     * player, otherwise returns 0.
+     */
+    int playerId() const;
+
+    QString address() const;
 
 public slots: // These slots are connected to parser
     void onActionCreateGame(const CreateGameData&, const CreatePlayerData&);
@@ -136,6 +149,7 @@ private:
     const int           m_id;
     Parser*             mp_parser;
     PlayerCtrl*         mp_playerCtrl;
+    QTcpSocket*         mp_socket;
 };
 
 #endif

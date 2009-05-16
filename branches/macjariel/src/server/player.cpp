@@ -184,6 +184,11 @@ void Player::appendCardToSelection(PlayingCard* card)
     m_selection.append(card);
 }
 
+void Player::setPassword(const QString& password)
+{
+    m_password = password;
+}
+
 bool Player::removeCardFromHand(PlayingCard* card)
 {
     return m_hand.removeOne(card);
