@@ -46,7 +46,7 @@ public:
      */
     static GameServer&  instance();
 
-    StructServerInfo    structServerInfo() const;
+    ServerInfoData    serverInfo() const;
 
     /**
      * Creates new game and returns a pointer to it.
@@ -117,7 +117,7 @@ private:
     int m_nextClientId;
     int m_nextGameId;
     int m_maxClientCount; // is this necessary?
-    StructServerInfo    m_structServerInfo;
+    ServerInfoData m_serverInfoData;
     TcpServer* mp_tcpServer;
     CardFactory* mp_cardFactory;
 

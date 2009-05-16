@@ -50,8 +50,6 @@ public:
 
     PrivatePlayerData privatePlayerData() const;
 
-    virtual StructPlayer structPlayer() const;
-
     PlayingCard* card(int cardId) const;
 
 

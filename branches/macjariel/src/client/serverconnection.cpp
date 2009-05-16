@@ -70,8 +70,8 @@ void ServerConnection::connected()
     mp_parser->initializeStream();
 
     QueryGet* query = queryGet();
-    connect(query, SIGNAL(result(const StructServerInfo&)),
-            this, SLOT(recievedServerInfo(const StructServerInfo&)));
+    connect(query, SIGNAL(result(const ServerInfoData&)),
+            this, SLOT(recievedServerInfo(const ServerInfoData&)));
     query->getServerInfo();
 }
 
@@ -86,7 +86,7 @@ void ServerConnection::disconnected()
     m_serverHost = "";
 }
 
-void ServerConnection::recievedServerInfo(const StructServerInfo& serverInfo)
+void ServerConnection::recievedServerInfo(const ServerInfoData& serverInfo)
 {
     m_serverName = serverInfo.name;
     m_serverDescription = serverInfo.description;

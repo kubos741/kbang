@@ -92,7 +92,6 @@ GameInfoData PublicGameView::gameInfoData() const
 
 GameContextData PublicGameView::gameContextData() const
 {
-    qDebug() << "gameContextData in PublicGameView: game:" << mp_game;
     return mp_game->gameCycle().gameContextData();
 }
 

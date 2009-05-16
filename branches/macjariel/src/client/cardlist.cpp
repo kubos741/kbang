@@ -20,6 +20,8 @@
 #include "cardlist.h"
 #include "cardwidget.h"
 
+#include "gameenums.h"
+
 #include <cstdlib>
 
 #include <QSize>

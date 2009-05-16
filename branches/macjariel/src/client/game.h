@@ -84,6 +84,10 @@ public:
     inline GamePlayState   gamePlayState() const      { return m_gameContextData.gamePlayState; }
     inline bool            isCreator() const          { return m_isCreator; }
     inline bool            isAbleToRequest() const    { return requestedPlayerId() == m_playerId; }
+    inline bool            isPlaying() const          { return m_gameState == GAMESTATE_PLAYING; }
+    inline bool            isFinished() const         { return m_gameState == GAMESTATE_FINISHED; }
+
+    inline bool            gameInterfaceLoaded() const { return m_interface == GameInterface; }
 
     inline int playerId() const { return m_playerId; }
     CharacterType character() const;

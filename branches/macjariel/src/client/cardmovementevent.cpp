@@ -77,6 +77,9 @@ void CardMovementEvent::run()
 
 void CardMovementEvent::setCardAndPocket()
 {
+    if (!mp_game->gameInterfaceLoaded())
+        return;
+
     PlayerWidget* srcPlayer  = mp_game->playerWidget(m_cardMovementData.playerFrom);
     PlayerWidget* destPlayer = mp_game->playerWidget(m_cardMovementData.playerTo);
 

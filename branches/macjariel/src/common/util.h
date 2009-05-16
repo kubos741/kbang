@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <qglobal.h>
 
+
 #define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 

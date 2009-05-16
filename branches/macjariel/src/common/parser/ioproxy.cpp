@@ -1,8 +1,7 @@
 #include "ioproxy.h"
-#include <qdebug.h>
 
 IOProxy::IOProxy(QObject* parent):
-    QIODevice(parent)
+        QIODevice(parent)
 {
     open(QIODevice::WriteOnly);
 }

@@ -30,6 +30,7 @@
 #include "common.h"
 #include "cardbeer.h"
 #include "util.h"
+#include "config.h"
 #include "gameexceptions.h"
 
 
@@ -67,6 +68,11 @@ Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData)
 
 Game::~Game()
 {
+    // We need to unregister handlers before we delete
+    // gameEventBroadcaster
+    foreach(Player* player, m_playerList)
+        player->unregisterGameEventHandler();
+
     delete mp_gameInfo;
     delete mp_gameTable;
     delete mp_gameCycle;
@@ -222,8 +228,15 @@ void Game::removePlayer(Player* player)
 
     player->unregisterGameEventHandler();
     gameEventBroadcaster().onPlayerUpdated(player);
+
+    /* CLEANING GAME */
+    bool wipeAiOnlyGame = Config::instance().readString("server", "wipe-ai-only-game") == "true";
+
     bool emptyGame = 1;
     foreach(Player* p, m_playerList) {
+        if (wipeAiOnlyGame && p->isAI())
+            continue;
+
         if (p->hasController())
             emptyGame = 0;
     }
@@ -259,10 +272,10 @@ void Game::buryPlayer(Player* player, Player* causedBy)
 
     /// game winning condition check
     if (player->role() == ROLE_SHERIFF) {
-        if (m_outlawsCount > 0 || m_goodGuysCount > 0)
-            winningSituation(ROLE_OUTLAW);
-        else
+        if (m_goodGuysCount == 0 && m_outlawsCount == 0 && m_renegadesCount == 1)
             winningSituation(ROLE_RENEGADE);
+        else
+            winningSituation(ROLE_OUTLAW);
     } else if (m_outlawsCount == 0 && m_renegadesCount == 0) {
         winningSituation(ROLE_SHERIFF);
     } else if (player->role() == ROLE_OUTLAW && causedBy != 0) {
@@ -280,8 +293,27 @@ void Game::buryPlayer(Player* player, Player* causedBy)
 void Game::winningSituation(PlayerRole winners)
 {
     m_state = GAMESTATE_FINISHED;
-
-    /// @todo: announce game over
+    foreach(Player* player, m_playerList) {
+        switch(winners) {
+        case ROLE_SHERIFF:
+            if (player->role() == ROLE_SHERIFF ||
+                player->role() == ROLE_DEPUTY)
+                player->setWinner(1);
+            break;
+        case ROLE_OUTLAW:
+            if (player->role() == ROLE_OUTLAW)
+                player->setWinner(1);
+            break;
+        case ROLE_RENEGADE:
+            if (player->role() == ROLE_RENEGADE &&
+                player->isAlive())
+                player->setWinner(1);
+            break;
+        default:
+            NOT_REACHED();
+        }
+    }
+    mp_gameEventBroadcaster->onGameFinished();
 }
 
 void Game::setPlayerReaper(PlayerReaper* playerReaper)
@@ -326,7 +358,6 @@ void Game::sendChatMessage(Player* player, const QString& message)
 void Game::checkStartable()
 {
     bool newStartable;
-    qDebug() << "CheckStartable";
     if (m_playerList.count() >= mp_gameInfo->minPlayers() &&
             m_playerList.count() <= mp_gameInfo->maxPlayers())
         newStartable = 1;

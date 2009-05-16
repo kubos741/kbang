@@ -36,6 +36,7 @@ public:
     void onPlayerDied(Player*, Player* causedBy);
 
     void onGameStarted();
+    void onGameFinished();
 
 
 

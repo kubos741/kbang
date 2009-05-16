@@ -244,6 +244,11 @@ void Config::createDefaultConfig()
         group.records["port"] = ConfigRecord("port", CONFIG_RECORD_LIST, QString(), QStringList() <<
                                                  "6543");
     }
+    {
+        ConfigGroup& group = m_groups["server"];
+        group.name = "server";
+        group.records["wipe-ai-only-game"] = ConfigRecord("wipe-ai-only-game", CONFIG_RECORD_SINGLE, "true");
+    }
 }
 
 Config::ConfigRecord* Config::configRecord(QString group, QString varName) {

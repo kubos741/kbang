@@ -44,7 +44,7 @@ public:
 
     virtual void debug() {
         qDebug(qPrintable(QString("BadGamePlayStateException: expected %1 but current is %1.").arg(
-                GamePlayStateToString(m_expected)).arg(GamePlayStateToString(m_current))));
+                gamePlayStateToString(m_expected)).arg(gamePlayStateToString(m_current))));
     }
     virtual ~BadGamePlayStateException() {}
 private:

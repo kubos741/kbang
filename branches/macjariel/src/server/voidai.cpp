@@ -163,7 +163,7 @@ void VoidAI::requestWithAction()
             QList<PlayingCard*> cards = mp_playerCtrl->privatePlayerView().hand();
             foreach (PlayingCard* c, cards) {
                 try {
-                    qDebug() << "Trying to play: " << PlayingCardTypeToString(c->type());
+                    qDebug() << "Trying to play: " << playingCardTypeToString(c->type());
                     mp_playerCtrl->playCard(c);
                     return;
                 } catch (BadCardException e) {

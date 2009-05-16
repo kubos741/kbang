@@ -20,17 +20,20 @@
 #ifndef SERVERCONNECTION_H
 #define SERVERCONNECTION_H
 
-#include "parser/parserstructs.h"
+#include "gameenums.h"
+
 #include <QObject>
 #include <QList>
 
-
-/// Forward declarations
 class QTcpSocket;
-
+class QByteArray;
+class CreatePlayerData;
+class CreateGameData;
+class ServerInfoData;;
+class CardMovementData;
 class Parser;
-
 class QueryGet;
+
 namespace client {
 
 /**
@@ -81,7 +84,7 @@ private slots:
     void connected();
     void disconnected();
 
-    void recievedServerInfo(const StructServerInfo&);
+    void recievedServerInfo(const ServerInfoData&);
 
 
 private:
@@ -106,7 +109,7 @@ signals:
 
     void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
 
-    void enterGameMode(int gameId, const QString& gameName, ClientType);
+    void enterGameMode(int gameId, const QString& gameName, const ClientType&);
     void exitGameMode();
     void gameCanBeStarted(bool canBeStarted);
     void eventCardMovement(const CardMovementData&);

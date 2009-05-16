@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <QTcpSocket>
+#include <QHostAddress>
+
 #include "client.h"
 #include "publicgameview.h"
 #include "privateplayerview.h"
@@ -33,17 +35,17 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
         mp_playerCtrl(0)
 {
     Q_ASSERT(m_id != 0);
-    qDebug("%s:%d: Client #%d connected.", __FILE__, __LINE__, m_id);
+    qDebug("Client #%d connected from %s.", m_id, qPrintable(socket->peerAddress().toString()));
 
     mp_parser = new Parser(this, socket);
     connect(mp_parser,  SIGNAL(terminated()),
             this,       SLOT(onParserTerminated()));
     connect(mp_parser,  SIGNAL(sigQueryServerInfo(QueryResult)),
             this,       SLOT(onQueryServerInfo(QueryResult)));
-    connect(mp_parser,  SIGNAL(sigQueryGame(int, QueryResult)),
-            this,       SLOT(onQueryGame(int, QueryResult)));
-    connect(mp_parser,  SIGNAL(sigQueryGameList(QueryResult)),
-            this,       SLOT(onQueryGameList(QueryResult)));
+    connect(mp_parser,  SIGNAL(sigQueryGameInfo(int, const QueryResult&)),
+            this,       SLOT(onQueryGameInfo(int, const QueryResult&)));
+    connect(mp_parser,  SIGNAL(sigQueryGameInfoList(const QueryResult&)),
+            this,       SLOT(onQueryGameInfoList(const QueryResult&)));
     connect(mp_parser,  SIGNAL(sigActionCreateGame(const CreateGameData&, const CreatePlayerData&)),
             this,       SLOT(onActionCreateGame(const CreateGameData&, const CreatePlayerData&)));
     connect(mp_parser,  SIGNAL(sigActionJoinGame(int, int, const QString&, const CreatePlayerData&)),
@@ -275,10 +277,10 @@ void Client::onActionChatMessage(const QString& message)
 
 void Client::onQueryServerInfo(QueryResult result)
 {
-    result.sendData(PlayerCtrl::structServerInfo());
+    result.sendData(PlayerCtrl::serverInfo());
 }
 
-void Client::onQueryGame(int gameId, QueryResult result)
+void Client::onQueryGameInfo(int gameId, QueryResult result)
 {
     try {
         const PublicGameView& publicGameView = PlayerCtrl::publicGameView(gameId);
@@ -288,9 +290,8 @@ void Client::onQueryGame(int gameId, QueryResult result)
     }
 }
 
-void Client::onQueryGameList(QueryResult result)
+void Client::onQueryGameInfoList(QueryResult result)
 {
-    qDebug("Want game list");
     GameInfoListData gamesInfo;
     foreach (const PublicGameView* publicGameView, PlayerCtrl::publicGameList()) {
         gamesInfo.append(publicGameView->gameInfoData());
@@ -425,6 +426,16 @@ void Client::onGameStarted()
     }
     mp_parser->eventStartGame(structGame, structPlayerList);
     */
+}
+
+void Client::onGameFinished()
+{
+    if (mp_parser == 0) return;
+    GameMessage message;
+    message.type = GAMEMESSAGE_GAMEFINISHED;
+    mp_parser->eventGameMessage(message);
+
+    onGameSync();
 }
 
 void Client::onPlayerDrawFromDeck(PublicPlayerView& player, QList<const PlayingCard*> cards, bool revealCards)

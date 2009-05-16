@@ -20,12 +20,13 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include "gameenums.h"
+#include "util.h"
+
 #include <QMap>
 #include <QString>
 #include <QPixmap>
 
-#include "parser/parserstructs.h"
-#include "util.h"
 
 namespace client
 {

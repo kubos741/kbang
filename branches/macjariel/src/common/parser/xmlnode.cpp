@@ -26,7 +26,6 @@
 XmlNode::XmlNode(XmlNode* parent, const QString& elementName, bool isTextElement)
  : QObject(parent), m_elementName(elementName), m_isTextElement(isTextElement)
 {
-//    qDebug() << "Creating node (1): " << m_elementName;
 }
 
 

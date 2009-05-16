@@ -57,6 +57,11 @@ bool PublicPlayerView::isAlive() const
     return mp_player->isAlive();
 }
 
+bool PublicPlayerView::isWinner() const
+{
+    return mp_player->isWinner();
+}
+
 int PublicPlayerView::lifePoints() const
 {
     return mp_player->lifePoints();
@@ -84,7 +89,7 @@ CharacterType PublicPlayerView::character() const
  */
 PlayerRole PublicPlayerView::role() const
 {
-    if (mp_player->role() == ROLE_SHERIFF || !isAlive())
+    if (mp_player->isPublicRole())
         return mp_player->role();
     return ROLE_UNKNOWN;
 }
@@ -92,16 +97,6 @@ PlayerRole PublicPlayerView::role() const
 QList<PlayingCard*> PublicPlayerView::table() const
 {
     return mp_player->table();
-}
-
-StructPlayer PublicPlayerView::structPlayer() const
-{
-    StructPlayer x;
-    x.id = id();
-    x.name = name();
-    x.password = "";
-    x.role = role();
-    return x;
 }
 
 PublicPlayerData PublicPlayerView::publicPlayerData() const
@@ -121,6 +116,7 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     res.hasController = mp_player->gameEventHandler() != 0;
     res.isAI = mp_player->isAI();
     res.isAlive = mp_player->isAlive();
+    res.isWinner = mp_player->isWinner();
     res.role = role();
     return res;
 }

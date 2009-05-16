@@ -26,9 +26,10 @@
 
 
 QueryGet::QueryGet(Parser* parser, QXmlStreamWriter* streamWriter, const QString& id):
-QObject(parser), mp_streamWriter(streamWriter), m_id(id)
+        QObject(parser),
+        mp_streamWriter(streamWriter),
+        m_id(id)
 {
-
 }
 
 QueryGet::~QueryGet()
@@ -38,28 +39,25 @@ QueryGet::~QueryGet()
 void QueryGet::getServerInfo()
 {
     writeStartQuery();
-    mp_streamWriter->writeEmptyElement(StructServerInfo::elementName);
+    mp_streamWriter->writeEmptyElement(ServerInfoData::elementName);
     writeEndQuery();
 }
 
-void QueryGet::getGame(int id)
+void QueryGet::getGameInfo(int id)
 {
     writeStartQuery();
-    mp_streamWriter->writeStartElement("game");
+    mp_streamWriter->writeStartElement(GameInfoData::elementName);
     mp_streamWriter->writeAttribute("id", QString::number(id));
     mp_streamWriter->writeEndElement();
     writeEndQuery();
 }
 
-
-void QueryGet::getGameList()
+void QueryGet::getGameInfoList()
 {
     writeStartQuery();
-    mp_streamWriter->writeEmptyElement("gamelist");
+    mp_streamWriter->writeEmptyElement(GameInfoListData::elementName);
     writeEndQuery();
 }
-
-
 
 void QueryGet::writeStartQuery()
 {
@@ -75,29 +73,23 @@ void QueryGet::writeEndQuery()
 
 void QueryGet::parseResult(XmlNode* node)
 {
-    if (node->name() == StructServerInfo::elementName)
-    {
-        StructServerInfo x;
-        x.read(node);
-        emit result(x);
+    if (node->name() == ServerInfoData::elementName) {
+        ServerInfoData serverInfoData;
+        serverInfoData.read(node);
+        emit result(serverInfoData);
+        return;
     }
-    if (node->name() == "games-info")
-    {
-        GameInfoListData gamesInfo;
-        gamesInfo.read(node);
-        emit result(gamesInfo);
+    if (node->name() == GameInfoListData::elementName) {
+        GameInfoListData gameInfoListData;
+        gameInfoListData.read(node);
+        emit result(gameInfoListData);
+        return;
     }
-    if (node->name() == "game-info")
-    {
-        GameInfoData gameInfo;
-        gameInfo.read(node);
-        emit result(gameInfo);
-    }
-    if (node->name() == StructServerInfo::elementName)
-    {
-        StructServerInfo x;
-        x.read(node);
-        emit result(x);
+    if (node->name() == GameInfoData::elementName) {
+        GameInfoData gameInfoData;
+        gameInfoData.read(node);
+        emit result(gameInfoData);
+        return;
     }
 }
 

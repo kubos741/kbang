@@ -90,6 +90,12 @@ void GameEventBroadcaster::onGameStarted()
     }
 }
 
+void GameEventBroadcaster::onGameFinished()
+{
+    foreach(Handler* h, m_handlers) {
+        h->handler->onGameFinished();
+    }
+}
 
 void GameEventBroadcaster::onPlayerDrawFromDeck(Player* p, QList<const PlayingCard*> cards, bool revealCards)
 {

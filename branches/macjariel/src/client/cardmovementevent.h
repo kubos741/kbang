@@ -20,18 +20,15 @@
 #ifndef CARDMOVEMENTEVENT_H
 #define CARDMOVEMENTEVENT_H
 
+#include "gameevent.h"
+#include "parser/parserstructs.h"
+
 #include <QObject>
 #include <QPoint>
 #include <QList>
-#include <QQueue>
-#include <QRect>
-#include <QPointer>
-#include <QWidget>
 #include <QBasicTimer>
 #include <QTime>
 
-#include "parser/parserstructs.h"
-#include "gameevent.h"
 
 namespace client
 {

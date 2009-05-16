@@ -30,6 +30,7 @@ namespace client {
 class CardWidget;
 class CardList;
 class PlayerCharacterWidget;
+class Game;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -40,7 +41,7 @@ public:
     OpponentWidget(QWidget *parent);
     ~OpponentWidget();
 
-    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
+    virtual void init(Game*, GameObjectClickHandler*, CardWidgetFactory*);
 
     virtual void paintEvent(QPaintEvent* event);
 
@@ -63,12 +64,15 @@ private:
     QPixmap m_sheriffBadgePixmap;
     QLabel* mp_sheriffBadge;
     QLabel* mp_disconnectIcon;
+    QLabel* mp_winnerIcon;
 
     bool        m_isDead;
+    bool        m_isWinner;
     bool        m_hasController;
     PlayerRole  m_role;
     CardWidget* mp_roleCard;
     QPixmap     m_avatar;
+    Game*       mp_game;
 };
 }
 #endif

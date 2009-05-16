@@ -71,6 +71,8 @@ private:
 private:
     QString m_baseStyleSheet;
     PlayerRole m_role;
+    bool m_isWinner;
+    QLabel* mp_winnerIcon;
 };
 }
 #endif

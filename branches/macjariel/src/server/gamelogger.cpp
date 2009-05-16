@@ -40,8 +40,19 @@ void GameLogger::onGameStarted()
         QString msg = QString("onPlayerCreated(id=%1, name=\"%2\", role=\"%3\", character=\"%4\")").
                       arg(p->id()).
                       arg(p->name()).
-                      arg(PlayerRoleToString(p->role())).
-                      arg(CharacterTypeToString(p->character()));
+                      arg(playerRoleToString(p->role())).
+                      arg(characterTypeToString(p->character()));
+        m_logFile << msg.toStdString() << endl;
+    }
+}
+
+void GameLogger::onGameFinished()
+{
+    foreach (const PublicPlayerView* p, mp_publicGameView->publicPlayerList()) {
+        QString msg = QString("onGameFinished(player=%1, role=\"%2\", winner=\"%3\")").
+                      arg(p->id()).
+                      arg(playerRoleToString(p->role())).
+                      arg(p->isWinner());
         m_logFile << msg.toStdString() << endl;
     }
 }
@@ -210,8 +221,8 @@ void GameLogger::onPlayerUseAbility(PublicPlayerView& p)
 QString GameLogger::cardToString(const PlayingCard* card)
 {
     if (card == 0) return "card()";
-    return "card(" + PlayingCardTypeToString(card->type()) + "," +
-            QString::number(card->rank()) + "," + CardSuitToString(card->suit()) + ")";
+    return "card(" + playingCardTypeToString(card->type()) + "," +
+            QString::number(card->rank()) + "," + cardSuitToString(card->suit()) + ")";
 }
 
 QString GameLogger::cardListToString(QList<const PlayingCard*> l)

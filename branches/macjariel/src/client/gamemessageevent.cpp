@@ -23,7 +23,12 @@ void GameMessageEvent::run()
 
     switch(m_gameMessage.type) {
     case GAMEMESSAGE_GAMESTARTED:
+        mp_game->setGameState(GAMESTATE_PLAYING);
         msg = tr("The game has just started.");
+        break;
+    case GAMEMESSAGE_GAMEFINISHED:
+        mp_game->setGameState(GAMESTATE_FINISHED);
+        msg = tr("The game has finished.");
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:
         msg = tr("<i>%1</i> drawed %2 from the deck.").

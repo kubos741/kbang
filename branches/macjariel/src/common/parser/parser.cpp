@@ -32,23 +32,20 @@
 
 #include "ioproxy.h"
 
-#define PROTOCOL_VERSION "1.0"
+#define PROTOCOL_VERSION "0.1"
 #define ASSERT_SOCKET if (!mp_socket) { qDebug("Socket is dead!"); return; }
 
-
-
-Parser::Parser(QObject* parent):
-QObject(parent),
-mp_ioProxy(0),
-mp_socket(0),
-m_streamInitialized(0),
-m_readerState(S_Start),
-m_readerDepth(0),
-mp_parsedStanza(0),
-mp_queryGet(0)
-
-{
-}
+//Parser::Parser(QObject* parent):
+//QObject(parent),
+//mp_ioProxy(0),
+//mp_socket(0),
+//m_streamInitialized(0),
+//m_readerState(S_Start),
+//m_readerDepth(0),
+//mp_parsedStanza(0),
+//mp_queryGet(0)
+//{
+//}
 
 Parser::Parser(QObject* parent, QIODevice* socket):
 QObject(parent),
@@ -241,52 +238,56 @@ void Parser::stateStanza()
 
 }
 
+
 void Parser::processStanza()
 {
-    if (mp_parsedStanza->name() == "query")
-    {
+    if (mp_parsedStanza->name() == "query") {
         const QString& id = mp_parsedStanza->attribute("id");
         if (mp_parsedStanza->attribute("type") == "get")
         {
             XmlNode* query = mp_parsedStanza->getFirstChild();
             if (!query) return;
-            if (query->name() == StructServerInfo::elementName)
-            {
+            if (query->name() == ServerInfoData::elementName) {
                 emit sigQueryServerInfo(QueryResult(mp_streamWriter, id));
                 return;
             }
-            if (query->name() == StructGame::elementName)
-            {
+            if (query->name() == GameInfoData::elementName) {
                 int gameId = query->attribute("id").toInt();
-                emit sigQueryGame(gameId, QueryResult(mp_streamWriter, id));
+                emit sigQueryGameInfo(gameId, QueryResult(mp_streamWriter, id));
                 return;
             }
-            if (query->name() == "gamelist")
-            {
-                emit sigQueryGameList(QueryResult(mp_streamWriter, id));
+            if (query->name() == GameInfoListData::elementName) {
+                emit sigQueryGameInfoList(QueryResult(mp_streamWriter, id));
                 return;
             }
         }
-        if (mp_parsedStanza->attribute("type") == "result")
-        {
-            if (m_getQueries.contains(id))
-            {
+        if (mp_parsedStanza->attribute("type") == "result") {
+            if (m_getQueries.contains(id)) {
                 m_getQueries[id]->parseResult(mp_parsedStanza->getFirstChild());
                 m_getQueries[id]->deleteLater();
                 m_getQueries.remove(id);
+                return;
+            } else {
+                qDebug("Parser: unknown result query recieved.");
+                return;
             }
         }
-
-
+        qWarning("Parser: unknown query recieved.");
+        return;
     }
-    if (mp_parsedStanza->name() == "action")
-    {
+
+    if (mp_parsedStanza->name() == "action") {
         XmlNode* action = mp_parsedStanza->getFirstChild();
         if (!action) return;
-        if (action->name() == "create-game")
-        {
+        if (action->name() == "create-game") {
             XmlNode* game = action->getChildren()[0];
             XmlNode* player = action->getChildren()[1];
+
+            if (!game || game->name() != CreateGameData::elementName)
+                return;
+            if (!player || player->name() != CreatePlayerData::elementName)
+                return;
+
             CreateGameData createGameData;
             createGameData.read(game);
             CreatePlayerData createPlayerData;
@@ -294,30 +295,29 @@ void Parser::processStanza()
             emit sigActionCreateGame(createGameData, createPlayerData);
             return;
         }
-        if (action->name() == "join-game")
-        {
+        if (action->name() == "join-game") {
             int         gameId = action->attribute("gameId").toInt();
             int         playerId = action->attribute("playerId").toInt();
             QString     gamePassword = action->attribute("gamePassword");
             XmlNode* player = action->getFirstChild();
-            if (!player) return;
+
+            if (!player || player->name() != CreatePlayerData::elementName)
+                return;
+
             CreatePlayerData createPlayerData;
             createPlayerData.read(player);
             emit sigActionJoinGame(gameId, playerId, gamePassword, createPlayerData);
             return;
         }
-        if (action->name() == "leave-game")
-        {
+        if (action->name() == "leave-game") {
             emit sigActionLeaveGame();
             return;
         }
-        if (action->name() == "start-game")
-        {
+        if (action->name() == "start-game") {
             emit sigActionStartGame();
             return;
         }
-        if (action->name() == "chat-message")
-        {
+        if (action->name() == "chat-message") {
             XmlNode* messageNode = action->getFirstChild();
             if (!messageNode || !messageNode->isTextElement()) return;
             emit sigActionChatMessage(messageNode->text());
@@ -329,13 +329,13 @@ void Parser::processStanza()
             emit  sigActionDrawCard(numCards, revealCard);
             return;
         }
-        if (action->name() == "play-card") {
+        if (action->name() == ActionPlayCardData::elementName) {
             ActionPlayCardData actionPlayCardData;
             actionPlayCardData.read(action);
             emit sigActionPlayCard(actionPlayCardData);
             return;
         }
-        if (action->name() == "use-ability") {
+        if (action->name() == ActionUseAbilityData::elementName) {
             ActionUseAbilityData actionUseAbilityData;
             actionUseAbilityData.read(action);
             emit sigActionUseAbility(actionUseAbilityData);
@@ -354,6 +354,8 @@ void Parser::processStanza()
             emit sigActionDiscard(cardId);
             return;
         }
+        qDebug("Parser: recieved unknown action: %s.", qPrintable(action->name()));
+        return;
     }
 
     if (mp_parsedStanza->name() == "event")
@@ -363,7 +365,7 @@ void Parser::processStanza()
         if (event->name() == "enter-game-mode") {
             int gameId       = event->attribute("id").toInt();
             QString gameName = event->attribute("name");
-            ClientType type  = StringToClientType(event->attribute("type"));
+            ClientType type  = stringToClientType(event->attribute("type"));
             emit sigEventEnterGameMode(gameId, gameName, type);
             return;
         }
@@ -371,37 +373,33 @@ void Parser::processStanza()
             emit sigEventExitGameMode();
             return;
         }
-        if (event->name() == "join-game")
-        {
+        if (event->name() == "join-game") {
             XmlNode* player = event->getFirstChild();
-            if (!player) return;
+            if (!player || player->name() != PublicPlayerData::elementName) return;
             PublicPlayerData publicPlayerData;
             publicPlayerData.read(player);
             emit sigEventPlayerJoinedGame(publicPlayerData);
             return;
         }
-        if (event->name() == "leave-game")
-        {
+        if (event->name() == "leave-game") {
             int playerId = event->attribute("player-id").toInt();
             emit sigEventPlayerLeavedGame(playerId);
             return;
         }
-        if (event->name() == "player-update")
-        {
+        if (event->name() == "player-update") {
             XmlNode* player = event->getFirstChild();
-            if (!player) return;
+            if (!player || player->name() != PublicPlayerData::elementName) return;
             PublicPlayerData publicPlayerData;
             publicPlayerData.read(player);
             emit sigEventPlayerUpdate(publicPlayerData);
             return;
         }
-        if (event->name() == "game-startable")
-        {
+        if (event->name() == "game-startable") {
             bool canBeStarted = event->attribute("is-startable") == "true";
             emit sigEventGameCanBeStarted(canBeStarted);
             return;
         }
-        if (event->name() == "game-sync") {
+        if (event->name() == GameSyncData::elementName) {
             GameSyncData gameSyncData;
             gameSyncData.read(event);
             emit sigEventGameSync(gameSyncData);
@@ -415,47 +413,44 @@ void Parser::processStanza()
         }
         if (event->name() == "player-died") {
             int playerId = event->attribute("playerId").toInt();
-            PlayerRole role = StringToPlayerRole(event->attribute("role"));
+            PlayerRole role = stringToPlayerRole(event->attribute("role"));
             emit sigEventPlayerDied(playerId, role);
             return;
         }
-
-
-        if (event->name() == "card-movement")
-        {
-            CardMovementData x;
-            x.read(event);
-            emit sigEventCardMovement(x);
+        if (event->name() == CardMovementData::elementName) {
+            CardMovementData cardMovementData;
+            cardMovementData.read(event);
+            emit sigEventCardMovement(cardMovementData);
             return;
         }
-        if (event->name() == "chat-message")
-        {
+        if (event->name() == "chat-message") {
             XmlNode* messageNode = event->getFirstChild();
             if (!messageNode || !messageNode->isTextElement()) return;
             int senderId = event->attribute("senderId").toInt();
             QString senderName = event->attribute("senderName");
             emit sigEventChatMessage(senderId, senderName, messageNode->text());
+            return;
         }
-        if (event->name() == "game-message")
-        {
+        if (event->name() == GameMessage::elementName) {
             GameMessage gameMessage;
             gameMessage.read(event);
             emit sigEventGameMessage(gameMessage);
+            return;
         }
         if (event->name() == "game-state") {
-            GameState gameState = StringToGameState(event->attribute("state"));
+            GameState gameState = stringToGameState(event->attribute("state"));
             emit sigEventGameStateChange(gameState);
             return;
         }
-        if (event->name() == "game-context") {
+        if (event->name() == GameContextData::elementName) {
             GameContextData gameContextData;
             gameContextData.read(event);
             emit sigEventGameContextChange(gameContextData);
+            return;
         }
+        qDebug("Parser: recieved unknown event: %s.", qPrintable(event->name()));
+        return;
     }
-
-
-
 }
 
 void Parser::sendInitialization()
@@ -492,7 +487,7 @@ void Parser::eventEnterGameMode(int gameId, const QString& gameName, ClientType 
     mp_streamWriter->writeStartElement("enter-game-mode");
     mp_streamWriter->writeAttribute("id", QString::number(gameId));
     mp_streamWriter->writeAttribute("name", gameName);
-    mp_streamWriter->writeAttribute("type", ClientTypeToString(type));
+    mp_streamWriter->writeAttribute("type", clientTypeToString(type));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -562,7 +557,7 @@ void Parser::eventGameStateChange(const GameState& state)
     ASSERT_SOCKET;
     eventStart();
     mp_streamWriter->writeStartElement("game-state");
-    mp_streamWriter->writeAttribute("state", GameStateToString(state));
+    mp_streamWriter->writeAttribute("state", gameStateToString(state));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }
@@ -610,7 +605,7 @@ void Parser::eventPlayerDied(int playerId, PlayerRole role)
     eventStart();
     mp_streamWriter->writeStartElement("player-died");
     mp_streamWriter->writeAttribute("playerId", QString::number(playerId));
-    mp_streamWriter->writeAttribute("role", PlayerRoleToString(role));
+    mp_streamWriter->writeAttribute("role", playerRoleToString(role));
     mp_streamWriter->writeEndElement();
     eventEnd();
 }

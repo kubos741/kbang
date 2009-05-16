@@ -121,7 +121,7 @@ public:
     /**
      * Returns the StructServerInfo struct.
      */
-    static StructServerInfo structServerInfo();
+    static ServerInfoData serverInfo();
 
     /**
      * Returns the list of PublicGameViews.

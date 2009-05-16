@@ -4,8 +4,10 @@ MOC_DIR = mocs/server
 OBJECTS_DIR = obj/server
 QT += network xml
 
-CONFIG += release
+CONFIG += debug
 
+INCLUDEPATH += src/server src/common
+DEPENDPATH += src/common
 
 HEADERS += \ 
     src/server/player.h \
@@ -119,9 +121,6 @@ SOURCES += \
     src/server/playerreaper.cpp \
     src/server/charactervulturesam.cpp \
     src/server/characterluckyduke.cpp
-
-INCLUDEPATH += src/server src/common
-DEPENDPATH += src/server src/common
 
 unix {
     LIBPATH += lib

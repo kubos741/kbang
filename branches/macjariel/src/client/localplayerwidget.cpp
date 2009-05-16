@@ -33,7 +33,9 @@ using namespace client;
 LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
         PlayerWidget(parent),
         Ui::LocalPlayerWidget(),
-        m_role(ROLE_UNKNOWN)
+        m_role(ROLE_UNKNOWN),
+        m_isWinner(0),
+        mp_winnerIcon(0)
 {
     setupUi(this);
     setContentsMargins(5, 5, 5, 5);
@@ -70,6 +72,7 @@ void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, Car
     mp_characterWidget->init(mp_cardWidgetFactory);
     mp_cardWidgetFactory->registerCard(mp_roleCardWidget);
     m_role = ROLE_UNKNOWN;
+    m_isWinner = 0;
     mp_buttonEndTurn->setEnabled(0);
     mp_buttonPass->setEnabled(0);
     mp_buttonDiscard->setEnabled(0);
@@ -100,7 +103,7 @@ void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerDa
         card->validate();
         mp_table->push(card);
     }
-
+    m_isWinner = publicPlayerData.isWinner;
     updateWidgets();
 }
 
@@ -130,6 +133,7 @@ void LocalPlayerWidget::clear()
     setName("");
     m_isRequested = 0;
     m_isCurrent = 0;
+    m_isWinner = 0;
     updateWidgets();
 }
 
@@ -227,6 +231,8 @@ void LocalPlayerWidget::updateWidgets()
         mp_hand->clear();
         mp_table->clear();
         mp_labelAvatar->setPixmap(QPixmap());
+        if (mp_winnerIcon)
+                mp_winnerIcon->hide();
     } else {
         mp_labelPlayerName->setText(name());
         if (m_role != ROLE_UNKNOWN) {
@@ -235,6 +241,23 @@ void LocalPlayerWidget::updateWidgets()
             mp_roleCardWidget->setEmpty();
         }
         mp_roleCardWidget->validate();
+        if (m_isWinner) {
+            if (mp_winnerIcon == 0) {
+                QPixmap winnerPixmap(":/misc/winner.png");
+                mp_winnerIcon = new QLabel(this);
+                mp_winnerIcon->setPixmap(winnerPixmap);
+                mp_winnerIcon->resize(winnerPixmap.size());
+                mp_winnerIcon->setToolTip(tr("This player is winner."));
+            }
+            mp_winnerIcon->move(mp_roleCardWidget->x() + 2,
+                                mp_roleCardWidget->y() + mp_roleCardWidget->height() - (int)(mp_winnerIcon->height() / 3));
+            mp_winnerIcon->show();
+            mp_winnerIcon->raise();
+        } else {
+            if (mp_winnerIcon)
+                mp_winnerIcon->hide();
+        }
+
     }
     update();
 }

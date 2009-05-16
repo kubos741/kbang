@@ -44,7 +44,6 @@ void GameEventQueue::runGameEvent()
         m_eventOnHold = 1;
         return;
     }
-    qDebug() << "runGameEvent()";
     GameEvent* gameEvent = m_queue.head();
     Q_ASSERT(!gameEvent->isRunning());
     if (gameEvent->isReadyRun()) {
@@ -58,7 +57,6 @@ void GameEventQueue::runGameEvent()
 
 void GameEventQueue::onGameEventFinished(GameEvent* gameEvent)
 {
-    qDebug() << "onGameEventFinished()";
     Q_ASSERT(gameEvent == m_queue.head());
     m_queue.dequeue()->deleteLater();
     if (!m_queue.isEmpty())

@@ -98,6 +98,7 @@ public:
     inline CharacterBase*       character()        const { return mp_character;        }
     CharacterType               characterType()    const;
     inline bool                 isAlive()          const { return m_isAlive;           }
+    inline bool                 isWinner()         const { return m_isWinner;          }
     inline int                  weaponRange()      const { return m_weaponRange;       }
     inline bool                 hasController()    const { return mp_gameEventHandler != 0; }
     inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
@@ -105,7 +106,7 @@ public:
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
     inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
     bool                        isAI()             const;
-
+    bool                        isPublicRole()     const;
 
     /**
      * Returns the distance-in modificator. The player is seen by all other
@@ -171,6 +172,7 @@ public:
     void setBangPower(int bangPower);
     void setWeaponRange(int weaponRange);
     void setAlive(bool isAlive);
+    void setWinner(bool isWinner);
     void appendCardToHand(PlayingCard* card);
     void appendCardToTable(PlayingCard* card);
     void appendCardToSelection(PlayingCard* card);
@@ -243,6 +245,7 @@ private:
     PlayerRole                m_role;
     CharacterBase*            mp_character;
     bool                      m_isAlive;
+    bool                      m_isWinner;
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
     GameEventHandler*         mp_gameEventHandler;

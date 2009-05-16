@@ -172,9 +172,9 @@ void PlayerCtrl::replacePlayer(int gameId, int playerId, const QString& gamePass
 }
 
 
-StructServerInfo PlayerCtrl::structServerInfo()
+ServerInfoData PlayerCtrl::serverInfo()
 {
-    return GameServer::instance().structServerInfo();
+    return GameServer::instance().serverInfo();
 }
 
 QList<const PublicGameView*> PlayerCtrl::publicGameList()

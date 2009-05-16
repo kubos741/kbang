@@ -56,7 +56,7 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
 {
     mp_localPlayerWidget->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
     foreach(OpponentWidget* w, m_opponentWidgets) {
-        w->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
+        w->init(this, &m_gameObjectClickHandler, &m_cardWidgetFactory);
     }
     mp_gameEventHandler = new GameEventHandler(this);
     mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
@@ -200,7 +200,6 @@ void Game::setGraveyard(const CardData& data)
 
 void Game::validate()
 {
-    qDebug() << "Validate: " << m_gameState;
     switch(m_gameState) {
     case GAMESTATE_INVALID:
     case GAMESTATE_WAITINGFORPLAYERS:
@@ -316,6 +315,9 @@ void Game::unloadGameInterface()
     mp_selection->deleteLater();
     delete mp_middleWidget->layout();
     m_interface = NoInterface;
+    mp_deck = 0;
+    mp_graveyard = 0;
+    mp_selection = 0;
 }
 
 void Game::unloadInterface()

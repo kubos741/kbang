@@ -39,6 +39,7 @@ Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         m_role(ROLE_UNKNOWN),
         mp_character(0),
         m_isAlive(1),
+        m_isWinner(0),
         mp_game(game),
         mp_gameEventHandler(0),
         m_weaponRange(1),
@@ -71,6 +72,11 @@ CharacterType Player::characterType() const
 bool Player::isAI() const
 {
     return mp_gameEventHandler != 0 && mp_gameEventHandler->isAI();
+}
+
+bool Player::isPublicRole() const
+{
+    return role() == ROLE_SHERIFF || !isAlive() || mp_game->isFinished();
 }
 
 bool Player::isCreator() const
@@ -157,6 +163,10 @@ void Player::setAlive(bool isAlive)
     m_isAlive = isAlive;
     if (isAlive == 0)
         mp_character->playerDied();
+}
+
+void Player::setWinner(bool isWinner) {
+    m_isWinner = isWinner;
 }
 
 void Player::appendCardToHand(PlayingCard * card)

@@ -2,6 +2,7 @@
     <qresource prefix="/misc" >
         <file>background.png</file>
         <file>sheriff-badge.png</file>
+        <file>winner.png</file>
     </qresource>
     <qresource prefix="/icons" >
         <file>connect.png</file>

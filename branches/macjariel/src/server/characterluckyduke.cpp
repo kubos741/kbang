@@ -19,6 +19,7 @@ void CharacterLuckyDuke::checkDeck(PlayingCard* causedBy,
                                    CheckDeckResultHandler* resultHandler)
 {
 
+    mp_causedBy = causedBy;
     notifyAbilityUse();
     gameTable().drawIntoSelection(2);
     mp_resultHandler = resultHandler;

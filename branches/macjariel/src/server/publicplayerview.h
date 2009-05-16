@@ -44,6 +44,7 @@ public:
     bool                 isCreator()         const;
     bool                 isSheriff()         const;
     bool                 isAlive()           const;
+    bool                 isWinner()          const;
     int                  lifePoints()        const;
     int                  maxLifePoints()     const;
     int                  handSize()          const;
@@ -51,9 +52,6 @@ public:
     virtual PlayerRole   role()              const;
     QList<PlayingCard*>  table()             const;
     PublicPlayerData     publicPlayerData()  const;
-
-
-    virtual StructPlayer structPlayer() const; /// \deprecated
 
 protected:
     Player* mp_player;

@@ -76,8 +76,8 @@ public slots: // These slots are connected to parser
     void onActionChatMessage(const QString&);
 
     void onQueryServerInfo(QueryResult result);
-    void onQueryGame(int gameId, QueryResult result);
-    void onQueryGameList(QueryResult result);
+    void onQueryGameInfo(int gameId, QueryResult result);
+    void onQueryGameInfoList(QueryResult result);
 
     void onParserTerminated();
 
@@ -93,6 +93,7 @@ public: /* The GameEventHandler interface */
     virtual void onPlayerUpdated(PublicPlayerView&);
     virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy);
     virtual void onGameStarted();
+    virtual void onGameFinished();
 
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*> cards, bool revealCards);
     virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard* card, const PlayingCard* nextCard);

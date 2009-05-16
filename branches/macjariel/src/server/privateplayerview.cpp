@@ -59,15 +59,6 @@ PrivatePlayerData PrivatePlayerView::privatePlayerData() const
     return res;
 }
 
-
-StructPlayer PrivatePlayerView::structPlayer() const
-{
-    StructPlayer x = PublicPlayerView::structPlayer();
-    x.password = password();
-    x.role     = role();
-    return x;
-}
-
 PlayingCard* PrivatePlayerView::card(int cardId) const
 {
     PlayingCard* res = mp_player->game()->gameTable().card(cardId);

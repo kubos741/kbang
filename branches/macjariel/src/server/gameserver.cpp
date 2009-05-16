@@ -39,9 +39,9 @@ GameServer::GameServer():
     m_maxClientCount(1)
 {
     mp_tcpServer = new TcpServer(this);
-    m_structServerInfo.name =
+    m_serverInfoData.name =
             Config::instance().readString("network", "server_name");
-    m_structServerInfo.description =
+    m_serverInfoData.description =
             Config::instance().readString("network", "server_description");
     mp_cardFactory = new CardFactory();
 }
@@ -57,9 +57,9 @@ GameServer& GameServer::instance()
     return *sm_instance;
 }
 
-StructServerInfo GameServer::structServerInfo() const
+ServerInfoData GameServer::serverInfo() const
 {
-    return m_structServerInfo;
+    return m_serverInfoData;
 }
 
 Game* GameServer::createGame(const CreateGameData& createGameData)

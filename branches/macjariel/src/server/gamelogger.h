@@ -25,6 +25,7 @@ public:
     virtual void onPlayerUpdated(PublicPlayerView&) {}
     virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView* causedBy);
     virtual void onGameStarted();
+    virtual void onGameFinished();
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*>, bool);
     virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard*, const PlayingCard*);
     virtual void onPlayerDiscardCard(PublicPlayerView&, const PlayingCard*, PocketType);

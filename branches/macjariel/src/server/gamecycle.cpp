@@ -136,6 +136,9 @@ void GameCycle::discardCard(Player* player, PlayingCard* card)
     if (needDiscard(player) == 0)
         throw BadGameStateException();
 
+    if (card->owner() != mp_requestedPlayer || card->pocket() != POCKET_HAND)
+        throw BadCardException();
+
     mp_game->gameTable().playerDiscardCard(card);
     m_state = GAMEPLAYSTATE_DISCARD;
 

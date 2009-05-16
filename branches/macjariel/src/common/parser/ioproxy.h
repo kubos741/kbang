@@ -20,34 +20,20 @@
 #ifndef IOPROXY_H
 #define IOPROXY_H
 
-
 #include <QIODevice>
 
 class IOProxy: public QIODevice
 {
-    Q_OBJECT
-
+Q_OBJECT
 public:
     IOProxy(QObject* parent);
     virtual ~IOProxy();
 
     virtual qint64 readData(char* data, qint64 maxSize);
     virtual qint64 writeData(const char* data, qint64 maxSize);
-    //    virtual qint64 bytesAvailable() const;
-
-    //    virtual bool isSequential() const { return 1; }
-
-private:
-    //      QByteArray m_buffer;
 
 signals:
     void networkOut(QByteArray data);
-
-
-public slots:
-    //  void networkIn(QByteArray data);
-
 };
-
 
 #endif

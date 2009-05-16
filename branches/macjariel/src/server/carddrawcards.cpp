@@ -18,6 +18,7 @@ CardDrawCards::CardDrawCards(Game* game, int id, CardDrawCards::Type type, CardS
     }
 }
 
+
 CardDrawCards::~CardDrawCards()
 {
 }

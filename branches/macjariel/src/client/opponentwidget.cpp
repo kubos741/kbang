@@ -29,6 +29,7 @@
 
 #include "cardpilewidget.h"
 #include "cardwidgetfactory.h"
+#include "game.h"
 
 using namespace client;
 
@@ -36,9 +37,12 @@ OpponentWidget::OpponentWidget(QWidget *parent):
         PlayerWidget(parent),
         mp_sheriffBadge(0),
         mp_disconnectIcon(0),
+        mp_winnerIcon(0),
         m_isDead(0),
+        m_isWinner(0),
         m_role(ROLE_UNKNOWN),
-        mp_roleCard(0)
+        mp_roleCard(0),
+        mp_game(0)
 
 {
     setupUi(this);
@@ -59,14 +63,17 @@ OpponentWidget::~OpponentWidget()
 }
 
 
-void OpponentWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
+void OpponentWidget::init(Game* game, GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
 {
+    mp_game = game;
     PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
     mp_characterWidget->init(mp_cardWidgetFactory);
     m_isDead = 0;
+    m_isWinner = 0;
     m_hasController = 1;
     m_isCurrent = 0;
     m_isRequested = 0;
+
 }
 
 void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
@@ -108,6 +115,7 @@ void OpponentWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
         mp_table->push(card);
     }
     m_isDead = !publicPlayerData.isAlive;
+    m_isWinner = publicPlayerData.isWinner;
     m_role = publicPlayerData.role;
     updateWidgets();
 }
@@ -148,6 +156,9 @@ void OpponentWidget::clear()
     m_avatar = QPixmap();
     m_isCurrent = 0;
     m_isRequested = 0;
+    m_isDead = 0;
+    m_isWinner = 0;
+    mp_game = 0;
     updateWidgets();
 }
 
@@ -190,6 +201,8 @@ void OpponentWidget::updateWidgets()
         mp_labelAvatar->setPixmap(QPixmap());
         if (mp_disconnectIcon)
             mp_disconnectIcon->hide();
+        if (mp_winnerIcon)
+            mp_winnerIcon->hide();
     } else {
         mp_labelPlayerName->setText(name());
         if (isSheriff()) {
@@ -208,7 +221,7 @@ void OpponentWidget::updateWidgets()
             if (mp_sheriffBadge != 0)
                 mp_sheriffBadge->hide();
         }
-        if (m_isDead) {
+        if (m_isDead || (mp_game && mp_game->isFinished())) {
             if (mp_roleCard == 0) {
                 mp_roleCard = mp_cardWidgetFactory->createRoleCard(this, m_role);
                 mp_roleCard->setSize(CardWidget::SIZE_NORMAL);
@@ -219,7 +232,28 @@ void OpponentWidget::updateWidgets()
             mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
                               (int)(height() / 2 - mp_roleCard->height() / 2));
             mp_roleCard->show();
+            mp_roleCard->raise();
+        } else {
+            if (mp_roleCard)
+                mp_roleCard->hide();
         }
+        if (m_isWinner && mp_roleCard) {
+            if (mp_winnerIcon == 0) {
+                QPixmap winnerPixmap(":/misc/winner.png");
+                mp_winnerIcon = new QLabel(this);
+                mp_winnerIcon->setPixmap(winnerPixmap);
+                mp_winnerIcon->resize(winnerPixmap.size());
+                mp_winnerIcon->setToolTip(tr("This player is winner."));
+            }
+            mp_winnerIcon->move(mp_roleCard->x() + (int)(mp_roleCard->width() / 2) - (int)(mp_winnerIcon->width() / 3),
+                                mp_roleCard->y() + mp_roleCard->height() - (int)(mp_roleCard->height() / 2));
+            mp_winnerIcon->show();
+            mp_winnerIcon->raise();
+        } else {
+            if (mp_winnerIcon)
+                mp_winnerIcon->hide();
+        }
+
         if (m_hasController) {
             if (mp_disconnectIcon)
                 mp_disconnectIcon->hide();

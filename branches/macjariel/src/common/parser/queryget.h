@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
 #ifndef QUERYGET_H
 #define QUERYGET_H
 
@@ -26,38 +25,33 @@
 
 class Parser;
 class QXmlStreamWriter;
-class QXmlStreamReader;
 class XmlNode;
 
 class QueryGet: public QObject
 {
-    Q_OBJECT
-    friend class Parser;
+Q_OBJECT
+friend class Parser;
+public:
+    void getServerInfo();
+    void getGameInfo(int id);
+    void getGameInfoList();
+
+signals:
+    void result(const ServerInfoData&);
+    void result(const GameInfoData&);
+    void result(const GameInfoListData&);
+
 private:
     QueryGet(Parser* parser, QXmlStreamWriter* streamWriter, const QString& id);
     virtual ~QueryGet();
     void writeStartQuery();
     void writeEndQuery();
-
     void parseResult(XmlNode*);
 
-
-
-public:
-    void getServerInfo();
-    void getGame(int id);
-    void getGameList();
-
-
-signals:
-    void result(const StructServerInfo&);
-    void result(const GameInfoData&);
-    void result(const GameInfoListData&);
-
 private:
-    Parser* mp_parser;
-    QXmlStreamWriter* mp_streamWriter;
-    QString m_id;
+    Parser*             mp_parser;
+    QXmlStreamWriter*   mp_streamWriter;
+    QString             m_id;
 };
 
 #endif

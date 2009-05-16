@@ -5,7 +5,6 @@
 #include "gametable.h"
 #include "gamecycle.h"
 
-
 CardJail::CardJail(Game *game, int id, CardSuit suit, CardRank rank):
         TableCard(game, id, CARD_JAIL, suit, rank)
 {

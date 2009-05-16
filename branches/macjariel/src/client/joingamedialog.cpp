@@ -253,7 +253,7 @@ void JoinGameDialog::refreshGameList()
     QueryGet* query = mp_serverConnection->queryGet();
     connect(query,  SIGNAL(result(const GameInfoListData&)),
             this,   SLOT(updateGameList(const GameInfoListData&)));
-    query->getGameList();
+    query->getGameInfoList();
 }
 
 void JoinGameDialog::refreshGame(int gameId)
@@ -261,7 +261,7 @@ void JoinGameDialog::refreshGame(int gameId)
     QueryGet* query = mp_serverConnection->queryGet();
     connect(query, SIGNAL(result(const GameInfoData&)),
             this, SLOT(updateGame(const GameInfoData&)));
-    query->getGame(gameId);
+    query->getGameInfo(gameId);
 }
 
 void JoinGameDialog::selectGame(int gameId)
