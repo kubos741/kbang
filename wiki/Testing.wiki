@@ -1,7 +1,7 @@
 #summary Info about testing package
 
 = Win32 =
-[http://disk.jabbim.cz/macjariel@jabber.cz/kbang-build002.zip kbang-build002.zip]
+[http://disk.jabbim.cz/macjariel@jabber.cz/kbang-build002.zip kbang-build002.zip] - build on 2009-05-16
 
 All libraries are included. Just simply unzip the archive somewhere and run client.exe. In case you have problems with running KBang, send me an email.
 
