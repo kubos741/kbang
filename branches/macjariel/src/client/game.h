@@ -37,6 +37,7 @@ namespace client {
 
 class ServerConnection;
 class GameEventHandler;
+class CardWidgetSizeManager;
 
 class DeckWidget;
 class GraveyardWidget;
@@ -57,7 +58,7 @@ public:
     void setIsCreator(bool isCreator);
     void setGraveyard(const CardData&);
     void validate();
-    void clean();
+    void clear();
 
     void setTextInfo(const QString&);
     void unsetTextInfo();
@@ -96,7 +97,8 @@ public:
 
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
-    inline GameObjectClickHandler* cardWidgetClickHandler() { return &m_gameObjectClickHandler; }
+    inline GameObjectClickHandler* gameObjectClickHandler() { return &m_gameObjectClickHandler; }
+    inline CardWidgetFactory*       cardWidgetFactory()  { return &m_cardWidgetFactory; }
 
     inline ServerConnection* serverConnection() { return mp_serverConnection; }
 

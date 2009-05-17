@@ -22,6 +22,7 @@
 #include "cardlist.h"
 #include "playercharacterwidget.h"
 #include "cardwidgetfactory.h"
+
 #include "gameobjectclickhandler.h"
 
 #include <QtDebug>
@@ -31,14 +32,11 @@
 using namespace client;
 
 LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
-        PlayerWidget(parent),
-        Ui::LocalPlayerWidget(),
-        m_role(ROLE_UNKNOWN),
-        m_isWinner(0),
-        mp_winnerIcon(0)
+        PlayerWidget(parent)
 {
     setupUi(this);
     setContentsMargins(5, 5, 5, 5);
+
     mp_roleCardWidget->setType(Card::Role);
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
@@ -48,7 +46,6 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     mp_table->setOwnerId(id());
 
     updateWidgets();
-
 
     connect(mp_buttonEndTurn, SIGNAL(clicked()),
             this,             SLOT(onEndTurnClicked()));
@@ -66,98 +63,40 @@ LocalPlayerWidget::~LocalPlayerWidget()
 {
 }
 
-void LocalPlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
-{
-    PlayerWidget::init(gameObjectClickHandler, cardWidgetFactory);
-    mp_characterWidget->init(mp_cardWidgetFactory);
-    mp_cardWidgetFactory->registerCard(mp_roleCardWidget);
-    m_role = ROLE_UNKNOWN;
-    m_isWinner = 0;
-    mp_buttonEndTurn->setEnabled(0);
-    mp_buttonPass->setEnabled(0);
-    mp_buttonDiscard->setEnabled(0);
-}
-
-void LocalPlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
-{
-    setId(publicPlayerData.id);
-    setName(publicPlayerData.name);
-    mp_characterWidget->setCharacter(publicPlayerData.character);
-    mp_characterWidget->setLifePoints(publicPlayerData.lifePoints);
-    mp_characterWidget->setOwnerId(id());
-    setSheriff(publicPlayerData.isSheriff);
-
-    QPixmap avatar;
-    if (!publicPlayerData.avatar.isNull())
-        avatar = QPixmap::fromImage(publicPlayerData.avatar).scaled(mp_labelAvatar->size(),
-                                                                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    mp_labelAvatar->setPixmap(avatar);
-
-    mp_hand->setOwnerId(id());
-    mp_table->setOwnerId(id());
-
-    mp_table->clear();
-    foreach (const CardData& cardData, publicPlayerData.table) {
-        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
-        card->setCardData(cardData);
-        card->validate();
-        mp_table->push(card);
-    }
-    m_isWinner = publicPlayerData.isWinner;
-    updateWidgets();
-}
-
 void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
 {
-    Q_ASSERT(id() == privatePlayerData.id);
-    m_role = privatePlayerData.role;
+    Q_ASSERT(m_id == privatePlayerData.id);
+    m_playerRole = privatePlayerData.role;
+    
     mp_hand->clear();
     foreach (const CardData& cardData, privatePlayerData.hand) {
-        CardWidget* card = mp_cardWidgetFactory->createPlayingCard(this);
+        CardWidget* card = cardWidgetFactory()->createPlayingCard(this);
         card->setCardData(cardData);
         card->validate();
         mp_hand->push(card);
     }
+    
     updateWidgets();
 }
 
-void LocalPlayerWidget::dieAndRevealRole(const PlayerRole& role)
+void LocalPlayerWidget::setFromContext(const GameContextData& gameContext)
 {
-    Q_UNUSED(role);
-}
-
-
-void LocalPlayerWidget::clear()
-{
-    setId(0);
-    setName("");
-    m_isRequested = 0;
-    m_isCurrent = 0;
-    m_isWinner = 0;
-    updateWidgets();
-}
-
-void LocalPlayerWidget::setGameButtonState(const GameContextData& gameContext)
-{
-    qDebug() << "setGameButtonState" << gameContext.requestedPlayerId;
     if (gameContext.requestedPlayerId != id()) {
-        qDebug() << "A";
         mp_buttonPass->setEnabled(0);
         mp_buttonEndTurn->setEnabled(0);
         mp_buttonDiscard->setEnabled(0);
         mp_buttonDiscard->setChecked(0);
         return;
     }
+
     switch(gameContext.gamePlayState) {
     case GAMEPLAYSTATE_DRAW:
-        qDebug() << "B";
         mp_buttonPass->setEnabled(0);
         mp_buttonEndTurn->setEnabled(0);
         mp_buttonDiscard->setEnabled(0);
         mp_buttonDiscard->setChecked(0);
         break;
     case GAMEPLAYSTATE_TURN:
-        qDebug() << "C";
         mp_buttonPass->setEnabled(0);
         mp_buttonEndTurn->setEnabled(1);
         mp_buttonDiscard->setEnabled(1);
@@ -179,88 +118,59 @@ void LocalPlayerWidget::setGameButtonState(const GameContextData& gameContext)
         break;
     }
 }
-
-void LocalPlayerWidget::paintEvent(QPaintEvent* event)
+void LocalPlayerWidget::clearWidgets()
 {
-    QPainter painter(this);
-    painter.setClipRect(event->rect());
-    painter.fillRect(contentsRect(), QColor(0, 0, 0, 32));
+    PlayerWidget::clearWidgets();
+    mp_roleCardWidget->setEmpty();
 
-    if (m_isCurrent) {
-        painter.setPen(Qt::blue);
-        painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
-    }
+    mp_buttonEndTurn->setEnabled(0);
+    mp_buttonPass->setEnabled(0);
+    mp_buttonDiscard->setEnabled(0);
+}
 
-    if (m_isRequested) {
-        QPen pen;
-        pen.setColor(Qt::red);
-        pen.setWidth(2);
-        pen.setStyle(Qt::DashLine);
-        painter.setPen(pen);
-        painter.drawRect(rect().adjusted(1, 1, -2, -2));
-    }
+void LocalPlayerWidget::updateWidgets()
+{
+    PlayerWidget::updateWidgets();
+    updateRoleCardWidget();
+    update();
+}
+
+void LocalPlayerWidget::moveWinnerIcon()
+{
+    /** @todo: refactor me please */
+    mp_winnerIcon->move(mp_roleCardWidget->x() + 2, mp_roleCardWidget->y()
+                        + mp_roleCardWidget->height()- (int)(mp_winnerIcon->height() / 3));
+}
+
+void LocalPlayerWidget::onGameEntered()
+{
+    cardWidgetFactory()->registerCard(mp_roleCardWidget);
 }
 
 void LocalPlayerWidget::onEndTurnClicked()
 {
-    if (mp_gameObjectClickHandler != 0)
-        mp_gameObjectClickHandler->onEndTurnClicked();
+    if (gameObjectClickHandler() != 0)
+        gameObjectClickHandler()->onEndTurnClicked();
 }
 
 void LocalPlayerWidget::onPassClicked()
 {
-    if (mp_gameObjectClickHandler != 0)
-        mp_gameObjectClickHandler->onPassClicked();
+    if (gameObjectClickHandler() != 0)
+        gameObjectClickHandler()->onPassClicked();
 }
 
 void LocalPlayerWidget::onDiscardClicked()
 {
-    if (mp_gameObjectClickHandler != 0)
-        mp_gameObjectClickHandler->setDiscardMode(mp_buttonDiscard->isChecked());
+    if (gameObjectClickHandler() != 0)
+        gameObjectClickHandler()->setDiscardMode(mp_buttonDiscard->isChecked());
 }
 
-
-
-void LocalPlayerWidget::updateWidgets()
+void LocalPlayerWidget::updateRoleCardWidget()
 {
-    if (isVoid()) {
-        mp_labelPlayerName->setText("");
-        mp_characterWidget->setCharacter(CHARACTER_UNKNOWN);
-        mp_roleCardWidget->setEmpty();
-        mp_roleCardWidget->validate();
-        mp_hand->clear();
-        mp_table->clear();
-        mp_labelAvatar->setPixmap(QPixmap());
-        if (mp_winnerIcon)
-                mp_winnerIcon->hide();
+    if (m_playerRole != ROLE_UNKNOWN) {
+        mp_roleCardWidget->setPlayerRole(m_playerRole);
     } else {
-        mp_labelPlayerName->setText(name());
-        if (m_role != ROLE_UNKNOWN) {
-            mp_roleCardWidget->setPlayerRole(m_role);
-        } else {
-            mp_roleCardWidget->setEmpty();
-        }
-        mp_roleCardWidget->validate();
-        if (m_isWinner) {
-            if (mp_winnerIcon == 0) {
-                QPixmap winnerPixmap(":/misc/winner.png");
-                mp_winnerIcon = new QLabel(this);
-                mp_winnerIcon->setPixmap(winnerPixmap);
-                mp_winnerIcon->resize(winnerPixmap.size());
-                mp_winnerIcon->setToolTip(tr("This player is winner."));
-            }
-            mp_winnerIcon->move(mp_roleCardWidget->x() + 2,
-                                mp_roleCardWidget->y() + mp_roleCardWidget->height() - (int)(mp_winnerIcon->height() / 3));
-            mp_winnerIcon->show();
-            mp_winnerIcon->raise();
-        } else {
-            if (mp_winnerIcon)
-                mp_winnerIcon->hide();
-        }
-
+        mp_roleCardWidget->setEmpty();
     }
-    update();
+    mp_roleCardWidget->validate();
 }
-
-
-

@@ -271,6 +271,7 @@ QString clientTypeToString(const ClientType& t) {
 
 GameMessageType stringToGameMessageType(const QString& s) {
     if (s == "game-started")                return GAMEMESSAGE_GAMESTARTED;
+    if (s == "game-finished")               return GAMEMESSAGE_GAMEFINISHED;
     if (s == "player-draw-from-deck")       return GAMEMESSAGE_PLAYERDRAWFROMDECK;
     if (s == "player-draw-from-graveyard")  return GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD;
     if (s == "player-discard-card")         return GAMEMESSAGE_PLAYERDISCARDCARD;
@@ -289,6 +290,7 @@ GameMessageType stringToGameMessageType(const QString& s) {
 QString gameMessageTypeToString(const GameMessageType& g) {
     switch(g) {
     case GAMEMESSAGE_GAMESTARTED:               return "game-started";
+    case GAMEMESSAGE_GAMEFINISHED:              return "game-finished";
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:        return "player-draw-from-deck";
     case GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD:   return "player-draw-from-graveyard";
     case GAMEMESSAGE_PLAYERDISCARDCARD:         return "player-discard-card";

@@ -39,40 +39,33 @@ class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
 
 public:
     OpponentWidget(QWidget *parent);
-    ~OpponentWidget();
+    virtual ~OpponentWidget();
 
-    virtual void init(Game*, GameObjectClickHandler*, CardWidgetFactory*);
+    virtual CardList*               hand()            { return mp_hand;             }
+    virtual CardList*               table()           { return mp_table;            }
+    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget;  }
+    virtual QLabel*                 playerNameLabel() { return mp_labelPlayerName;  }
+    virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
+    virtual bool                    isLocalPlayer()   { return 0;                   }
 
-    virtual void paintEvent(QPaintEvent* event);
-
-    virtual void setFromPublicData(const PublicPlayerData&);
-    virtual void dieAndRevealRole(const PlayerRole& role);
-    virtual void clear();
-
-    virtual CardList*               hand()            { return mp_hand; }
-    virtual CardList*               table()           { return mp_table; }
-    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
-    virtual bool                    isLocalPlayer()   { return 0; }
-
-private:
-    void setAvatarPixmap();
-    void updateWidgets();
-    void setSeriff(bool isSheriff);
+protected:
+    virtual void clearWidgets();
+    virtual void updateWidgets();
+    virtual void moveWinnerIcon();
+    virtual void onGameEntered();
 
 private:
-    QString m_baseStyleSheet;
-    QPixmap m_sheriffBadgePixmap;
-    QLabel* mp_sheriffBadge;
-    QLabel* mp_disconnectIcon;
-    QLabel* mp_winnerIcon;
+    void createSheriffBadgeIcon();
+    void updateSheriffBadgeIcon();
+    void createRoleCard();
+    void updateRoleCard();
+    void createDisconnectIcon();
+    void updateDisconnectIcon();
 
-    bool        m_isDead;
-    bool        m_isWinner;
-    bool        m_hasController;
-    PlayerRole  m_role;
+    QLabel*     mp_sheriffBadge;
+    QLabel*     mp_disconnectIcon;
     CardWidget* mp_roleCard;
-    QPixmap     m_avatar;
-    Game*       mp_game;
+
 };
 }
 #endif

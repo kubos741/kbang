@@ -20,46 +20,34 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
-#include <QHash>
-#include <QList>
-#include <QGridLayout>
-
 #include "ui_mainwindow.h"
 #include "serverconnection.h"
 
-class QLabel;
+#include <QList>
 
 namespace client {
 
 class ConnectToServerDialog;
 class CreateGameDialog;
 class JoinGameDialog;
-class LogWidget;
-class ChatWidget;
-class LocalPlayerWidget;
 class OpponentWidget;
 class Game;
+class CardWidgetSizeManager;
 
-/**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
- */
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
 Q_OBJECT
 public:
     MainWindow();
     virtual ~MainWindow();
-
     virtual void paintEvent(QPaintEvent* event);
 
-private slots:
-    void connectToServer();
+public slots:
+    void showConnectToServerDialog();
     void disconnectFromServer();
     void showCreateGameDialog();
     void showJoinGameDialog();
     void leaveGame();
-
 
     void enterGameMode(int gameId, const QString& gameName, ClientType);
     void exitGameMode();
@@ -67,22 +55,19 @@ private slots:
     void serverConnectionStatusChanged();
 
 private:
+    void createMenu();
+    void createActions();
+    void createWidgets();
+    void updateActions();
+
     ConnectToServerDialog* mp_connectToServerDialog;
     CreateGameDialog*      mp_createGameDialog;
     JoinGameDialog*        mp_joinGameDialog;
     ServerConnection       m_serverConnection;
     Game*                  mp_game;
-    QLabel*                mp_labelStatusBarServerState;
     QList<OpponentWidget*> m_opponentWidgets;
+    CardWidgetSizeManager* mp_cardWidgetSizeManager;
 
-
-private:
-    void createStatusBar();
-    void createMenu();
-    void createActions();
-    void createWidgets();
-
-    void updateActions();
 
 };
 }

@@ -26,6 +26,7 @@
 #include "gameeventhandler.h"
 #include "deckwidget.h"
 #include "graveyardwidget.h"
+#include "cardwidgetsizemanager.h"
 
 #include <QtDebug>
 #include <QBoxLayout>
@@ -54,9 +55,10 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
         m_gameObjectClickHandler(this)
 
 {
-    mp_localPlayerWidget->init(&m_gameObjectClickHandler, &m_cardWidgetFactory);
-    foreach(OpponentWidget* w, m_opponentWidgets) {
-        w->init(this, &m_gameObjectClickHandler, &m_cardWidgetFactory);
+
+    mp_localPlayerWidget->init(this);
+    foreach(OpponentWidget* opponentWidget, m_opponentWidgets) {
+        opponentWidget->init(this);
     }
     mp_gameEventHandler = new GameEventHandler(this);
     mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
@@ -112,18 +114,7 @@ void Game::setGameContext(const GameContextData& gameContextData)
         qWarning("Cannot set requested player.");
     }
 
-    mp_localPlayerWidget->setGameButtonState(gameContextData);
-
-//    if (oldGamePlayState != m_gameContextData.gamePlayState) {
-//        switch(m_gameContextData.gamePlayState) {
-//        case GAMEPLAYSTATE_DRAW:
-//            emit emitLogMessage(tr("<i>%1</i> is on turn.").arg(currentPlayer->name()));
-//            break;
-//        case GAMEPLAYSTATE_
-//
-//        }
-//
-//    }
+    mp_localPlayerWidget->setFromContext(gameContextData);
 
 
     if (!requestedPlayer || !requestedPlayer->isLocalPlayer()) {
@@ -219,7 +210,7 @@ void Game::validate()
     }
 }
 
-void Game::clean()
+void Game::clear()
 {
     unloadInterface();
     mp_localPlayerWidget->clear();

@@ -18,7 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "playerwidget.h"
+#include "playercharacterwidget.h"
+#include "game.h"
 #include "gameobjectclickhandler.h"
+#include "cardlist.h"
+#include "parser/parserstructs.h"
+
+#include <QPainter>
 #include <QMouseEvent>
 
 
@@ -26,32 +32,52 @@ using namespace client;
 
 PlayerWidget::PlayerWidget(QWidget* parent):
         QWidget(parent),
-        mp_gameObjectClickHandler(0),
-        mp_cardWidgetFactory(0),
+        m_id(0),
+        m_hasController(1),
+        m_isAI(0),
+        m_isAlive(1),
+        m_isSheriff(0),
+        m_isWinner(0),
         m_isCurrent(0),
         m_isRequested(0),
-        m_id(0),
-        m_isSheriff(0)
+        m_playerRole(ROLE_UNKNOWN),
+        mp_winnerIcon(0),
+        mp_game(0),
+        mp_cardWidgetSizeManager(0)
 {
 }
 
-void PlayerWidget::init(GameObjectClickHandler* gameObjectClickHandler, CardWidgetFactory* cardWidgetFactory)
+PlayerWidget::~PlayerWidget()
 {
-    mp_gameObjectClickHandler = gameObjectClickHandler;
-    mp_cardWidgetFactory = cardWidgetFactory;
 }
 
-//void PlayerWidget::setPlayer(const StructPlayer& structPlayer)
-//{
-//    PublicPlayerData data;
-//    data.id = structPlayer.id;
-//    data.name = structPlayer.name;
-//    data.isSheriff = 0;
-//    data.lifePoints = 0;
-//    data.handSize = 0;
-//    // data.character
-//    setFromPublicData(data);
-//}
+void PlayerWidget::setup(CardWidgetSizeManager* cardWidgetSizeManager)
+{
+    mp_cardWidgetSizeManager = cardWidgetSizeManager;
+}
+
+void PlayerWidget::init(Game* game)
+{
+    mp_game = game;
+    characterWidget()->init(game->cardWidgetFactory());
+    onGameEntered();
+}
+
+void PlayerWidget::clear()
+{
+    m_id = m_isAI = m_isSheriff = m_isWinner = m_isCurrent = m_isRequested = 0;
+    m_name = QString();
+    m_isAlive = m_hasController = 1;
+    mp_game = 0;
+    m_avatar = QPixmap();
+    m_playerRole = ROLE_UNKNOWN;
+
+    characterWidget()->setCharacter(CHARACTER_UNKNOWN);
+    hand()->clear();
+    table()->clear();
+
+    clearWidgets();
+}
 
 void PlayerWidget::setCurrent(bool isCurrent)
 {
@@ -63,26 +89,159 @@ void PlayerWidget::setRequested(bool isRequested)
     m_isRequested = isRequested;
 }
 
-void PlayerWidget::setId(int id)
+void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
-    m_id = id;
+    m_id            = publicPlayerData.id;
+    m_name          = publicPlayerData.name;
+    m_hasController = publicPlayerData.hasController;
+    m_isAI          = publicPlayerData.isAI;
+    m_isAlive       = publicPlayerData.isAlive;
+    m_isSheriff     = publicPlayerData.isSheriff;
+    m_isWinner      = publicPlayerData.isWinner;
+    m_playerRole    = publicPlayerData.role;
+
+    characterWidget()->setCharacter(publicPlayerData.character);
+    characterWidget()->setLifePoints(publicPlayerData.lifePoints);
+    characterWidget()->setOwnerId(m_id);
+
+    hand()->setOwnerId(m_id);
+    table()->setOwnerId(m_id);
+
+    if (!publicPlayerData.avatar.isNull()) {
+        m_avatar = QPixmap::fromImage(publicPlayerData.avatar).
+                   scaled(avatarLabel()->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+
+    setHandSize(publicPlayerData.handSize);
+    setTable(publicPlayerData.table);
+    updateWidgets();
 }
 
-void PlayerWidget::setName(const QString& name)
+void PlayerWidget::dieAndRevealRole(PlayerRole playerRole)
 {
-    m_name = name;
+    m_isAlive = 0;
+    m_playerRole = playerRole;
+    updateWidgets();
 }
 
-void PlayerWidget::setSheriff(bool isSheriff)
+void PlayerWidget::paintEvent(QPaintEvent* event)
 {
-    m_isSheriff = isSheriff;
+    QPainter painter(this);
+    painter.setClipRect(event->rect());
+    painter.fillRect(contentsRect(), QColor(0, 0, 0, 32));
+
+    if (m_isCurrent) {
+        painter.setPen(Qt::blue);
+        painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
+    }
+
+    if (m_isRequested) {
+        QPen pen;
+        pen.setColor(Qt::red);
+        pen.setWidth(2);
+        pen.setStyle(Qt::DashLine);
+        painter.setPen(pen);
+        painter.drawRect(rect().adjusted(1, 1, -2, -2));
+    }
 }
 
-
-void PlayerWidget::mousePressEvent(QMouseEvent *ev)
+void PlayerWidget::mousePressEvent(QMouseEvent* event)
 {
-    if (mp_gameObjectClickHandler && ev->button() == Qt::LeftButton)
-        mp_gameObjectClickHandler->onPlayerClicked(this);
+    if (gameObjectClickHandler() && event->button() == Qt::LeftButton) {
+        gameObjectClickHandler()->onPlayerClicked(this);
+    }
+}
+
+GameObjectClickHandler* PlayerWidget::gameObjectClickHandler() const
+{
+    if (mp_game == 0) {
+        return 0;
+    } else {
+        return mp_game->gameObjectClickHandler();
+    }
+}
+
+CardWidgetFactory* PlayerWidget::cardWidgetFactory() const
+{
+    if (mp_game == 0) {
+        return 0;
+    } else {
+        return mp_game->cardWidgetFactory();
+    }
+}
+
+void PlayerWidget::setHandSize(int handSize)
+{
+    hand()->clear();
+    for(int i = 0; i < handSize; ++i) {
+        CardWidget* card = mp_game->cardWidgetFactory()->createPlayingCard(this);
+        card->validate();
+        hand()->push(card);
+    }
+}
+
+void PlayerWidget::setTable(QList<CardData> tableCards)
+{
+    table()->clear();
+    foreach (const CardData& cardData, tableCards) {
+        CardWidget* card = mp_game->cardWidgetFactory()->createPlayingCard(this);
+        card->setCardData(cardData);
+        card->validate();
+        table()->push(card);
+    }
+}
+
+void PlayerWidget::clearWidgets()
+{
+    playerNameLabel()->setText("");
+
+    if (mp_winnerIcon)
+        mp_winnerIcon->hide();
+
+    avatarLabel()->setPixmap(QPixmap());
+}
+
+void PlayerWidget::updateWidgets()
+{
+    playerNameLabel()->setText(m_name);
+    updateWinnerIcon();
+    updateAvatarLabel();
+}
+
+void PlayerWidget::updateAvatarLabel()
+{
+    QPixmap avatar = m_avatar;
+    if (!m_hasController && !avatar.isNull()) {
+        QPainter painter(&avatar);
+        painter.fillRect(avatar.rect(), QColor(0, 0, 0, 128));
+    }
+    avatarLabel()->setPixmap(avatar);
+}
+
+void PlayerWidget::createWinnerIcon()
+{
+    Q_ASSERT(mp_winnerIcon == 0);
+    QPixmap winnerPixmap(":/misc/winner.png");
+    mp_winnerIcon = new QLabel(this);
+    mp_winnerIcon->setPixmap(winnerPixmap);
+    mp_winnerIcon->resize(winnerPixmap.size());
+    mp_winnerIcon->setToolTip(tr("This player is winner."));
+}
+
+void PlayerWidget::updateWinnerIcon()
+{
+    if (m_isWinner && mp_game && mp_game->isFinished()) {
+        if (mp_winnerIcon == 0) {
+            createWinnerIcon();
+        }
+        moveWinnerIcon();
+        mp_winnerIcon->show();
+        mp_winnerIcon->raise();
+    } else {
+        if (mp_winnerIcon) {
+            mp_winnerIcon->hide();
+        }
+    }
 }
 
 

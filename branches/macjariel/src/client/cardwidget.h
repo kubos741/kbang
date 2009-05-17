@@ -88,6 +88,7 @@ public:
 protected:
     virtual void mousePressEvent(QMouseEvent *ev);
 
+
 private:
     virtual void paintEvent (QPaintEvent *event);
 

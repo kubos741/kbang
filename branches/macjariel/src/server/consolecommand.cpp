@@ -95,9 +95,8 @@ CMDDEF(console_list_clients)
             console.Cout() << QString("in %1 (%2)").arg(game->gameInfo().name()).arg(game->id());
             if (client->playerId()) {
                 Player* player = game->player(client->playerId());
-                console.Cout() << QString("as %1 (%2)").arg(player->name()).arg(player->id());
+                console.Cout() << QString(" as %1 (%2)").arg(player->name()).arg(player->id());
             }
-            return 1;
         }
         console.Cout() << endl;
     }

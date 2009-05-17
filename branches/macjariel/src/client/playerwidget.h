@@ -20,13 +20,20 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
-#include <QWidget>
 #include "parser/parserstructs.h"
+#include "gameenums.h"
+#include <QWidget>
+#include <QPixmap>
+
+class QLabel;
 
 namespace client {
 class CardList;
+class CardWidget;
 class PlayerCharacterWidget;
+class Game;
 class CardWidgetFactory;
+class CardWidgetSizeManager;
 class GameObjectClickHandler;
 
 /**
@@ -39,49 +46,83 @@ class PlayerWidget: public QWidget {
 Q_OBJECT
 public:
     PlayerWidget(QWidget* parent);
-    virtual ~PlayerWidget() {}
+    virtual ~PlayerWidget();
 
-    inline int      id()        const { return m_id; }
-    inline QString  name()      const { return m_name; }
-    inline bool     isSheriff() const { return m_isSheriff; }
-    inline bool     isVoid()    const { return (m_id == 0); }
+    /**
+     * Sets-up the widget. This method should be called as soon as the
+     * object is created.
+     */
+    void setup(CardWidgetSizeManager*);
 
-    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
+    /**
+     * Initializes the object for Game mode. This should be called after
+     * the Game mode is entered.
+     */
+    void init(Game*);
+    void clear();
 
-    //void setPlayer(const StructPlayer&);
-    virtual void setFromPublicData(const PublicPlayerData&) = 0;
-    virtual void dieAndRevealRole(const PlayerRole& role) = 0;
-    virtual void clear() = 0;
+    inline int          id()        const { return m_id;            }
+    inline QString      name()      const { return m_name;          }
+    inline bool         isAI()      const { return m_isAI;          }
+    inline bool         isAlive()   const { return m_isAlive;       }
+    inline bool         isSheriff() const { return m_isSheriff;     }
+    inline bool         isWinner()  const { return m_isWinner;      }
+    inline bool         isVoid()    const { return (m_id == 0);     }
+    inline PlayerRole   role()      const { return m_playerRole;    }
+
+    void setCurrent(bool);
+    void setRequested(bool);
+
+    void setFromPublicData(const PublicPlayerData&);
+    void dieAndRevealRole(PlayerRole);
+
+
 
     virtual CardList* hand() = 0;
     virtual CardList* table() = 0;
     virtual PlayerCharacterWidget* characterWidget() = 0;
-
+    virtual QLabel* avatarLabel() = 0;
+    virtual QLabel* playerNameLabel() = 0;
     virtual bool isLocalPlayer() = 0;
-    void setCurrent(bool);
-    void setRequested(bool);
-
 
 protected:
-    void setId(int id);
-    void setName(const QString& name);
-    void setSheriff(bool isSheriff);
+    void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
 
-    void mousePressEvent(QMouseEvent *ev);
-
-    GameObjectClickHandler* mp_gameObjectClickHandler;
-    CardWidgetFactory*      mp_cardWidgetFactory;
-
-protected:
-    bool        m_isCurrent;
-    bool        m_isRequested;
+    GameObjectClickHandler* gameObjectClickHandler() const;
+    CardWidgetFactory*      cardWidgetFactory() const;
 
 
-private:
-    int         m_id;
-    QString     m_name;
-    bool        m_isSheriff;
+    virtual void onGameEntered() = 0;
 
+    virtual void setHandSize(int handSize);
+    virtual void setTable(QList<CardData>);
+
+    virtual void clearWidgets();
+    virtual void updateWidgets();
+
+    void updateAvatarLabel();
+
+    void createWinnerIcon();
+    virtual void moveWinnerIcon() = 0;
+    void updateWinnerIcon();
+
+    int                     m_id;
+    QString                 m_name;
+    bool                    m_hasController;
+    bool                    m_isAI;
+    bool                    m_isAlive;
+    bool                    m_isSheriff;
+    bool                    m_isWinner;
+    bool                    m_isCurrent;
+    bool                    m_isRequested;
+
+    QPixmap                 m_avatar;
+    PlayerRole              m_playerRole;
+    QLabel*                 mp_winnerIcon;
+
+    Game*                   mp_game;
+    CardWidgetSizeManager*  mp_cardWidgetSizeManager;
 };
 }
 #endif

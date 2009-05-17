@@ -413,7 +413,7 @@ void Game::setRolesAndCharacters()
 
 QList<PlayerRole> Game::getRoleList()
 {
-    static char* roleSets[] = {"", "S", "SB", "SRB", "SBBR", "SVBBR", "SVVBBR", "SVVBBBR"};
+    static char* roleSets[] = {"", "S", "SB", "SRB", "SBBR", "SVBBR", "SVBBBR", "SVVBBBR"};
     QList<PlayerRole> res;
     char* i = roleSets[m_playerList.count()];
     while(*i != '\0')

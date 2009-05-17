@@ -29,6 +29,7 @@
 #include "parser/queryget.h"
 #include "game.h"
 #include "card.h"
+#include "cardwidgetsizemanager.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -36,19 +37,18 @@
 using namespace client;
 
 MainWindow::MainWindow():
-    mp_connectToServerDialog(0),
-    mp_createGameDialog(0),
-    mp_joinGameDialog(0),
-    m_serverConnection(this),
-    mp_game(0)
+        mp_connectToServerDialog(0),
+        mp_createGameDialog(0),
+        mp_joinGameDialog(0),
+        m_serverConnection(this),
+        mp_game(0)
 {
     setupUi(this);
-
     Card::loadDefaultRuleset();
+    mp_cardWidgetSizeManager = new CardWidgetSizeManager(this);
 
     createActions();
     createMenu();
-    createStatusBar();
     createWidgets();
     updateActions();
 
@@ -65,7 +65,17 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::connectToServer()
+void MainWindow::paintEvent(QPaintEvent* e)
+{
+    QPainter painter(this);
+    QRadialGradient g(width() / 2, height() / 2, width() / 2, width() / 2 , height() / 2);
+    g.setColorAt(0, QColor(239, 215, 179));
+    g.setColorAt(0.5 , QColor(211, 179, 140));
+    painter.fillRect(e->rect(), g);
+    QMainWindow::paintEvent(e);
+}
+
+void MainWindow::showConnectToServerDialog()
 {
     if (!mp_connectToServerDialog)
     {
@@ -106,35 +116,38 @@ void MainWindow::showJoinGameDialog()
     mp_joinGameDialog->show();
 }
 
-
-
-void MainWindow::createStatusBar()
+void MainWindow::leaveGame()
 {
-    mp_labelStatusBarServerState = new QLabel;
-    serverConnectionStatusChanged();
-    //statusBar()->addPermanentWidget(mp_labelStatusBarServerState);
+    if (m_serverConnection.isConnected()) {
+        m_serverConnection.leaveGame();
+    } else {
+        exitGameMode();
+    }
+}
+
+void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
+{
+    Q_ASSERT(mp_game == 0);
+    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets, mp_statusLabel);
+    mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
+    connect(mp_game, SIGNAL(emitLogMessage(const QString&)),
+            mp_logWidget, SLOT(appendLogMessage(const QString&)));
+    mp_logWidget->appendLogMessage(tr("You have joined <i>%1</i>.").arg(gameName));
+    updateActions();
+}
+
+void MainWindow::exitGameMode()
+{
+    mp_game->clear();
+    mp_game->deleteLater();
+    mp_game = 0;
+    mp_chatWidget->clear();
+    updateActions();
 }
 
 void MainWindow::serverConnectionStatusChanged()
 {
     updateActions();
-    if (m_serverConnection.isConnected())
-    {
-        const QString& serverName = m_serverConnection.serverName();
-        const QString& hostName = m_serverConnection.hostName();
-        QString text;
-        if (serverName.isEmpty())
-        {
-            text = QString("%0: %1").arg(tr("Connected to server")).arg(hostName);
-        }
-        else
-        {
-            text = QString("%0: %1  (%2)").arg(tr("Connected to server")).arg(serverName).arg(hostName);
-        }
-        mp_labelStatusBarServerState->setText(text);
-    } else {
-        mp_labelStatusBarServerState->setText(tr("Not connected to server."));
-    }
 }
 
 
@@ -150,6 +163,34 @@ void MainWindow::createActions()
             this, SLOT(showJoinGameDialog()));
     connect(mp_actionLeaveGame, SIGNAL(triggered()),
             this, SLOT(leaveGame()));
+}
+
+
+void MainWindow::createMenu()
+{
+}
+
+void MainWindow::createWidgets()
+{
+    m_opponentWidgets.append(mp_opponent1);
+    m_opponentWidgets.append(mp_opponent2);
+    m_opponentWidgets.append(mp_opponent3);
+    m_opponentWidgets.append(mp_opponent4);
+    m_opponentWidgets.append(mp_opponent5);
+    m_opponentWidgets.append(mp_opponent6);
+
+    connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
+            &m_serverConnection, SLOT(sendChatMessage(const QString&)));
+    connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
+            mp_chatWidget, SLOT(incomingMessage(int, const QString&, const QString&)));
+
+    connect(&m_serverConnection, SIGNAL(logMessage(QString)),
+            mp_logWidget, SLOT(appendLogMessage(QString)));
+    connect(&m_serverConnection, SIGNAL(incomingData(const QByteArray&)),
+            mp_logWidget, SLOT(appendIncomingData(const QByteArray&)));
+    connect(&m_serverConnection, SIGNAL(outgoingData(const QByteArray&)),
+            mp_logWidget, SLOT(appendOutgoingData(const QByteArray&)));
+
 }
 
 void MainWindow::updateActions()
@@ -180,73 +221,3 @@ void MainWindow::updateActions()
         mp_actionLeaveGame->setEnabled(mp_game != 0);
     }
 }
-
-
-void MainWindow::createMenu()
-{
-
-}
-
-void MainWindow::createWidgets()
-{
-    m_opponentWidgets.append(mp_opponent1);
-    m_opponentWidgets.append(mp_opponent2);
-    m_opponentWidgets.append(mp_opponent3);
-    m_opponentWidgets.append(mp_opponent4);
-    m_opponentWidgets.append(mp_opponent5);
-    m_opponentWidgets.append(mp_opponent6);
-
-    connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
-            &m_serverConnection, SLOT(sendChatMessage(const QString&)));
-    connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
-            mp_chatWidget, SLOT(incomingMessage(int, const QString&, const QString&)));
-
-    connect(&m_serverConnection, SIGNAL(logMessage(QString)),
-            mp_logWidget, SLOT(appendLogMessage(QString)));
-    connect(&m_serverConnection, SIGNAL(incomingData(const QByteArray&)),
-            mp_logWidget, SLOT(appendIncomingData(const QByteArray&)));
-    connect(&m_serverConnection, SIGNAL(outgoingData(const QByteArray&)),
-            mp_logWidget, SLOT(appendOutgoingData(const QByteArray&)));
-
-}
-
-void MainWindow::leaveGame()
-{
-    if (m_serverConnection.isConnected())
-        m_serverConnection.leaveGame();
-    else
-        exitGameMode();
-}
-
-
-void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
-{
-    Q_ASSERT(mp_game == 0);
-    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets, mp_statusLabel);
-    mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
-    connect(mp_game, SIGNAL(emitLogMessage(const QString&)),
-            mp_logWidget, SLOT(appendLogMessage(const QString&)));
-    mp_logWidget->appendLogMessage(tr("You have joined <i>%1</i>.").arg(gameName));
-    updateActions();
-}
-
-void MainWindow::exitGameMode()
-{
-    mp_game->clean();
-    mp_game->deleteLater();
-    mp_game = 0;
-    mp_chatWidget->clear();
-    updateActions();
-}
-
-void MainWindow::paintEvent(QPaintEvent* e)
-{
-    QPainter painter(this);
-    QRadialGradient g(width() / 2, height() / 2, width() / 2, width() / 2 , height() / 2);
-    g.setColorAt(0, QColor(239, 215, 179));
-    g.setColorAt(0.5 , QColor(211, 179, 140));
-    painter.fillRect(e->rect(), g);
-    QMainWindow::paintEvent(e);
-}
-
-

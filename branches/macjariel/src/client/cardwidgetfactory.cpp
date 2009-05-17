@@ -38,6 +38,6 @@ CardWidget* CardWidgetFactory::createRoleCard(QWidget* parent, PlayerRole role)
 
 void CardWidgetFactory::registerCard(CardWidget* cardWidget)
 {
-    cardWidget->setGameObjectClickHandler(mp_game->cardWidgetClickHandler());
+    cardWidget->setGameObjectClickHandler(mp_game->gameObjectClickHandler());
 }
 

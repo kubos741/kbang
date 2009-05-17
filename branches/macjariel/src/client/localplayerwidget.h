@@ -20,13 +20,9 @@
 #ifndef LOCALPLAYERWIDGET_H
 #define LOCALPLAYERWIDGET_H
 
-
-
-#include <QWidget>
-#include <ui_localplayerwidget.h>
-
 #include "parser/parserstructs.h"
 #include "playerwidget.h"
+#include <ui_localplayerwidget.h>
 
 namespace client {
 
@@ -39,26 +35,24 @@ class LocalPlayerWidget: public PlayerWidget, public Ui::LocalPlayerWidget
 {
 Q_OBJECT
 public:
-    LocalPlayerWidget(QWidget* parent);
+    LocalPlayerWidget(QWidget *parent);
     virtual ~LocalPlayerWidget();
 
-    virtual void init(GameObjectClickHandler*, CardWidgetFactory*);
+    virtual CardList*               hand()            { return mp_hand;             }
+    virtual CardList*               table()           { return mp_table;            }
+    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget;  }
+    virtual QLabel*                 playerNameLabel() { return mp_labelPlayerName;  }
+    virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
+    virtual bool                    isLocalPlayer()   { return 1;                   }
 
-    virtual void setFromPublicData(const PublicPlayerData&);
-    virtual void setFromPrivateData(const PrivatePlayerData&);
-    virtual void dieAndRevealRole(const PlayerRole& role);
-    virtual void clear();
+    void setFromPrivateData(const PrivatePlayerData&);
+    void setFromContext(const GameContextData&);
 
-    void setGameButtonState(const GameContextData&);
-
-
-    virtual CardList*               hand()            { return mp_hand; }
-    virtual CardList*               table()           { return mp_table; }
-    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget; }
-    virtual bool                    isLocalPlayer()   { return 1; }
-    PlayerRole                      role()            { return m_role; }
-
-    virtual void paintEvent(QPaintEvent* event);
+protected:
+    virtual void clearWidgets();
+    virtual void updateWidgets();
+    virtual void moveWinnerIcon();
+    virtual void onGameEntered();
 
 private slots:
     void onEndTurnClicked();
@@ -66,13 +60,7 @@ private slots:
     void onDiscardClicked();
 
 private:
-    void    updateWidgets();
-
-private:
-    QString m_baseStyleSheet;
-    PlayerRole m_role;
-    bool m_isWinner;
-    QLabel* mp_winnerIcon;
+    void updateRoleCardWidget();
 };
 }
 #endif
