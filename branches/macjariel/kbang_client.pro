@@ -1,22 +1,20 @@
-
 TEMPLATE = app
 UI_DIR = uics/client
 MOC_DIR = mocs/client
 RCC_DIR = rccs/client
 OBJECTS_DIR = obj/client
-
-
 CONFIG += qt
-CONFIG += debug warn_on
-
-QT += network xml
+CONFIG += debug \
+    warn_on
+QT += network \
+    xml
 RESOURCES += src/client/resources/client.qrc
-INCLUDEPATH += src/client src/common
+INCLUDEPATH += src/client \
+    src/common
 DEPENDPATH += src/common
 
 # Input
-HEADERS += \
-    src/client/gameloop.h \
+HEADERS += src/client/gameloop.h \
     src/client/connecttoserverdialog.h \
     src/client/mainwindow.h \
     src/client/serverconnection.h \
@@ -52,9 +50,9 @@ HEADERS += \
     src/client/cardzoomwidget.h \
     src/client/newserverdialog.h \
     src/client/selectplayericonwidget.h \
-    src/client/gamemessageevent.h
-FORMS += \
-    src/client/connecttoserverdialog.ui \
+    src/client/gamemessageevent.h \
+    src/client/cardwidgetsizemanager.h
+FORMS += src/client/connecttoserverdialog.ui \
     src/client/mainwindow.ui \
     src/client/joingamedialog.ui \
     src/client/logwidget.ui \
@@ -63,8 +61,7 @@ FORMS += \
     src/client/creategamedialog.ui \
     src/client/localplayerwidget.ui \
     src/client/newserverdialog.ui
-SOURCES += \
-    src/client/gameloop.cpp \
+SOURCES += src/client/gameloop.cpp \
     src/client/main.cpp \
     src/client/connecttoserverdialog.cpp \
     src/client/mainwindow.cpp \
@@ -101,19 +98,16 @@ SOURCES += \
     src/client/cardzoomwidget.cpp \
     src/client/newserverdialog.cpp \
     src/client/selectplayericonwidget.cpp \
-    src/client/gamemessageevent.cpp
-
-unix {
+    src/client/gamemessageevent.cpp \
+    src/client/cardwidgetsizemanager.cpp
+unix { 
     LIBPATH += lib
     TARGETDEPS += lib/libkbang_common.a
 }
-
-win32 {
+win32 { 
     debug:LIBPATH += debug/lib
     release:LIBPATH += release/lib
 }
-
 LIBS += -lkbang_common
-
 TARGET = kbang-client
 QMAKE_CXXFLAGS_DEBUG += -Wall
