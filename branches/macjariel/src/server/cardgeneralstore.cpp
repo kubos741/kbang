@@ -42,8 +42,12 @@ void CardGeneralStore::requestNext()
         mp_currentPlayer = mp_firstPlayer;
     } else {
         mp_currentPlayer = game()->nextPlayer(mp_currentPlayer);
-        if (mp_currentPlayer == mp_firstPlayer)
+        if (game()->nextPlayer(mp_currentPlayer) == mp_firstPlayer) {
+            Q_ASSERT(gameTable()->selection().size() == 1);
+            PlayingCard* selectionCard = gameTable()->selection()[0];
+            gameTable()->playerPickFromSelection(mp_currentPlayer, selectionCard);
             return;
+        }
     }
     game()->gameCycle().setResponseMode(this, mp_currentPlayer);
 }

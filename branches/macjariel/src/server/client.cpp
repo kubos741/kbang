@@ -71,8 +71,6 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
 
 Client::~Client()
 {
-    if (mp_playerCtrl)
-        mp_playerCtrl->disconnect();
     emit disconnected(m_id);
     mp_socket->deleteLater();
 }
@@ -319,8 +317,9 @@ void Client::onQueryGameInfoList(QueryResult result)
 void Client::onParserTerminated()
 {
     mp_parser = 0;
-    if (mp_playerCtrl)
+    if (mp_playerCtrl) {
         mp_playerCtrl->disconnect();
+    }
     deleteLater();
 }
 
@@ -344,9 +343,9 @@ void Client::onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtr
 
 void Client::onHandlerUnregistered()
 {
+    mp_playerCtrl = 0;
     if (mp_parser == 0) return;
     mp_parser->eventExitGameMode();
-    mp_playerCtrl = 0;
 }
 
 void Client::onGameStartabilityChanged(bool isStartable)
