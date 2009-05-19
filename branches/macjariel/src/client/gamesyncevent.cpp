@@ -71,6 +71,7 @@ void GameSyncEvent::run()
     emit finished(this);
 }
 
+
 bool GameSyncEvent::isReadyRun()
 {
     return 1;

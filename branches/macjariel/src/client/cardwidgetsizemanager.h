@@ -36,7 +36,7 @@ private:
 
 
     static qreal sm_cardRatio;
-    static qreal sm_lifePointCardRatio;
+    static qreal sm_lifePointCardRatio[];
     static int sm_initialHeight;
 
 };

@@ -55,8 +55,6 @@ CardMovementEvent::CardMovementEvent(Game* game, const CardMovementData& cardMov
 
 CardMovementEvent::~CardMovementEvent()
 {
-    if (mp_card)
-        mp_card->deleteLater();
 }
 
 bool CardMovementEvent::isReadyRun()
@@ -73,6 +71,14 @@ void CardMovementEvent::run()
         setCardAndPocket();
     startTransition();
     GameEvent::run();
+}
+
+void CardMovementEvent::stop()
+{
+    if (mp_card)
+        mp_card->deleteLater();
+    sm_timer.stop();
+    deleteLater();
 }
 
 void CardMovementEvent::setCardAndPocket()

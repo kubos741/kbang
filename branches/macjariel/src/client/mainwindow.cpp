@@ -154,7 +154,7 @@ void MainWindow::serverConnectionStatusChanged()
 void MainWindow::createActions()
 {
     connect(mp_actionConnectToServer, SIGNAL(triggered()),
-            this, SLOT(connectToServer()));
+            this, SLOT(showConnectToServerDialog()));
     connect(mp_actionDisconnectFromServer, SIGNAL(triggered()),
             this, SLOT(disconnectFromServer()));
     connect(actionCreateGame, SIGNAL(triggered()),

@@ -19,6 +19,10 @@ void GameEvent::run()
     m_isRunning = 1;
 }
 
+void GameEvent::stop()
+{
+}
+
 void GameEvent::finish()
 {
     m_isRunning = 0;

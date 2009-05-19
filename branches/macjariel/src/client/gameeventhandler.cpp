@@ -52,6 +52,11 @@ void GameEventHandler::resume()
     mp_queue->resume();
 }
 
+void GameEventHandler::clear()
+{
+    mp_queue->clear();
+}
+
 
 void GameEventHandler::onCardMovementEvent(const CardMovementData& cardMovementData)
 {

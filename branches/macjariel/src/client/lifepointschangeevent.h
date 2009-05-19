@@ -13,6 +13,7 @@ public:
     LifePointsChangeEvent(Game* game, int playerId, int lifePoints);
     virtual ~LifePointsChangeEvent();
     virtual void run();
+    virtual void stop();
 
 private:
     int m_playerId;

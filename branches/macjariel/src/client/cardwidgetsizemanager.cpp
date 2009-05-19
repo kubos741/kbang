@@ -3,10 +3,10 @@
 using namespace client;
 
 qreal CardWidgetSizeManager::sm_cardRatio = 20 / 31;
-qreal CardWidgetSizeManager::sm_lifePointCardRatio = {0, 19/75, 31/75, 44/75, 57/75, 68/75};
+qreal CardWidgetSizeManager::sm_lifePointCardRatio[] = {0, 19/75, 31/75, 44/75, 57/75, 68/75};
 int CardWidgetSizeManager::sm_initialHeight = 75;
 
-CardWidgetSizeManager::CardWidgetSizeManager(QObject* parent, QWidget* mainWidget):
+CardWidgetSizeManager::CardWidgetSizeManager(QObject* parent):
         QObject(parent)
 {
     m_normalSize = QSize(width(sm_initialHeight), sm_initialHeight);
@@ -21,7 +21,7 @@ int CardWidgetSizeManager::lifeLevel(int lifePoints) const
     return (int)(m_normalSize.height() * sm_lifePointCardRatio[lifePoints]);
 }
 
-static QSize initialSize()
+QSize CardWidgetSizeManager::initialSize()
 {
     return QSize(width(sm_initialHeight), sm_initialHeight);
 }

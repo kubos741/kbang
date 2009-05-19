@@ -22,3 +22,4 @@ void GameContextChangeEvent::run()
     mp_game->setGameContext(m_gameContextData);
     QTimer::singleShot(100, this, SLOT(finish()));
 }
+

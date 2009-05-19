@@ -58,7 +58,9 @@ public:
      * Initializes the object for Game mode. This should be called after
      * the Game mode is entered.
      */
-    void init(Game*);
+    virtual void enterGameMode(Game*);
+    virtual void leaveGameMode();
+
     void clear();
 
     inline int          id()        const { return m_id;            }
@@ -93,8 +95,7 @@ protected:
     CardWidgetFactory*      cardWidgetFactory() const;
 
 
-    virtual void onGameEntered() = 0;
-
+    virtual void setRoleFromPublicData(PlayerRole);
     virtual void setHandSize(int handSize);
     virtual void setTable(QList<CardData>);
 

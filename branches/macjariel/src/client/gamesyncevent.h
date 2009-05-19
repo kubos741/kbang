@@ -15,6 +15,7 @@ public:
     virtual void run();
     virtual bool isReadyRun();
 
+
 private:
     void setLocalPlayer(int index);
 

@@ -1,4 +1,5 @@
 #include <QTimer>
+#include <QQueue>
 #include <QtDebug>
 #include "gameeventqueue.h"
 #include "gameevent.h"
@@ -9,7 +10,12 @@ using namespace client;
 GameEventQueue::GameEventQueue(QObject* parent):
         QObject(parent),
         m_paused(0),
-        m_eventOnHold(0)
+        m_eventOnHold(0),
+        m_aboutToDelete(0)
+{
+}
+
+GameEventQueue::~GameEventQueue()
 {
 }
 
@@ -38,8 +44,19 @@ void GameEventQueue::resume()
     }
 }
 
+void GameEventQueue::clear()
+{
+    m_aboutToDelete = 1;
+    if (!m_queue.isEmpty() && m_queue.head()->isRunning()) {
+        m_queue.head()->stop();
+    }
+}
+
 void GameEventQueue::runGameEvent()
 {
+    if (m_aboutToDelete) {
+        return;
+    }
     if (m_paused) {
         m_eventOnHold = 1;
         return;

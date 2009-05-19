@@ -27,6 +27,7 @@ public:
     GameEvent(Game* game);
     virtual ~GameEvent();
     virtual void run();
+    virtual void stop();
     virtual bool isReadyRun();
     bool isRunning();
 

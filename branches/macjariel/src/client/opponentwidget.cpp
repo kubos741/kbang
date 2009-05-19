@@ -45,10 +45,12 @@ OpponentWidget::OpponentWidget(QWidget *parent):
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
+
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
-    updateWidgets();
+
+    clear();
 }
 
 OpponentWidget::~OpponentWidget()
@@ -67,6 +69,7 @@ void OpponentWidget::clearWidgets()
     if (mp_roleCard) {
         mp_roleCard->hide();
     }
+    update();
 }
 
 void OpponentWidget::updateWidgets()
@@ -84,10 +87,6 @@ void OpponentWidget::moveWinnerIcon()
     createRoleCard();
     mp_winnerIcon->move(mp_roleCard->x() + (int)(mp_roleCard->width() / 2) - (int)(mp_winnerIcon->width() / 3),
                         mp_roleCard->y() + mp_roleCard->height() - (int)(mp_roleCard->height() / 2));
-}
-
-void OpponentWidget::onGameEntered()
-{
 }
 
 void OpponentWidget::createSheriffBadgeIcon()
@@ -132,6 +131,9 @@ void OpponentWidget::updateRoleCard()
         mp_roleCard->validate();
         mp_roleCard->show();
         mp_roleCard->raise();
+        if (mp_winnerIcon && mp_winnerIcon->isVisible()) {
+            mp_winnerIcon->raise();
+        }
     } else if (mp_roleCard != 0) {
         mp_roleCard->hide();
     }

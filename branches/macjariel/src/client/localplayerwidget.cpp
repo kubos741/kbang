@@ -38,14 +38,16 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     setContentsMargins(5, 5, 5, 5);
 
     mp_roleCardWidget->setType(Card::Role);
+
     mp_hand->setCardSize(CardWidget::SIZE_SMALL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
+
     mp_table->setCardSize(CardWidget::SIZE_SMALL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
 
-    updateWidgets();
+    clear();
 
     connect(mp_buttonEndTurn, SIGNAL(clicked()),
             this,             SLOT(onEndTurnClicked()));
@@ -63,9 +65,16 @@ LocalPlayerWidget::~LocalPlayerWidget()
 {
 }
 
+void LocalPlayerWidget::enterGameMode(Game* game)
+{
+    PlayerWidget::enterGameMode(game);
+    cardWidgetFactory()->registerCard(mp_roleCardWidget);
+}
+
 void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
 {
     Q_ASSERT(m_id == privatePlayerData.id);
+    qDebug() << this << "setFromPrivateData";
     m_playerRole = privatePlayerData.role;
     
     mp_hand->clear();
@@ -122,10 +131,13 @@ void LocalPlayerWidget::clearWidgets()
 {
     PlayerWidget::clearWidgets();
     mp_roleCardWidget->setEmpty();
+    mp_roleCardWidget->validate();
 
     mp_buttonEndTurn->setEnabled(0);
     mp_buttonPass->setEnabled(0);
     mp_buttonDiscard->setEnabled(0);
+
+    update();
 }
 
 void LocalPlayerWidget::updateWidgets()
@@ -142,9 +154,14 @@ void LocalPlayerWidget::moveWinnerIcon()
                         + mp_roleCardWidget->height()- (int)(mp_winnerIcon->height() / 3));
 }
 
-void LocalPlayerWidget::onGameEntered()
+void LocalPlayerWidget::setRoleFromPublicData(PlayerRole playerRole)
 {
-    cardWidgetFactory()->registerCard(mp_roleCardWidget);
+    Q_UNUSED(playerRole);
+}
+
+void LocalPlayerWidget::setHandSize(int handSize)
+{
+    Q_UNUSED(handSize);
 }
 
 void LocalPlayerWidget::onEndTurnClicked()

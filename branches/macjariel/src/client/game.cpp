@@ -56,9 +56,9 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
 
 {
 
-    mp_localPlayerWidget->init(this);
+    mp_localPlayerWidget->enterGameMode(this);
     foreach(OpponentWidget* opponentWidget, m_opponentWidgets) {
-        opponentWidget->init(this);
+        opponentWidget->enterGameMode(this);
     }
     mp_gameEventHandler = new GameEventHandler(this);
     mp_gameEventHandler->connectSlots(mp_serverConnection->parser());
@@ -213,10 +213,11 @@ void Game::validate()
 void Game::clear()
 {
     unloadInterface();
-    mp_localPlayerWidget->clear();
+    mp_localPlayerWidget->leaveGameMode();
     foreach(OpponentWidget* opponentWidget, m_opponentWidgets)
-        opponentWidget->clear();
+        opponentWidget->leaveGameMode();
     unsetTextInfo();
+    mp_gameEventHandler->clear();
 }
 
 void Game::setTextInfo(const QString& text)

@@ -52,7 +52,6 @@ protected:
     virtual void clearWidgets();
     virtual void updateWidgets();
     virtual void moveWinnerIcon();
-    virtual void onGameEntered();
 
 private:
     void createSheriffBadgeIcon();

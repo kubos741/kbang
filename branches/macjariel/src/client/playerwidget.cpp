@@ -56,11 +56,16 @@ void PlayerWidget::setup(CardWidgetSizeManager* cardWidgetSizeManager)
     mp_cardWidgetSizeManager = cardWidgetSizeManager;
 }
 
-void PlayerWidget::init(Game* game)
+void PlayerWidget::enterGameMode(Game* game)
 {
     mp_game = game;
     characterWidget()->init(game->cardWidgetFactory());
-    onGameEntered();
+}
+
+void PlayerWidget::leaveGameMode()
+{
+    mp_game = 0;
+    clear();
 }
 
 void PlayerWidget::clear()
@@ -68,7 +73,6 @@ void PlayerWidget::clear()
     m_id = m_isAI = m_isSheriff = m_isWinner = m_isCurrent = m_isRequested = 0;
     m_name = QString();
     m_isAlive = m_hasController = 1;
-    mp_game = 0;
     m_avatar = QPixmap();
     m_playerRole = ROLE_UNKNOWN;
 
@@ -91,6 +95,7 @@ void PlayerWidget::setRequested(bool isRequested)
 
 void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
+    qDebug() << this << "setFromPublicData()";
     m_id            = publicPlayerData.id;
     m_name          = publicPlayerData.name;
     m_hasController = publicPlayerData.hasController;
@@ -98,7 +103,8 @@ void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     m_isAlive       = publicPlayerData.isAlive;
     m_isSheriff     = publicPlayerData.isSheriff;
     m_isWinner      = publicPlayerData.isWinner;
-    m_playerRole    = publicPlayerData.role;
+
+    setRoleFromPublicData(publicPlayerData.role);
 
     characterWidget()->setCharacter(publicPlayerData.character);
     characterWidget()->setLifePoints(publicPlayerData.lifePoints);
@@ -110,6 +116,8 @@ void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     if (!publicPlayerData.avatar.isNull()) {
         m_avatar = QPixmap::fromImage(publicPlayerData.avatar).
                    scaled(avatarLabel()->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    } else {
+        m_avatar = QPixmap();
     }
 
     setHandSize(publicPlayerData.handSize);
@@ -168,6 +176,11 @@ CardWidgetFactory* PlayerWidget::cardWidgetFactory() const
     } else {
         return mp_game->cardWidgetFactory();
     }
+}
+
+void PlayerWidget::setRoleFromPublicData(PlayerRole playerRole)
+{
+    m_playerRole = playerRole;
 }
 
 void PlayerWidget::setHandSize(int handSize)

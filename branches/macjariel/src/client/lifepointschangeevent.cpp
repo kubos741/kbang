@@ -28,3 +28,7 @@ void LifePointsChangeEvent::run()
             this,                                                  SLOT(finish()));
     mp_game->playerWidget(m_playerId)->characterWidget()->setLifePoints(m_lifePoints);
 }
+
+void LifePointsChangeEvent::stop()
+{
+}

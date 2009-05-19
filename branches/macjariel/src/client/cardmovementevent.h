@@ -60,6 +60,7 @@ public:
     CardMovementEvent(Game* game, const CardMovementData& cardMovementData);
     virtual ~CardMovementEvent();
     virtual void run();
+    virtual void stop();
     virtual bool isReadyRun();
 
 private:

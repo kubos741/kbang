@@ -18,6 +18,7 @@ public:
 
     void pause();
     void resume();
+    void clear();
 
 public slots:
     void onCardMovementEvent(const CardMovementData&);

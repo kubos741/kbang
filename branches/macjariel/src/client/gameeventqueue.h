@@ -13,10 +13,13 @@ class GameEventQueue : public QObject
 Q_OBJECT;
 public:
     GameEventQueue(QObject* parent);
+    ~GameEventQueue();
+
     void add(GameEvent*);
 
     void pause();
     void resume();
+    void clear();
 
 public slots:
     void onGameEventFinished(GameEvent*);
@@ -28,6 +31,7 @@ private:
     QQueue<GameEvent*> m_queue;
     bool m_paused;
     bool m_eventOnHold;
+    bool m_aboutToDelete;
 
 };
 }

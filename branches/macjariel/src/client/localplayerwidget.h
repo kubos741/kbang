@@ -45,6 +45,8 @@ public:
     virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
     virtual bool                    isLocalPlayer()   { return 1;                   }
 
+    virtual void enterGameMode(Game* game);
+
     void setFromPrivateData(const PrivatePlayerData&);
     void setFromContext(const GameContextData&);
 
@@ -52,7 +54,9 @@ protected:
     virtual void clearWidgets();
     virtual void updateWidgets();
     virtual void moveWinnerIcon();
-    virtual void onGameEntered();
+    virtual void setRoleFromPublicData(PlayerRole);
+    virtual void setHandSize(int handSize);
+
 
 private slots:
     void onEndTurnClicked();
