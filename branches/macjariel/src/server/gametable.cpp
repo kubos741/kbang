@@ -318,7 +318,7 @@ void GameTable::regenerateDeck()
     m_deck << m_graveyard;
     m_graveyard.clear();
     m_graveyard << m_deck.takeLast();
-    shuffleList(m_graveyard);
+    shuffleList(m_deck);
     mp_game->gameEventBroadcaster().onDeckRegenerate();
 }
 
