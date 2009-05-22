@@ -286,6 +286,7 @@ void GameTable::generateCards(CardFactory* cardFactory)
 {
     m_cards = cardFactory->generateCards(mp_game);
     m_deck << m_cards.values();
+    shuffleDeck();
 }
 
 void GameTable::shuffleDeck()
@@ -318,7 +319,7 @@ void GameTable::regenerateDeck()
     m_deck << m_graveyard;
     m_graveyard.clear();
     m_graveyard << m_deck.takeLast();
-    shuffleList(m_deck);
+    shuffleDeck();
     mp_game->gameEventBroadcaster().onDeckRegenerate();
 }
 
