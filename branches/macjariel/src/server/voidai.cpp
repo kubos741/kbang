@@ -47,13 +47,13 @@ void VoidAI::requestWithAction()
 {
     qDebug() << QString("VoidAI (%1): onActionRequest(%2)").arg(m_id).arg(m_requestType);
     if (mp_playerCtrl->publicGameView().gameContextData().requestedPlayerId != mp_playerCtrl->privatePlayerView().id()) {
-        QString("VoidAI (%1): Not requested!");
+        QString("VoidAI (%1): Not requested!").arg(m_id);
         return;
     }
     QList<PlayingCard*> hand = mp_playerCtrl->privatePlayerView().hand();
     switch(m_requestType) {
         case REQUEST_DRAW:
-        qDebug() << QString("VoidAI (%1): REQUEST_DRAW");
+        qDebug() << QString("VoidAI (%1): REQUEST_DRAW").arg(m_id);
             // Drawing two cards
             try {
                 mp_playerCtrl->draw();
@@ -73,7 +73,7 @@ void VoidAI::requestWithAction()
             }
             break;
         case REQUEST_PLAY: {
-            qDebug() << QString("VoidAI (%1): REQUEST_PLAY");
+            qDebug() << QString("VoidAI (%1): REQUEST_PLAY").arg(m_id);
             // Try to use blue cards:
             foreach (PlayingCard* card, hand) {
                 try {
@@ -127,6 +127,8 @@ void VoidAI::requestWithAction()
                                     qDebug() << "VoidAI: BadTargetPlayerException!";
                                 } catch (OneBangPerTurnException e) {
                                     qDebug() << "VoidAI: One bang per turn!";
+                                } catch(GameException& e) {
+                                    qDebug() << "VoidAI: GameException";
                                 }
                             }
                             break;
@@ -156,10 +158,15 @@ void VoidAI::requestWithAction()
             if (mp_playerCtrl->publicGameView().selection().size() > 0) {
                 QList<PlayingCard*> cards = mp_playerCtrl->publicGameView().selection();
                 int index = rand() % cards.size();
-                mp_playerCtrl->playCard(cards[index]);
-                return;
+                try {
+                    mp_playerCtrl->playCard(cards[index]);
+                    return;
+                } catch(GameException& e) {
+                    qDebug() << QString("VoidAI (%1): Respond - selection: GameException").arg(m_id);
+                    e.debug();
+                }
             }
-            qDebug() << QString("VoidAI (%1): REQUEST_RESPOND");
+            qDebug() << QString("VoidAI (%1): REQUEST_RESPOND").arg(m_id);;
             QList<PlayingCard*> cards = mp_playerCtrl->privatePlayerView().hand();
             foreach (PlayingCard* c, cards) {
                 try {

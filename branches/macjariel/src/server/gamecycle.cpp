@@ -153,14 +153,17 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
-    if (card->owner() != player) {
-        qDebug() << "Bad card owner: " << card->owner();
+    if (card->owner() != 0 && card->owner() != player) {
         throw BadCardException();
     }
 
     if (isResponse()) {
         player->character()->respondCard(m_reactionHandlers.head(), card);
     } else {
+        if (card->owner() == 0) {
+            qDebug() << "Cannot play card owned by nobody.";
+            throw BadCardException();
+        }
         player->character()->playCard(card);
     }
     sendRequest();
