@@ -160,10 +160,10 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     if (isResponse()) {
         player->character()->respondCard(m_reactionHandlers.head(), card);
     } else {
-        if (card->owner() == 0) {
-            qDebug() << "Cannot play card owned by nobody.";
-            throw BadCardException();
-        }
+//        if (card->owner() == 0) {
+//            qDebug() << "Cannot play card owned by nobody.";
+//            throw BadCardException();
+//        }
         player->character()->playCard(card);
     }
     sendRequest();
