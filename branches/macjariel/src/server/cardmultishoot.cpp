@@ -28,6 +28,7 @@ CardMultiShoot::~CardMultiShoot()
 void CardMultiShoot::play()
 {
     gameCycle()->assertTurn();
+    assertInHand();
     mp_shootingPlayer = owner();
     mp_requestedPlayer = owner();
     m_usedBarrels.clear();

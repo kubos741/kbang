@@ -153,7 +153,8 @@ void GameCycle::playCard(Player* player, PlayingCard* card)
     if (player != mp_requestedPlayer)
         throw BadPlayerException(mp_currentPlayer->id());
 
-    if (card->owner() !=  0 && card->owner() != player) {
+    if (card->owner() != player) {
+        qDebug() << "Bad card owner: " << card->owner();
         throw BadCardException();
     }
 
