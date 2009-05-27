@@ -34,22 +34,19 @@
   <property name="styleSheet">
    <string notr="true">QToolButton {
 	width: 20px;
-	height: 20px
+	height: 20px;
 	border: 1px solid gray;
-	border-radius: 4px;
+	border-radius: 2px;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                        stop: 0 #f6f7fa, stop: 1 #dadbde);
+
 }
 QToolButton:pressed {
-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                        stop: 0 #dadbde, stop: 1 #f6f7fa);
  }
 
- QToolButton:flat {
-     border: none; /* no border for a flat push button */
- }
-
- QToolButton:default {
+QToolButton:default {
      border-color: navy; 
 }</string>
   </property>
@@ -150,6 +147,9 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
         <widget class="QToolButton" name="mp_buttonEndTurn">
          <property name="toolTip">
           <string>Turn</string>
+         </property>
+         <property name="styleSheet">
+          <string/>
          </property>
          <property name="text">
           <string>T</string>
