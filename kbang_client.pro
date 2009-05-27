@@ -4,7 +4,7 @@ MOC_DIR = mocs/client
 RCC_DIR = rccs/client
 OBJECTS_DIR = obj/client
 CONFIG += qt
-CONFIG += debug \
+CONFIG += release \
     warn_on
 QT += network \
     xml

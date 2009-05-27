@@ -4,7 +4,7 @@ MOC_DIR = mocs/server
 OBJECTS_DIR = obj/server
 QT += network xml
 
-CONFIG += debug
+CONFIG += release
 
 INCLUDEPATH += src/server src/common
 DEPENDPATH += src/common
