@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/misc" >
+        <file>background.png</file>
+        <file>sheriff-badge.png</file>
+        <file>winner.png</file>
+    </qresource>
+    <qresource prefix="/icons" >
+        <file>connect.png</file>
+        <file>disconnect.png</file>
+        <file>ai.png</file>
+        <file>alive.png</file>
+        <file>dead.png</file>
+        <file>human.png</file>
+        <file>sheriff.png</file>
+    </qresource>
+</RCC>
