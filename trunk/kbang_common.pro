@@ -3,8 +3,8 @@ UI_DIR = uics/common
 MOC_DIR = mocs/common
 OBJECTS_DIR = obj/common
 
-# CONFIG += staticlib release
-CONFIG += staticlib \
+CONFIG += staticlib release
+#CONFIG += staticlib \
     debug
 QT += xml
 INCLUDEPATH += src/common
