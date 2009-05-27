@@ -24,53 +24,55 @@
 
 Console::Console(GameServer* gameServer, FILE* in, FILE* out):
         QThread(gameServer),
+        m_isEnabled(1),
         m_cin(in, QIODevice::ReadOnly),
         m_cout(out, QIODevice::WriteOnly),
         mp_gameServer(gameServer)
 {
 }
 
+void Console::disable()
+{
+    m_isEnabled = 0;
+}
 
 Console::~Console()
 {
-    if (!isFinished()) {
-        exit(0);
-        if (!wait(200)) {
-            terminate();
-            wait(500);
-        }
-    }
+    terminate();
+    wait(2000);
 }
 
 void Console::run()
 {
-    initConsole();
-    QString line;
-    while(1)
-    {
-        line = readLine();
-        execLine(line);
-    }
+    init();
+    doLoop();
 }
 
-void Console::initConsole()
+void Console::init()
 {
     console_register_commands();
     m_cout << QString("Welcome to KBang Server version %1.").arg(mp_gameServer->version()) << endl;
+    Console::usleep(1000);
 }
 
-QString Console::readLine()
+void Console::doLoop()
 {
-    
-    m_cout << "> " << flush;
-    return m_cin.readLine();
+    while (m_isEnabled) {
+        writePrompt();
+        QString line = m_cin.readLine();
+        if (!line.isNull()) {
+            execLine(line);
+        } else {
+            break;
+        }
+    }
 }
 
 /**
  *
  * @param cmdString
  */
-void Console::execLine(QString& cmdString)
+void Console::execLine(QString cmdString)
 {
     QString cmdName;
     QStringList cmdArgs;
@@ -89,19 +91,10 @@ void Console::execLine(QString& cmdString)
         return;
     }
     (*cmd)(cmdArgs, *this); 
-/*    
-//    const ConsoleCmd& cmd = ConsoleCmd::instance(pair.first);
-    QString result = cmd.execute(pair.first, pair.second, mp_gameServer);
-    //QString result(cmd.exec(mp_gameServer));
-    if (result.size())
-    {
-        QStringList resultLines = result.split('\n');
-        for(QStringList::const_iterator it = resultLines.begin(); it != resultLines.end(); ++it)
-        {
-            m_cout << "   " << *it << endl;
-        }
-    } else {
-        m_cout << flush;
-    }
-*/
 }
+
+void Console::writePrompt()
+{
+    m_cout << "> " << flush;
+}
+

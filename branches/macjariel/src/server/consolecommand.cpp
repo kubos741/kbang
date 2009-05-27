@@ -35,7 +35,7 @@
 #define CMDDEF(name) bool name(const QStringList& args, Console& console)
 #define CMDREG(name, function) cmdHash.insert(name, function)
 #define CMDALIAS(name, alias) cmdHash.insert(name, cmdHash[alias])
-#define CMD_ASSERT_ARG_CNT(cnt) if (args.size() != cnt) { console.Cout() << QString("Bad arguments count, expected %1.").arg(cnt); return 1; }
+#define CMD_ASSERT_ARG_CNT(cnt) if (args.size() != cnt) { console.cout() << QString("Bad arguments count, expected %1.").arg(cnt); return 1; }
 
 
 
@@ -54,7 +54,7 @@ ConsoleCmd* console_get_command(const QString& cmdName)
 CMDDEF(console_help)
 {
     (void) args;
-    console.Cout() << "Help" << endl;
+    console.cout() << "Help" << endl;
     return 1;
 }
 
@@ -62,7 +62,7 @@ CMDDEF(console_quit)
 {
     (void) args;
     (void) console;
-    qDebug() << "QUIT";
+    console.disable();
     GameServer::instance().exit();
     return 1;
 }
@@ -71,13 +71,13 @@ CMDDEF(console_list_games)
 {
     Q_UNUSED(args);
     foreach(Game* game, GameServer::instance().gameList()) {
-        console.Cout() << "--------------------------------------------------------------------------------" << endl;
-        console.Cout() << " " << game->gameInfo().name() << " (id: " << game->id() << ")" << endl;
-        console.Cout() << "--------------------------------------------------------------------------------" << endl;
+        console.cout() << "--------------------------------------------------------------------------------" << endl;
+        console.cout() << " " << game->gameInfo().name() << " (id: " << game->id() << ")" << endl;
+        console.cout() << "--------------------------------------------------------------------------------" << endl;
         foreach(Player* player, game->playerList()) {
-            console.Cout() << "  " << player->id() << ": " << player->name() << endl;
+            console.cout() << "  " << player->id() << ": " << player->name() << endl;
         }
-        console.Cout() << endl << endl;
+        console.cout() << endl << endl;
     }
     return 0;
 }
@@ -86,19 +86,19 @@ CMDDEF(console_list_clients)
 {
     Q_UNUSED(args);
     foreach(Client* client, GameServer::instance().clientList()) {
-        console.Cout() << "  " << client->id() << ", " << client->address() << ", ";
+        console.cout() << "  " << client->id() << ", " << client->address() << ", ";
         if (client->gameId() == 0) {
-            console.Cout() << "not in game";
+            console.cout() << "not in game";
         } else {
             Game* game = GameServer::instance().game(client->gameId());
             Q_ASSERT(game);
-            console.Cout() << QString("in %1 (%2)").arg(game->gameInfo().name()).arg(game->id());
+            console.cout() << QString("in %1 (%2)").arg(game->gameInfo().name()).arg(game->id());
             if (client->playerId()) {
                 Player* player = game->player(client->playerId());
-                console.Cout() << QString(" as %1 (%2)").arg(player->name()).arg(player->id());
+                console.cout() << QString(" as %1 (%2)").arg(player->name()).arg(player->id());
             }
         }
-        console.Cout() << endl;
+        console.cout() << endl;
     }
     return 0;
 }
@@ -113,12 +113,12 @@ CMDDEF(console_set_player_password)
 
     Game* game = GameServer::instance().game(gameId);
     if (game == 0) {
-        console.Cout() << QString("The game id %1 does not exist.").arg(gameId);
+        console.cout() << QString("The game id %1 does not exist.").arg(gameId);
         return 1;
     }
     Player* player = game->player(playerId);
     if (player == 0) {
-        console.Cout() << QString("The player id %1 in game %2 does not exist.").arg(playerId).arg(game->gameInfo().name());
+        console.cout() << QString("The player id %1 in game %2 does not exist.").arg(playerId).arg(game->gameInfo().name());
         return 1;
     }
     player->setPassword(args[2]);

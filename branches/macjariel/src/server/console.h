@@ -20,11 +20,12 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include <QtCore>
+#include <QObject>
+#include <QFile>
+#include <QTextStream>
+#include <QThread>
 
 class GameServer;
-
-
 
 /**
  * @author MacJariel <macjariel@users.sourceforge.net>
@@ -32,21 +33,31 @@ class GameServer;
 class Console: public QThread
 {
     Q_OBJECT
-protected:
-    void run();
 public:
     Console(GameServer* gameServer, FILE* in, FILE* out);
     ~Console();
-    QTextStream& Cout() { return m_cout; }
+
+    inline QTextStream& cout() { return m_cout; }
+    void disable();
+
+protected:
+    void run();
+
 private:
+    void init();
+    void doLoop();
+    void execLine(QString cmd);
+    void writePrompt();
+
+private:
+    bool        m_isEnabled;
     QTextStream m_cin;
     QTextStream m_cout;
     GameServer* mp_gameServer;
 
 private:
-    void initConsole();
-    QString readLine();
-    void execLine(QString& cmd);
+
+
 
 };
 
