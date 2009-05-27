@@ -50,7 +50,7 @@ void CardList::setCardSize(const CardWidget::Size& cardSize)
     QSize cardS = CardWidget::qSize(cardSize);
     QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
     m_moveFactor = cardS.width() / 2 + cardS.width() / 5;
-    setMinimumWidth((int)(cardS.width() * 3.5));
+    setMinimumWidth((int)(cardS.width() * 3.8));
     setMinimumHeight(cardS.height() + 2 * m_vPadding);
     updateGeometry();
 }
@@ -144,9 +144,9 @@ int CardList::cardX(int i, bool newCard) const
     int cardCount = m_cards.size();
     if (newCard)
         cardCount++;
-    int cSize = cardCount * m_moveFactor + CardWidget::qSize(m_cardSize).width();
+    int cSize = (cardCount - 1) * m_moveFactor + CardWidget::qSize(m_cardSize).width();
     if (cSize <= width() - 2 * m_hPadding) {
-        return m_hPadding + i * m_moveFactor;
+        return m_hPadding + i * m_moveFactor + (int)((width() - 2 * m_hPadding) / 2 - (cSize / 2));
     } else {
         int newMoveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
         //i * NF = todoWidth - 2*hpadding - width

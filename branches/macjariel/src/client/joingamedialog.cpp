@@ -19,6 +19,7 @@ c *   (at your option) any later version.                                   *
  ***************************************************************************/
 
 #include <QInputDialog>
+#include <QHeaderView>
 
 #include "joingamedialog.h"
 #include "serverconnection.h"
