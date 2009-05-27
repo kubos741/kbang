@@ -31,56 +31,57 @@ void GameMessageEvent::run()
         msg = tr("The game has finished.");
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:
-        msg = tr("<i>%1</i> drew %2 from the deck.").
-                    arg(playerName).
+        msg = tr("%1 drew %2 from the deck.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardListToString(m_gameMessage.cards));
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD:
-        msg = tr("<i>%1</i> drew %2 from the discard pile.").
-                    arg(playerName).
+        msg = tr("%1 drew %2 from the discard pile.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card));
         break;
     case GAMEMESSAGE_PLAYERDISCARDCARD:
-        msg = tr("<i>%1</i> discarded %2.").
-                    arg(playerName).
+        msg = tr("%1 discarded %2.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card));
         break;
     case GAMEMESSAGE_PLAYERPLAYCARD:
         if (m_gameMessage.targetCard.id) {
-            msg = tr("<i>%1</i> played %2 on <i>%3</i>%4.").
-                        arg(playerName).
+            msg = tr("%1 played %2 on %3%4.").
+                        arg(decoratePlayerName(playerName)).
                         arg(cardToString(m_gameMessage.card)).
                         arg(cardToString(m_gameMessage.targetCard)).
                         arg(m_gameMessage.targetPlayer ?
-                                tr(" owned by <i>%1</i>").arg(targetPlayerName) : "");
-        } else if (m_gameMessage.targetPlayer) {
-            msg = tr("<i>%1</i> played %2 on <i>%3</i>.").
-                        arg(playerName).
+                                tr(" owned by %1").arg(decoratePlayerName(targetPlayerName, 1)) : "");
+        } else if (m_gameMessage.targetPlayer && m_gameMessage.targetPlayer != m_gameMessage.player) {
+            msg = tr("%1 played %2 on %3.").
+                        arg(decoratePlayerName(playerName)).
                         arg(cardToString(m_gameMessage.card)).
-                        arg(targetPlayerName);
+                        arg(decoratePlayerName(targetPlayerName, 1));
         } else {
-            msg = tr("<i>%1</i> played %2.").
-                        arg(playerName).
+            msg = tr("%1 played %2.").
+                        arg(decoratePlayerName(playerName)).
                         arg(cardToString(m_gameMessage.card));
         }
         break;
     case GAMEMESSAGE_PLAYERRESPONDWITHCARD:
-        msg = tr("<i>%1</i> responded with %2.").
-                    arg(playerName).
+        msg = tr("&nbsp;&nbsp;&nbsp;&nbsp;%1 responded with %2.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card));
         break;
     case GAMEMESSAGE_PLAYERPASS:
-        msg = tr("<i>%1</i> did not reacted.").
-                    arg(playerName);
+        msg = tr("&nbsp;&nbsp;&nbsp;&nbsp;%1 did not react.").
+                    arg(decoratePlayerName(playerName));
         break;
     case GAMEMESSAGE_PLAYERPICKFROMSELECTION:
-        msg = tr("<i>%1</i> took %2 from selection.").
-                    arg(playerName).
+        msg = tr("&nbsp;&nbsp;&nbsp;&nbsp;%1 took %2 from selection.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card));
         break;
     case GAMEMESSAGE_PLAYERCHECKDECK:
-        msg = tr("<i>%1</i> checked deck (because of %2) and ").
-                    arg(playerName).
+        msg = tr("%1 \"drew!\" %2 (because of %3) and ").
+                    arg(decoratePlayerName(playerName)).
+                    arg(cardToString(m_gameMessage.targetCard, 1)).
                     arg(cardToString(m_gameMessage.card));
         if (m_gameMessage.checkResult)
             msg += tr("was lucky.");
@@ -88,23 +89,23 @@ void GameMessageEvent::run()
             msg += tr("failed.");
         break;
     case GAMEMESSAGE_PLAYERSTEALCARD:
-        msg = tr("<i>%1</i> took %2 from <i>%3</i>.").
-                    arg(playerName).
+        msg = tr("%1 drew %2 from %3.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card)).
-                    arg(targetPlayerName);
+                    arg(decoratePlayerName(targetPlayerName, 1));
         break;
     case GAMEMESSAGE_PLAYERCANCELCARD:
-        msg = tr("<i>%1</i> canceled %2 from <i>%3</i>.").
-                    arg(playerName).
+        msg = tr("%1 forced %3 to discard %2.").
+                    arg(decoratePlayerName(playerName)).
                     arg(cardToString(m_gameMessage.card)).
-                    arg(targetPlayerName);
+                    arg(decoratePlayerName(targetPlayerName, 1));
         break;
     case GAMEMESSAGE_DECKREGENERATE:
         msg = tr("The deck ran out of cards. Cards from the discard pile were shuffled and are now used as new deck.");
         break;
     case GAMEMESSAGE_PLAYERDIED:
-        msg = tr("<i>%1</i> passed away. R.I.P.").
-                    arg(playerName);
+        msg = tr("%1 passed away. R.I.P.").
+                    arg(decoratePlayerName(playerName));
         break;
     case GAMEMESSAGE_INVALID:
         break;
@@ -124,7 +125,7 @@ QString GameMessageEvent::cardToString(const CardData& cardData, bool withRankAn
     if (card == 0)
         return "";
 
-    QString res = "<i>" + card->name() + "</i>";
+    QString res = "<b><i>" + card->name() + "</i></b>";
     if (withRankAndSuit)
         res += " (" + Card::rankToString(cardData.rank) +
                Card::suitToColorString(cardData.suit) + ")";
@@ -151,4 +152,10 @@ QString GameMessageEvent::cardListToString(QList<CardData> cardList)
         }
     }
     return result;
+}
+
+QString GameMessageEvent::decoratePlayerName(const QString& playerName, bool isTarget)
+{
+    return QString("<font color=\"%2\"><b>%1</b></font>").
+                  arg(playerName).arg(isTarget ? "navy" : "lightblue");
 }

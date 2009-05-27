@@ -117,10 +117,17 @@ void Game::setGameContext(const GameContextData& gameContextData)
     mp_localPlayerWidget->setFromContext(gameContextData);
 
 
+    if (gamePlayState() == GAMEPLAYSTATE_DRAW) {
+        emit emitLogMessage("<br />");
+    }
+
+
     if (!requestedPlayer || !requestedPlayer->isLocalPlayer()) {
         unsetTextInfo();
         return;
     }
+
+
 
     if (gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
         PlayerWidget* causedBy = gameContextData.causedBy ? playerWidget(gameContextData.causedBy) : 0;

@@ -22,6 +22,7 @@
 #include "connecttoserverdialog.h"
 #include "creategamedialog.h"
 #include "joingamedialog.h"
+#include "aboutdialog.h"
 #include "logwidget.h"
 #include "chatwidget.h"
 #include "opponentwidget.h"
@@ -40,6 +41,7 @@ MainWindow::MainWindow():
         mp_connectToServerDialog(0),
         mp_createGameDialog(0),
         mp_joinGameDialog(0),
+        mp_aboutDialog(0),
         m_serverConnection(this),
         mp_game(0)
 {
@@ -95,8 +97,7 @@ void MainWindow::disconnectFromServer()
 
 void MainWindow::showCreateGameDialog()
 {
-    if (!mp_createGameDialog)
-    {
+    if (!mp_createGameDialog) {
         mp_createGameDialog = new CreateGameDialog(this);
         connect(mp_createGameDialog,SIGNAL(createGame(CreateGameData,CreatePlayerData)),
                 &m_serverConnection, SLOT(createGame(CreateGameData,CreatePlayerData)));
@@ -107,8 +108,7 @@ void MainWindow::showCreateGameDialog()
 
 void MainWindow::showJoinGameDialog()
 {
-    if (!mp_joinGameDialog)
-    {
+    if (!mp_joinGameDialog) {
         mp_joinGameDialog = new JoinGameDialog(this, &m_serverConnection);
         connect(mp_joinGameDialog, SIGNAL(joinGame(int,int,QString,CreatePlayerData)),
                 &m_serverConnection, SLOT(joinGame(int,int,QString,CreatePlayerData)));
@@ -123,6 +123,14 @@ void MainWindow::leaveGame()
     } else {
         exitGameMode();
     }
+}
+
+void MainWindow::showAboutDialog()
+{
+    if (!mp_aboutDialog) {
+        mp_aboutDialog = new AboutDialog(this);
+    }
+    mp_aboutDialog->show();
 }
 
 void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
@@ -163,6 +171,8 @@ void MainWindow::createActions()
             this, SLOT(showJoinGameDialog()));
     connect(mp_actionLeaveGame, SIGNAL(triggered()),
             this, SLOT(leaveGame()));
+    connect(mp_actionAbout, SIGNAL(triggered()),
+            this, SLOT(showAboutDialog()));
 }
 
 

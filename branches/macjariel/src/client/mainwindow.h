@@ -30,6 +30,7 @@ namespace client {
 class ConnectToServerDialog;
 class CreateGameDialog;
 class JoinGameDialog;
+class AboutDialog;
 class OpponentWidget;
 class Game;
 class CardWidgetSizeManager;
@@ -48,6 +49,7 @@ public slots:
     void showCreateGameDialog();
     void showJoinGameDialog();
     void leaveGame();
+    void showAboutDialog();
 
     void enterGameMode(int gameId, const QString& gameName, ClientType);
     void exitGameMode();
@@ -63,6 +65,7 @@ private:
     ConnectToServerDialog* mp_connectToServerDialog;
     CreateGameDialog*      mp_createGameDialog;
     JoinGameDialog*        mp_joinGameDialog;
+    AboutDialog*           mp_aboutDialog;
     ServerConnection       m_serverConnection;
     Game*                  mp_game;
     QList<OpponentWidget*> m_opponentWidgets;

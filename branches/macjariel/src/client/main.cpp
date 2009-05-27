@@ -24,6 +24,10 @@
 #include <time.h>
 #include "mainwindow.h"
 
+#define KBANG_CLIENT_VERSION_MAJOR 0
+#define KBANG_CLIENT_VERSION_MINOR 1
+#define KBANG_CLIENT_VERSION_REVISION 3
+
 using namespace client;
 
 int main(int argc, char *argv[])
@@ -33,6 +37,10 @@ int main(int argc, char *argv[])
     srand((unsigned int) sec);
 
     QApplication app(argc, argv);
+    app.setApplicationName("KBang Client");
+    app.setApplicationVersion(QString("%1.%2.%3").arg(KBANG_CLIENT_VERSION_MAJOR).
+                                                  arg(KBANG_CLIENT_VERSION_MINOR).
+                                                  arg(KBANG_CLIENT_VERSION_REVISION));
     MainWindow mainWindow;
     mainWindow.show();
     return app.exec();
