@@ -52,7 +52,7 @@ void Console::init()
 {
     console_register_commands();
     m_cout << QString("Welcome to KBang Server version %1.").arg(mp_gameServer->version()) << endl;
-    Console::usleep(1000);
+    Console::msleep(500);
 }
 
 void Console::doLoop()
