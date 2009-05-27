@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "cardplayable.h"
+#include "player.h"
+#include "gametable.h"
+
+CardPlayable::CardPlayable(Game* game, int id): PlayingCard(game, id)
+{
+}
+
+CardPlayable::~CardPlayable()
+{
+}
+
+bool CardPlayable::play()
+{
+    mp_game->gameTable().playCard(owner(), this);
+    return 1;
+}
+
+

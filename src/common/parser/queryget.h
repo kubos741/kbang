@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef QUERYGET_H
+#define QUERYGET_H
+
+#include "parserstructs.h"
+#include <QObject>
+
+class Parser;
+class QXmlStreamWriter;
+class XmlNode;
+
+class QueryGet: public QObject
+{
+Q_OBJECT
+friend class Parser;
+public:
+    void getServerInfo();
+    void getGameInfo(int id);
+    void getGameInfoList();
+
+signals:
+    void result(const ServerInfoData&);
+    void result(const GameInfoData&);
+    void result(const GameInfoListData&);
+
+private:
+    QueryGet(Parser* parser, QXmlStreamWriter* streamWriter, const QString& id);
+    virtual ~QueryGet();
+    void writeStartQuery();
+    void writeEndQuery();
+    void parseResult(XmlNode*);
+
+private:
+    Parser*             mp_parser;
+    QXmlStreamWriter*   mp_streamWriter;
+    QString             m_id;
+};
+
+#endif

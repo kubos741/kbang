@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifndef UTIL_H
+#define UTIL_H
+
+#include <QString>
+#include <QList>
+#include <QLinkedList>
+#include <cstdlib>
+#include <qglobal.h>
+
+
+#define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+
+QString randomToken(int minLength, int maxLength);
+
+template <typename T>
+inline void shuffleList(QList<T>& list)
+{
+    int size = list.count();
+    int swapCount = size * 4;
+    while(swapCount-- != 0)
+    {
+        list.swap(rand() % size, rand() % size);
+    }
+}
+
+template <typename T>
+inline void shuffleList(QLinkedList<T>& list)
+{
+    int size = list.count();
+    int swapCount = size * 4;
+    while(swapCount-- != 0)
+    {
+        list.swap(rand() % size, rand() % size);
+    }
+}
+
+class NonCopyable
+{
+protected:
+    NonCopyable() {}
+    ~NonCopyable() {}
+private:
+    NonCopyable(const NonCopyable&);
+    NonCopyable& operator=(const NonCopyable&);
+};
+
+
+#endif

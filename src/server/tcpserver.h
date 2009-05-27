@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
+
+#include <QTcpServer>
+
+class GameServer;
+
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class TcpServer : public QTcpServer
+{
+Q_OBJECT
+public:
+    TcpServer(GameServer* parent);
+    virtual bool listen();
+    virtual ~TcpServer();
+
+    inline QString hostAddressString()
+    {
+        return m_hostAddressString;
+    }
+
+    inline quint16 port()
+    {
+        return m_port;
+    }
+
+
+
+private:
+    QHostAddress m_hostAddress;
+    QString m_hostAddressString;
+    quint16 m_port;
+    GameServer* mp_gameServer;
+};
+
+#endif

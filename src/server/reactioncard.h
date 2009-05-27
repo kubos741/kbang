@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef REACTIONCARD_H
+#define REACTIONCARD_H
+
+#include "playingcard.h"
+#include "reactionhandler.h"
+#include "parser/parserstructs.h"
+
+/**
+ * The ReactionCard is the base class for all playing cards, that, when are played,
+ * require a reaction of (an)other player(s). This, for example, includes Bang!, Indians,
+ * General Store, etc.
+ *
+ * When the card is played, it can register itself at GameCycle and request gamecycle for
+ * a responce from a player. The responce can be either using a card or passing (doing nothing).
+ * Thus the ReactionCard childs need to implement these methods:
+ *  * virtual void respondPass();
+ *  * virtual void respondCard(ReactionCard* targetCard);
+ *
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class ReactionCard: public PlayingCard, public ReactionHandler
+{
+Q_OBJECT
+public:
+    ReactionCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
+    //virtual ~ReactionCard();
+};
+
+#endif

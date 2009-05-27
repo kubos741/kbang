@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CARDPOCKET_H
+#define CARDPOCKET_H
+
+#include <QFrame>
+#include <QPoint>
+
+#include "parser/parserstructs.h"
+
+namespace client
+{
+class CardWidget;
+
+/**
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class CardPocket : public QFrame
+{
+Q_OBJECT
+public:
+    CardPocket(QWidget *parent);
+    virtual ~CardPocket();
+    virtual QPoint newCardPosition() const = 0;
+    virtual void push(CardWidget*);
+    void setPocketType(const PocketType&);
+    void setOwnerId(int);
+
+signals:
+    void newCardPositionChanged(const QPoint&);
+
+protected:
+    PocketType m_pocketType;
+    int        m_ownerId;
+};
+}
+#endif

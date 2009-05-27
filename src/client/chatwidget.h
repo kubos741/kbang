@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CHATWIDGET_H
+#define CHATWIDGET_H
+
+#include <QWidget>
+#include "ui_chatwidget.h"
+
+namespace client
+{
+
+/**
+ *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ChatWidget : public QWidget, public Ui::ChatWidget
+{
+Q_OBJECT
+public:
+    ChatWidget(QWidget *parent = 0);
+    ~ChatWidget();
+    virtual void paintEvent(QPaintEvent* event);
+    void clear();
+
+public slots:
+    void incomingMessage(int senderId, const QString& senderName, const QString& message);
+    void sendMessage();
+
+signals:
+    void outgoingMessage(const QString& message);
+
+};
+}
+#endif

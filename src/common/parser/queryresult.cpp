@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include "queryresult.h"
+#include "parser.h"
+#include <QXmlStreamWriter>
+
+QueryResult::QueryResult(QXmlStreamWriter* streamWriter, const QString& id):
+mp_streamWriter(streamWriter), m_id(id), m_sent(0)
+{
+}
+
+void QueryResult::writeStartQuery()
+{
+    mp_streamWriter->writeStartElement("query");
+    mp_streamWriter->writeAttribute("type", "result");
+    mp_streamWriter->writeAttribute("id", m_id);
+}
+
+void QueryResult::writeEndQuery()
+{
+    mp_streamWriter->writeEndElement();
+}

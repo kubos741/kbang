@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifndef COMMON_H
+#define COMMON_H
+
+#include <QtDebug>
+#include <QList>
+#include <QLabel>
+
+class QGridLayout;
+
+namespace client
+{
+class LocalPlayerWidget;
+class OpponentWidget;
+
+struct GameWidgets
+{
+    QWidget* mainWidget;
+    QWidget* middleWidget;
+    LocalPlayerWidget* localPlayerWidget;
+    QList<OpponentWidget*> opponentWidget;
+    QLabel*  statusLabel;
+    GameWidgets(QWidget* main, QWidget* middle, LocalPlayerWidget* p,
+                const QList<OpponentWidget*>& o, QLabel* s):
+        mainWidget(main), middleWidget(middle), localPlayerWidget(p), opponentWidget(o),
+        statusLabel(s){}
+};
+
+}
+
+#endif

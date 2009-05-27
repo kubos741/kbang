@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CONNECTTOSERVERDIALOG_H
+#define CONNECTTOSERVERDIALOG_H
+
+#include <QDialog>
+#include <ui_connecttoserverdialog.h>
+
+namespace client
+{
+
+/**
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class ConnectToServerDialog : public QDialog, public Ui::ConnectToServerDialog
+{
+Q_OBJECT
+public:
+    ConnectToServerDialog(QWidget *parent = 0);
+    ~ConnectToServerDialog();
+
+    void reloadServerList();
+
+private slots:
+    void on_serverList_currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+    void on_serverList_itemDoubleClicked (QTreeWidgetItem*, int);
+    void on_pushButtonAddServer_clicked();
+    void on_pushButtonEditServer_clicked();
+    void on_pushButtonDeleteServer_clicked();
+    void on_pushButtonConnect_clicked();
+
+signals:
+    void connectToServer(QString serverHost, int serverPort);
+
+private:
+    void loadConfigValues();
+    void saveConfigValues();
+};
+}
+#endif
