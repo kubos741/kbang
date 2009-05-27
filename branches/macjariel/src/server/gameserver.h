@@ -47,7 +47,9 @@ public:
     static GameServer&  instance();
 
     ServerInfoData      serverInfo() const;
-    QString             version() const { return sm_version; }
+    QString             version() const { return m_version; }
+    void                setVersion(QString version);
+
 
     /**
      * Creates new game and returns a pointer to it.
@@ -113,7 +115,7 @@ private:
 
 private:
     static GameServer*       sm_instance;
-    static QString           sm_version;
+    QString                 m_version;
     QHash<int, Game*>   m_games;
     QHash<int, Client*>      m_clients;
 

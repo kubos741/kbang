@@ -29,6 +29,10 @@
 
 #include "parser/parserstructs.h"
 
+#define KBANG_SERVER_VERSION_MAJOR 0
+#define KBANG_SERVER_VERSION_MINOR 1
+#define KBANG_SERVER_VERSION_REVISION 3
+
 int main(int argc, char* argv[])
 {
     time_t sec;
@@ -36,9 +40,13 @@ int main(int argc, char* argv[])
     srand((unsigned int) sec);
     QCoreApplication app(argc, argv);
     GameServer& server = GameServer::instance();
-    server.listen();
+    server.setVersion(QString("%1.%2.%3").arg(KBANG_SERVER_VERSION_MAJOR).
+                                          arg(KBANG_SERVER_VERSION_MINOR).
+                                          arg(KBANG_SERVER_VERSION_REVISION));
+
     Console* console = new Console(&server, stdin, stdout);
     console->start();
+    server.listen();
 //    QObject::connect(&app, SIGNAL(aboutToQuit()),
 //                     console, SLOT(terminate()));
     return app.exec();

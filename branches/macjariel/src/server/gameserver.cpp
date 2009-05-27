@@ -30,8 +30,6 @@
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
 
-QString GameServer::sm_version("0.1.0-r2");
-
 GameServer* GameServer::sm_instance = 0;
 
 GameServer::GameServer():
@@ -63,6 +61,11 @@ GameServer& GameServer::instance()
 ServerInfoData GameServer::serverInfo() const
 {
     return m_serverInfoData;
+}
+
+void GameServer::setVersion(QString version)
+{
+    m_version = version;
 }
 
 Game* GameServer::createGame(const CreateGameData& createGameData)
