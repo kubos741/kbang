@@ -32,7 +32,8 @@
 
 #include "ioproxy.h"
 
-#define PROTOCOL_VERSION "0.1"
+#define KBANG_PROTOCOL_VERSION 1
+
 #define ASSERT_SOCKET if (!mp_socket) { qDebug("Socket is dead!"); return; }
 
 //Parser::Parser(QObject* parent):
@@ -123,7 +124,7 @@ void Parser::initializeStream()
 
 QString Parser::protocolVersion()
 {
-    return PROTOCOL_VERSION;
+    return QString::number(KBANG_PROTOCOL_VERSION);
 }
 
 void Parser::readData()

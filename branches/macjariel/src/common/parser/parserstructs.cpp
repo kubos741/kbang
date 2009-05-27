@@ -424,7 +424,7 @@ void GameMessage::read(XmlNode* node)
     foreach(XmlNode* child, node->getChildren()) {
         if (child->name() == "card")
             card.read(child);
-        else if (child->name() == "targetCard")
+        else if (child->name() == "target-card")
             targetCard.read(child->getFirstChild());
         else if (child->name() == "cards") {
             foreach (XmlNode* cardNode, child->getChildren()) {
