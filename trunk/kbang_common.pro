@@ -4,8 +4,8 @@ MOC_DIR = mocs/common
 OBJECTS_DIR = obj/common
 
 CONFIG += staticlib release
-#CONFIG += staticlib \
-    debug
+#CONFIG += staticlib debug
+
 QT += xml
 INCLUDEPATH += src/common
 HEADERS += src/common/parser/ioproxy.h \
