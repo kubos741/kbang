@@ -51,7 +51,8 @@ HEADERS += src/client/gameloop.h \
     src/client/newserverdialog.h \
     src/client/selectplayericonwidget.h \
     src/client/gamemessageevent.h \
-    src/client/cardwidgetsizemanager.h
+    src/client/cardwidgetsizemanager.h \
+    src/client/aboutdialog.h
 FORMS += src/client/connecttoserverdialog.ui \
     src/client/mainwindow.ui \
     src/client/joingamedialog.ui \
@@ -60,7 +61,8 @@ FORMS += src/client/connecttoserverdialog.ui \
     src/client/opponentwidget.ui \
     src/client/creategamedialog.ui \
     src/client/localplayerwidget.ui \
-    src/client/newserverdialog.ui
+    src/client/newserverdialog.ui \
+    src/client/aboutdialog.ui
 SOURCES += src/client/gameloop.cpp \
     src/client/main.cpp \
     src/client/connecttoserverdialog.cpp \
@@ -99,7 +101,8 @@ SOURCES += src/client/gameloop.cpp \
     src/client/newserverdialog.cpp \
     src/client/selectplayericonwidget.cpp \
     src/client/gamemessageevent.cpp \
-    src/client/cardwidgetsizemanager.cpp
+    src/client/cardwidgetsizemanager.cpp \
+    src/client/aboutdialog.cpp
 unix { 
     LIBPATH += lib
     TARGETDEPS += lib/libkbang_common.a
