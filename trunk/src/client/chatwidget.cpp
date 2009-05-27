@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "chatwidget.h"
+
+#include <QPainter>
+#include <QPaintEvent>
+
+
+using namespace client;
+
+ChatWidget::ChatWidget(QWidget *parent)
+ : QWidget(parent)
+{
+    setupUi(this);
+    setContentsMargins(5, 5, 5, 5);
+    /*
+    QPalette palette = QApplication::palette();
+    palette.setColor(QPalette::Base, QColor(0, 0, 0, 16));
+    setPalette(palette);
+    */
+
+    mp_chatView->setFocusPolicy(Qt::NoFocus);
+    mp_messageBox->setFocusPolicy(Qt::ClickFocus);
+    connect(mp_messageBox, SIGNAL(returnPressed()),
+            this, SLOT(sendMessage()));
+}
+
+
+ChatWidget::~ChatWidget()
+{
+}
+
+void ChatWidget::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+}
+
+void ChatWidget::clear()
+{
+    mp_chatView->clear();
+}
+
+void ChatWidget::incomingMessage(int, const QString& senderName, const QString& message)
+{
+    mp_chatView->append(QString("<b>%1:</b> %2").arg(senderName).arg(message));
+}
+
+void ChatWidget::sendMessage()
+{
+    const QString& message = mp_messageBox->text();
+    mp_messageBox->clear();
+    emit outgoingMessage(message);
+}
+
+

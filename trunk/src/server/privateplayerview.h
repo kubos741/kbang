@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef PRIVATEPLAYERVIEW_H
+#define PRIVATEPLAYERVIEW_H
+
+#include <publicplayerview.h>
+
+class PlayingCard;
+
+
+/**
+ *
+ * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ */
+class PrivatePlayerView: public PublicPlayerView
+{
+friend class Player;
+private:
+    PrivatePlayerView(Player* player);
+    virtual ~PrivatePlayerView();
+
+public:
+    /**
+     * Returns the role of the player. The valid role
+     * is returned even if the player is still alive
+     * and is not sheriff.
+     */
+    virtual PlayerRole role() const;
+
+    QString password() const;
+
+    QList<PlayingCard* > hand() const;
+
+    PrivatePlayerData privatePlayerData() const;
+
+    PlayingCard* card(int cardId) const;
+
+
+    // implement method cardsInHand
+};
+
+#endif

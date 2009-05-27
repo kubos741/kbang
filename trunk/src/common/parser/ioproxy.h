@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef IOPROXY_H
+#define IOPROXY_H
+
+#include <QIODevice>
+
+class IOProxy: public QIODevice
+{
+Q_OBJECT
+public:
+    IOProxy(QObject* parent);
+    virtual ~IOProxy();
+
+    virtual qint64 readData(char* data, qint64 maxSize);
+    virtual qint64 writeData(const char* data, qint64 maxSize);
+
+signals:
+    void networkOut(QByteArray data);
+};
+
+#endif

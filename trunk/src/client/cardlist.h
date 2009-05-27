@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CLIENTCARDLIST_H
+#define CLIENTCARDLIST_H
+
+#include <cardpocket.h>
+#include <cardwidget.h>
+
+#include <QList>
+
+namespace client {
+
+/**
+ * @author MacJariel <MacJariel@gmail.com>
+ */
+class CardList: public CardPocket
+{
+Q_OBJECT
+public:
+    CardList(QWidget *parent);
+    void setCardSize(const CardWidget::Size& cardSize);
+    virtual ~CardList();
+
+    virtual void push(CardWidget* card);
+    virtual QPoint newCardPosition() const;
+
+    virtual CardWidget* take(int cardId);
+    virtual CardWidget* pop();
+
+    virtual void paintEvent(QPaintEvent* event);
+
+    void clear();
+
+protected:
+    QList<CardWidget*> m_cards;
+
+private:
+    void reorder();
+    int cardX(int i, bool newCard = 0) const;
+
+private:
+    CardWidget::Size m_cardSize;
+    bool             m_revealed;
+    int              m_moveFactor;
+    int              m_hPadding, m_vPadding;
+};
+
+}
+
+#endif

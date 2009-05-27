@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
- *   MacJariel (at) gmail.com                                              *
+ *   Copyright (C) 2008 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include <QApplication>
+#include <QDialog>
+#include <cstdlib>
+#include <time.h>
+#include "mainwindow.h"
+
+#define KBANG_CLIENT_VERSION_MAJOR 0
+#define KBANG_CLIENT_VERSION_MINOR 1
+#define KBANG_CLIENT_VERSION_REVISION 3
+
+using namespace client;
+
+int main(int argc, char *argv[])
+{
+    time_t sec;
+    time(&sec);
+    srand((unsigned int) sec);
+
+    QApplication app(argc, argv);
+    app.setApplicationName("KBang Client");
+    app.setApplicationVersion(QString("%1.%2.%3").arg(KBANG_CLIENT_VERSION_MAJOR).
+                                                  arg(KBANG_CLIENT_VERSION_MINOR).
+                                                  arg(KBANG_CLIENT_VERSION_REVISION));
+    MainWindow mainWindow;
+    mainWindow.show();
+    return app.exec();
+}
+
