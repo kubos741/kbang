@@ -46,6 +46,11 @@ QToolButton:pressed {
                                        stop: 0 #dadbde, stop: 1 #f6f7fa);
  }
 
+QToolButton:checked {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #da5b5e, stop: 1 #f6676a);
+}
+
 QToolButton:default {
      border-color: navy; 
 }</string>
