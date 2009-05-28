@@ -146,10 +146,11 @@ private:
 
 
 private:
-    const int           m_id;
-    Parser*             mp_parser;
-    PlayerCtrl*         mp_playerCtrl;
-    QTcpSocket*         mp_socket;
+    const int             m_id;
+    Parser*               mp_parser;
+    PlayerCtrl*           mp_playerCtrl;
+    const PublicGameView* mp_publicGameView;
+    QTcpSocket*           mp_socket;
 };
 
 #endif
