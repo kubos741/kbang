@@ -80,7 +80,7 @@ public slots: // These slots are connected to parser
     void onActionJoinGame(int gameId, int playerId, QString gamePassword, const CreatePlayerData&);
     void onActionLeaveGame();
     void onActionStartGame();
-    void onActionDrawCard(int numCards, bool revealCard);
+    void onActionDrawCard();
     void onActionPlayCard(const ActionPlayCardData&);
     void onActionUseAbility(const ActionUseAbilityData&);
     void onActionEndTurn();

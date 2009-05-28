@@ -79,7 +79,7 @@ public:
     void actionLeaveGame();
     void actionStartGame();
     void actionChatMessage(const QString& message);
-    void actionDrawCard(int numCards, bool revealCard);
+    void actionDrawCard();
     void actionPlayCard(const ActionPlayCardData&);
     void actionUseAbility(const ActionUseAbilityData&);
     void actionEndTurn();
@@ -131,7 +131,7 @@ signals:
     void sigActionLeaveGame();
     void sigActionStartGame();
     void sigActionChatMessage(const QString& message);
-    void sigActionDrawCard(int numCards, bool revealCard);
+    void sigActionDrawCard();
     void sigActionPlayCard(const ActionPlayCardData&);
     void sigActionUseAbility(const ActionUseAbilityData&);
     void sigActionEndTurn();

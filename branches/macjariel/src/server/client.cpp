@@ -143,14 +143,15 @@ void Client::onActionStartGame()
     mp_playerCtrl->startGame();
 }
 
-void Client::onActionDrawCard(int numCards, bool revealCard)
+void Client::onActionDrawCard()
 {
     if (mp_playerCtrl == 0)
         return;
+
     try {
         mp_playerCtrl->draw();
     } catch (GameException& e) {
-        qDebug() << "Client::onActionDrawCard - exception:";
+        qDebug() << "Client::onActionDrawCard";
         e.debug();
     }
 }
