@@ -6,9 +6,8 @@
 #include "game.h"
 #include "gametable.h"
 #include "gameexceptions.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventmanager.h"
 #include "checkdeckresulthandler.h"
-#include "gameeventbroadcaster.h"
 
 CharacterBase::CharacterBase(QObject *parent, CharacterType characterType):
         QObject(parent),
@@ -66,7 +65,7 @@ void CharacterBase::checkDeck(PlayingCard* causedBy,
 {
     PlayingCard* checkedCard = gameTable().checkDeck();
     bool checkResult = (*checkFunc)(checkedCard);
-    mp_player->game()->gameEventBroadcaster().onPlayerCheckDeck(mp_player, checkedCard, causedBy, checkResult);
+    mp_player->game()->gameEventManager().onPlayerCheckDeck(mp_player, checkedCard, causedBy, checkResult);
     resultHandler->checkResult(checkResult);
 }
 
@@ -92,7 +91,7 @@ void CharacterBase::setCharacterType(CharacterType type)
 
 void CharacterBase::notifyAbilityUse()
 {
-    mp_player->game()->gameEventBroadcaster().onPlayerUseAbility(mp_player);
+    mp_player->game()->gameEventManager().onPlayerUseAbility(mp_player);
 }
 
 GameTable& CharacterBase::gameTable()

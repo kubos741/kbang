@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "playerwidget.h"
-#include "playercharacterwidget.h"
+#include "characterwidget.h"
 #include "game.h"
-#include "gameobjectclickhandler.h"
-#include "cardlist.h"
+#include "gameactionmanager.h"
+#include "cardlistwidget.h"
 #include "parser/parserstructs.h"
 
 #include <QPainter>
@@ -155,17 +155,17 @@ void PlayerWidget::paintEvent(QPaintEvent* event)
 
 void PlayerWidget::mousePressEvent(QMouseEvent* event)
 {
-    if (gameObjectClickHandler() && event->button() == Qt::LeftButton) {
-        gameObjectClickHandler()->onPlayerClicked(this);
+    if (gameActionManager() && event->button() == Qt::LeftButton) {
+        gameActionManager()->onPlayerClicked(this);
     }
 }
 
-GameObjectClickHandler* PlayerWidget::gameObjectClickHandler() const
+GameActionManager* PlayerWidget::gameActionManager() const
 {
     if (mp_game == 0) {
         return 0;
     } else {
-        return mp_game->gameObjectClickHandler();
+        return mp_game->gameActionManager();
     }
 }
 

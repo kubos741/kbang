@@ -21,7 +21,7 @@
 #include <QtDebug>
 #include <QPainter>
 
-#include "playercharacterwidget.h"
+#include "characterwidget.h"
 #include "cardwidgetfactory.h"
 
 
@@ -29,14 +29,14 @@ using namespace client;
 
 
 
-QTimer PlayerCharacterWidget::sm_timer;
-int    PlayerCharacterWidget::sm_countAnimaton = 0;
+QTimer CharacterWidget::sm_timer;
+int    CharacterWidget::sm_countAnimaton = 0;
 
 double pixelsPerSecond =  25;
 const int timerInterval = 100;
 
 
-PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
+CharacterWidget::CharacterWidget(QWidget *parent):
         QWidget(parent),
         m_character(CHARACTER_UNKNOWN),
         m_lifePoints(0),
@@ -52,11 +52,11 @@ PlayerCharacterWidget::PlayerCharacterWidget(QWidget *parent):
         resize(widgetSize);
 }
 
-PlayerCharacterWidget::~PlayerCharacterWidget()
+CharacterWidget::~CharacterWidget()
 {
 }
 
-void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
+void CharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
 {
     mp_backCard = cardWidgetFactory->createCharacterCard(this);
     mp_backCard->validate();
@@ -72,12 +72,12 @@ void PlayerCharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
     m_lifePoints = 0;
 }
 
-void PlayerCharacterWidget::setOwnerId(int ownerId)
+void CharacterWidget::setOwnerId(int ownerId)
 {
     mp_characterCard->setOwnerId(ownerId);
 }
 
-void PlayerCharacterWidget::setCharacter(CharacterType character)
+void CharacterWidget::setCharacter(CharacterType character)
 {
     m_character = character;
     if (mp_characterCard) {
@@ -89,7 +89,7 @@ void PlayerCharacterWidget::setCharacter(CharacterType character)
         mp_backCard->setVisible(!isEmpty());
 }
 
-void PlayerCharacterWidget::setLifePoints(int lifePoints)
+void CharacterWidget::setLifePoints(int lifePoints)
 {
     if (lifePoints < 0 || lifePoints > 5) return;
 
@@ -101,12 +101,12 @@ void PlayerCharacterWidget::setLifePoints(int lifePoints)
         emit animationFinished();
 }
 
-bool PlayerCharacterWidget::isEmpty() const
+bool CharacterWidget::isEmpty() const
 {
     return m_character == CHARACTER_UNKNOWN;
 }
 
-void PlayerCharacterWidget::lifePointsChanged()
+void CharacterWidget::lifePointsChanged()
 {
     m_sourceY = mp_characterCard->y();
     m_targetY = mp_backCard->y() + CardWidget::lifeLevel(m_lifePoints);
@@ -122,7 +122,7 @@ void PlayerCharacterWidget::lifePointsChanged()
     sm_countAnimaton++;
 }
 
-void PlayerCharacterWidget::onTimeout()
+void CharacterWidget::onTimeout()
 {
     qreal progress;
     if (!isEmpty()) {

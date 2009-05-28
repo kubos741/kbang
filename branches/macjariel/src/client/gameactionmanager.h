@@ -13,7 +13,7 @@ class CardWidget;
 class PlayerWidget;
 
 
-class GameObjectClickHandler
+class GameActionManager
 {
 friend class Game;
 public:
@@ -26,7 +26,7 @@ public:
     void setDiscardMode(bool inDiscardMode);
 
 private:
-    GameObjectClickHandler(Game* game);
+    GameActionManager(Game* game);
     void onMainCardClicked(CardWidget*);
     void onCharacterClicked(CardWidget*);
 

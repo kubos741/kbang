@@ -16,7 +16,7 @@ public:
 
 private:
     QString cardToString(const CardData&, bool withRankAndSuit = 0);
-    QString cardListToString(QList<CardData>);
+    QString cardListWidgetToString(QList<CardData>);
     QString decoratePlayerName(const QString& playerName, bool isTarget = 0);
 
     GameMessage m_gameMessage;

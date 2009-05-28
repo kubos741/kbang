@@ -94,7 +94,7 @@ font: oblique 7pt "DejaVu Sans";</string>
         </spacer>
        </item>
        <item>
-        <widget class="client::PlayerCharacterWidget" native="1" name="mp_characterWidget" />
+        <widget class="client::CharacterWidget" native="1" name="mp_characterWidget" />
        </item>
       </layout>
      </item>
@@ -150,7 +150,7 @@ font: oblique 7pt "DejaVu Sans";</string>
         </spacer>
        </item>
        <item>
-        <widget class="client::CardList" native="1" name="mp_hand" >
+        <widget class="client::CardListWidget" native="1" name="mp_hand" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
            <horstretch>0</horstretch>
@@ -166,7 +166,7 @@ font: oblique 7pt "DejaVu Sans";</string>
         </widget>
        </item>
        <item>
-        <widget class="client::CardList" native="1" name="mp_table" >
+        <widget class="client::CardListWidget" native="1" name="mp_table" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
            <horstretch>0</horstretch>
@@ -189,15 +189,15 @@ font: oblique 7pt "DejaVu Sans";</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>client::PlayerCharacterWidget</class>
+   <class>client::CharacterWidget</class>
    <extends>QWidget</extends>
-   <header>playercharacterwidget.h</header>
+   <header>characterwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>client::CardList</class>
+   <class>client::CardListWidget</class>
    <extends>QWidget</extends>
-   <header>cardlist.h</header>
+   <header>cardlistwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

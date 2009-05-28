@@ -5,7 +5,7 @@
 #include "gameexceptions.h"
 #include "player.h"
 #include "game.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventmanager.h"
 #include "checkdeckresulthandler.h"
 
 CharacterLuckyDuke::CharacterLuckyDuke(QObject *parent):
@@ -33,7 +33,7 @@ void CharacterLuckyDuke::respondCard(PlayingCard* checkedCard)
         throw BadCardException();
     gameCycle().unsetResponseMode();
     bool checkResult = (*mp_checkFunc)(checkedCard);
-    mp_player->game()->gameEventBroadcaster().onPlayerCheckDeck(mp_player, checkedCard, mp_causedBy, checkResult);
+    mp_player->game()->gameEventManager().onPlayerCheckDeck(mp_player, checkedCard, mp_causedBy, checkResult);
     gameTable().cancelSelection();
     mp_resultHandler->checkResult(checkResult);
 }

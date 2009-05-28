@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "cardlist.h"
+#include "cardlistwidget.h"
 #include "cardwidget.h"
 
 #include "gameenums.h"
@@ -31,20 +31,20 @@
 
 using namespace client;
 
-CardList::CardList(QWidget *parent):
+CardListWidget::CardListWidget(QWidget *parent):
         CardPocket(parent),
         m_cardSize(CardWidget::SIZE_SMALL),
         m_hPadding(3),
         m_vPadding(3)
 {
-    //setStyleSheet("client--CardList { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
+    //setStyleSheet("client--CardListWidget { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
 }
 
-CardList::~CardList()
+CardListWidget::~CardListWidget()
 {
 }
 
-void CardList::setCardSize(const CardWidget::Size& cardSize)
+void CardListWidget::setCardSize(const CardWidget::Size& cardSize)
 {
     m_cardSize = cardSize;
     QSize cardS = CardWidget::qSize(cardSize);
@@ -55,7 +55,7 @@ void CardList::setCardSize(const CardWidget::Size& cardSize)
     updateGeometry();
 }
 
-void CardList::push(CardWidget* card)
+void CardListWidget::push(CardWidget* card)
 {
     CardPocket::push(card);
     card->move(newCardPosition());
@@ -68,14 +68,14 @@ void CardList::push(CardWidget* card)
     card->show();
 }
 
-QPoint CardList::newCardPosition() const
+QPoint CardListWidget::newCardPosition() const
 {
     //return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
     return QPoint(cardX(m_cards.size(), 1), m_vPadding);
 }
 
 
-CardWidget* CardList::take(int cardId)
+CardWidget* CardListWidget::take(int cardId)
 {
     if (m_cards.size() == 0) {
         qCritical("Trying to take from empty card list.");
@@ -89,7 +89,7 @@ CardWidget* CardList::take(int cardId)
                 return card;
             }
         }
-        qCritical("Cannot find card id %d in CardList. Taking random card.", cardId);
+        qCritical("Cannot find card id %d in CardListWidget. Taking random card.", cardId);
     }
     int cardIndex = (int)rand() % (int)m_cards.size();
     CardWidget* res = m_cards.takeAt(cardIndex);
@@ -97,27 +97,27 @@ CardWidget* CardList::take(int cardId)
     return res;
 }
 
-CardWidget* CardList::pop()
+CardWidget* CardListWidget::pop()
 {
     CardWidget* res = m_cards.takeLast();
     reorder();
     return res;
 }
 
-void CardList::paintEvent(QPaintEvent* event)
+void CardListWidget::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.fillRect(event->rect(), QColor(0, 0, 0, 16));
 }
 
-void CardList::clear()
+void CardListWidget::clear()
 {
     foreach(CardWidget* card, m_cards)
         card->deleteLater();
     m_cards.clear();
 }
 
-void CardList::reorder()
+void CardListWidget::reorder()
 {
     for(int i = 0; i < m_cards.size(); ++i) {
         m_cards[i]->move(cardX(i), m_vPadding);
@@ -125,7 +125,7 @@ void CardList::reorder()
 }
 
 /*
-int CardList::cardX(int i, bool newCard) const
+int CardListWidget::cardX(int i, bool newCard) const
 {
     int cardCount = m_cards.size();
     if (newCard)
@@ -139,7 +139,7 @@ int CardList::cardX(int i, bool newCard) const
 }
 */
 
-int CardList::cardX(int i, bool newCard) const
+int CardListWidget::cardX(int i, bool newCard) const
 {
     int cardCount = m_cards.size();
     if (newCard)

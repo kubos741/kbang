@@ -1,6 +1,6 @@
 #include "lifepointschangeevent.h"
 #include "game.h"
-#include "playercharacterwidget.h"
+#include "characterwidget.h"
 
 using namespace client;
 

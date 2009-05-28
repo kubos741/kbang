@@ -1,13 +1,13 @@
 #ifndef VOIDAI_H
 #define VOIDAI_H
 
-#include "gameeventhandler.h"
+#include "gameeventlistener.h"
 #include "parser/parserstructs.h"
 #include <QObject>
 
 class PlayerCtrl;
 
-class VoidAI : public QObject, public GameEventHandler
+class VoidAI : public QObject, public GameEventListener
 {
 Q_OBJECT;
 public:

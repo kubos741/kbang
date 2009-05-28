@@ -1,26 +1,26 @@
-#ifndef GAMEEVENTBROADCASTER_H
-#define GAMEEVENTBROADCASTER_H
+#ifndef GAMEEVENTMANAGER_H
+#define GAMEEVENTMANAGER_H
 
 #include "parser/parserstructs.h"
-#include "gameeventhandler.h"
+#include "gameeventlistener.h"
 
 #include <QString>
 #include <QList>
 #include <QPair>
 
-class GameEventHandler;
+class GameEventListener;
 class Player;
 class PlayingCard;
 class Game;
 
 
-class GameEventBroadcaster
+class GameEventManager
 {
 public:
-    GameEventBroadcaster(Game*);
-    void registerHandler(GameEventHandler*, Player* player = 0);
-    void registerSupervisor(GameEventHandler*);
-    void unregisterHandler(GameEventHandler*);
+    GameEventManager(Game*);
+    void registerHandler(GameEventListener*, Player* player = 0);
+    void registerSupervisor(GameEventListener*);
+    void unregisterHandler(GameEventListener*);
 
 
     void onChatMessage(Player*, const QString& message);
@@ -83,9 +83,9 @@ public:
     struct Handler {
 
         Handler(): handler(0), player(0), isSupervisor(0) {}
-        Handler(GameEventHandler* h, Player* p, bool s = 0):
+        Handler(GameEventListener* h, Player* p, bool s = 0):
                 handler(h), player(p), isSupervisor(s) {}
-        GameEventHandler* handler;
+        GameEventListener* handler;
         Player*           player;
         bool              isSupervisor;
     };
@@ -97,4 +97,4 @@ private:
 
 };
 
-#endif // GAMEEVENTBROADCASTER_H
+#endif // GAMEEVENTMANAGER_H

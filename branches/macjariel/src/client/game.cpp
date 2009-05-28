@@ -22,7 +22,7 @@
 #include "parser/queryget.h"
 #include "localplayerwidget.h"
 #include "opponentwidget.h"
-#include "cardlist.h"
+#include "cardlistwidget.h"
 #include "gameeventhandler.h"
 #include "deckwidget.h"
 #include "graveyardwidget.h"
@@ -52,7 +52,7 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
         mp_graveyard(0),
         mp_selection(0),
         m_cardWidgetFactory(this),
-        m_gameObjectClickHandler(this)
+        m_gameActionManager(this)
 
 {
 
@@ -277,7 +277,7 @@ void Game::loadGameInterface()
     mp_deck->init(&m_cardWidgetFactory);
     mp_graveyard = new GraveyardWidget(0);
     mp_graveyard->init(&m_cardWidgetFactory);
-    mp_selection = new CardList(0);
+    mp_selection = new CardListWidget(0);
     mp_selection->setPocketType(POCKET_SELECTION);
     mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
     mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -416,7 +416,7 @@ void Game::startButtonClicked()
 //    mp_deck->init(&m_cardWidgetFactory);
 //    mp_graveyard = new CardPileWidget(0);
 //    mp_graveyard->setPocketType(POCKET_GRAVEYARD);
-//    mp_selection = new CardList(0);
+//    mp_selection = new CardListWidget(0);
 //    mp_selection->setPocketType(POCKET_SELECTION);
 //    mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
 //    mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

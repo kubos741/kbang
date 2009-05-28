@@ -33,7 +33,7 @@ class CharacterCard;
 class WeaponCard;
 class PlayerCtrl;
 class Game;
-class GameEventHandler;
+class GameEventListener;
 class CharacterBase;
 
 /**
@@ -50,7 +50,7 @@ class CharacterBase;
  * used in network communication with clients).
  *
  * The players can be controlled by controllers. A player controller is a class that
- * implements the GameEventHandler interface and acquires the PlayerCtrl instance. A
+ * implements the GameEventListener interface and acquires the PlayerCtrl instance. A
  * basic controller is the Client class that forms an adapter between remote clients
  * and player controller API.
  *
@@ -61,7 +61,7 @@ class Player : public QObject
     Q_OBJECT;
 public:
     /**
-     * Constructs new player and uses gameEventHandler as the controller. The construction
+     * Constructs new player and uses gameEventListener as the controller. The construction
      * of Player objects is the Game class responsibility and other way of creating Players
      * than using Game::createNewPlayer() is not recommended.
      * @param game      the game where the new player is created.
@@ -100,8 +100,8 @@ public:
     inline bool                 isAlive()          const { return m_isAlive;           }
     inline bool                 isWinner()         const { return m_isWinner;          }
     inline int                  weaponRange()      const { return m_weaponRange;       }
-    inline bool                 hasController()    const { return mp_gameEventHandler != 0; }
-    inline GameEventHandler*    gameEventHandler() const { return mp_gameEventHandler; }
+    inline bool                 hasController()    const { return mp_gameEventListener != 0; }
+    inline GameEventListener*    gameEventListener() const { return mp_gameEventListener; }
     inline int                  bangPower()        const { return m_bangPower;         }
     inline PublicPlayerView&    publicView()       const { return m_publicPlayerView;  }
     inline PrivatePlayerView&   privateView()      const { return m_privatePlayerView; }
@@ -212,8 +212,8 @@ public:
 
     void onTurnStart();
 
-    void registerGameEventHandler(GameEventHandler*);
-    void unregisterGameEventHandler();
+    void registerGameEventListener(GameEventListener*);
+    void unregisterGameEventListener();
 
     void checkEmptyHand();
 
@@ -250,7 +250,7 @@ private:
     bool                      m_isWinner;
     Game*                     mp_game;
     PlayerCtrl*               mp_playerCtrl;
-    GameEventHandler*         mp_gameEventHandler;
+    GameEventListener*         mp_gameEventListener;
 
     int                       m_weaponRange;
     int                       m_distanceIn;

@@ -19,11 +19,11 @@
  ***************************************************************************/
 #include "localplayerwidget.h"
 #include "cardwidget.h"
-#include "cardlist.h"
-#include "playercharacterwidget.h"
+#include "cardlistwidget.h"
+#include "characterwidget.h"
 #include "cardwidgetfactory.h"
 
-#include "gameobjectclickhandler.h"
+#include "gameactionmanager.h"
 
 #include <QtDebug>
 #include <QPainter>
@@ -166,20 +166,20 @@ void LocalPlayerWidget::setHandSize(int handSize)
 
 void LocalPlayerWidget::onEndTurnClicked()
 {
-    if (gameObjectClickHandler() != 0)
-        gameObjectClickHandler()->onEndTurnClicked();
+    if (gameActionManager() != 0)
+        gameActionManager()->onEndTurnClicked();
 }
 
 void LocalPlayerWidget::onPassClicked()
 {
-    if (gameObjectClickHandler() != 0)
-        gameObjectClickHandler()->onPassClicked();
+    if (gameActionManager() != 0)
+        gameActionManager()->onPassClicked();
 }
 
 void LocalPlayerWidget::onDiscardClicked()
 {
-    if (gameObjectClickHandler() != 0)
-        gameObjectClickHandler()->setDiscardMode(mp_buttonDiscard->isChecked());
+    if (gameActionManager() != 0)
+        gameActionManager()->setDiscardMode(mp_buttonDiscard->isChecked());
 }
 
 void LocalPlayerWidget::updateRoleCardWidget()

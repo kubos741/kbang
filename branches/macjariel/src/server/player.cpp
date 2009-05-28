@@ -22,7 +22,7 @@
 #include "client.h"
 #include "cards.h"
 #include "playerctrl.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventmanager.h"
 #include "characterbase.h"
 
 #include "gameinfo.h"
@@ -41,7 +41,7 @@ Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
         m_isAlive(1),
         m_isWinner(0),
         mp_game(game),
-        mp_gameEventHandler(0),
+        mp_gameEventListener(0),
         m_weaponRange(1),
         m_distanceIn(0),
         m_distanceOut(0),
@@ -58,7 +58,7 @@ Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
 
 Player::~Player()
 {
-    unregisterGameEventHandler();
+    unregisterGameEventListener();
 }
 
 
@@ -71,7 +71,7 @@ CharacterType Player::characterType() const
 
 bool Player::isAI() const
 {
-    return mp_gameEventHandler != 0 && mp_gameEventHandler->isAI();
+    return mp_gameEventListener != 0 && mp_gameEventListener->isAI();
 }
 
 bool Player::isPublicRole() const
@@ -116,7 +116,7 @@ void Player::modifyLifePoints(int x, Player* causedBy, bool disableBeerRescue)
         m_lifePoints = m_maxLifePoints;
 
     if (oldLifePoints != m_lifePoints) {
-        game()->gameEventBroadcaster().onLifePointsChange(this, m_lifePoints, causedBy);
+        game()->gameEventManager().onLifePointsChange(this, m_lifePoints, causedBy);
     }
     int hitPoints = oldLifePoints - m_lifePoints;
 
@@ -265,18 +265,18 @@ void Player::onTurnStart()
 }
 
 
-void Player::registerGameEventHandler(GameEventHandler* gameEventHandler)
+void Player::registerGameEventListener(GameEventListener* gameEventListener)
 {
-    Q_ASSERT(mp_gameEventHandler == 0);
-    mp_gameEventHandler = gameEventHandler;
-    mp_game->gameEventBroadcaster().registerHandler(mp_gameEventHandler, this);
+    Q_ASSERT(mp_gameEventListener == 0);
+    mp_gameEventListener = gameEventListener;
+    mp_game->gameEventManager().registerHandler(mp_gameEventListener, this);
 }
 
-void Player::unregisterGameEventHandler()
+void Player::unregisterGameEventListener()
 {
-    if (mp_gameEventHandler == 0) return;
-    mp_game->gameEventBroadcaster().unregisterHandler(mp_gameEventHandler);
-    mp_gameEventHandler = 0;
+    if (mp_gameEventListener == 0) return;
+    mp_game->gameEventManager().unregisterHandler(mp_gameEventListener);
+    mp_gameEventListener = 0;
 }
 
 

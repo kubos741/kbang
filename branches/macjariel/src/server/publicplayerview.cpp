@@ -113,7 +113,7 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
         res.table.append(card->cardData());
     }
     res.hasPassword = !mp_player->password().isEmpty();
-    res.hasController = mp_player->gameEventHandler() != 0;
+    res.hasController = mp_player->gameEventListener() != 0;
     res.isAI = mp_player->isAI();
     res.isAlive = mp_player->isAlive();
     res.isWinner = mp_player->isWinner();

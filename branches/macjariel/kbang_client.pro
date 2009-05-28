@@ -28,12 +28,12 @@ HEADERS += src/client/gameloop.h \
     src/client/cardwidget.h \
     src/client/creategamedialog.h \
     src/client/playerwidget.h \
-    src/client/playercharacterwidget.h \
+    src/client/characterwidget.h \
     src/client/cardpilewidget.h \
     src/client/deckwidget.h \
     src/client/cardpocket.h \
     src/client/localplayerwidget.h \
-    src/client/cardlist.h \
+    src/client/cardlistwidget.h \
     src/client/gameevent.h \
     src/client/cardmovementevent.h \
     src/client/gameeventqueue.h \
@@ -43,7 +43,7 @@ HEADERS += src/client/gameloop.h \
     src/client/lifepointschangeevent.h \
     src/client/cardactionswidget.h \
     src/client/cardwidgetfactory.h \
-    src/client/gameobjectclickhandler.h \
+    src/client/gameactionmanager.h \
     src/client/playerdiedevent.h \
     src/client/playerevent.h \
     src/client/graveyardwidget.h \
@@ -78,11 +78,11 @@ SOURCES += src/client/gameloop.cpp \
     src/client/cardwidget.cpp \
     src/client/creategamedialog.cpp \
     src/client/playerwidget.cpp \
-    src/client/playercharacterwidget.cpp \
+    src/client/characterwidget.cpp \
     src/client/cardpilewidget.cpp \
     src/client/deckwidget.cpp \
     src/client/localplayerwidget.cpp \
-    src/client/cardlist.cpp \
+    src/client/cardlistwidget.cpp \
     src/client/gameevent.cpp \
     src/client/cardmovementevent.cpp \
     src/client/gameeventqueue.cpp \
@@ -92,7 +92,7 @@ SOURCES += src/client/gameloop.cpp \
     src/client/lifepointschangeevent.cpp \
     src/client/cardactionswidget.cpp \
     src/client/cardwidgetfactory.cpp \
-    src/client/gameobjectclickhandler.cpp \
+    src/client/gameactionmanager.cpp \
     src/client/cardpocket.cpp \
     src/client/playerdiedevent.cpp \
     src/client/playerevent.cpp \

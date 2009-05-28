@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "opponentwidget.h"
 #include "cardwidget.h"
-#include "cardlist.h"
+#include "cardlistwidget.h"
 
 #include <QMovie>
 #include <QtDebug>

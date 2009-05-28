@@ -7,7 +7,7 @@
 #include "parser/parserstructs.h"
 
 class Player;
-class GameEventHandler;
+class GameEventListener;
 class PublicGameView;
 class PublicPlayerView;
 class PrivatePlayerView;
@@ -97,25 +97,25 @@ public:
      * Creates a new game and automatically puts the player in. This should be used
      * exclusively by nonAI client classes, as AIs typically don't create games.
      * \note The client class gets the PlayerCtrl instance through the
-     *       GameEventHandler::onPlayerInit(PlayerCtrl*) method.
+     *       GameEventListener::onPlayerInit(PlayerCtrl*) method.
      * \param game The game structure.
      * \param player The player structure.
      */
-    static void createGame(const CreateGameData&, const CreatePlayerData&, GameEventHandler*);
+    static void createGame(const CreateGameData&, const CreatePlayerData&, GameEventListener*);
 
     /**
      * Puts the player to the game.
      * \note The client class gets the PlayerCtrl instance through the
-     *       GameEventHandler::onPlayerInit(PlayerCtrl*) method.
+     *       GameEventListener::onPlayerInit(PlayerCtrl*) method.
      *
      * \param gameId The id of the game.
      * \param player The player structure.
      * \throws BadGameException The game does not exist.
      * \throws BadGameStateException The game has already started.
      */
-    static void joinGame(int gameId, const QString& gamePassword, const CreatePlayerData&, GameEventHandler*);
+    static void joinGame(int gameId, const QString& gamePassword, const CreatePlayerData&, GameEventListener*);
 
-    static void replacePlayer(int gameId, int playerId, const QString& password, const CreatePlayerData&, GameEventHandler*);
+    static void replacePlayer(int gameId, int playerId, const QString& password, const CreatePlayerData&, GameEventListener*);
 
 
     /**

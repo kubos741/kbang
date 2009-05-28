@@ -28,7 +28,7 @@ namespace client
 {
 
 class CardWidgetFactory;
-class GameObjectClickHandler;
+class GameActionManager;
 
 /**
  * @author MacJariel <MacJariel (at) gmail.com>
@@ -50,7 +50,7 @@ public:
     inline int              ownerId()    const { return m_ownerId; }
     inline CharacterType    character()  const { return m_characterType; }
 
-    void setGameObjectClickHandler(GameObjectClickHandler*);
+    void setGameActionManager(GameActionManager*);
 
     void setType(Card::Type);
 
@@ -105,7 +105,7 @@ private:
     bool        m_shadowMode;
     bool        m_hasHighlight;
     bool        m_isEmpty;
-    GameObjectClickHandler* mp_gameObjectClickHandler;
+    GameActionManager* mp_gameActionManager;
 
     const static QSize sm_qsizeSmall, sm_qsizeNormal, sm_qsizeBig;
     static int sm_lifeLevels[];

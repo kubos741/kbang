@@ -17,51 +17,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENTCARDLIST_H
-#define CLIENTCARDLIST_H
+#ifndef CHARACTERWIDGET_H
+#define CHARACTERWIDGET_H
 
-#include <cardpocket.h>
-#include <cardwidget.h>
-
-#include <QList>
+#include <QWidget>
+#include <QTimer>
+#include <QTime>
+#include <QSize>
+#include "cardwidget.h"
 
 namespace client {
 
 /**
+ * @todo Rename to CharacterWidget
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardList: public CardPocket
+class CharacterWidget: public QWidget
 {
 Q_OBJECT
 public:
-    CardList(QWidget *parent);
-    void setCardSize(const CardWidget::Size& cardSize);
-    virtual ~CardList();
+    CharacterWidget(QWidget *parent = 0);
+    virtual ~CharacterWidget();
 
-    virtual void push(CardWidget* card);
-    virtual QPoint newCardPosition() const;
+    void init(CardWidgetFactory* cardWidgetFactory);
 
-    virtual CardWidget* take(int cardId);
-    virtual CardWidget* pop();
 
-    virtual void paintEvent(QPaintEvent* event);
+    inline CharacterType character() const { return m_character; }
+    inline int     lifePoints() const { return m_lifePoints; }
 
-    void clear();
-
-protected:
-    QList<CardWidget*> m_cards;
+    void setOwnerId(int ownerId);
+    void setCharacter(CharacterType character);
+    void setLifePoints(int lifePoints);
+    bool isEmpty() const;
 
 private:
-    void reorder();
-    int cardX(int i, bool newCard = 0) const;
+    void lifePointsChanged();
+
+private slots:
+    void onTimeout();
+
+signals:
+    void animationFinished();
 
 private:
-    CardWidget::Size m_cardSize;
-    bool             m_revealed;
-    int              m_moveFactor;
-    int              m_hPadding, m_vPadding;
+    CharacterType m_character;
+    int m_lifePoints;
+    int m_sourceY;
+    int m_targetY;
+
+    CardWidget* mp_backCard;
+    CardWidget* mp_characterCard;
+
+    bool          m_isAnimating;
+
+    static QTimer sm_timer;
+    static int    sm_countAnimaton;
+    //QSize         m_sizeHint;
+
+    CardWidgetFactory*  mp_cardWidgetFactory;
+    QTime         m_time;
 };
 
 }
-
 #endif
