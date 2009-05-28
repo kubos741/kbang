@@ -29,10 +29,10 @@ QTabWidget::pane {
 	background: rgba(0, 0, 0, 0);
 	border: 0;
 
-    
+    /*    
     position: absolute;
     top: 7px;
-    
+    */
 }
 QTabWidget::tab-bar {
 	left: 10px;
