@@ -53,8 +53,8 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
             this,       SLOT(onActionLeaveGame()));
     connect(mp_parser,  SIGNAL(sigActionStartGame()),
             this,       SLOT(onActionStartGame()));
-    connect(mp_parser,  SIGNAL(sigActionDrawCard(int,bool)),
-            this,       SLOT(onActionDrawCard(int,bool)));
+    connect(mp_parser,  SIGNAL(sigActionDrawCard()),
+            this,       SLOT(onActionDrawCard()));
     connect(mp_parser,  SIGNAL(sigActionPlayCard(const ActionPlayCardData&)),
             this,       SLOT(onActionPlayCard(const ActionPlayCardData&)));
     connect(mp_parser,  SIGNAL(sigActionUseAbility(const ActionUseAbilityData&)),
