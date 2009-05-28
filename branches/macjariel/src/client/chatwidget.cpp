@@ -60,7 +60,7 @@ void ChatWidget::clear()
 
 void ChatWidget::incomingMessage(int, const QString& senderName, const QString& message)
 {
-    mp_chatView->append(QString("<b>%1:</b> %2").arg(senderName).arg(message));
+    mp_chatView->append(QString("<b>%1:</b> %2").arg(Qt::escape(senderName)).arg(Qt::escape(message)));
 }
 
 void ChatWidget::sendMessage()
