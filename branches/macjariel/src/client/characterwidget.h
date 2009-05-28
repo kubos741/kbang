@@ -28,10 +28,6 @@
 
 namespace client {
 
-/**
- * @todo Rename to CharacterWidget
- * @author MacJariel <MacJariel@gmail.com>
- */
 class CharacterWidget: public QWidget
 {
 Q_OBJECT

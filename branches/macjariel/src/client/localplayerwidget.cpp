@@ -149,7 +149,7 @@ void LocalPlayerWidget::updateWidgets()
 
 void LocalPlayerWidget::moveWinnerIcon()
 {
-    /** @todo: refactor me please */
+    /// @todo refactor me please
     mp_winnerIcon->move(mp_roleCardWidget->x() + 2, mp_roleCardWidget->y()
                         + mp_roleCardWidget->height()- (int)(mp_winnerIcon->height() / 3));
 }

@@ -92,7 +92,7 @@ public:
     /**
      * Returns the count of spectators in the game.
      */
-    inline int spectatorsCount() const { return 0; } /// @todo Spectators
+    inline int spectatorsCount() const { return 0; } /// @todo implement spectators
 
     inline GameState& gameState() { return m_state; }
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }

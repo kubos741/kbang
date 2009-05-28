@@ -55,7 +55,7 @@ Game::Game(QObject* parent, int gameId, ClientType clientType,
         m_gameActionManager(this)
 
 {
-
+    Q_UNUSED(clientType);
     mp_localPlayerWidget->enterGameMode(this);
     foreach(OpponentWidget* opponentWidget, m_opponentWidgets) {
         opponentWidget->enterGameMode(this);
@@ -95,7 +95,6 @@ void Game::setGameContext(const GameContextData& gameContextData)
         requestedPlayer->setRequested(0);
         requestedPlayer->update();
     }
-    GamePlayState oldGamePlayState = m_gameContextData.gamePlayState;
     m_gameContextData = gameContextData;
     currentPlayer = playerWidget(currentPlayerId());
     requestedPlayer = playerWidget(requestedPlayerId());

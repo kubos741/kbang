@@ -143,9 +143,11 @@ public:
     }
 };
 
+/**
+ * @todo add information about predraw card
+ */
 class BadPredrawException: public GameException
-{
-/// @todo: add information about predraw card
+{ 
 public:
     virtual void debug() {
         qDebug("BadPredrawException");

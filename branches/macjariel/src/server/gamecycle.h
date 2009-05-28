@@ -50,8 +50,6 @@ public:
      * \throws PrematureDrawException   missed card-effect - BOOM/PRISON (todo)
      *
      * \param player The calling player
-     * \todo Draw cards from hands of other players (character feature).
-     * \todo Draw three cards and return one on top of deck (character feature).
      */
     void draw(Player* player, bool specialDraw = 0);
 

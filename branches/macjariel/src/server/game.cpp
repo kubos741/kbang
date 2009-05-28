@@ -194,16 +194,13 @@ void Game::replacePlayer(Player* player, const CreatePlayerData& createPlayerDat
     gameEventManager().onPlayerUpdated(player);
 }
 
-/**
- * @TODO: When the creator disconnects, cancel the game.
- */
 void Game::removePlayer(Player* player)
 {
     Q_ASSERT(player->game() == this);
     int playerId = player->id();
     if (!m_playerMap.contains(playerId))
         return;
-    Q_ASSERT(m_playerMap.contains(playerId)); // THIS ASSERTED @todo: examine
+    Q_ASSERT(m_playerMap.contains(playerId)); ///@todo examine this code
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
 
@@ -390,7 +387,6 @@ void Game::setRolesAndCharacters()
     m_goodGuysCount = m_outlawsCount = m_renegadesCount = 0;
     while(pIt.hasNext() && rIt.hasNext() && cIt.hasNext())
     {
-        // TODO
         pIt.peekNext()->setRoleAndCharacter(rIt.peekNext(), cIt.peekNext());
         switch(rIt.peekNext()) {
             case ROLE_SHERIFF:

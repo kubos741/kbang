@@ -83,7 +83,7 @@ void OpponentWidget::updateWidgets()
 
 void OpponentWidget::moveWinnerIcon()
 {
-    /** @todo: refactor me please */
+    /// @todo: refactor me please
     createRoleCard();
     mp_winnerIcon->move(mp_roleCard->x() + (int)(mp_roleCard->width() / 2) - (int)(mp_winnerIcon->width() / 3),
                         mp_roleCard->y() + mp_roleCard->height() - (int)(mp_roleCard->height() / 2));

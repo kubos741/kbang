@@ -767,7 +767,7 @@ void Client::onDeckRegenerate()
 
 void Client::onPlayerUseAbility(PublicPlayerView&)
 {
-    ///@todo
+    ///@todo create new use ability event
 }
 
 void Client::onActionRequest(ActionRequestType requestType)

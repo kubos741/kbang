@@ -42,9 +42,6 @@ class CardWidget;
  * itself controls its lifetime, so you only need to create it with <b>new</b> operator
  * and leave it.
  *
- * \todo It may be desired to reveal yet unrevealed card sometimes. This class should
- *       handle this.
- *
  * @author MacJariel <MacJariel@gmail.com>
  */
 class CardMovementEvent : public GameEvent
