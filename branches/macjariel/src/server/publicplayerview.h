@@ -53,6 +53,8 @@ public:
     QList<PlayingCard*>  table()             const;
     PublicPlayerData     publicPlayerData()  const;
 
+    PlayingCard*         cardFromTable(PlayingCardType cardType = CARD_UNKNOWN) const;
+
 protected:
     Player* mp_player;
 

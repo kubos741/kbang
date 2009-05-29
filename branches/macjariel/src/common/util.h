@@ -32,6 +32,7 @@
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 QString randomToken(int minLength, int maxLength);
+bool randomBool(qreal probability);
 
 template <typename T>
 inline void shuffleList(QList<T>& list)
@@ -40,7 +41,7 @@ inline void shuffleList(QList<T>& list)
     int swapCount = size * 4;
     while(swapCount-- != 0)
     {
-        list.swap(rand() % size, rand() % size);
+        list.swap(qrand() % size, qrand() % size);
     }
 }
 
@@ -51,7 +52,7 @@ inline void shuffleList(QLinkedList<T>& list)
     int swapCount = size * 4;
     while(swapCount-- != 0)
     {
-        list.swap(rand() % size, rand() % size);
+        list.swap(qrand() % size, qrand() % size);
     }
 }
 

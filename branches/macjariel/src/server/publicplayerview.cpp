@@ -120,3 +120,20 @@ PublicPlayerData PublicPlayerView::publicPlayerData() const
     res.role = role();
     return res;
 }
+
+PlayingCard* PublicPlayerView::cardFromTable(PlayingCardType cardType) const
+{
+    if (table().size() == 0) {
+        return 0;
+    }
+
+    if (cardType == CARD_UNKNOWN) {
+        return table()[qrand() % table().size()];
+    }
+
+    foreach (PlayingCard* card, table()) {
+        if (card->type() == cardType)
+            return card;
+    }
+    return 0;
+}

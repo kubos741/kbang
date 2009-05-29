@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 {
     time_t sec;
     time(&sec);
-    srand((unsigned int) sec);
+    qsrand((unsigned int) sec);
     QCoreApplication app(argc, argv);
     GameServer& server = GameServer::instance();
     server.setVersion(QString("%1.%2.%3").arg(KBANG_SERVER_VERSION_MAJOR).

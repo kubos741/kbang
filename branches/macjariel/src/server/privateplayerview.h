@@ -48,9 +48,13 @@ public:
 
     QList<PlayingCard* > hand() const;
 
+    int handSize(PlayingCardType) const;
+
     PrivatePlayerData privatePlayerData() const;
 
     PlayingCard* card(int cardId) const;
+
+
 
 
     // implement method cardsInHand

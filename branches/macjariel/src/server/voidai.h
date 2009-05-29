@@ -29,7 +29,7 @@ public:
     virtual void onPlayerLeavedGame(PublicPlayerView&) {}
     virtual void onPlayerUpdated(PublicPlayerView&) {}
     virtual void onPlayerDied(PublicPlayerView&, PublicPlayerView*) {}
-    virtual void onGameStarted() {}
+    virtual void onGameStarted();
     virtual void onGameFinished() {}
     virtual void onPlayerDrawFromDeck(PublicPlayerView&, QList<const PlayingCard*>, bool) {}
     virtual void onPlayerDrawFromGraveyard(PublicPlayerView&, const PlayingCard*, const PlayingCard*) {}
@@ -58,10 +58,33 @@ public slots:
     void requestWithAction();
 
 private:
+    void onRequestDraw();
+    void onRequestPlay();
+    void onRequestResponse();
+    void onRequestDiscard();
+
+    bool playCardTakers();
+    bool playAlwaysPlayables();
+    bool playAggresiveCards();
+
+    bool isRenegade() const;
+    bool isOutlaw() const;
+    bool isGoodGuy() const;
+
+    QList<PublicPlayerView*> enemyPlayers() const;
+    PublicPlayerView* takersTarget(QList<PublicPlayerView*>) const;
+    QList<PublicPlayerView*> friendPlayers(QList<PublicPlayerView*>) const;
+
+    QList<PublicPlayerView*> playersToTreshold(int treshold, bool isAscending);
+
+
     static int sm_playerCounter;
     int         m_id;
     PlayerCtrl* mp_playerCtrl;
     ActionRequestType m_requestType;
+
+    QHash<PublicPlayerView*, int> m_score;
+    QHash<PublicPlayerView*, int> m_scoreRenegadeness;
 };
 
 #endif // VOIDAI_H

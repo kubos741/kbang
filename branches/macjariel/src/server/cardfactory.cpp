@@ -116,7 +116,7 @@ struct CardFactory::CardFactoryImp
     {
         int cardId;
         do {
-            cardId = (int)rand();
+            cardId = (int)qrand();
         } while(m_ids.contains(cardId));
         m_ids.insert(cardId);
         return cardId;
