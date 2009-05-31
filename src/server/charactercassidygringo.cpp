@@ -35,7 +35,7 @@ void CharacterCassidyGringo::onHit(int lifePoints, Player* causedBy)
         return;
     }
     if (m_type == ElGringo) {
-        if (causedBy == 0) return;
+        if (causedBy == 0 || causedBy == mp_player) return;
         notifyAbilityUse();
         for (int i = 0; i < lifePoints; ++i) {
             PlayingCard* targetCard = causedBy->getRandomCardFromHand();
