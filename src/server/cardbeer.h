@@ -30,12 +30,13 @@ public:
     virtual ReactionType reactionType() const { return REACTION_LASTSAVE; }
     virtual Player* causedBy() const { return 0; }
 
-    void allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave);
+    void allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave, int hitPoints);
 
 private:
     Player* mp_attacker;
     Player* mp_target;
     int     m_lifePointsToSave;
+    int     m_hitPoints;
     Game*   mp_game;
 };
 

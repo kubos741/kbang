@@ -108,30 +108,45 @@ bool Player::canPlayBang() const
     return (m_unlimitedBangs > 0 || m_lastBangTurn != mp_game->gameCycle().turnNumber());
 }
 
-void Player::modifyLifePoints(int x, Player* causedBy, bool disableBeerRescue)
+void Player::modifyLifePoints(int x, Player* causedBy)
 {
+    // modify lifePoints member
     int oldLifePoints = m_lifePoints;
     m_lifePoints += x;
     if (m_lifePoints > m_maxLifePoints)
         m_lifePoints = m_maxLifePoints;
 
+    // only if lifePoints actually changed, have the event sent
     if (oldLifePoints != m_lifePoints) {
         game()->gameEventBroadcaster().onLifePointsChange(this, m_lifePoints, causedBy);
     }
     int hitPoints = oldLifePoints - m_lifePoints;
 
+    // allow last save
     if (m_lifePoints <= 0) {
-        if (disableBeerRescue) 
-            mp_game->buryPlayer(this, causedBy);
-        else
-            mp_game->beerRescue()->allowSaveWithBeer(causedBy, this, 1 - m_lifePoints);
-    } else {
+        mp_game->beerRescue()->allowSaveWithBeer(causedBy, this, 1 - m_lifePoints, hitPoints);
+        // onHit signal is emitted only if player saves himself with beer(s)
+    }
 
-        if (hitPoints > 0)
-            // TODO: tune emiting this signal when on the fly beer is used
-            emit onHit(hitPoints, causedBy);
+    // emit onHit only if player was hit and is not dying
+    if (m_lifePoints > 0 && hitPoints > 0) {
+        emit onHit(hitPoints, causedBy);
     }
 }
+
+void Player::lastSaveSuccess(int hitPoints, Player* causedBy)
+{
+    modifyLifePoints(1, this);
+    emit onHit(hitPoints, causedBy);
+}
+
+void Player::lastSaveFailure(int hitPoints, Player* causedBy)
+{
+    Q_UNUSED(hitPoints);
+    mp_game->buryPlayer(this, causedBy);
+}
+
+
 
 void Player::modifyDistanceIn(int delta)
 {

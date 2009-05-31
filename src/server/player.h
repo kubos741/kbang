@@ -165,7 +165,10 @@ public:
      * @param preventDeath set to true to prevent dying (used by instantly
      *                     played beer)
      */
-    void modifyLifePoints(int lifePoints, Player* causedBy, bool disableBeerRescue = 0);
+    void modifyLifePoints(int lifePoints, Player* causedBy);
+    void lastSaveSuccess(int hitPoints, Player* causedBy);
+    void lastSaveFailure(int hitPoints, Player* causedBy);
+
     void modifyDistanceIn(int delta);
     void modifyDistanceOut(int delta);
     void modifyUnlimitedBangs(int delta);
