@@ -47,7 +47,7 @@ BeerRescue::BeerRescue(Game* game):
 void BeerRescue::respondPass()
 {
     mp_game->gameCycle().unsetResponseMode();
-    mp_target->modifyLifePoints(0, mp_attacker, 1);
+    mp_target->lastSaveFailure(m_hitPoints, mp_attacker);
 }
 
 void BeerRescue::respondCard(PlayingCard* targetCard)
@@ -66,14 +66,15 @@ void BeerRescue::dismiss()
     m_lifePointsToSave--;
     if (m_lifePointsToSave == 0) {
         mp_game->gameCycle().unsetResponseMode();
-        mp_target->modifyLifePoints(1, mp_attacker);
+        mp_target->lastSaveSuccess(m_hitPoints, mp_attacker);
     }
 }
 
-void BeerRescue::allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave)
+void BeerRescue::allowSaveWithBeer(Player* attacker, Player* target, int lifePointsToSave, int hitPoints)
 {
     mp_attacker = attacker;
     mp_target = target;
     m_lifePointsToSave = lifePointsToSave;
+    m_hitPoints = hitPoints;
     mp_game->gameCycle().setResponseMode(this, mp_target);
 }
