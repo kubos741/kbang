@@ -21,7 +21,7 @@ public:
 private:
     void requestNext();
 
-    //Player* mp_initialPlayer;
+    Player* mp_initialPlayer;
     Player* mp_shootingPlayer;
     Player* mp_requestedPlayer;
 };

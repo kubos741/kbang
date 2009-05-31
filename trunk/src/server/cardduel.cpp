@@ -23,7 +23,7 @@ void CardDuel::play(Player* targetPlayer)
     if (owner() == targetPlayer)
         throw BadTargetPlayerException();
 
-    //mp_initialPlayer = owner();
+    mp_initialPlayer = owner();
     // the positions will swap in requestNext(), therefore
     // are swapped here
     mp_requestedPlayer = owner();
@@ -37,7 +37,7 @@ void CardDuel::respondPass()
 {
     game()->gameCycle().unsetResponseMode();
     gameTable()->playerPass(mp_requestedPlayer);
-    mp_requestedPlayer->modifyLifePoints(-1, mp_shootingPlayer);
+    mp_requestedPlayer->modifyLifePoints(-1, mp_initialPlayer);
 }
 
 void CardDuel::respondCard(PlayingCard* targetCard)
