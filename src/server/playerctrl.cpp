@@ -43,17 +43,17 @@ void PlayerCtrl::discardCard(PlayingCard* card)
 
 void PlayerCtrl::useAbility()
 {
-    mp_player->character()->useAbility();
+    mp_player->game()->gameCycle().useAbility(mp_player);
 }
 
 void PlayerCtrl::useAbility(const PublicPlayerView* targetPlayer)
 {
-    mp_player->character()->useAbility(Player::player(targetPlayer));
+    mp_player->game()->gameCycle().useAbility(mp_player, Player::player(targetPlayer));
 }
 
 void PlayerCtrl::useAbility(QList<PlayingCard*> cards)
 {
-    mp_player->character()->useAbility(cards);
+    mp_player->game()->gameCycle().useAbility(mp_player, cards);
 }
 
 void PlayerCtrl::playCard(PlayingCard* card)

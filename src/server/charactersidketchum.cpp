@@ -41,6 +41,7 @@ void CharacterSidKetchum::useAbility(QList<PlayingCard*> cards)
             gameTable().playerDiscardCard(card);
         }
         gameCycle().reactionHandler()->dismiss();
+        return;
     }
     throw BadGameStateException();
 }
