@@ -69,6 +69,10 @@ public:
     void playCard(Player* player, PlayingCard* card, PlayingCard* targetCard);
     void pass(Player* player);
 
+    void useAbility(Player* player);
+    void useAbility(Player* player, Player* targetPlayer);
+    void useAbility(Player* player, QList<PlayingCard*> cards);
+
     void checkDeck(Player* player, PlayingCard* causedBy, bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler*);
 
     void setResponseMode(ReactionHandler* reactionHandler, Player* requestedPlayer, bool skipQueue = 0);

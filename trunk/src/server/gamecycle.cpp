@@ -206,7 +206,6 @@ void GameCycle::playCard(Player* player, PlayingCard* card, PlayingCard* targetC
     sendRequest();
 }
 
-
 void GameCycle::pass(Player* player)
 {
     m_contextDirty = 0;
@@ -220,12 +219,32 @@ void GameCycle::pass(Player* player)
     sendRequest();
 }
 
+void GameCycle::useAbility(Player* player)
+{
+    m_contextDirty = 0;
+    player->character()->useAbility();
+    sendRequest();
+}
+
+void GameCycle::useAbility(Player* player, Player* targetPlayer)
+{
+    m_contextDirty = 0;
+    player->character()->useAbility(targetPlayer);
+    sendRequest();
+}
+
+void GameCycle::useAbility(Player* player, QList<PlayingCard*> cards)
+{
+    m_contextDirty = 0;
+    player->character()->useAbility(cards);
+    sendRequest();
+}
+
 void GameCycle::checkDeck(Player* player, PlayingCard* causedBy,
                           bool (*checkFunc)(PlayingCard*), CheckDeckResultHandler* resultHandler)
 {
     player->character()->checkDeck(causedBy, checkFunc, resultHandler);
 }
-
 
 void GameCycle::setResponseMode(ReactionHandler* reactionHandler, Player* player, bool skipQueue)
 {
