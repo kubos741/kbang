@@ -16,11 +16,20 @@
   <property name="windowTitle">
    <string>KBang Client</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources/client.qrc">
+    <normaloff>:/icons/kbang.png</normaloff>:/icons/kbang.png</iconset>
+  </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string>#mp_centralWidget {
+	background-image: url(&quot;gfx/misc/bang-artwork.png&quot;);
+	background-position: center center;
+	background-repeat: no-repeat;
+
+}</string>
   </property>
   <widget class="QWidget" name="mp_centralWidget">
    <property name="autoFillBackground">

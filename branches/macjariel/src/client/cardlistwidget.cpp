@@ -34,6 +34,7 @@ using namespace client;
 CardListWidget::CardListWidget(QWidget *parent):
         CardPocket(parent),
         m_cardSize(CardWidget::SIZE_SMALL),
+        m_hasBox(1),
         m_hPadding(3),
         m_vPadding(3)
 {
@@ -106,8 +107,15 @@ CardWidget* CardListWidget::pop()
 
 void CardListWidget::paintEvent(QPaintEvent* event)
 {
-    QPainter painter(this);
-    painter.fillRect(event->rect(), QColor(0, 0, 0, 16));
+    if (m_hasBox) {
+        QPainter painter(this);
+        painter.fillRect(event->rect(), QColor(0, 0, 0, 16));
+    }
+}
+
+void CardListWidget::setHasBox(bool hasBox)
+{
+    m_hasBox = hasBox;
 }
 
 void CardListWidget::clear()
