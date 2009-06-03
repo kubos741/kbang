@@ -149,9 +149,9 @@ void LocalPlayerWidget::updateWidgets()
 
 void LocalPlayerWidget::moveWinnerIcon()
 {
-    /// @todo refactor me please
-    mp_winnerIcon->move(mp_roleCardWidget->x() + 2, mp_roleCardWidget->y()
-                        + mp_roleCardWidget->height()- (int)(mp_winnerIcon->height() / 3));
+    int x = (int)((mp_hand->width() - mp_winnerIcon->width()) / 2);
+    int y = (int)((mp_table->y() + mp_table->height() - mp_hand->y() - mp_winnerIcon->height()) / 2);
+    mp_winnerIcon->move(mp_hand->x() + x, mp_hand->y() + y);
 }
 
 void LocalPlayerWidget::setRoleFromPublicData(PlayerRole playerRole)

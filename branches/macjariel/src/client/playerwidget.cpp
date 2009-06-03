@@ -234,7 +234,7 @@ void PlayerWidget::updateAvatarLabel()
 void PlayerWidget::createWinnerIcon()
 {
     Q_ASSERT(mp_winnerIcon == 0);
-    QPixmap winnerPixmap(":/misc/winner.png");
+    QPixmap winnerPixmap("gfx/misc/winner-sign.png");
     mp_winnerIcon = new QLabel(this);
     mp_winnerIcon->setPixmap(winnerPixmap);
     mp_winnerIcon->resize(winnerPixmap.size());

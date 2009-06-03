@@ -83,10 +83,10 @@ void OpponentWidget::updateWidgets()
 
 void OpponentWidget::moveWinnerIcon()
 {
-    /// @todo: refactor me please
     createRoleCard();
-    mp_winnerIcon->move(mp_roleCard->x() + (int)(mp_roleCard->width() / 2) - (int)(mp_winnerIcon->width() / 3),
-                        mp_roleCard->y() + mp_roleCard->height() - (int)(mp_roleCard->height() / 2));
+    int x = (int)((mp_hand->width() - mp_winnerIcon->width()) / 2);
+    int y = (int)((mp_table->y() + mp_table->height() - mp_hand->y() - mp_winnerIcon->height()) / 2);
+    mp_winnerIcon->move(mp_hand->x() + x, mp_hand->y() + y);
 }
 
 void OpponentWidget::createSheriffBadgeIcon()
@@ -116,17 +116,23 @@ void OpponentWidget::createRoleCard()
     if (mp_roleCard != 0)
         return;
     mp_roleCard = cardWidgetFactory()->createRoleCard(this, ROLE_UNKNOWN);
-    mp_roleCard->setSize(CardWidget::SIZE_NORMAL);
-    mp_roleCard->validate();
-    mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
-                      (int)(height() / 2 - mp_roleCard->height() / 2));
-
 }
 
 void OpponentWidget::updateRoleCard()
 {
     if (!m_isAlive || mp_game->isFinished()) {
         createRoleCard();
+        if (m_isWinner) {
+            mp_roleCard->setSize(CardWidget::SIZE_SMALL);
+            mp_roleCard->validate();
+            mp_roleCard->move(mp_characterWidget->x(),
+                              height() - mp_roleCard->height() - 10);
+        } else {
+            mp_roleCard->setSize(CardWidget::SIZE_NORMAL);
+            mp_roleCard->validate();
+            mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
+                              (int)(height() / 2 - mp_roleCard->height() / 2));
+        }
         mp_roleCard->setPlayerRole(m_playerRole);
         mp_roleCard->validate();
         mp_roleCard->show();
