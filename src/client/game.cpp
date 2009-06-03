@@ -281,6 +281,7 @@ void Game::loadGameInterface()
     mp_selection->setPocketType(POCKET_SELECTION);
     mp_selection->setCardSize(CardWidget::SIZE_NORMAL);
     mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    mp_selection->setHasBox(0);
 
     QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
     l->addStretch(3);

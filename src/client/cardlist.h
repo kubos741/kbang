@@ -45,6 +45,8 @@ public:
     virtual CardWidget* pop();
 
     virtual void paintEvent(QPaintEvent* event);
+    
+    void setHasBox(bool hasBox);
 
     void clear();
 
@@ -57,6 +59,7 @@ private:
 
 private:
     CardWidget::Size m_cardSize;
+    bool             m_hasBox;
     bool             m_revealed;
     int              m_moveFactor;
     int              m_hPadding, m_vPadding;

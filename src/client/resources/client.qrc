@@ -12,5 +12,9 @@
         <file>dead.png</file>
         <file>human.png</file>
         <file>sheriff.png</file>
+        <file>pass.png</file>
+        <file>turn.png</file>
+        <file>discard.png</file>
+        <file>kbang.png</file>
     </qresource>
 </RCC>
