@@ -108,6 +108,7 @@ unix {
     TARGETDEPS += lib/libkbang_common.a
 }
 win32 { 
+    RC_FILE = kbang_client.rc
     debug:LIBPATH += debug/lib
     release:LIBPATH += release/lib
 }

@@ -33,8 +33,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QToolButton {
-	width: 20px;
-	height: 20px;
+	width: 28px;
+	height: 28px;
 	border: 1px solid gray;
 	border-radius: 2px;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -146,33 +146,54 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
        <item>
         <widget class="QToolButton" name="mp_buttonEndTurn">
          <property name="toolTip">
-          <string>Turn</string>
+          <string>End of your turn</string>
          </property>
          <property name="styleSheet">
           <string/>
          </property>
-         <property name="text">
-          <string>T</string>
+         <property name="icon">
+          <iconset resource="resources/client.qrc">
+           <normaloff>:/icons/turn.png</normaloff>:/icons/turn.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QToolButton" name="mp_buttonPass">
          <property name="toolTip">
-          <string>Pass</string>
+          <string>Do not react - you will lose a life point,</string>
          </property>
-         <property name="text">
-          <string>P</string>
+         <property name="icon">
+          <iconset resource="resources/client.qrc">
+           <normaloff>:/icons/pass.png</normaloff>:/icons/pass.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QToolButton" name="mp_buttonDiscard">
          <property name="toolTip">
-          <string>Discard</string>
+          <string>Discard cards before end of your turn.</string>
          </property>
-         <property name="text">
-          <string>D</string>
+         <property name="icon">
+          <iconset resource="resources/client.qrc">
+           <normaloff>:/icons/discard.png</normaloff>:/icons/discard.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -291,6 +312,8 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources/client.qrc"/>
+ </resources>
  <connections/>
 </ui>
