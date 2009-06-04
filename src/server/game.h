@@ -30,8 +30,8 @@ class GameServer;
 class Game;
 class PlayingCard;
 class CardPlayable;
-class GameEventHandler;
-class GameEventBroadcaster;
+class GameEventListener;
+class GameEventManager;
 class GameLogger;
 
 class PublicPlayerView;
@@ -92,14 +92,14 @@ public:
     /**
      * Returns the count of spectators in the game.
      */
-    inline int spectatorsCount() const { return 0; } /// @todo Spectators
+    inline int spectatorsCount() const { return 0; } /// @todo implement spectators
 
     inline GameState& gameState() { return m_state; }
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
     inline GameCycle& gameCycle() { return *mp_gameCycle; }
     inline GameTable& gameTable() { return *mp_gameTable; }
-    inline GameEventBroadcaster&
-            gameEventBroadcaster(){ return *mp_gameEventBroadcaster; }
+    inline GameEventManager&
+            gameEventManager(){ return *mp_gameEventManager; }
     inline BeerRescue* beerRescue() { return mp_beerRescue; }
 
     inline const PublicGameView& publicGameView() const
@@ -151,11 +151,11 @@ public:
      * returns the pointer to it. Creating players is reasonable only
      * before the game is started.
      */
-    Player* createPlayer(const CreatePlayerData&, GameEventHandler*);
+    Player* createPlayer(const CreatePlayerData&, GameEventListener*);
 
     void createAI(int count);
 
-    void replacePlayer(Player*, const CreatePlayerData&, GameEventHandler*);
+    void replacePlayer(Player*, const CreatePlayerData&, GameEventListener*);
 
     /**
      * Removes a player from the game. Removing players is reasonable only
@@ -198,7 +198,7 @@ private:
     GameInfo*             mp_gameInfo;
     GameTable*            mp_gameTable;
     GameCycle*            mp_gameCycle;
-    GameEventBroadcaster* mp_gameEventBroadcaster;
+    GameEventManager*     mp_gameEventManager;
 
     PublicGameView      m_publicGameView;
     int                 m_nextUnusedPlayerId;

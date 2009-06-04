@@ -28,8 +28,8 @@
 
 namespace client {
 class CardWidget;
-class CardList;
-class PlayerCharacterWidget;
+class CardListWidget;
+class CharacterWidget;
 class Game;
 
 /**
@@ -41,9 +41,9 @@ public:
     OpponentWidget(QWidget *parent);
     virtual ~OpponentWidget();
 
-    virtual CardList*               hand()            { return mp_hand;             }
-    virtual CardList*               table()           { return mp_table;            }
-    virtual PlayerCharacterWidget*  characterWidget() { return mp_characterWidget;  }
+    virtual CardListWidget*               hand()            { return mp_hand;             }
+    virtual CardListWidget*               table()           { return mp_table;            }
+    virtual CharacterWidget*  characterWidget() { return mp_characterWidget;  }
     virtual QLabel*                 playerNameLabel() { return mp_labelPlayerName;  }
     virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
     virtual bool                    isLocalPlayer()   { return 0;                   }

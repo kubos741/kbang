@@ -64,7 +64,7 @@ public slots:
     void sendChatMessage(const QString& message);
 
 
-    void drawCard(int numCards = 1, bool revealCard = 0);
+    void drawCard();
     void playCard(int cardId);
     void playCardWithPlayer(int cardId, int playerId);
     void playCardWithCard(int cardId, int otherCardId);

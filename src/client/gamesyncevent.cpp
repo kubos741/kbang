@@ -66,8 +66,6 @@ void GameSyncEvent::run()
     mp_game->setGameContext(m_gameSyncData.gameContext);
     mp_game->setSelection(m_gameSyncData.selection);
 
-    /// \todo Make sure unused opponentWidgets are clear
-
     emit finished(this);
 }
 

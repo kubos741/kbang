@@ -38,7 +38,7 @@ class PlayerCtrl;
  * \note This class could be renamed. Candidates are:
  *   * GameEventsHandler
  */
-class GameEventHandler
+class GameEventListener
 {
 public:
     virtual bool isAI() = 0;
@@ -123,8 +123,8 @@ public:
 
     virtual void onActionRequest(ActionRequestType requestType) = 0;
 
-    virtual ~GameEventHandler() {}
+    virtual ~GameEventListener() {}
 };
 
 
-#endif // GameEventHandler_H
+#endif // GameEventListener_H

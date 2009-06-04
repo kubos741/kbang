@@ -2,7 +2,7 @@
 #include "common.h"
 #include "player.h"
 #include "util.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventmanager.h"
 #include "gameexceptions.h"
 #include "game.h"
 #include "tablecard.h"
@@ -18,7 +18,7 @@ GameTable::GameTable(Game* game):
 
 void GameTable::prepareGame(CardFactory* cardFactory) {
     generateCards(cardFactory);
-    mp_game->gameEventBroadcaster().onGameSync();
+    mp_game->gameEventManager().onGameSync();
     dealCards();
 }
 
@@ -36,7 +36,7 @@ QList<const PlayingCard*> GameTable::playerDrawFromDeck(Player* player, int coun
         card->setPocket(POCKET_HAND);
         drawedCards.append(card);
     }
-    mp_game->gameEventBroadcaster().onPlayerDrawFromDeck(player, drawedCards, revealCards);
+    mp_game->gameEventManager().onPlayerDrawFromDeck(player, drawedCards, revealCards);
     return drawedCards;
 }
 
@@ -50,7 +50,7 @@ void GameTable::playerDrawFromGraveyard(Player* player)
     card->setOwner(player);
     card->setPocket(POCKET_HAND);
     PlayingCard* nextCard = m_graveyard.isEmpty() ? 0 : m_graveyard.first();
-    mp_game->gameEventBroadcaster().onPlayerDrawFromGraveyard(player, card, nextCard);
+    mp_game->gameEventManager().onPlayerDrawFromGraveyard(player, card, nextCard);
 }
 
 void GameTable::playerDiscardCard(PlayingCard* card)
@@ -62,7 +62,7 @@ void GameTable::playerDiscardCard(PlayingCard* card)
     Q_ASSERT(pocket == POCKET_HAND || pocket == POCKET_TABLE);
     moveCardToGraveyard(card);
 
-    mp_game->gameEventBroadcaster().onPlayerDiscardCard(owner, card, pocket);
+    mp_game->gameEventManager().onPlayerDiscardCard(owner, card, pocket);
     owner->checkEmptyHand();
 }
 
@@ -74,7 +74,7 @@ void GameTable::playerPlayCard(PlayingCard* card)
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
     moveCardToGraveyard(card);
-    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card);
+    mp_game->gameEventManager().onPlayerPlayCard(owner, card);
     owner->checkEmptyHand();
 }
 
@@ -85,7 +85,7 @@ void GameTable::playerPlayCard(PlayingCard* card, Player* targetPlayer)
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
     moveCardToGraveyard(card);
-    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetPlayer);
+    mp_game->gameEventManager().onPlayerPlayCard(owner, card, targetPlayer);
     owner->checkEmptyHand();
 }
 
@@ -97,7 +97,7 @@ void GameTable::playerPlayCard(PlayingCard* card, PlayingCard* targetCard)
     Q_ASSERT(!targetCard->isVirtual());
     Player* owner = card->owner();
     moveCardToGraveyard(card);
-    mp_game->gameEventBroadcaster().onPlayerPlayCard(owner, card, targetCard);
+    mp_game->gameEventManager().onPlayerPlayCard(owner, card, targetCard);
     owner->checkEmptyHand();
 }
 
@@ -119,7 +119,7 @@ void GameTable::playerPlayCardOnTable(TableCard* card, Player* targetPlayer)
     card->setPocket(POCKET_TABLE);
     card->registerPlayer(targetPlayer);
 
-    mp_game->gameEventBroadcaster().onPlayerPlayCardOnTable(owner, card, targetPlayer);
+    mp_game->gameEventManager().onPlayerPlayCardOnTable(owner, card, targetPlayer);
     owner->checkEmptyHand();
 }
 
@@ -138,12 +138,12 @@ void GameTable::passTableCard(TableCard* card, Player* targetPlayer)
     card->setOwner(targetPlayer);
     card->setPocket(POCKET_TABLE);
     card->registerPlayer(targetPlayer);
-    mp_game->gameEventBroadcaster().onPassTableCard(owner, card, targetPlayer);
+    mp_game->gameEventManager().onPassTableCard(owner, card, targetPlayer);
 }
 
 void GameTable::playerPass(Player* player)
 {
-    mp_game->gameEventBroadcaster().onPlayerPass(player);
+    mp_game->gameEventManager().onPlayerPass(player);
 }
 
 void GameTable::playerRespondWithCard(PlayingCard* card)
@@ -153,7 +153,7 @@ void GameTable::playerRespondWithCard(PlayingCard* card)
     Q_ASSERT(card->pocket() == POCKET_HAND);
     Player* owner = card->owner();
     moveCardToGraveyard(card);
-    mp_game->gameEventBroadcaster().onPlayerRespondWithCard(owner, card);
+    mp_game->gameEventManager().onPlayerRespondWithCard(owner, card);
     owner->checkEmptyHand();
 }
 
@@ -170,7 +170,7 @@ void GameTable::drawIntoSelection(int count, Player* selectionOwner)
         card->setPocket(POCKET_SELECTION);
         drawedCards.append(card);
     }
-    mp_game->gameEventBroadcaster().onDrawIntoSelection(selectionOwner, drawedCards);
+    mp_game->gameEventManager().onDrawIntoSelection(selectionOwner, drawedCards);
 }
 
 void GameTable::playerPickFromSelection(Player* player, PlayingCard* card)
@@ -182,7 +182,7 @@ void GameTable::playerPickFromSelection(Player* player, PlayingCard* card)
     player->appendCardToHand(card);
     card->setOwner(player);
     card->setPocket(POCKET_HAND);
-    mp_game->gameEventBroadcaster().onPlayerPickFromSelection(player, card, revealCard);
+    mp_game->gameEventManager().onPlayerPickFromSelection(player, card, revealCard);
 }
 
 void GameTable::undrawFromSelection(PlayingCard* card)
@@ -193,7 +193,7 @@ void GameTable::undrawFromSelection(PlayingCard* card)
     putCardToDeck(card);
     card->setOwner(0);
     card->setPocket(POCKET_DECK);
-    mp_game->gameEventBroadcaster().onUndrawFromSelection(card, owner);
+    mp_game->gameEventManager().onUndrawFromSelection(card, owner);
 }
 
 /*
@@ -208,7 +208,7 @@ void GameTable::playerCheckDeck(Player* player, PlayingCard* causedBy, bool (*ch
     checkedCard->setOwner(0);
     checkedCard->setPocket(POCKET_GRAVEYARD);
     bool checkResult = (*checkFunc)(checkedCard);
-    mp_game->gameEventBroadcaster().onPlayerCheckDeck(player, checkedCard, causedBy, checkResult);
+    mp_game->gameEventManager().onPlayerCheckDeck(player, checkedCard, causedBy, checkResult);
     resultHandler->checkResult(checkResult);
 }
 */
@@ -220,7 +220,7 @@ PlayingCard* GameTable::checkDeck()
     putCardToGraveyard(checkedCard);
     checkedCard->setOwner(0);
     checkedCard->setPocket(POCKET_GRAVEYARD);
-    mp_game->gameEventBroadcaster().onCancelCard(0, POCKET_DECK, checkedCard, 0);
+    mp_game->gameEventManager().onCancelCard(0, POCKET_DECK, checkedCard, 0);
     return checkedCard;
 }
 
@@ -246,7 +246,7 @@ void GameTable::playerStealCard(Player* player, PlayingCard* card)
     card->setOwner(player);
     card->setPocket(POCKET_HAND);
 
-    mp_game->gameEventBroadcaster().onPlayerStealCard(player, owner, pocket, card);
+    mp_game->gameEventManager().onPlayerStealCard(player, owner, pocket, card);
     owner->checkEmptyHand();
 }
 
@@ -259,7 +259,7 @@ void GameTable::cancelCard(PlayingCard* card, Player* player)
 
     moveCardToGraveyard(card);
 
-    mp_game->gameEventBroadcaster().onCancelCard(owner, pocket, card, player);
+    mp_game->gameEventManager().onCancelCard(owner, pocket, card, player);
     if (owner != 0 && pocket == POCKET_HAND)
         owner->checkEmptyHand();
 }
@@ -320,7 +320,7 @@ void GameTable::regenerateDeck()
     m_graveyard.clear();
     m_graveyard << m_deck.takeLast();
     shuffleDeck();
-    mp_game->gameEventBroadcaster().onDeckRegenerate();
+    mp_game->gameEventManager().onDeckRegenerate();
 }
 
 void GameTable::moveCardToGraveyard(PlayingCard* card)

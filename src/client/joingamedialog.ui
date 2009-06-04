@@ -5,7 +5,7 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>4</y>
+    <y>0</y>
     <width>575</width>
     <height>461</height>
    </rect>
@@ -394,6 +394,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonSpectate">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Spectate</string>
        </property>

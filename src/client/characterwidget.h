@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PLAYERCHARACTERWIDGET_H
-#define PLAYERCHARACTERWIDGET_H
+#ifndef CHARACTERWIDGET_H
+#define CHARACTERWIDGET_H
 
 #include <QWidget>
 #include <QTimer>
@@ -28,16 +28,12 @@
 
 namespace client {
 
-/**
- * @todo Rename to CharacterWidget
- * @author MacJariel <MacJariel@gmail.com>
- */
-class PlayerCharacterWidget: public QWidget
+class CharacterWidget: public QWidget
 {
 Q_OBJECT
 public:
-    PlayerCharacterWidget(QWidget *parent = 0);
-    virtual ~PlayerCharacterWidget();
+    CharacterWidget(QWidget *parent = 0);
+    virtual ~CharacterWidget();
 
     void init(CardWidgetFactory* cardWidgetFactory);
 

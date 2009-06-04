@@ -131,11 +131,11 @@ void ServerConnection::sendChatMessage(const QString& message)
     mp_parser->actionChatMessage(message);
 }
 
-void ServerConnection::drawCard(int numCards, bool revealCard)
+void ServerConnection::drawCard()
 {
     if (mp_parser == 0)
         return;
-    mp_parser->actionDrawCard(numCards, revealCard);
+    mp_parser->actionDrawCard();
 }
 
 void ServerConnection::playCard(int cardId)

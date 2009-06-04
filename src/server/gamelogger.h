@@ -3,10 +3,10 @@
 
 #include <fstream>
 
-#include "gameeventhandler.h"
+#include "gameeventlistener.h"
 
 
-class GameLogger : public GameEventHandler
+class GameLogger : public GameEventListener
 {
 public:
     GameLogger();

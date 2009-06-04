@@ -18,7 +18,7 @@ void CharacterSuzyLafayette::onEmptyHand()
 {
     Q_ASSERT(mp_player->handSize() == 0);
     if (!mp_player->isAlive()) return;
-    ///@todo: the ability cannot be used during Duel shoot-out
+    ///@todo the ability cannot be used during Duel shoot-out
     notifyAbilityUse();
     gameTable().playerDrawFromDeck(mp_player, 1, 0);
 }

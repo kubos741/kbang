@@ -49,8 +49,6 @@ namespace client
  *       implemented by adding a kind of card-set-manager class that will manage
  *       creating the Card objects.
  *
- * \todo The class will use only one pixmap of the largest size. CardWidget can resize
- *       this pixmap on fly.
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */

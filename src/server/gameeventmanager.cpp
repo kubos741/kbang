@@ -1,5 +1,5 @@
-#include "gameeventbroadcaster.h"
-#include "gameeventhandler.h"
+#include "gameeventmanager.h"
+#include "gameeventlistener.h"
 #include "player.h"
 #include "playingcard.h"
 #include "game.h"
@@ -11,26 +11,26 @@ QList<const PlayingCard*> voidCardList(int s) {
     return l;
 }
 
-GameEventBroadcaster::GameEventBroadcaster(Game* game):
+GameEventManager::GameEventManager(Game* game):
         mp_game(game)
 {
 }
 
 
-void GameEventBroadcaster::registerHandler(GameEventHandler* handler, Player* player)
+void GameEventManager::registerHandler(GameEventListener* handler, Player* player)
 {
     m_handlers.append(new Handler(handler, player));
     handler->onHandlerRegistered(&mp_game->publicGameView(),
                                              (player ? player->playerCtrl() : 0));
 }
 
-void GameEventBroadcaster::registerSupervisor(GameEventHandler* handler)
+void GameEventManager::registerSupervisor(GameEventListener* handler)
 {
     m_handlers.append(new Handler(handler, 0, 1));
     handler->onHandlerRegistered(&mp_game->publicGameView(), 0);
 }
 
-void GameEventBroadcaster::unregisterHandler(GameEventHandler* handler)
+void GameEventManager::unregisterHandler(GameEventListener* handler)
 {
     foreach(Handler* h, m_handlers) {
         if (h->handler == handler) {
@@ -41,21 +41,21 @@ void GameEventBroadcaster::unregisterHandler(GameEventHandler* handler)
     handler->onHandlerUnregistered();
 }
 
-void GameEventBroadcaster::onChatMessage(Player* p, const QString& message)
+void GameEventManager::onChatMessage(Player* p, const QString& message)
 {    
     foreach(Handler* h, m_handlers) {
         h->handler->onChatMessage(p->publicView(), message);
     }
 }
 
-void GameEventBroadcaster::onGameSync()
+void GameEventManager::onGameSync()
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onGameSync();
     }
 }
 
-void GameEventBroadcaster::onPlayerJoinedGame(Player* p)
+void GameEventManager::onPlayerJoinedGame(Player* p)
 {
     // Do not send to the player that just joined
     foreach(Handler* h, m_handlers) {
@@ -64,42 +64,42 @@ void GameEventBroadcaster::onPlayerJoinedGame(Player* p)
     }
 }
 
-void GameEventBroadcaster::onPlayerLeavedGame(Player* p)
+void GameEventManager::onPlayerLeavedGame(Player* p)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerLeavedGame(p->publicView());
     }
 }
 
-void GameEventBroadcaster::onPlayerUpdated(Player* p)
+void GameEventManager::onPlayerUpdated(Player* p)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerUpdated(p->publicView());
     }
 }
 
-void GameEventBroadcaster::onPlayerDied(Player* p, Player* causedBy)
+void GameEventManager::onPlayerDied(Player* p, Player* causedBy)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerDied(p->publicView(), causedBy ? &causedBy->publicView() : 0);
     }
 }
 
-void GameEventBroadcaster::onGameStarted()
+void GameEventManager::onGameStarted()
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onGameStarted();
     }
 }
 
-void GameEventBroadcaster::onGameFinished()
+void GameEventManager::onGameFinished()
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onGameFinished();
     }
 }
 
-void GameEventBroadcaster::onPlayerDrawFromDeck(Player* p, QList<const PlayingCard*> cards, bool revealCards)
+void GameEventManager::onPlayerDrawFromDeck(Player* p, QList<const PlayingCard*> cards, bool revealCards)
 {
     foreach(Handler* h, m_handlers) {
         if (h->player == p || revealCards || h->isSupervisor)
@@ -109,35 +109,35 @@ void GameEventBroadcaster::onPlayerDrawFromDeck(Player* p, QList<const PlayingCa
     }
 }
 
-void GameEventBroadcaster::onPlayerDrawFromGraveyard(Player* p, const PlayingCard* card, const PlayingCard* nextCard)
+void GameEventManager::onPlayerDrawFromGraveyard(Player* p, const PlayingCard* card, const PlayingCard* nextCard)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerDrawFromGraveyard(p->publicView(), card, nextCard);
     }
 }
 
-void GameEventBroadcaster::onPlayerDiscardCard(Player* p, PlayingCard* card, PocketType pocketFrom)
+void GameEventManager::onPlayerDiscardCard(Player* p, PlayingCard* card, PocketType pocketFrom)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerDiscardCard(p->publicView(), card, pocketFrom);
     }
 }
 
-void GameEventBroadcaster::onPlayerPlayCard(Player* p, PlayingCard* card)
+void GameEventManager::onPlayerPlayCard(Player* p, PlayingCard* card)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerPlayCard(p->publicView(), card);
     }
 }
 
-void GameEventBroadcaster::onPlayerPlayCard(Player* p, PlayingCard* card, Player* targetPlayer)
+void GameEventManager::onPlayerPlayCard(Player* p, PlayingCard* card, Player* targetPlayer)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerPlayCard(p->publicView(), card, targetPlayer->publicView());
     }
 }
 
-void GameEventBroadcaster::onPlayerPlayCard(Player* p, PlayingCard* card, PlayingCard* targetCard)
+void GameEventManager::onPlayerPlayCard(Player* p, PlayingCard* card, PlayingCard* targetCard)
 {
     PublicPlayerView* owner = targetCard->owner() ? &targetCard->owner()->publicView() : 0;
     foreach(Handler* h, m_handlers) {
@@ -149,35 +149,35 @@ void GameEventBroadcaster::onPlayerPlayCard(Player* p, PlayingCard* card, Playin
     }
 }
 
-void GameEventBroadcaster::onPlayerPlayCardOnTable(Player* p, PlayingCard* card, Player* targetPlayer)
+void GameEventManager::onPlayerPlayCardOnTable(Player* p, PlayingCard* card, Player* targetPlayer)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerPlayCardOnTable(p->publicView(), card, targetPlayer->publicView());
     }
 }
 
-void GameEventBroadcaster::onPassTableCard(Player* p, PlayingCard* card, Player* targetPlayer)
+void GameEventManager::onPassTableCard(Player* p, PlayingCard* card, Player* targetPlayer)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPassTableCard(p->publicView(), card, targetPlayer->publicView());
     }
 }
 
-void GameEventBroadcaster::onPlayerRespondWithCard(Player* p, PlayingCard* card)
+void GameEventManager::onPlayerRespondWithCard(Player* p, PlayingCard* card)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerRespondWithCard(p->publicView(), card);
     }
 }
 
-void GameEventBroadcaster::onPlayerPass(Player* p)
+void GameEventManager::onPlayerPass(Player* p)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerPass(p->publicView());
     }
 }
 
-void GameEventBroadcaster::onDrawIntoSelection(Player* selectionOwner, QList<const PlayingCard*> cards)
+void GameEventManager::onDrawIntoSelection(Player* selectionOwner, QList<const PlayingCard*> cards)
 {
     foreach(Handler* h, m_handlers) {
         if (selectionOwner == 0 || h->player == selectionOwner || h->isSupervisor)
@@ -187,7 +187,7 @@ void GameEventBroadcaster::onDrawIntoSelection(Player* selectionOwner, QList<con
     }
 }
 
-void GameEventBroadcaster::onPlayerPickFromSelection(Player* p, PlayingCard* card, bool revealCard)
+void GameEventManager::onPlayerPickFromSelection(Player* p, PlayingCard* card, bool revealCard)
 {
     foreach(Handler* h, m_handlers) {
         if (h->player == p || revealCard || h->isSupervisor)
@@ -197,7 +197,7 @@ void GameEventBroadcaster::onPlayerPickFromSelection(Player* p, PlayingCard* car
     }
 }
 
-void GameEventBroadcaster::onUndrawFromSelection(PlayingCard* card, Player* selectionOwner)
+void GameEventManager::onUndrawFromSelection(PlayingCard* card, Player* selectionOwner)
 {
     foreach(Handler* h, m_handlers) {
         if (h->player == selectionOwner || h->isSupervisor)
@@ -207,14 +207,14 @@ void GameEventBroadcaster::onUndrawFromSelection(PlayingCard* card, Player* sele
     }
 }
 
-void GameEventBroadcaster::onPlayerCheckDeck(Player* p, PlayingCard* checkedCard, PlayingCard* causedBy, bool checkResult)
+void GameEventManager::onPlayerCheckDeck(Player* p, PlayingCard* checkedCard, PlayingCard* causedBy, bool checkResult)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerCheckDeck(p->publicView(), checkedCard, causedBy, checkResult);
     }
 }
 
-void GameEventBroadcaster::onPlayerStealCard(Player* p, Player* targetPlayer, PocketType pocketFrom, PlayingCard* card)
+void GameEventManager::onPlayerStealCard(Player* p, Player* targetPlayer, PocketType pocketFrom, PlayingCard* card)
 {
     foreach(Handler* h, m_handlers) {
         if (pocketFrom != POCKET_HAND || h->player == p || h->player == targetPlayer || h->isSupervisor)
@@ -224,7 +224,7 @@ void GameEventBroadcaster::onPlayerStealCard(Player* p, Player* targetPlayer, Po
     }
 }
 
-void GameEventBroadcaster::onCancelCard(Player* targetPlayer, PocketType pocketFrom, PlayingCard* card, Player* causedBy)
+void GameEventManager::onCancelCard(Player* targetPlayer, PocketType pocketFrom, PlayingCard* card, Player* causedBy)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onCancelCard(pocketFrom, card,
@@ -233,28 +233,28 @@ void GameEventBroadcaster::onCancelCard(Player* targetPlayer, PocketType pocketF
     }
 }
 
-void GameEventBroadcaster::onGameContextChange(const GameContextData& gameContextData)
+void GameEventManager::onGameContextChange(const GameContextData& gameContextData)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onGameContextChange(gameContextData);
     }
 }
 
-void GameEventBroadcaster::onLifePointsChange(Player* p, int lifePoints, Player* causedBy)
+void GameEventManager::onLifePointsChange(Player* p, int lifePoints, Player* causedBy)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onLifePointsChange(p->publicView(), lifePoints, causedBy ? &causedBy->publicView() : 0);
     }
 }
 
-void GameEventBroadcaster::onDeckRegenerate()
+void GameEventManager::onDeckRegenerate()
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onDeckRegenerate();
     }
 }
 
-void GameEventBroadcaster::onPlayerUseAbility(Player* player)
+void GameEventManager::onPlayerUseAbility(Player* player)
 {
     foreach(Handler* h, m_handlers) {
         h->handler->onPlayerUseAbility(player->publicView());

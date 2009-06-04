@@ -31,7 +31,7 @@
 #include "playerwidget.h"
 
 #include "cardwidgetfactory.h"
-#include "gameobjectclickhandler.h"
+#include "gameactionmanager.h"
 
 namespace client {
 
@@ -74,7 +74,7 @@ public slots:
 public:
     inline DeckWidget*     deck() const               { return mp_deck; }
     inline GraveyardWidget*graveyard() const          { return mp_graveyard; }
-    inline CardList*       selection() const          { return mp_selection; }
+    inline CardListWidget*       selection() const          { return mp_selection; }
     inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
     inline LocalPlayerWidget*
                            localPlayerWidget() const  { return mp_localPlayerWidget; }
@@ -97,7 +97,7 @@ public:
 
     void assignPlayerWidget(int playerId, PlayerWidget*);
 
-    inline GameObjectClickHandler* gameObjectClickHandler() { return &m_gameObjectClickHandler; }
+    inline GameActionManager* gameActionManager() { return &m_gameActionManager; }
     inline CardWidgetFactory*       cardWidgetFactory()  { return &m_cardWidgetFactory; }
 
     inline ServerConnection* serverConnection() { return mp_serverConnection; }
@@ -147,12 +147,12 @@ private:
     QPushButton*              mp_startButton;
     DeckWidget*               mp_deck;
     GraveyardWidget*          mp_graveyard;
-    CardList*                 mp_selection;
+    CardListWidget*                 mp_selection;
     QQueue<CardMovementData> m_cardMovementQueue;
 
     GameEventHandler*         mp_gameEventHandler;
     CardWidgetFactory         m_cardWidgetFactory;
-    GameObjectClickHandler    m_gameObjectClickHandler;
+    GameActionManager    m_gameActionManager;
 
 
 

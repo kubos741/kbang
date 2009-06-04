@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENTCARDLIST_H
-#define CLIENTCARDLIST_H
+#ifndef CLIENTCARDLISTWIDGET_H
+#define CLIENTCARDLISTWIDGET_H
 
 #include <cardpocket.h>
 #include <cardwidget.h>
@@ -30,13 +30,13 @@ namespace client {
 /**
  * @author MacJariel <MacJariel@gmail.com>
  */
-class CardList: public CardPocket
+class CardListWidget: public CardPocket
 {
 Q_OBJECT
 public:
-    CardList(QWidget *parent);
+    CardListWidget(QWidget *parent);
     void setCardSize(const CardWidget::Size& cardSize);
-    virtual ~CardList();
+    virtual ~CardListWidget();
 
     virtual void push(CardWidget* card);
     virtual QPoint newCardPosition() const;
@@ -45,7 +45,7 @@ public:
     virtual CardWidget* pop();
 
     virtual void paintEvent(QPaintEvent* event);
-    
+
     void setHasBox(bool hasBox);
 
     void clear();

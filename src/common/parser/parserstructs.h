@@ -187,7 +187,7 @@ struct CardMovementData {
 };
 
 /**
- * @todo: remove PLAYCARD_HAND, use PLAYCARD_PLAYER instead
+ * @todo remove PLAYCARD_HAND, use PLAYCARD_PLAYER instead
  */
 struct ActionPlayCardData {
     int playedCardId;

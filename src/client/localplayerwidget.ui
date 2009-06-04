@@ -46,6 +46,11 @@ QToolButton:pressed {
                                        stop: 0 #dadbde, stop: 1 #f6f7fa);
  }
 
+QToolButton:checked {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #da5b5e, stop: 1 #f6676a);
+}
+
 QToolButton:default {
      border-color: navy; 
 }</string>
@@ -124,7 +129,7 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
      <item row="0" column="1">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="client::PlayerCharacterWidget" name="mp_characterWidget" native="true"/>
+        <widget class="client::CharacterWidget" name="mp_characterWidget" native="true"/>
        </item>
        <item>
         <spacer name="verticalSpacer_3">
@@ -257,7 +262,7 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
       </spacer>
      </item>
      <item>
-      <widget class="client::CardList" name="mp_table" native="true">
+      <widget class="client::CardListWidget" name="mp_table" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -273,7 +278,7 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
       </widget>
      </item>
      <item>
-      <widget class="client::CardList" name="mp_hand" native="true">
+      <widget class="client::CardListWidget" name="mp_hand" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -294,15 +299,15 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>client::PlayerCharacterWidget</class>
+   <class>client::CharacterWidget</class>
    <extends>QWidget</extends>
-   <header>playercharacterwidget.h</header>
+   <header>characterwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>client::CardList</class>
+   <class>client::CardListWidget</class>
    <extends>QWidget</extends>
-   <header>cardlist.h</header>
+   <header>cardlistwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

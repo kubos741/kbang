@@ -22,7 +22,7 @@
 
 #include "parser/parser.h"
 #include "playerctrl.h"
-#include "gameeventhandler.h"
+#include "gameeventlistener.h"
 
 #include <QObject>
 #include <QPointer>
@@ -40,7 +40,7 @@ class QTcpSocket;
  *
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class Client : public QObject, public GameEventHandler
+class Client : public QObject, public GameEventListener
 {
 Q_OBJECT
 public:
@@ -80,7 +80,7 @@ public slots: // These slots are connected to parser
     void onActionJoinGame(int gameId, int playerId, QString gamePassword, const CreatePlayerData&);
     void onActionLeaveGame();
     void onActionStartGame();
-    void onActionDrawCard(int numCards, bool revealCard);
+    void onActionDrawCard();
     void onActionPlayCard(const ActionPlayCardData&);
     void onActionUseAbility(const ActionUseAbilityData&);
     void onActionEndTurn();
@@ -94,7 +94,7 @@ public slots: // These slots are connected to parser
 
     void onParserTerminated();
 
-public: /* The GameEventHandler interface */
+public: /* The GameEventListener interface */
     virtual void onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtrl* playerCtrl);
     virtual void onHandlerUnregistered();
     virtual void onGameStartabilityChanged(bool isStartable);
@@ -146,10 +146,11 @@ private:
 
 
 private:
-    const int           m_id;
-    Parser*             mp_parser;
-    PlayerCtrl*         mp_playerCtrl;
-    QTcpSocket*         mp_socket;
+    const int             m_id;
+    Parser*               mp_parser;
+    PlayerCtrl*           mp_playerCtrl;
+    const PublicGameView* mp_publicGameView;
+    QTcpSocket*           mp_socket;
 };
 
 #endif
