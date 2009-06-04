@@ -37,3 +37,11 @@ QString randomToken(int minLength, int maxLength)
     token[length - 1] = '\0';
     return QString(token);
 }
+
+bool randomBool(qreal probability)
+{
+    int random_val_size = 4096;
+    int true_val_treshold = (int)(random_val_size * probability);
+    int random_val = qrand() % random_val_size;
+    return (random_val < true_val_treshold);
+}

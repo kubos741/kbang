@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 {
     time_t sec;
     time(&sec);
-    srand((unsigned int) sec);
+    qsrand((unsigned int) sec);
 
     QApplication app(argc, argv);
     app.setApplicationName("KBang Client");

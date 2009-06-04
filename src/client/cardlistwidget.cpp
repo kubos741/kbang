@@ -92,7 +92,7 @@ CardWidget* CardListWidget::take(int cardId)
         }
         qCritical("Cannot find card id %d in CardListWidget. Taking random card.", cardId);
     }
-    int cardIndex = (int)rand() % (int)m_cards.size();
+    int cardIndex = (int)qrand() % (int)m_cards.size();
     CardWidget* res = m_cards.takeAt(cardIndex);
     reorder();
     return res;

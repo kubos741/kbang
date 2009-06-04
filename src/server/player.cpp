@@ -213,7 +213,7 @@ PlayingCard* Player::getRandomCardFromHand()
 {
     int size = m_hand.size();
     if (size == 0) return 0;
-    return m_hand[rand() % size];
+    return m_hand[qrand() % size];
 }
 
 bool Player::removeCardFromTable(PlayingCard* card)
