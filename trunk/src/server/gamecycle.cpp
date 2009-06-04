@@ -141,6 +141,7 @@ void GameCycle::discardCard(Player* player, PlayingCard* card)
 
     mp_game->gameTable().playerDiscardCard(card);
     m_state = GAMEPLAYSTATE_DISCARD;
+    m_contextDirty = 1;
 
     if (needDiscard(player) == 0)
         startTurn(mp_game->nextPlayer(mp_currentPlayer));
