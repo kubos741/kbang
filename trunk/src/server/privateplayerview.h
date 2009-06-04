@@ -48,6 +48,11 @@ public:
 
     QList<PlayingCard* > hand() const;
 
+    /**
+     * Returns the number of cards of given type in player's hand.
+     */
+    int handSize(PlayingCardType) const;
+
     PrivatePlayerData privatePlayerData() const;
 
     PlayingCard* card(int cardId) const;

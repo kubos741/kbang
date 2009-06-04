@@ -53,6 +53,11 @@ public:
     QList<PlayingCard*>  table()             const;
     PublicPlayerData     publicPlayerData()  const;
 
+    /**
+     * Returns a random card of given type from player's table.
+     */
+    PlayingCard* cardFromTable(PlayingCardType cardType = CARD_UNKNOWN) const;
+
 protected:
     Player* mp_player;
 

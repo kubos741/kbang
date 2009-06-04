@@ -48,6 +48,16 @@ QList<PlayingCard* > PrivatePlayerView::hand() const
     return mp_player->hand();
 }
 
+int PrivatePlayerView::handSize(PlayingCardType cardType) const
+{
+    int res = 0;
+    foreach (PlayingCard* card, mp_player->hand()) {
+        if (card->type() == cardType)
+            res++;
+    }
+    return res;
+}
+
 PrivatePlayerData PrivatePlayerView::privatePlayerData() const
 {
     PrivatePlayerData res;
