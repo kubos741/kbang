@@ -33,7 +33,7 @@ HEADERS += \
     src/server/gameinfo.h \
     src/server/gametable.h \
     src/server/playerctrl.h \
-    src/server/gameeventhandler.h \
+    src/server/gameeventlistener.h \
     src/server/voidai.h \
     src/server/cardbeer.h \
     src/server/cardhorse.h \
@@ -47,7 +47,7 @@ HEADERS += \
     src/server/carddynamite.h \
     src/server/cardtaker.h \
     src/server/cardbarrel.h \
-    src/server/gameeventbroadcaster.h \
+    src/server/gameeventmanager.h \
     src/server/gamelogger.h \
     src/server/characterbase.h \
     src/server/charactercalamityjanet.h \
@@ -91,7 +91,7 @@ SOURCES += \
     src/server/gametable.cpp \
     src/server/playerctrl.cpp \
     src/server/voidai.cpp \
-    src/server/gameeventhandler.cpp \
+    src/server/gameeventlistener.cpp \
     src/server/cardbeer.cpp \
     src/server/cardhorse.cpp \
     src/server/cardfactory.cpp \
@@ -104,7 +104,7 @@ SOURCES += \
     src/server/carddynamite.cpp \
     src/server/cardtaker.cpp \
     src/server/cardbarrel.cpp \
-    src/server/gameeventbroadcaster.cpp \
+    src/server/gameeventmanager.cpp \
     src/server/gamelogger.cpp \
     src/server/characterbase.cpp \
     src/server/charactercalamityjanet.cpp \

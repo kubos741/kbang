@@ -3,7 +3,7 @@
 #include "gamecycle.h"
 #include "player.h"
 #include "playerctrl.h"
-#include "gameeventhandler.h"
+#include "gameeventlistener.h"
 #include "gametable.h"
 #include "playingcard.h"
 #include "characterbase.h"
@@ -130,7 +130,7 @@ const PrivatePlayerView& PlayerCtrl::privatePlayerView() const
 
 
 
-void PlayerCtrl::createGame(const CreateGameData& game, const CreatePlayerData& player, GameEventHandler* handler)
+void PlayerCtrl::createGame(const CreateGameData& game, const CreatePlayerData& player, GameEventListener* handler)
 {
     Game* newGame = GameServer::instance().createGame(game);
     Q_ASSERT(newGame != 0);
@@ -139,7 +139,7 @@ void PlayerCtrl::createGame(const CreateGameData& game, const CreatePlayerData& 
 }
 
 void PlayerCtrl::joinGame(int gameId, const QString& gamePassword,
-                          const CreatePlayerData& player, GameEventHandler* handler)
+                          const CreatePlayerData& player, GameEventListener* handler)
 {
     Game* game = GameServer::instance().game(gameId);
     if (game == 0)
@@ -155,7 +155,7 @@ void PlayerCtrl::joinGame(int gameId, const QString& gamePassword,
 
 void PlayerCtrl::replacePlayer(int gameId, int playerId, const QString& gamePassword,
                                 const CreatePlayerData& createPlayerData,
-                                GameEventHandler* gameEventHandler)
+                                GameEventListener* gameEventListener)
 {
     Game* game = GameServer::instance().game(gameId);
     if (game == 0)
@@ -168,7 +168,7 @@ void PlayerCtrl::replacePlayer(int gameId, int playerId, const QString& gamePass
     if (player == 0)
         throw BadTargetPlayerException();
 
-    game->replacePlayer(player, createPlayerData, gameEventHandler);
+    game->replacePlayer(player, createPlayerData, gameEventListener);
 }
 
 

@@ -28,13 +28,13 @@
 class QLabel;
 
 namespace client {
-class CardList;
+class CardListWidget;
 class CardWidget;
-class PlayerCharacterWidget;
+class CharacterWidget;
 class Game;
 class CardWidgetFactory;
 class CardWidgetSizeManager;
-class GameObjectClickHandler;
+class GameActionManager;
 
 /**
  * The PlayerWidget class provides the abstraction for a widget that contains
@@ -80,9 +80,9 @@ public:
 
 
 
-    virtual CardList* hand() = 0;
-    virtual CardList* table() = 0;
-    virtual PlayerCharacterWidget* characterWidget() = 0;
+    virtual CardListWidget* hand() = 0;
+    virtual CardListWidget* table() = 0;
+    virtual CharacterWidget* characterWidget() = 0;
     virtual QLabel* avatarLabel() = 0;
     virtual QLabel* playerNameLabel() = 0;
     virtual bool isLocalPlayer() = 0;
@@ -91,7 +91,7 @@ protected:
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent*);
 
-    GameObjectClickHandler* gameObjectClickHandler() const;
+    GameActionManager* gameActionManager() const;
     CardWidgetFactory*      cardWidgetFactory() const;
 
 

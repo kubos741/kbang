@@ -82,7 +82,7 @@ GameInfoData PublicGameView::gameInfoData() const
         playerInfo.id = p->id();
         playerInfo.name = p->name();
         playerInfo.isAlive = p->isAlive();
-        playerInfo.hasController = (p->gameEventHandler() != 0);
+        playerInfo.hasController = (p->gameEventListener() != 0);
         playerInfo.isAI = p->isAI();
         playerInfo.hasPassword = 0; // todo
         res.players.append(playerInfo);

@@ -53,8 +53,8 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
             this,       SLOT(onActionLeaveGame()));
     connect(mp_parser,  SIGNAL(sigActionStartGame()),
             this,       SLOT(onActionStartGame()));
-    connect(mp_parser,  SIGNAL(sigActionDrawCard(int,bool)),
-            this,       SLOT(onActionDrawCard(int,bool)));
+    connect(mp_parser,  SIGNAL(sigActionDrawCard()),
+            this,       SLOT(onActionDrawCard()));
     connect(mp_parser,  SIGNAL(sigActionPlayCard(const ActionPlayCardData&)),
             this,       SLOT(onActionPlayCard(const ActionPlayCardData&)));
     connect(mp_parser,  SIGNAL(sigActionUseAbility(const ActionUseAbilityData&)),
@@ -84,7 +84,7 @@ int Client::gameId() const
 {
     if (!mp_playerCtrl)
         return 0;
-    return mp_playerCtrl->publicGameView().id();
+    return mp_publicGameView->id();
 }
 
 int Client::playerId() const
@@ -143,14 +143,15 @@ void Client::onActionStartGame()
     mp_playerCtrl->startGame();
 }
 
-void Client::onActionDrawCard(int numCards, bool revealCard)
+void Client::onActionDrawCard()
 {
     if (mp_playerCtrl == 0)
         return;
+
     try {
         mp_playerCtrl->draw();
     } catch (GameException& e) {
-        qDebug() << "Client::onActionDrawCard - exception:";
+        qDebug() << "Client::onActionDrawCard";
         e.debug();
     }
 }
@@ -182,7 +183,7 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
                                      actionPlayCardData.targetHandId;
 
                 const PublicPlayerView* targetPlayer =
-                        mp_playerCtrl->publicGameView().publicPlayerView(targetPlayerId);
+                        mp_publicGameView->publicPlayerView(targetPlayerId);
 
                 if (targetPlayer == 0) {
                     qDebug(qPrintable(QString("[CLIENT]   Target player '%1' not exist!").arg(actionPlayCardData.targetPlayerId)));
@@ -334,9 +335,9 @@ void Client::onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtr
 {
     if (mp_parser == 0) return;
     mp_playerCtrl = playerCtrl;
-    //todo: make use of publicGameView
-    mp_parser->eventEnterGameMode(mp_playerCtrl->publicGameView().id(),
-                                  mp_playerCtrl->publicGameView().name(),
+    mp_publicGameView = publicGameView;
+    mp_parser->eventEnterGameMode(mp_publicGameView->id(),
+                                  mp_publicGameView->name(),
                                   CLIENT_PLAYER); //@todo: spectator
     onGameSync();
 }
@@ -344,6 +345,7 @@ void Client::onHandlerRegistered(const PublicGameView* publicGameView, PlayerCtr
 void Client::onHandlerUnregistered()
 {
     mp_playerCtrl = 0;
+    mp_publicGameView = 0;
     if (mp_parser == 0) return;
     mp_parser->eventExitGameMode();
 }
@@ -366,23 +368,23 @@ void Client::onGameSync()
 {
     if (mp_parser == 0) return;
     GameSyncData gameSyncData;
-    gameSyncData.id = mp_playerCtrl->publicGameView().id();
-    gameSyncData.name = mp_playerCtrl->publicGameView().name();
+    gameSyncData.id = mp_publicGameView->id();
+    gameSyncData.name = mp_publicGameView->name();
     gameSyncData.isCreator = mp_playerCtrl->privatePlayerView().isCreator();
-    gameSyncData.state = mp_playerCtrl->publicGameView().gameState();
-    gameSyncData.graveyard = mp_playerCtrl->publicGameView().graveyardTop()->cardData();
-    foreach (const PublicPlayerView* p, mp_playerCtrl->publicGameView().publicPlayerList())
+    gameSyncData.state = mp_publicGameView->gameState();
+    gameSyncData.graveyard = mp_publicGameView->graveyardTop()->cardData();
+    foreach (const PublicPlayerView* p, mp_publicGameView->publicPlayerList())
         gameSyncData.players.append(p->publicPlayerData());
     gameSyncData.localPlayer = mp_playerCtrl->privatePlayerView().privatePlayerData();
-    gameSyncData.gameContext = mp_playerCtrl->publicGameView().gameContextData();
-    foreach (const PlayingCard* c, mp_playerCtrl->publicGameView().selection())
+    gameSyncData.gameContext = mp_publicGameView->gameContextData();
+    foreach (const PlayingCard* c, mp_publicGameView->selection())
         gameSyncData.selection.append(c->cardData());
     mp_parser->eventGameSync(gameSyncData);
 
 
 
     if (gameSyncData.isCreator && gameSyncData.state == GAMESTATE_WAITINGFORPLAYERS)
-        onGameStartabilityChanged(mp_playerCtrl->publicGameView().canBeStarted());
+        onGameStartabilityChanged(mp_publicGameView->canBeStarted());
 }
 
 
@@ -432,10 +434,10 @@ void Client::onGameStarted()
 
 
     /*
-    StructGame structGame = mp_playerCtrl->publicGameView().structGame();
+    StructGame structGame = mp_publicGameView->structGame();
     StructPlayerList structPlayerList;
     const PrivatePlayerView* privatePlayer = &mp_playerCtrl->privatePlayerView();
-    foreach(const PublicPlayerView* player, mp_playerCtrl->publicGameView().publicPlayerList()) {
+    foreach(const PublicPlayerView* player, mp_publicGameView->publicPlayerList()) {
         if (player->id() == privatePlayer->id())
             player = privatePlayer;
         structPlayerList.append(player->structPlayer());
@@ -457,6 +459,8 @@ void Client::onGameFinished()
 void Client::onPlayerDrawFromDeck(PublicPlayerView& player, QList<const PlayingCard*> cards, bool revealCards)
 {
     if (mp_parser == 0) return;
+
+    Q_UNUSED(revealCards);
 
     GameMessage message;
     message.type = GAMEMESSAGE_PLAYERDRAWFROMDECK;
@@ -555,6 +559,8 @@ void Client::onPlayerPlayCard(PublicPlayerView& player, const PlayingCard* card,
 void Client::onPlayerPlayCard(PublicPlayerView& player, const PlayingCard* card, const PlayingCard* target, PublicPlayerView* targetPlayer)
 {
     if (mp_parser == 0) return;
+
+    Q_UNUSED(target);
 
     GameMessage message;
     message.type = GAMEMESSAGE_PLAYERPLAYCARD;
@@ -745,6 +751,7 @@ void Client::onGameContextChange(const GameContextData& gameContextData)
 
 void Client::onLifePointsChange(PublicPlayerView& player, int lifePoints, PublicPlayerView* causedBy)
 {
+    Q_UNUSED(causedBy);
     if (mp_parser == 0) return;
     mp_parser->eventLifePointsChange(player.id(), lifePoints);
 }
@@ -760,7 +767,7 @@ void Client::onDeckRegenerate()
 
 void Client::onPlayerUseAbility(PublicPlayerView&)
 {
-    ///@todo
+    ///@todo create new use ability event
 }
 
 void Client::onActionRequest(ActionRequestType requestType)
@@ -772,7 +779,7 @@ void Client::onActionRequest(ActionRequestType requestType)
 
 PublicPlayerView* Client::getPlayer(int playerId)
 {
-    PublicPlayerView* res = mp_playerCtrl->publicGameView().publicPlayerView(playerId);
+    PublicPlayerView* res = mp_publicGameView->publicPlayerView(playerId);
     if (res == 0)
         qDebug(qPrintable(QString("[CLIENT]   Target player '%1' not exist!").arg(playerId)));
     return res;

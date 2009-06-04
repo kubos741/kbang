@@ -19,7 +19,8 @@
  ***************************************************************************/
 
 /**
- * @todo: REMOVE THIS AND USE util.h
+ * @file common.cpp
+ * @todo Use util.h and util.cpp from common instead
  */
 
 #include <QString>

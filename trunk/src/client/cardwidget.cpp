@@ -26,7 +26,7 @@
 #include "card.h"
 #include "cardwidget.h"
 #include "cardactionswidget.h"
-#include "gameobjectclickhandler.h"
+#include "gameactionmanager.h"
 
 using namespace client;
 
@@ -56,7 +56,7 @@ CardWidget::CardWidget(QWidget* parent, Card::Type cardType):
         m_shadowMode(0),
         m_hasHighlight(0),
         m_isEmpty(0),
-        mp_gameObjectClickHandler(0)
+        mp_gameActionManager(0)
 {
     show();
 }
@@ -65,9 +65,9 @@ CardWidget::~ CardWidget()
 {
 }
 
-void CardWidget::setGameObjectClickHandler(GameObjectClickHandler* gameObjectClickHandler)
+void CardWidget::setGameActionManager(GameActionManager* gameActionManager)
 {
-    mp_gameObjectClickHandler = gameObjectClickHandler;
+    mp_gameActionManager = gameActionManager;
 }
 
 void CardWidget::setType(Card::Type cardType)
@@ -201,16 +201,16 @@ QPoint CardWidget::center() const
 
 void CardWidget::mousePressEvent(QMouseEvent* e)
 {
-    if (mp_gameObjectClickHandler) {
+    if (mp_gameActionManager) {
         switch(e->button()) {
         case Qt::LeftButton: {
-            bool handled = mp_gameObjectClickHandler->onCardClicked(this);
+            bool handled = mp_gameActionManager->onCardClicked(this);
             if (!handled)
                 QLabel::mousePressEvent(e);
             break;
         }
         case Qt::RightButton:
-            mp_gameObjectClickHandler->onCardRightClicked(this);
+            mp_gameActionManager->onCardRightClicked(this);
             break;
         default:
             break;

@@ -3,8 +3,8 @@
 #include "gameexceptions.h"
 #include "game.h"
 #include "player.h"
-#include "gameeventhandler.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventlistener.h"
+#include "gameeventmanager.h"
 #include "reactioncard.h"
 #include "characterbase.h"
 #include <QDebug>
@@ -312,7 +312,7 @@ void GameCycle::sendRequest()
     if (m_contextDirty) {
         announceContextChange();
     }
-    GameEventHandler* handler = mp_requestedPlayer->gameEventHandler();
+    GameEventListener* handler = mp_requestedPlayer->gameEventListener();
     if (handler)
         handler->onActionRequest(requestType);
 }
@@ -335,5 +335,5 @@ int GameCycle::needDiscard(Player* player)
 
 void GameCycle::announceContextChange()
 {
-    mp_game->gameEventBroadcaster().onGameContextChange(gameContextData());
+    mp_game->gameEventManager().onGameContextChange(gameContextData());
 }

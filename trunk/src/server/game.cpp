@@ -37,7 +37,7 @@
 #include "gameinfo.h"
 #include "gametable.h"
 #include "gamecycle.h"
-#include "gameeventbroadcaster.h"
+#include "gameeventmanager.h"
 #include "gamelogger.h"
 #include "characterbase.h"
 #include "characterlist.h"
@@ -57,26 +57,26 @@ Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData)
     mp_gameInfo = new GameInfo(createGameData);
     mp_gameTable = new GameTable(this);
     mp_gameCycle = new GameCycle(this);
-    mp_gameEventBroadcaster = new GameEventBroadcaster(this);
+    mp_gameEventManager = new GameEventManager(this);
     mp_beerRescue = new BeerRescue(this);
     mp_defaultPlayerReaper = new PlayerReaper(this);
     mp_playerReaper = mp_defaultPlayerReaper;
     mp_gameLogger = new GameLogger();
-    mp_gameEventBroadcaster->registerSupervisor(mp_gameLogger);
+    mp_gameEventManager->registerSupervisor(mp_gameLogger);
     createAI(mp_gameInfo->AIPlayers());
 }
 
 Game::~Game()
 {
     // We need to unregister handlers before we delete
-    // gameEventBroadcaster
+    // gameEventManager
     foreach(Player* player, m_playerList)
-        player->unregisterGameEventHandler();
+        player->unregisterGameEventListener();
 
     delete mp_gameInfo;
     delete mp_gameTable;
     delete mp_gameCycle;
-    delete mp_gameEventBroadcaster;
+    delete mp_gameEventManager;
     delete mp_defaultPlayerReaper;
     delete mp_gameLogger;
 }
@@ -145,7 +145,7 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
     return baseDistance;
 }
 
-Player* Game::createPlayer(const CreatePlayerData& createPlayerData, GameEventHandler* handler)
+Player* Game::createPlayer(const CreatePlayerData& createPlayerData, GameEventListener* handler)
 {
     if (m_state != GAMESTATE_WAITINGFORPLAYERS) {
         throw BadGameStateException();
@@ -165,8 +165,8 @@ Player* Game::createPlayer(const CreatePlayerData& createPlayerData, GameEventHa
     }
 
 
-    newPlayer->registerGameEventHandler(handler);
-    gameEventBroadcaster().onPlayerJoinedGame(newPlayer);
+    newPlayer->registerGameEventListener(handler);
+    gameEventManager().onPlayerJoinedGame(newPlayer);
     checkStartable();
     return newPlayer;
 }
@@ -180,7 +180,7 @@ void Game::createAI(int count)
 }
 
 void Game::replacePlayer(Player* player, const CreatePlayerData& createPlayerData,
-                         GameEventHandler* gameEventHandler)
+                         GameEventListener* gameEventListener)
 {
     Q_ASSERT(m_playerList.contains(player));
     if (player->hasController() && !player->isAI())
@@ -189,27 +189,24 @@ void Game::replacePlayer(Player* player, const CreatePlayerData& createPlayerDat
         throw BadPlayerPasswordException();
     player->update(createPlayerData);
     if (player->hasController())
-        player->unregisterGameEventHandler();
-    player->registerGameEventHandler(gameEventHandler);
-    gameEventBroadcaster().onPlayerUpdated(player);
+        player->unregisterGameEventListener();
+    player->registerGameEventListener(gameEventListener);
+    gameEventManager().onPlayerUpdated(player);
 }
 
-/**
- * @TODO: When the creator disconnects, cancel the game.
- */
 void Game::removePlayer(Player* player)
 {
     Q_ASSERT(player->game() == this);
     int playerId = player->id();
     if (!m_playerMap.contains(playerId))
         return;
-    Q_ASSERT(m_playerMap.contains(playerId)); // THIS ASSERTED @todo: examine
+    Q_ASSERT(m_playerMap.contains(playerId)); ///@todo examine this code
     Q_ASSERT(m_playerMap[playerId] == player);
     qDebug(qPrintable(QString("Removing player #%1.").arg(playerId)));
 
     if (player->isCreator() && m_state == GAMESTATE_WAITINGFORPLAYERS) {
         foreach(Player* p, m_playerList) {
-            p->unregisterGameEventHandler();
+            p->unregisterGameEventListener();
         }
         GameServer::instance().removeGame(this);
         return;
@@ -218,16 +215,16 @@ void Game::removePlayer(Player* player)
         m_publicPlayerList.removeAll(&player->publicView());
         m_playerList.removeAll(player);
         m_playerMap.remove(playerId);
-        player->unregisterGameEventHandler();
-        gameEventBroadcaster().onPlayerLeavedGame(player);
+        player->unregisterGameEventListener();
+        gameEventManager().onPlayerLeavedGame(player);
         if (m_state == GAMESTATE_WAITINGFORPLAYERS)
             checkStartable();
         player->deleteLater();
         return;
     }
 
-    player->unregisterGameEventHandler();
-    gameEventBroadcaster().onPlayerUpdated(player);
+    player->unregisterGameEventListener();
+    gameEventManager().onPlayerUpdated(player);
 
     /* CLEANING GAME */
     bool wipeAiOnlyGame = Config::instance().readString("server", "wipe-ai-only-game") == "true";
@@ -253,7 +250,7 @@ void Game::buryPlayer(Player* player, Player* causedBy)
 
     mp_playerReaper->cleanUpCards(player);
 
-    gameEventBroadcaster().onPlayerDied(player, causedBy);
+    gameEventManager().onPlayerDied(player, causedBy);
 
     switch(player->role()) {
         case ROLE_SHERIFF:
@@ -313,7 +310,7 @@ void Game::winningSituation(PlayerRole winners)
             NOT_REACHED();
         }
     }
-    mp_gameEventBroadcaster->onGameFinished();
+    gameEventManager().onGameFinished();
 }
 
 void Game::setPlayerReaper(PlayerReaper* playerReaper)
@@ -344,7 +341,7 @@ void Game::startGame(Player* player)
 
     setRolesAndCharacters();
 
-    gameEventBroadcaster().onGameStarted();
+    gameEventManager().onGameStarted();
     mp_gameTable->prepareGame(GameServer::instance().cardFactory());
     mp_gameCycle->start();
 }
@@ -352,7 +349,7 @@ void Game::startGame(Player* player)
 
 void Game::sendChatMessage(Player* player, const QString& message)
 {
-    gameEventBroadcaster().onChatMessage(player, message);
+    gameEventManager().onChatMessage(player, message);
 }
 
 void Game::checkStartable()
@@ -364,7 +361,7 @@ void Game::checkStartable()
     else
         newStartable = 0;
     if (m_startable != newStartable && mp_gameInfo->creatorId() != 0) {
-        m_playerMap[mp_gameInfo->creatorId()]->gameEventHandler()->onGameStartabilityChanged(newStartable);
+        m_playerMap[mp_gameInfo->creatorId()]->gameEventListener()->onGameStartabilityChanged(newStartable);
     }
     m_startable = newStartable;
 }
@@ -390,7 +387,6 @@ void Game::setRolesAndCharacters()
     m_goodGuysCount = m_outlawsCount = m_renegadesCount = 0;
     while(pIt.hasNext() && rIt.hasNext() && cIt.hasNext())
     {
-        // TODO
         pIt.peekNext()->setRoleAndCharacter(rIt.peekNext(), cIt.peekNext());
         switch(rIt.peekNext()) {
             case ROLE_SHERIFF:

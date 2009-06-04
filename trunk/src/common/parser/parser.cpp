@@ -325,9 +325,7 @@ void Parser::processStanza()
             return;
         }
         if (action->name() == "draw-card") {
-            int numCards = action->attribute("num-cards").toInt();
-            bool revealCard = (action->attribute("reveal-card") == "true");
-            emit  sigActionDrawCard(numCards, revealCard);
+            emit  sigActionDrawCard();
             return;
         }
         if (action->name() == ActionPlayCardData::elementName) {
@@ -681,13 +679,11 @@ void Parser::actionChatMessage(const QString& message)
     actionEnd();
 }
 
-void Parser::actionDrawCard(int numCards, bool revealCard)
+void Parser::actionDrawCard()
 {
     ASSERT_SOCKET;
     actionStart();
     mp_streamWriter->writeStartElement("draw-card");
-    mp_streamWriter->writeAttribute("num-cards", QString::number(numCards));
-    mp_streamWriter->writeAttribute("reveal-card", revealCard ? "true" : "false");
     mp_streamWriter->writeEndElement();
     actionEnd();
 }

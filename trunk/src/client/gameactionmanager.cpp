@@ -1,4 +1,4 @@
-#include "gameobjectclickhandler.h"
+#include "gameactionmanager.h"
 #include "game.h"
 #include "playerwidget.h"
 #include "serverconnection.h"
@@ -7,7 +7,7 @@
 
 using namespace client;
 
-GameObjectClickHandler::GameObjectClickHandler(Game* game):
+GameActionManager::GameActionManager(Game* game):
         m_state(STATE_MAIN),
         mp_game(game),
         mp_activeCard(0)
@@ -16,12 +16,12 @@ GameObjectClickHandler::GameObjectClickHandler(Game* game):
 
 
 
-bool GameObjectClickHandler::isClickable(CardWidget*)
+bool GameActionManager::isClickable(CardWidget*)
 {
     return 1;
 }
 
-bool GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
+bool GameActionManager::onCardClicked(CardWidget* cardWidget)
 {
     if (!mp_game->isAbleToRequest())
         return 0;
@@ -90,12 +90,12 @@ bool GameObjectClickHandler::onCardClicked(CardWidget* cardWidget)
     return 1;
 }
 
-void GameObjectClickHandler::onCardRightClicked(CardWidget* cardWidget)
+void GameActionManager::onCardRightClicked(CardWidget* cardWidget)
 {
     new CardZoomWidget(mp_game, cardWidget);
 }
 
-void GameObjectClickHandler::onPlayerClicked(PlayerWidget* playerWidget)
+void GameActionManager::onPlayerClicked(PlayerWidget* playerWidget)
 {
     if (!mp_game->isAbleToRequest() || m_state != STATE_SELECT_PLAYER ||
         playerWidget->id() == 0     || mp_activeCard == 0)
@@ -109,25 +109,25 @@ void GameObjectClickHandler::onPlayerClicked(PlayerWidget* playerWidget)
     unsetActiveCard();
 }
 
-void GameObjectClickHandler::onEndTurnClicked()
+void GameActionManager::onEndTurnClicked()
 {
     unsetActiveCard();
     mp_game->serverConnection()->endTurn();
 }
 
-void GameObjectClickHandler::onPassClicked()
+void GameActionManager::onPassClicked()
 {
     unsetActiveCard();
     mp_game->serverConnection()->pass();
 }
 
-void GameObjectClickHandler::setDiscardMode(bool inDiscardMode)
+void GameActionManager::setDiscardMode(bool inDiscardMode)
 {
     unsetActiveCard();
     m_state = inDiscardMode ? STATE_DISCARD : STATE_MAIN;
 }
 
-void GameObjectClickHandler::onMainCardClicked(CardWidget* cardWidget)
+void GameActionManager::onMainCardClicked(CardWidget* cardWidget)
 {
     switch (cardWidget->cardData().type) {
         case CARD_BANG:
@@ -150,7 +150,7 @@ void GameObjectClickHandler::onMainCardClicked(CardWidget* cardWidget)
     }
 }
 
-void GameObjectClickHandler::onCharacterClicked(CardWidget* cardWidget)
+void GameActionManager::onCharacterClicked(CardWidget* cardWidget)
 {
     switch(mp_game->character()) {
     case CHARACTER_JESSE_JONES:
@@ -165,7 +165,7 @@ void GameObjectClickHandler::onCharacterClicked(CardWidget* cardWidget)
     }
 }
 
-void GameObjectClickHandler::selectPlayer(CardWidget* activeCard)
+void GameActionManager::selectPlayer(CardWidget* activeCard)
 {
     Q_ASSERT(mp_activeCard == 0);
     Q_ASSERT(m_state == STATE_MAIN);
@@ -174,7 +174,7 @@ void GameObjectClickHandler::selectPlayer(CardWidget* activeCard)
     mp_activeCard->setHighlight(1);
 }
 
-void GameObjectClickHandler::selectCards(CardWidget* activeCard, int cardCount)
+void GameActionManager::selectCards(CardWidget* activeCard, int cardCount)
 {
     Q_ASSERT(mp_activeCard == 0);
     Q_ASSERT(m_state == STATE_MAIN);
@@ -185,7 +185,7 @@ void GameObjectClickHandler::selectCards(CardWidget* activeCard, int cardCount)
     mp_activeCard->setHighlight(1);
 }
 
-void GameObjectClickHandler::unsetActiveCard()
+void GameActionManager::unsetActiveCard()
 {
     if (m_state == STATE_SELECT_CARDS) {
         foreach (CardWidget* c, m_cardSelection)
@@ -199,20 +199,20 @@ void GameObjectClickHandler::unsetActiveCard()
 }
 
 
-void GameObjectClickHandler::addToSelection(CardWidget* card)
+void GameActionManager::addToSelection(CardWidget* card)
 {
     m_cardSelection.append(card);
     if (m_cardSelection.size() != m_selectionSize)
         card->setHighlight(1);
 }
 
-void GameObjectClickHandler::removeFromSelection(CardWidget* card)
+void GameActionManager::removeFromSelection(CardWidget* card)
 {
     m_cardSelection.removeAll(card);
     card->setHighlight(0);
 }
 
-void GameObjectClickHandler::useAbilityWithCards()
+void GameActionManager::useAbilityWithCards()
 {
     QList<int> cards;
     foreach (CardWidget* card, m_cardSelection)
@@ -221,7 +221,7 @@ void GameObjectClickHandler::useAbilityWithCards()
     mp_game->serverConnection()->useAbility(cards);
 }
 
-void GameObjectClickHandler::playWithCards()
+void GameActionManager::playWithCards()
 {
     if (m_cardSelection.size() == 1) {
         CardWidget* card = m_cardSelection[0];
@@ -236,7 +236,7 @@ void GameObjectClickHandler::playWithCards()
 }
 
 
-void GameObjectClickHandler::debug(const QString& msg)
+void GameActionManager::debug(const QString& msg)
 {
     qDebug(qPrintable(QString("[Click]         %1").arg(msg)));
 }

@@ -24,7 +24,7 @@
 #include <QtDebug>
 
 #include "cardwidget.h"
-#include "cardlist.h"
+#include "cardlistwidget.h"
 #include "game.h"
 #include "parser/parserstructs.h"
 #include "deckwidget.h"

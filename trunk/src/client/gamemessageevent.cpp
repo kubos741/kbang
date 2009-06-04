@@ -33,7 +33,7 @@ void GameMessageEvent::run()
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:
         msg = tr("%1 drew %2 from the deck.").
                     arg(decoratePlayerName(playerName)).
-                    arg(cardListToString(m_gameMessage.cards));
+                    arg(cardListWidgetToString(m_gameMessage.cards));
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD:
         msg = tr("%1 drew %2 from the discard pile.").
@@ -132,12 +132,12 @@ QString GameMessageEvent::cardToString(const CardData& cardData, bool withRankAn
     return res;
 }
 
-QString GameMessageEvent::cardListToString(QList<CardData> cardList)
+QString GameMessageEvent::cardListWidgetToString(QList<CardData> cardListWidget)
 {
-    if (cardList.size() == 0)
+    if (cardListWidget.size() == 0)
         return "";
     QStringList cardStrings;
-    foreach(const CardData& cardData, cardList) {
+    foreach(const CardData& cardData, cardListWidget) {
         cardStrings.append(cardToString(cardData));
     }
     QString result;
