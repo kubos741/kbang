@@ -24,12 +24,18 @@ void CardTaker::play(Player* targetPlayer)
     gameCycle()->assertTurn();
     assertInHand();
 
-    /* don't allow steel yourself */
-    if (owner() == targetPlayer)
+    /* allow steel from himself only if has more than one card in hand */
+    if (owner() == targetPlayer && owner()->handSize() < 2)
         throw BadTargetPlayerException();
 
-     PlayingCard* targetCard = targetPlayer->getRandomCardFromHand();
-     if (targetCard == 0)
+    
+    PlayingCard* targetCard;
+
+    do {
+        targetCard = targetPlayer->getRandomCardFromHand();
+    } while (targetCard == this); // pick other than this card
+
+    if (targetCard == 0)
         throw BadTargetPlayerException();
 
      play(targetCard);
@@ -41,10 +47,6 @@ void CardTaker::play(PlayingCard* targetCard)
     assertInHand();
 
     Player* o = owner();
-
-    /* don't allow steel yourself */
-    if (owner() == targetCard->owner())
-        throw BadTargetCardException();
 
     if (m_type == Panic) {
         /* distance check */
