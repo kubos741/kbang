@@ -225,7 +225,7 @@ void GameActionManager::playWithCards()
 {
     if (m_cardSelection.size() == 1) {
         CardWidget* card = m_cardSelection[0];
-        if (card->pocketType() == POCKET_HAND && card->ownerId() != mp_game->playerId()) {
+        if (card->pocketType() == POCKET_HAND) {
             mp_game->serverConnection()->playCardWithPlayer(mp_activeCard->cardData().id, card->ownerId());
         } else {
             mp_game->serverConnection()->playCardWithCard(mp_activeCard->cardData().id, card->cardData().id);
