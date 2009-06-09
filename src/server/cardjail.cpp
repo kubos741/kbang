@@ -27,8 +27,6 @@ void CardJail::play(Player* targetPlayer)
 {
     gameCycle()->assertTurn();
     assertInHand();
-    if (targetPlayer == owner())
-        throw BadTargetPlayerException();
     if (targetPlayer->role() == ROLE_SHERIFF)
         throw BadTargetPlayerException();
 
