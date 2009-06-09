@@ -125,6 +125,10 @@ int Game::getDistance(Player *fromPlayer, Player *toPlayer) const
     if (fromIndex == -1 || toIndex == -1)
         return infiniteDistance;
 
+    // A player is always at distance 1 from himself
+    if (fromIndex == toIndex)
+        return 1;
+    
     int upIndex   = fromIndex;
     int downIndex = fromIndex;
     int baseDistance = 0;
