@@ -1,0 +1,79 @@
+#summary This is the user manual of the SVN trunk version of KBang
+
+= Introduction =
+KBang is a [http://en.wikipedia.org/wiki/Cross-platform cross-platform] [http://en.wikipedia.org/wiki/Open_source open source] implementation of [http://en.wikipedia.org/wiki/Bang! Bang!], the card game designed by Emiliano Sciarra. The goal of this project is to allow Bang! enthusiasts play the game online with another folks from around the world.
+
+<wiki:toc max_depth="2" />
+
+= Installation =
+KBang supports several platforms and operating systems. Unfortunately there is only Windows build now - for other platforms you have to compile sources yourself. This will hopefully change in the future, as we plan to support various Linux distributions, as well as provide Mac OS X binaries.
+
+= Windows =
+The preferred method is to use the binary package, although you can compile KBang yourself (for example to verify a bugfix in the SVN). 
+
+== Precompiled package ==
+The Windows version of KBang is distributed in a zipped archive. This archive contains compiled KBang binaries for both client and server, graphics files and bundled Qt4 runtime files. To install KBang on your Windows, simply unpack the archive to a folder. You can then execute one of the _exe_ files to run client or server.
+
+== Compiling from sources ==
+If you want to, you can compile KBang from sources by yourself. First of all get the sources. You can get them either from the download section, or from SVN. 
+
+=== Checking-out sources from SVN ===
+If you are not familiar with SVN, I recommend you to download and install [http://tortoisesvn.net/downloads TortoiseSVN]. After you install it, it will extend the context menu in Windows.
+
+Go to the folder where you want to download the sources and with right click open the context menu. From the context menu select *SVN checkout*. Enter *http://kbang.googlecode.com/svn/trunk/* to the _URL of repository_ field and press _OK_. It should download the sources now.
+
+In the future you can update the repository by the *SVN update* option from the context menu.
+
+=== Compiling with MinGW ===
+The easiest way how to compile KBang on Windows is to use the *Qt SDK for Windows*. You can download it from the [http://www.qtsoftware.com/downloads QtSoftware download site]. After you have installed Qt SDK, run *Qt Creator* and open the *kbang.pro* file, that is located in the root directory of the sources. Then click *Build all* from the *Build* menu.
+
+When the compilation is finished (the small vertical bar on the left panel is green), it should create files *kbang-client.exe* and *kbang-server.exe* in debug or release subdirectory.
+
+To run those files, you need to supply gfx directory and dll files. The best thing is to use them from the binary package. Just download the latest binary package, unzip it somewhere and replace the exe files with those compiled ones.
+
+=== Compiling with Visual Studio ===
+Visual Studio is not currently supported, but I would appreciate if someone would like to make it work. I am afraid that there need to be some fixes in code to be done to make it compile. If you send me the compile log with errors, I can fix them in SVN.
+
+_Note that KBang supports Windows XP and newer. You can experience problems (or not be able to run KBang at all) on older Windows._
+
+= Linux =
+At the current state we do not provide Linux binaries so you need to compile KBang yourself.
+
+== Compiling from sources ==
+First you need to get source files. You can get them either from the download section, or from SVN. 
+
+You also need Qt4 library.
+
+On Debian/Ubuntu:
+{{{
+$ sudo apt-get install libqt4-dev
+}}}
+
+On Gentoo:
+{{{
+$ emerge qt:4
+}}}
+
+Then download the sources and unpack them into a directory.
+{{{
+$ tar xzf kbang-x.y.z.tar.gz
+$ cd kbang-x.y.z
+}}}
+
+Finally compile the sources.
+{{{
+$ qmake kbang.pro
+$ make
+}}}
+
+You can then execute client or server.
+{{{
+$ ./kbang-client
+$ ./kbang-server
+}}}
+
+
+= Client =
+For end users the most interesting part of KBang project would be the _client_. If you want to play over the Internet, you do not have to run the server yourself and connect to the official KBang server *alderan.cz*.
+
+TODO
