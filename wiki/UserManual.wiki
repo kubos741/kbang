@@ -103,4 +103,12 @@ Finally you can set the player properties:
  * _Player Password_ - the password of the player. This password is used in case of reconnecting to a player. For example if you by an accident disconnect from a game, you can reconnect back and continue in game. To prevent misuse of this feature, you need to enter the same password as before.
  * _Avatar_ - you can set an avatar which is then displayed next to your name in game. Click on the *Avatar* area and select the file with your avatar. The image is automatically resized.
 
+== Gameplay ==
+
+Every game starts in the _waiting_ state. As soon as enough players connect to the game, it can be started by the creator by pressing the *Start* button in the middle of the table. The cards are then dealt and the game starts.
+
+=== The beginning of the turn ===
+
+
+
 TODO
