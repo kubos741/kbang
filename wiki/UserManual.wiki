@@ -76,4 +76,31 @@ $ ./kbang-server
 = Client =
 For end users the most interesting part of KBang project would be the _client_. If you want to play over the Internet, you do not have to run the server yourself and connect to the official KBang server *alderan.cz*.
 
+== Connecting to server ==
+After you start the client, you need to connect to a server. Select _Connect to server_ from _Game_ menu and the server dialog will pop up. To play over the internet you can connect to *alderan.cz*, which is the default server. If you do not have access to the internet, you can still play on your LAN or run the server yourself. To connect to the server that runs on your machine, add a server with address *localhost*.
+
+== Creating games ==
+When you connect to a server, you can create a new game. Select *Create new game* from the *Game* menu. In the dialog that pops up you can set the parameters of the game:
+ * _Game Name_ - the game will be listed under this name.
+ * _Game Description_ - additional description of the game, can be left empty.
+ * _Number of Players_ - the expected minimal and maximal count of players. The game can be started only if enough players connect.
+ * _Number of AI Players_ - set this number if you want to have AI players in your game.
+ * _Max. Number of Spectators_ `(not implemented yet)` - you can limit the number of spectators with this option.
+ * _Password for Players_ - this option allows you to protect your game with password. Players that want to join your game need to know this password. Leave this option empty to disable password.
+ * _Password for Spectators_ - this option allows you to protect your game with password. Anyone that wants to spectate your game need to know this password. Leave this option empty to disable password.
+ * _Order of Players_ - if set to _chronological_, the order of players around the table is kept as the players connect to the game. If set to _random_, players are shuffled after the game starts.
+
+When you create a new game, you automatically join it as a new player. You can set the player properties as well. This properties are described in the _Joining games_ section.
+
+== Joining games ==
+
+You can join a game by selecting *Join Game* option from the *Game* menu. The _Join Game_ dialog appears. In the left part you can see all the games on the server. If you select a game from the list, you can see the information about the game and the list of players in the left part of the dialog.
+
+To join a game, select the game and then select a player that you want to join to. If the game is in the _waiting_ state, you can create a new player. In this case, select _Create new player_ in the player list.
+
+Finally you can set the player properties:
+ * _Player Name_ - the name of the player.
+ * _Player Password_ - the password of the player. This password is used in case of reconnecting to a player. For example if you by an accident disconnect from a game, you can reconnect back and continue in game. To prevent misuse of this feature, you need to enter the same password as before.
+ * _Avatar_ - you can set an avatar which is then displayed next to your name in game. Click on the *Avatar* area and select the file with your avatar. The image is automatically resized.
+
 TODO
