@@ -107,8 +107,29 @@ Finally you can set the player properties:
 
 Every game starts in the _waiting_ state. As soon as enough players connect to the game, it can be started by the creator by pressing the *Start* button in the middle of the table. The cards are then dealt and the game starts.
 
-=== The beginning of the turn ===
+The further text assumes that you are familiar with the rules of the Bang! game. If you are new to Bang!, please read the official rules. They can be found on the [http://www.davincigames.com/page_eng.cfm?sez=01&gioco=bang! official Bang! site] in various languages.
 
+=== Beginning of the turn ===
+The turn typically starts by drawing two cards from the deck. You can do this by clicking on the deck. If you have Jail (or Dynamite) in front of you, you need to "Draw!" to check its effect. You can do it by clicking on the Jail (or Dynamite) card. Note that you always check the Dynamite first.
 
+Certain characters have the ability to draw differently:
+ * _Kit Carlson_ may draw 3 cards, select 2 of them and return the remaining back to the top of the deck. To use this ability, click on the Kit Carlson card, instead of clicking the deck. Three cards then gather in the middle of the table. Click on the cards that you want to take.
+ * _Pedro Ramirez_ may draw the first card from the top of the discard pile. To use this ability, click on the Pedro Ramirez card, instead of clicking the deck.
+ * _Jesse Jones_ may draw the first card from the hand of arbitrary player. To use this ability, click on the Jesse Jones card and select the target player.
 
-TODO
+=== Main phase ===
+In the main phase you can play cards from your hand. You can play most of the cards by simply clicking on them. To play a card that requires to specify target player or target card, click the card and then click on the target player or target card.
+
+=== Reactions ===
+When someone plays a card that effects you, you can either decide not to react by clicking the *Pass* button or you can counter the effect by another card by clicking on that card. To use Barrel, simply click it. Do not forget, that Barrel can be played only against Bang! and Gatling.
+
+You can also use the Jourdonnais ability. Jourdonnais is considered to have one implicit barrel. To draw a card on that barrel, click on the Jourdonnais card.
+
+When someone plays General Store, you can pick a card by clicking on it.
+
+=== End of turn ===
+If you want to end your turn, click on the *End Turn* button. If you have more cards in your hand than your life points, you need to discard some cards. Click on the *Discard* button and then select cards you want to discard.
+
+=== Using character abilities ===
+Most of the character abilities are applied automatically, so you do not have to remember them. However some of them are voluntary, so you can use them only if you want. Some of the character abilities have been discussed in corresponding sections above. The following character abilities that need to be activated are:
+ * _Sid Ketchum_ - he can discard two cards and to regain one life point. To use this ability, click on the Sid Ketchum card and select two cards from your hand. _According to Bang! rules, this ability can be used at any time in the game (with a little exception when Panic or Cat Balou is played), however in KBang you can use this ability only in your main phase or when you are about to lose your last life point.
