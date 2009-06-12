@@ -110,6 +110,9 @@ Every game starts in the _waiting_ state. As soon as enough players connect to t
 
 The further text assumes that you are familiar with the rules of the Bang! game. If you are new to Bang!, please read the official rules. They can be found on the [http://www.davincigames.com/page_eng.cfm?sez=01&gioco=bang! official Bang! site] in various languages.
 
+=== Zooming cards ===
+If you want to read the text on a card, you can zoom it by clicking on it with right mouse button.
+
 === Beginning of the turn ===
 The turn typically starts by drawing two cards from the deck. You can do this by clicking on the deck. If you have Jail (or Dynamite) in front of you, you need to "Draw!" to check its effect. You can do it by clicking on the Jail (or Dynamite) card. Note that you always check the Dynamite first.
 
