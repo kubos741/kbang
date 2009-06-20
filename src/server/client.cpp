@@ -105,7 +105,12 @@ void Client::onActionCreateGame(const CreateGameData& createGameData, const Crea
         // TODO: respond with error
         return;
     }
-    PlayerCtrl::createGame(createGameData, createPlayerData, this);
+    try {
+		PlayerCtrl::createGame(createGameData, createPlayerData, this);
+	} catch (GameException& e) {
+        qDebug() << "Client::onActionCreateGame - exception:";
+        e.debug();
+	}
 }
 
 
@@ -121,7 +126,7 @@ void Client::onActionJoinGame(int gameId, int playerId, QString gamePassword, co
         } else {
             PlayerCtrl::replacePlayer(gameId, playerId, gamePassword, player, this);
         }
-    } catch(GameException& e) {
+    } catch (GameException& e) {
         qDebug() << "Client::onActionJoinGame - exception:";
         e.debug();
     }
@@ -132,7 +137,12 @@ void Client::onActionLeaveGame()
     if (!isInGame()) {
         return;
     }
-    mp_playerCtrl->disconnect();
+	try {
+		mp_playerCtrl->disconnect();
+	} catch (GameException& e) {
+        qDebug() << "Client::onActionLeaveGame - exception:";
+        e.debug();
+	}
 }
 
 void Client::onActionStartGame()
@@ -140,7 +150,12 @@ void Client::onActionStartGame()
     if (!isInGame()) {
         return;
     }
-    mp_playerCtrl->startGame();
+	try {
+	    mp_playerCtrl->startGame();
+	} catch (GameException& e) {
+        qDebug() << "Client::onActionStartGame - exception:";
+        e.debug();
+	}
 }
 
 void Client::onActionDrawCard()
@@ -287,7 +302,13 @@ void Client::onActionChatMessage(const QString& message)
 {
     if (mp_playerCtrl == 0)
         return;
-    mp_playerCtrl->sendChatMessage(message);
+
+	try {
+		mp_playerCtrl->sendChatMessage(message);
+	} catch (GameException& e) {
+        qDebug() << "Client::onActionChatMessage - exception:";
+        e.debug();
+	}
 }
 
 
@@ -302,7 +323,9 @@ void Client::onQueryGameInfo(int gameId, QueryResult result)
         const PublicGameView& publicGameView = PlayerCtrl::publicGameView(gameId);
         GameInfoData gameInfoData = publicGameView.gameInfoData();
         result.sendData(gameInfoData);
-    } catch (BadGameException e) {
+    } catch (GameException& e) {
+        qDebug() << "Client::onQueryGameInfo - exception:";
+        e.debug();
     }
 }
 
