@@ -279,13 +279,13 @@ Config::dataPathString()
                 path += "/data/";
             } else if (QRegExp("usr/games/bin/?$").indexIn(path) != -1) {
                 // we are in /usr/games/bin (like gentoo linux does)
-                path += "/../../share/games/pokerth/data/";
+                path += "/../../share/games/kbang/data/";
             } else if (QRegExp("usr/games/?$").indexIn(path) != -1) {
                 // we are in /usr/games (like Debian linux does)
-                path += "/../share/games/pokerth/";
+                path += "/../share/games/kbang/";
             } else if (QRegExp("bin/?$").indexIn(path) != -1) {
                 // we are in a bin directory. e.g. /usr/bin
-                path += "/../share/pokerth/data/";
+                path += "/../share/kbang/data/";
             } else {
                 path += "/data/";
             }
