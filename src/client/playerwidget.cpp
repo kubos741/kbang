@@ -23,6 +23,7 @@
 #include "gameactionmanager.h"
 #include "cardlistwidget.h"
 #include "parser/parserstructs.h"
+#include "config.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -234,7 +235,7 @@ void PlayerWidget::updateAvatarLabel()
 void PlayerWidget::createWinnerIcon()
 {
     Q_ASSERT(mp_winnerIcon == 0);
-    QPixmap winnerPixmap("gfx/misc/winner-sign.png");
+    QPixmap winnerPixmap(Config::dataPathString() + "gfx/misc/winner-sign.png");
     mp_winnerIcon = new QLabel(this);
     mp_winnerIcon->setPixmap(winnerPixmap);
     mp_winnerIcon->resize(winnerPixmap.size());

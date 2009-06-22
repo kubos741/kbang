@@ -24,6 +24,8 @@
 #include <time.h>
 #include "mainwindow.h"
 
+#include "config.h"
+
 #define KBANG_CLIENT_VERSION_MAJOR 0
 #define KBANG_CLIENT_VERSION_MINOR 1
 #define KBANG_CLIENT_VERSION_REVISION 3
