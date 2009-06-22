@@ -251,6 +251,6 @@ QString Card::suitToColorString(CardSuit suit)
 void Card::loadPixmap()
 {
     if (!m_image.load(Config::dataPathString() + m_imageFileName)) {
-        qWarning(qPrintable(QString("Cannot load pixmap: %1").arg(m_imageFileName)));
+        qWarning(qPrintable(QString("Cannot load pixmap: %1").arg(Config::dataPathString() + m_imageFileName)));
     }
 }
