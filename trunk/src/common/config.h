@@ -53,6 +53,8 @@ public:
         return *smp_instance;
     }
 
+    static QString dataPathString();
+
 private:
     Config();
     ~Config();

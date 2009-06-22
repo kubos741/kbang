@@ -256,3 +256,40 @@ Config::ConfigRecord* Config::configRecord(QString group, QString varName) {
         return 0;
     return &(m_groups[group].records[varName]);
 }
+
+
+/* static */ QString
+Config::dataPathString()
+{
+    QString path(QCoreApplication::instance()->applicationDirPath());
+
+    #ifdef Q_OS_WIN32
+        path += "/data/";
+    #else
+        #ifdef Q_WS_MAC
+            if (QRegExp("Contents/MacOS/?$").indexIn(path) != -1) {
+                // pointing into an macosx application bundle
+                path += "/../Resources/data/";
+            } else {
+                path += "/data/";
+            }
+        #else //Unix
+            if (QRegExp("pokerth/?$").indexIn(path) != -1) {
+                // there is an own application directory
+                path += "/data/";
+            } else if (QRegExp("usr/games/bin/?$").indexIn(path) != -1) {
+                // we are in /usr/games/bin (like gentoo linux does)
+                path += "/../../share/games/pokerth/data/";
+            } else if (QRegExp("usr/games/?$").indexIn(path) != -1) {
+                // we are in /usr/games (like Debian linux does)
+                path += "/../share/games/pokerth/";
+            } else if (QRegExp("bin/?$").indexIn(path) != -1) {
+                // we are in a bin directory. e.g. /usr/bin
+                path += "/../share/pokerth/data/";
+            } else {
+                path += "/data/";
+            }
+        #endif
+    #endif
+    return (QDir::cleanPath(path) + "/");
+}
