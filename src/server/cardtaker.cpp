@@ -52,11 +52,15 @@ void CardTaker::play(PlayingCard* targetCard)
         /* distance check */
         if (game()->getDistance(owner(), targetCard->owner()) > 1)
             throw PlayerOutOfRangeException();
+        gameCycle()->setCardEffect(1);
         gameTable()->playerPlayCard(this, targetCard);
         gameTable()->playerStealCard(o, targetCard);
+        gameCycle()->setCardEffect(0);
     } else {
+        gameCycle()->setCardEffect(1);
         gameTable()->playerPlayCard(this, targetCard);
         gameTable()->cancelCard(targetCard, o);
+        gameCycle()->setCardEffect(0);
     }
 }
 

@@ -10,10 +10,12 @@
 #include <QDebug>
 
 GameCycle::GameCycle(Game* game):
+        QObject(game),
         mp_game(game),
         m_state(GAMEPLAYSTATE_INVALID),
         mp_currentPlayer(0),
-        mp_requestedPlayer(0)
+        mp_requestedPlayer(0),
+        m_isCardEffect(0)
 {
 }
 
@@ -281,6 +283,20 @@ void GameCycle::unsetResponseMode()
         m_state = m_lastState;
     }
     m_contextDirty = 1;
+}
+
+void GameCycle::setCardEffect(bool isCardEffect)
+{
+    bool oldIsCardEffect = m_isCardEffect;
+    m_isCardEffect = isCardEffect;
+    if (oldIsCardEffect && !m_isCardEffect) {
+        emit cardEffectOver();
+    }
+}
+
+bool GameCycle::isCardEffect() const
+{
+    return m_isCardEffect;
 }
 
 void GameCycle::sendRequest()

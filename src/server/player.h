@@ -218,6 +218,7 @@ public:
     void registerGameEventListener(GameEventListener*);
     void unregisterGameEventListener();
 
+public slots:
     void checkEmptyHand();
 
 signals:
