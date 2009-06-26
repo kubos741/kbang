@@ -29,6 +29,7 @@ void CardDuel::play(Player* targetPlayer)
     mp_requestedPlayer = owner();
     mp_shootingPlayer  = targetPlayer;
 
+    gameCycle()->setCardEffect(1);
     gameTable()->playerPlayCard(this, targetPlayer);
     requestNext();
 }
@@ -38,6 +39,7 @@ void CardDuel::respondPass()
     game()->gameCycle().unsetResponseMode();
     gameTable()->playerPass(mp_requestedPlayer);
     mp_requestedPlayer->modifyLifePoints(-1, mp_initialPlayer);
+    gameCycle()->setCardEffect(0);
 }
 
 void CardDuel::respondCard(PlayingCard* targetCard)

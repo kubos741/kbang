@@ -28,6 +28,8 @@ void CardDrawCards::play()
     gameCycle()->assertTurn();
     assertInHand();
     Player* player = owner();
+    gameCycle()->setCardEffect(1);
     gameTable()->playerPlayCard(this);
     gameTable()->playerDrawFromDeck(player, m_cardCount);
+    gameCycle()->setCardEffect(0);
 }

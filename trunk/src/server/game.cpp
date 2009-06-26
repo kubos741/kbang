@@ -75,7 +75,6 @@ Game::~Game()
 
     delete mp_gameInfo;
     delete mp_gameTable;
-    delete mp_gameCycle;
     delete mp_gameEventManager;
     delete mp_defaultPlayerReaper;
     delete mp_gameLogger;

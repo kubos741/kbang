@@ -3,6 +3,7 @@
 
 #include "parser/parserstructs.h"
 
+#include <QObject>
 #include <QQueue>
 
 class Game;
@@ -12,8 +13,9 @@ class ReactionHandler;
 class CheckDeckResultHandler;
 
 
-class GameCycle
+class GameCycle: public QObject
 {
+Q_OBJECT
 public:
     GameCycle(Game* game);
     ~GameCycle();
@@ -76,6 +78,12 @@ public:
     void setResponseMode(ReactionHandler* reactionHandler, Player* requestedPlayer, bool skipQueue = 0);
     void unsetResponseMode();
 
+    void setCardEffect(bool isCardEffect);
+    bool isCardEffect() const;
+
+signals:
+    void cardEffectOver();
+
 private:
     Game*                       mp_game;
     GamePlayState               m_state;
@@ -89,6 +97,7 @@ private:
     int     m_drawCardMax;
     int     m_turnNum;
     bool    m_contextDirty;
+    bool    m_isCardEffect;
 
 private:
     void    sendRequest();

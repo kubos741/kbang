@@ -298,7 +298,14 @@ void Player::unregisterGameEventListener()
 void Player::checkEmptyHand()
 {
     if (m_hand.size() == 0) {
-        emit onEmptyHand();
+        if (game()->gameCycle().isCardEffect()) {
+            QObject::connect(&game()->gameCycle(), SIGNAL(cardEffectOver()),
+                             this, SLOT(checkEmptyHand()));
+        } else {
+            QObject::disconnect(&game()->gameCycle(), SIGNAL(cardEffectOver()),
+                                this, SLOT(checkEmptyHand()));
+            emit onEmptyHand();
+        }
     }
 }
 
