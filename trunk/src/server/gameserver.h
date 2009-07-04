@@ -105,6 +105,8 @@ public slots:
     //void                queryGame(int gameId, QueryResult result);
     //void                queryGameList(QueryResult result);
 
+signals:
+    void pingClients();
 
 private:
     GameServer();
@@ -125,6 +127,7 @@ private:
     ServerInfoData m_serverInfoData;
     TcpServer* mp_tcpServer;
     CardFactory* mp_cardFactory;
+    QTimer  m_pingTimer;
 
 };
 

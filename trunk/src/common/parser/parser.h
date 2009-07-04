@@ -56,6 +56,7 @@ public slots:
     void attachSocket(QIODevice* socket);
     void detachSocket();
     void terminate();
+    void ping();
 
 signals:
     void streamInitialized();
@@ -65,6 +66,8 @@ signals:
 
 public:
     static QString protocolVersion();
+signals:
+    void pong(int latency);
 
 
     ////////////

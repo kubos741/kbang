@@ -22,6 +22,7 @@
 
 #include "parserstructs.h"
 #include <QObject>
+#include <QTime>
 
 class Parser;
 class QXmlStreamWriter;
@@ -35,11 +36,13 @@ public:
     void getServerInfo();
     void getGameInfo(int id);
     void getGameInfoList();
+    void getPing();
 
 signals:
     void result(const ServerInfoData&);
     void result(const GameInfoData&);
     void result(const GameInfoListData&);
+    void pong(int latency);
 
 private:
     QueryGet(Parser* parser, QXmlStreamWriter* streamWriter, const QString& id);
@@ -52,6 +55,7 @@ private:
     Parser*             mp_parser;
     QXmlStreamWriter*   mp_streamWriter;
     QString             m_id;
+    QTime               m_pingTime;
 };
 
 #endif

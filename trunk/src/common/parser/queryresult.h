@@ -40,6 +40,8 @@ public:
         writeEndQuery();
     }
 
+    void sendPong();
+
 private:
     void writeStartQuery();
     void writeEndQuery();

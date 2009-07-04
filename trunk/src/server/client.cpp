@@ -104,6 +104,12 @@ QTcpSocket* Client::socket()
     return mp_socket;
 }
 
+void Client::sendPing()
+{
+    if (mp_parser == 0) return;
+    mp_parser->ping();
+}
+
 void Client::onActionCreateGame(const CreateGameData& createGameData, const CreatePlayerData& createPlayerData)
 {
     if (isInGame()) {

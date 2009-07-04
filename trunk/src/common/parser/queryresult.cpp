@@ -27,6 +27,13 @@ mp_streamWriter(streamWriter), m_id(id), m_sent(0)
 {
 }
 
+void QueryResult::sendPong()
+{
+    writeStartQuery();
+    mp_streamWriter->writeEmptyElement("pong");
+    writeEndQuery();
+}
+
 void QueryResult::writeStartQuery()
 {
     mp_streamWriter->writeStartElement("query");

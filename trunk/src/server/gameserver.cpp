@@ -53,6 +53,11 @@ GameServer::GameServer():
     m_serverInfoData.description =
             Config::instance().readString("network", "server_description");
     mp_cardFactory = new CardFactory();
+
+    connect(&m_pingTimer, SIGNAL(timeout()),
+            this, SIGNAL(pingClients()));
+    m_pingTimer.setInterval(60000);
+    m_pingTimer.start();
 }
 
 GameServer::~GameServer()
@@ -146,6 +151,8 @@ void GameServer::createClient()
     m_clients[clientId] = new Client(this, clientId, socket);
     connect(m_clients[clientId], SIGNAL(disconnected(int)),
             this, SLOT(deleteClient(int)));
+    connect(this, SIGNAL(pingClients()),
+            m_clients[clientId], SLOT(sendPing()));
 }
 
 void GameServer::deleteClient(int clientId)
