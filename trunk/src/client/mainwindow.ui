@@ -25,7 +25,7 @@
   </property>
   <property name="styleSheet">
    <string>#mp_centralWidget {
-	background-image: url(&quot;gfx/misc/bang-artwork.png&quot;);
+	background-image: url(&quot;data/gfx/misc/bang-artwork.png&quot;);
 	background-position: center center;
 	background-repeat: no-repeat;
 
@@ -651,7 +651,7 @@
      <x>0</x>
      <y>0</y>
      <width>388</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="autoFillBackground">

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "common.h"
+#include "config.h"
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "creategamedialog.h"
@@ -46,6 +47,10 @@ MainWindow::MainWindow():
         mp_game(0)
 {
     setupUi(this);
+    setStyleSheet(styleSheet() + "\n"
+        "#mp_centralWidget {\n"
+        "   background-image: url(\"" + Config::dataPathString() + "gfx/misc/bang-artwork.png\");\n"
+        "}\n\n");
     Card::loadDefaultRuleset();
     mp_cardWidgetSizeManager = new CardWidgetSizeManager(this);
 
