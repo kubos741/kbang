@@ -23,8 +23,11 @@
 #include <cstdlib>
 #include <time.h>
 #include "mainwindow.h"
-
 #include "config.h"
+
+#ifdef Q_OS_UNIX
+#include <signal.h>
+#endif
 
 #define KBANG_CLIENT_VERSION_MAJOR 0
 #define KBANG_CLIENT_VERSION_MINOR 1
@@ -37,6 +40,11 @@ int main(int argc, char *argv[])
     time_t sec;
     time(&sec);
     qsrand((unsigned int) sec);
+
+#ifdef Q_OS_UNIX
+    // ignore broken-pipe signal eventually caused by sockets
+    signal(SIGPIPE, SIG_IGN);
+#endif
 
     QApplication app(argc, argv);
     app.setApplicationName("KBang Client");
