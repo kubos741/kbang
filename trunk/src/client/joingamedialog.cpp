@@ -171,7 +171,7 @@ void JoinGameDialog::updateGameView()
 
     playerListView->clear();
     foreach(const PlayerInfoData& p, gameInfo->players) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(playerListView);
+        QTreeWidgetItem* item = new QTreeWidgetItem();
         item->setData(0, Qt::UserRole, p.id);
         if (p.id == m_currentPlayerId)
             playerListView->setCurrentItem(item);
@@ -205,6 +205,7 @@ void JoinGameDialog::updateGameView()
         } else {
             item->setDisabled(0);
         }
+        playerListView->addTopLevelItem(item);
     }
     if (gameInfo->state == GAMESTATE_WAITINGFORPLAYERS &&
             gameInfo->totalPlayersCnt < gameInfo->maxPlayers) {
