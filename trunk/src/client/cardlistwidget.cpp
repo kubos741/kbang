@@ -105,6 +105,11 @@ CardWidget* CardListWidget::pop()
     return res;
 }
 
+void CardListWidget::showEvent(QShowEvent* event)
+{
+    reorder();
+}
+
 void CardListWidget::paintEvent(QPaintEvent* event)
 {
     if (m_hasBox) {
