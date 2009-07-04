@@ -107,6 +107,7 @@ CardWidget* CardListWidget::pop()
 
 void CardListWidget::showEvent(QShowEvent* event)
 {
+    QWidget::showEvent(event);
     reorder();
 }
 
