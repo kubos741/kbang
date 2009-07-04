@@ -30,6 +30,10 @@
 #include <QTcpSocket>
 #include <QXmlStreamWriter>
 
+#ifdef Q_OS_UNIX
+#include <signal.h>
+#endif
+
 GameServer* GameServer::sm_instance = 0;
 
 GameServer::GameServer():
@@ -38,6 +42,11 @@ GameServer::GameServer():
     m_nextGameId(0),
     m_maxClientCount(1)
 {
+#ifdef Q_OS_UNIX
+    // ignore broken-pipe signal eventually caused by sockets
+    signal(SIGPIPE, SIG_IGN);
+#endif
+
     mp_tcpServer = new TcpServer(this);
     m_serverInfoData.name =
             Config::instance().readString("network", "server_name");
