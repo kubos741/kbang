@@ -114,6 +114,14 @@ void Parser::writeData(const QByteArray& data)
 }
 
 
+void Parser::ping()
+{
+    ASSERT_SOCKET;
+    QueryGet* query = queryGet();
+    connect(query, SIGNAL(pong(int)),
+            this, SIGNAL(pong(int)));
+    query->getPing();
+}
 
 void Parser::initializeStream()
 {
@@ -259,6 +267,11 @@ void Parser::processStanza()
             }
             if (query->name() == GameInfoListData::elementName) {
                 emit sigQueryGameInfoList(QueryResult(mp_streamWriter, id));
+                return;
+            }
+            if (query->name() == "ping") {
+                QueryResult pong(mp_streamWriter, id);
+                pong.sendPong();
                 return;
             }
         }

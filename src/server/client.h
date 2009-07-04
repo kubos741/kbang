@@ -77,6 +77,9 @@ public:
 
     QTcpSocket* socket();
 
+public slots:
+    void sendPing();
+
 
 public slots: // These slots are connected to parser
     void onActionCreateGame(const CreateGameData&, const CreatePlayerData&);

@@ -59,6 +59,14 @@ void QueryGet::getGameInfoList()
     writeEndQuery();
 }
 
+void QueryGet::getPing()
+{
+    m_pingTime.start();
+    writeStartQuery();
+    mp_streamWriter->writeEmptyElement("ping");
+    writeEndQuery();
+}
+
 void QueryGet::writeStartQuery()
 {
     mp_streamWriter->writeStartElement("query");
@@ -89,6 +97,10 @@ void QueryGet::parseResult(XmlNode* node)
         GameInfoData gameInfoData;
         gameInfoData.read(node);
         emit result(gameInfoData);
+        return;
+    }
+    if (node->name() == "pong") {
+        emit pong(m_pingTime.elapsed());
         return;
     }
 }
