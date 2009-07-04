@@ -102,18 +102,9 @@ public slots:
      */
     void                deleteClient(int clientId);
 
-    //void                queryGame(int gameId, QueryResult result);
-    //void                queryGameList(QueryResult result);
-
-signals:
-    void pingClients();
-
 private:
     GameServer();
     ~GameServer();
-
-
-
 
 private:
     static GameServer*       sm_instance;
@@ -127,8 +118,6 @@ private:
     ServerInfoData m_serverInfoData;
     TcpServer* mp_tcpServer;
     CardFactory* mp_cardFactory;
-    QTimer  m_pingTimer;
-
 };
 
 #endif
