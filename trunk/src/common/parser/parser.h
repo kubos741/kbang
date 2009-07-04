@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QList>
 #include <QHash>
+#include <QTimer>
 
 #include "parserstructs.h"
 #include "queryget.h"
@@ -52,11 +53,15 @@ public:
 
     typedef QString QueryId;
 
+    bool isKeepAlive() const;
+    void setKeepAlive(bool keepAlive);
+
 public slots:
     void attachSocket(QIODevice* socket);
     void detachSocket();
     void terminate();
     void ping();
+    void sendKeepAlive();
 
 signals:
     void streamInitialized();
@@ -178,6 +183,7 @@ private:
     XmlNode*          mp_parsedXmlElement;
     QHash<QString, QueryGet*> m_getQueries;
     QueryGet*         mp_queryGet;
+    QTimer            m_keepAliveTimer;
 };
 
 #endif

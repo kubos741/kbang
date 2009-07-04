@@ -59,11 +59,29 @@ mp_parsedStanza(0),
 mp_queryGet(0)
 {
     attachSocket(socket);
+    m_keepAliveTimer.setInterval(5000);
+    connect(&m_keepAliveTimer, SIGNAL(timeout()),
+            this, SLOT(sendKeepAlive()));
+    setKeepAlive(1);
 }
 
 Parser::~Parser()
 {
     if (mp_ioProxy != 0) delete mp_ioProxy;
+}
+
+bool Parser::isKeepAlive() const
+{
+    return m_keepAliveTimer.isActive();
+}
+
+void Parser::setKeepAlive(bool keepAlive)
+{
+    if (keepAlive) {
+        m_keepAliveTimer.start();
+    } else {
+        m_keepAliveTimer.stop();
+    }
 }
 
 void Parser::attachSocket(QIODevice* socket)
@@ -121,6 +139,12 @@ void Parser::ping()
     connect(query, SIGNAL(pong(int)),
             this, SIGNAL(pong(int)));
     query->getPing();
+}
+
+void Parser::sendKeepAlive()
+{
+    ASSERT_SOCKET;
+    writeData(" ");
 }
 
 void Parser::initializeStream()
