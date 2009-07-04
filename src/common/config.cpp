@@ -274,7 +274,7 @@ Config::dataPathString()
                 path += "/data/";
             }
         #else //Unix
-            if (QRegExp("pokerth/?$").indexIn(path) != -1) {
+            if (QRegExp("kbang/?$").indexIn(path) != -1) {
                 // there is an own application directory
                 path += "/data/";
             } else if (QRegExp("usr/games/bin/?$").indexIn(path) != -1) {
