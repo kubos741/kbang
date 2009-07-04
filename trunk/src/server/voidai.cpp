@@ -120,6 +120,9 @@ void VoidAI::requestWithAction()
                             QList<PublicPlayerView*> players = mp_playerCtrl->publicGameView().publicPlayerList();
                             shuffleList(players);
                             foreach(const PublicPlayerView* p, players) {
+                                if (mp_playerCtrl->privatePlayerView().id() == p->id()) {
+                                    continue;
+                                }
                                 try {
                                     mp_playerCtrl->playCard(card, p);
                                     return;
