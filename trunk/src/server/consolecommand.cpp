@@ -143,7 +143,7 @@ CMDDEF(console_dump_clients)
         out << qSetFieldWidth(11) << center << client->socket()->state() << reset << " | ";
         out << qSetFieldWidth(27) << center << QString("%1, %2").
                 arg(client->socket()->error()).
-                arg(client->socket()->errorString()) << " |";
+                arg(client->socket()->errorString()) << reset << " |";
         out << reset << endl;
     }
     return 0;
