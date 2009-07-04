@@ -44,7 +44,8 @@ public:
     virtual CardWidget* take(int cardId);
     virtual CardWidget* pop();
 
-    virtual void paintEvent(QPaintEvent* event);
+    virtual void showEvent(QShowEvent*);
+    virtual void paintEvent(QPaintEvent*);
 
     void setHasBox(bool hasBox);
 
