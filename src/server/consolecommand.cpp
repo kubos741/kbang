@@ -20,6 +20,8 @@
 
 #include <QTextStream>
 #include <QStringList>
+#include <QTcpSocket>
+
 #include "consolecommand.h"
 #include "console.h"
 #include "gameserver.h"
@@ -103,6 +105,49 @@ CMDDEF(console_list_clients)
     return 0;
 }
 
+CMDDEF(console_dump_clients)
+{
+    Q_UNUSED(args);
+    QString dumpFileName = QString("client-dump-%1.log").
+                          arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+    QFile dumpFile(dumpFileName);
+    dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    QTextStream out(&dumpFile);
+
+    out.setPadChar('*');
+    out << qSetFieldWidth(80) << center << " KBang Server: client dump " <<
+            reset << endl;
+    out.setPadChar('*');
+    out << qSetFieldWidth(80) << center << QDateTime::currentDateTime().
+            toString("yyyy/MM/dd hh:mm:ss") << reset << endl << endl;
+
+    out.setPadChar('-');
+    out << qSetFieldWidth(80) << "";
+    out << reset << endl;
+
+    out << "| " << qSetFieldWidth(4) << center << "Id" << reset << " | ";
+    out << qSetFieldWidth(16) << center << "Ip Address" << reset << " | ";
+    out << qSetFieldWidth(6) << center << "GameId" << reset << " | ";
+    out << qSetFieldWidth(11) << center << "SocketState" << reset << " | ";
+    out << qSetFieldWidth(27) << center << "SocketError" << reset << " |";
+    out << endl;
+
+    out.setPadChar('-');
+    out << qSetFieldWidth(80) << "";
+    out << reset << endl;
+
+    foreach(Client* client, GameServer::instance().clientList()) {
+        out << "| " << qSetFieldWidth(4) << center << client->id() << reset << " | ";
+        out << qSetFieldWidth(16) << center << client->address() << reset << " | ";
+        out << qSetFieldWidth(6) << center << client->gameId() << reset << " | ";
+        out << qSetFieldWidth(11) << center << client->socket()->state() << reset << " | ";
+        out << qSetFieldWidth(27) << center << QString("%1, %2").
+                arg(client->socket()->error()).
+                arg(client->socket()->errorString()) << " |";
+        out << reset << endl;
+    }
+    return 0;
+}
 
 
 CMDDEF(console_set_player_password)
@@ -131,6 +176,7 @@ void console_register_commands()
     CMDREG("quit", &console_quit);
     CMDREG("list-games", &console_list_games);
     CMDREG("list-clients", &console_list_clients);
+    CMDREG("dump-clients", &console_dump_clients);
     CMDREG("set-player-password", &console_set_player_password);
 
 
