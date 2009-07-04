@@ -99,6 +99,11 @@ QString Client::address() const
     return mp_socket->peerAddress().toString();
 }
 
+QTcpSocket* Client::socket()
+{
+    return mp_socket;
+}
+
 void Client::onActionCreateGame(const CreateGameData& createGameData, const CreatePlayerData& createPlayerData)
 {
     if (isInGame()) {

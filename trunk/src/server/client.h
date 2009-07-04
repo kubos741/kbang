@@ -75,6 +75,9 @@ public:
 
     QString address() const;
 
+    QTcpSocket* socket();
+
+
 public slots: // These slots are connected to parser
     void onActionCreateGame(const CreateGameData&, const CreatePlayerData&);
     void onActionJoinGame(int gameId, int playerId, QString gamePassword, const CreatePlayerData&);
