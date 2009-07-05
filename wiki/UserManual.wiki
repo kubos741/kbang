@@ -67,6 +67,8 @@ $ qmake kbang.pro
 $ make
 }}}
 
+*Note:* if you have both Qt3 and Qt4 installed, you may need to use *qmake-qt4* instead of *qmake*. If you use Qt3 version of qmake, the compilation will fail on missing header files (QIODevice, ...).
+
 You can then execute client or server.
 {{{
 $ ./kbang-client
