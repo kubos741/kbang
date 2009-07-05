@@ -24,9 +24,8 @@
 #include <QPair>
 #include <QString>
 #include <QMap>
+#include <QXmlStreamAttributes>
 
-
-class QXmlStreamAttributes;
 class QStringRef;
 
 /**
