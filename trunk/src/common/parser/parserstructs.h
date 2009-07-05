@@ -24,9 +24,9 @@
 
 #include <QList>
 #include <QImage>
+#include <QXmlStreamWriter>
 
 class XmlNode;
-class QXmlStreamWriter;
 
 struct ServerInfoData
 {
