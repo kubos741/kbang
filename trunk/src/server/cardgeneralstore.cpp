@@ -18,6 +18,7 @@ void CardGeneralStore::play()
     gameCycle()->assertTurn();
     assertInHand();
     mp_firstPlayer = owner();
+    gameCycle()->setCardEffect(1);
     mp_currentPlayer = 0;
     gameTable()->playerPlayCard(this);
     gameTable()->drawIntoSelection(game()->alivePlayersCount());
@@ -46,6 +47,7 @@ void CardGeneralStore::requestNext()
             Q_ASSERT(gameTable()->selection().size() == 1);
             PlayingCard* selectionCard = gameTable()->selection()[0];
             gameTable()->playerPickFromSelection(mp_currentPlayer, selectionCard);
+            gameCycle()->setCardEffect(0);
             return;
         }
     }
