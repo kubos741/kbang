@@ -43,7 +43,7 @@ At the current state we do not provide Linux binaries so you need to compile KBa
 == Compiling from sources ==
 First you need to get source files. You can get them either from the download section, or from SVN. 
 
-You also need Qt4 library.
+You also need Qt4 library, *version 4.4* or newer.
 
 On Debian/Ubuntu:
 {{{
@@ -68,6 +68,8 @@ $ make
 }}}
 
 *Note:* if you have both Qt3 and Qt4 installed, you may need to use *qmake-qt4* instead of *qmake*. If you use Qt3 version of qmake, the compilation will fail on missing header files (QIODevice, ...).
+
+*Note:* if you have older version of Qt than 4.4, your compiler will probably complain about missing *removeOne* method in *QList* template class. Please update to Qt 4.4 or newer to solve this problem.
 
 You can then execute client or server.
 {{{
