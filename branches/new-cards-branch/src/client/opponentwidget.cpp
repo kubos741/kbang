@@ -42,11 +42,11 @@ OpponentWidget::OpponentWidget(QWidget *parent):
     setupUi(this);
     setContentsMargins(5, 5, 5, 5);
 
-    mp_hand->setCardSize(CardWidget::SIZE_SMALL);
+    mp_hand->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
 
-    mp_table->setCardSize(CardWidget::SIZE_SMALL);
+    mp_table->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
 
@@ -115,7 +115,8 @@ void OpponentWidget::createRoleCard()
 {
     if (mp_roleCard != 0)
         return;
-    mp_roleCard = cardWidgetFactory()->createRoleCard(this, ROLE_UNKNOWN);
+    mp_roleCard = new CardWidget(this);
+    mp_roleCard->setPlayerRoleCard(ROLE_UNKNOWN);
 }
 
 void OpponentWidget::updateRoleCard()
@@ -123,18 +124,18 @@ void OpponentWidget::updateRoleCard()
     if (!m_isAlive || mp_game->isFinished()) {
         createRoleCard();
         if (m_isWinner) {
-            mp_roleCard->setSize(CardWidget::SIZE_SMALL);
-            mp_roleCard->validate();
+            mp_roleCard->setCardSizeRole(CARD_SIZE_NORMAL);
+            mp_roleCard->updatePixmap();
             mp_roleCard->move(mp_characterWidget->x(),
                               height() - mp_roleCard->height() - 10);
         } else {
-            mp_roleCard->setSize(CardWidget::SIZE_NORMAL);
-            mp_roleCard->validate();
+            mp_roleCard->setCardSizeRole(CARD_SIZE_NORMAL);
+            mp_roleCard->updatePixmap();
             mp_roleCard->move((int)(width() / 2 - mp_roleCard->width() / 2),
                               (int)(height() / 2 - mp_roleCard->height() / 2));
         }
-        mp_roleCard->setPlayerRole(m_playerRole);
-        mp_roleCard->validate();
+        mp_roleCard->setPlayerRoleCard(m_playerRole);
+        mp_roleCard->updatePixmap();
         mp_roleCard->show();
         mp_roleCard->raise();
         if (mp_winnerIcon && mp_winnerIcon->isVisible()) {

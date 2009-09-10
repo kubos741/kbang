@@ -30,9 +30,8 @@ c *   (at your option) any later version.                                   *
 
 using namespace client;
 
-JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnection):
+JoinGameDialog::JoinGameDialog(QWidget *parent):
         QDialog(parent),
-        mp_serverConnection(serverConnection),
         m_currentGameId(0),
         m_currentPlayerId(0)
 {
@@ -252,7 +251,7 @@ void JoinGameDialog::updateGame(const GameInfoData& game)
 
 void JoinGameDialog::refreshGameList()
 {
-    QueryGet* query = mp_serverConnection->queryGet();
+    QueryGet* query = ServerConnection::instance()->queryGet();
     connect(query,  SIGNAL(result(const GameInfoListData&)),
             this,   SLOT(updateGameList(const GameInfoListData&)));
     query->getGameInfoList();
@@ -260,7 +259,7 @@ void JoinGameDialog::refreshGameList()
 
 void JoinGameDialog::refreshGame(int gameId)
 {
-    QueryGet* query = mp_serverConnection->queryGet();
+    QueryGet* query = ServerConnection::instance()->queryGet();
     connect(query, SIGNAL(result(const GameInfoData&)),
             this, SLOT(updateGame(const GameInfoData&)));
     query->getGameInfo(gameId);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,30 +21,62 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
-#include "ui_chatwidget.h"
+
+namespace Ui {
+class ChatWidget;
+}
 
 namespace client
 {
 
 /**
- *@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The ChatWidget class provides a widget that displays incoming chat messages
+ * and allows user to write messages.
+ * @author MacJariel
  */
-class ChatWidget : public QWidget, public Ui::ChatWidget
+class ChatWidget: public QWidget
 {
 Q_OBJECT
 public:
-    ChatWidget(QWidget *parent = 0);
-    ~ChatWidget();
+    /**
+     * Constructs a ChatWidget instance.
+     */
+    ChatWidget(QWidget* parent = 0);
+
+    /**
+     * Destroys the ChatWidget instance.
+     */
+    virtual ~ChatWidget();
+
+    /**
+     * Paints the background of the ChatWidget.
+     */
     virtual void paintEvent(QPaintEvent* event);
+
+    /**
+     * Clears the content of the ChatWidget.
+     */
     void clear();
 
 public slots:
-    void incomingMessage(int senderId, const QString& senderName, const QString& message);
+    /**
+     * Appends incoming message to the chat.
+     */
+    void appendIncomingMessage(int senderId, const QString& senderName, const QString& message);
+
+    /**
+     * Sends the message typed in messageBox.
+     */
     void sendMessage();
 
 signals:
+    /**
+     * This signal is emitted when user wants to send a message through the ChatWidget.
+     */
     void outgoingMessage(const QString& message);
 
+private:
+    Ui::ChatWidget* mp_ui;
 };
 }
 #endif

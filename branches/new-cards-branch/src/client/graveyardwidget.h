@@ -4,7 +4,6 @@
 #include "cardpilewidget.h"
 
 namespace client {
-class CardWidgetFactory;
 
 /**
  * @author MacJariel <MacJariel@gmail.com>
@@ -16,7 +15,7 @@ public:
     GraveyardWidget(QWidget *parent = 0);
     ~GraveyardWidget();
 
-    void init(CardWidgetFactory*);
+    void init();
 
     virtual CardWidget* pop();
     virtual void push(CardWidget* card);
@@ -30,7 +29,6 @@ private:
     CardWidget* mp_firstCard;
     CardWidget* mp_secondCard;
 
-    CardWidgetFactory* mp_cardWidgetFactory;
 };
 }
 

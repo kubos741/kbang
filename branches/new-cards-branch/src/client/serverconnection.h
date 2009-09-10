@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,76 +20,134 @@
 #ifndef SERVERCONNECTION_H
 #define SERVERCONNECTION_H
 
-#include "gameenums.h"
-
 #include <QObject>
 #include <QList>
 
+#include "gamestructs.h"
+
 class QTcpSocket;
-class QByteArray;
-class CreatePlayerData;
-class CreateGameData;
-class ServerInfoData;;
-class CardMovementData;
+
 class Parser;
 class QueryGet;
 
 namespace client {
 
 /**
- *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The ServerConnection class ... @todo
+ * @author MacJariel
  */
 class ServerConnection : public QObject
 {
 Q_OBJECT
 public:
-    ServerConnection(QObject *parent);
-    virtual ~ServerConnection();
+    /**
+     * Returns a reference to the singleton instance.
+     */
+    static ServerConnection* instance() {
+        static ServerConnection singleton;
+        return &singleton;
+    }
 
-    QueryGet* queryGet();
+    /**
+     * Returns whether client is connected to a server.
+     */
     bool isConnected() const;
+
+    /**
+     * Returns the name of the server to which the client is connected.
+     */
     QString serverName() const;
+
+    /**
+     * Returns the hostname of the server to which the client is connected.
+     */
     QString hostName() const;
 
-    QObject* parser() const;
+    /**
+     * Returns new QueryGet instance that can be used to send a get query
+     * to server.
+     */
+    QueryGet* newQueryGet();
 
 public slots:
+    /**
+     * Connects to server.
+     * @param serverHost the address/hostname of the server
+     * @param serverPort the TCP port on which server listens
+     */
     void connectToServer(QString serverHost, int serverPort);
+
+    /**
+     * Disconnects from server.
+     */
     void disconnectFromServer();
 
+    /**
+     * Sends a create-game action to server.
+     */
     void createGame(const CreateGameData&, const CreatePlayerData&);
-    void joinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
+
+    /**
+     * Sends a join-game action to server.
+     */
+    void joinGame(GameId gameId, PlayerId playerId, const QString& gamePassword, const CreatePlayerData&);
+
+    /**
+     * Sends a leave-game action to server.
+     */
     void leaveGame();
+
+    /**
+     * Sends a start-game action to server.
+     */
     void startGame();
+
+    /**
+     * Sends a chat-message action to server.
+     */
     void sendChatMessage(const QString& message);
 
-
+    /**
+     * Sends a draw-card action.
+     */
     void drawCard();
-    void playCard(int cardId);
-    void playCardWithPlayer(int cardId, int playerId);
-    void playCardWithCard(int cardId, int otherCardId);
 
-    void useAbility();
-    void useAbility(int playerId);
-    void useAbility(QList<int> cards);
+    /**
+     * Sends a play-card action.
+     */
+    void playCard(const ActionPlayCardData&);
 
+    /**
+     * Sends a use-ability action.
+     */
+    void useAbility(const ActionUseAbilityData&);
+
+    /**
+     * Sends a end-turn action.
+     */
     void endTurn();
+
+    /**
+     * Sends a pass action.
+     */
     void pass();
-    void discardCard(int cardId);
 
-
-
+    /**
+     * Sends a discard-card action.
+     */
+    void discardCard(CardId cardId);
 
 private slots:
-    void connected();
-    void disconnected();
-
-    void recievedServerInfo(const ServerInfoData&);
+    void onSocketError();
+    void onSocketStateChanged();
+    void onServerInfoReceived(const ServerInfoData&);
 
 
 private:
-    void initializeParserConnections();
+    ServerConnection();
+    virtual ~ServerConnection();
 
+    void initializeParserConnections();
 
 
 private:
@@ -97,22 +155,20 @@ private:
     Parser*             mp_parser;
 
     QString             m_serverHost;
-    QString             m_serverName;
-    QString             m_serverDescription;
+    ServerInfoData      m_serverInfo;
 
 signals:
-    void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
-    void logMessage(QString message);
-
+    /**
+     * This signal is emitted after client receives data from server.
+     * It can be used for debugging purposes.
+     */
     void incomingData(const QByteArray&);
+
+    /**
+     * This signal is emitted after client sends data to server.
+     * It can be used for debugging purposes.
+     */
     void outgoingData(const QByteArray&);
-
-    void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
-
-    void enterGameMode(int gameId, const QString& gameName, const ClientType&);
-    void exitGameMode();
-    void gameCanBeStarted(bool canBeStarted);
-    void eventCardMovement(const CardMovementData&);
 
 
 };

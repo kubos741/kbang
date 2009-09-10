@@ -5,7 +5,7 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>126</y>
+    <y>0</y>
     <width>264</width>
     <height>220</height>
    </rect>
@@ -69,7 +69,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     <number>1</number>
    </property>
    <item>
-    <widget class="QTextBrowser" name="mp_chatView">
+    <widget class="QTextBrowser" name="chatView">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -86,7 +86,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="mp_messageBox">
+    <widget class="QLineEdit" name="messageBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>

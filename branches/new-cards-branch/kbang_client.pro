@@ -18,7 +18,6 @@ HEADERS += src/client/gameloop.h \
     src/client/connecttoserverdialog.h \
     src/client/mainwindow.h \
     src/client/serverconnection.h \
-    src/client/common.h \
     src/client/joingamedialog.h \
     src/client/logwidget.h \
     src/client/chatwidget.h \
@@ -41,8 +40,6 @@ HEADERS += src/client/gameloop.h \
     src/client/gamecontextchangeevent.h \
     src/client/gamesyncevent.h \
     src/client/lifepointschangeevent.h \
-    src/client/cardactionswidget.h \
-    src/client/cardwidgetfactory.h \
     src/client/gameactionmanager.h \
     src/client/playerdiedevent.h \
     src/client/playerevent.h \
@@ -52,7 +49,11 @@ HEADERS += src/client/gameloop.h \
     src/client/selectplayericonwidget.h \
     src/client/gamemessageevent.h \
     src/client/cardwidgetsizemanager.h \
-    src/client/aboutdialog.h
+    src/client/aboutdialog.h \
+    src/client/cardsetmanager.h \
+    src/client/cardsetinfo.h \
+    src/client/cardbank.h \
+    src/client/clienttypes.h
 FORMS += src/client/connecttoserverdialog.ui \
     src/client/mainwindow.ui \
     src/client/joingamedialog.ui \
@@ -68,7 +69,6 @@ SOURCES += src/client/gameloop.cpp \
     src/client/connecttoserverdialog.cpp \
     src/client/mainwindow.cpp \
     src/client/serverconnection.cpp \
-    src/client/common.cpp \
     src/client/joingamedialog.cpp \
     src/client/logwidget.cpp \
     src/client/chatwidget.cpp \
@@ -90,8 +90,6 @@ SOURCES += src/client/gameloop.cpp \
     src/client/gamecontextchangeevent.cpp \
     src/client/gamesyncevent.cpp \
     src/client/lifepointschangeevent.cpp \
-    src/client/cardactionswidget.cpp \
-    src/client/cardwidgetfactory.cpp \
     src/client/gameactionmanager.cpp \
     src/client/cardpocket.cpp \
     src/client/playerdiedevent.cpp \
@@ -102,7 +100,10 @@ SOURCES += src/client/gameloop.cpp \
     src/client/selectplayericonwidget.cpp \
     src/client/gamemessageevent.cpp \
     src/client/cardwidgetsizemanager.cpp \
-    src/client/aboutdialog.cpp
+    src/client/aboutdialog.cpp \
+    src/client/cardsetmanager.cpp \
+    src/client/cardsetinfo.cpp \
+    src/client/cardbank.cpp
 unix { 
     LIBPATH += lib
     TARGETDEPS += lib/libkbang_common.a

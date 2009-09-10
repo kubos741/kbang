@@ -20,7 +20,7 @@
 #ifndef QUERYGET_H
 #define QUERYGET_H
 
-#include "parserstructs.h"
+#include "gamestructs.h"
 #include <QObject>
 #include <QTime>
 

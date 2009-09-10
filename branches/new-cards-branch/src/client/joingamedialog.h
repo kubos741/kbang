@@ -23,20 +23,18 @@
 #include <QDialog>
 #include "ui_joingamedialog.h"
 
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 namespace client {
 
-class ServerConnection;
-
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel
  */
 class JoinGameDialog : public QDialog, public Ui::JoinGameDialog
 {
 Q_OBJECT
 public:
-    JoinGameDialog(QWidget *parent, ServerConnection* serverConnection);
+    JoinGameDialog(QWidget *parent);
     ~JoinGameDialog();
 
     void updateGameListView();
@@ -69,8 +67,6 @@ private:
     void loadConfigValues();
     void saveConfigValues();
 
-
-    ServerConnection*           mp_serverConnection;
     GameInfoListData            m_gameList;
     int                         m_currentGameId;
     int                         m_currentPlayerId;

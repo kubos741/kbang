@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,8 +23,8 @@
 
 using namespace client;
 
-ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
- : QDialog(parent)
+ConnectToServerDialog::ConnectToServerDialog(QWidget *parent):
+        QDialog(parent)
 {
     setupUi(this);
     loadConfigValues();
@@ -35,22 +35,26 @@ ConnectToServerDialog::~ConnectToServerDialog()
 {
 }
 
-void ConnectToServerDialog::reloadServerList()
+void
+ConnectToServerDialog::reloadServerList()
 {
 }
 
-void ConnectToServerDialog::on_serverList_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
+void
+ConnectToServerDialog::on_serverList_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
     Q_UNUSED(previous);
     pushButtonConnect->setEnabled(current != 0);
 }
 
-void ConnectToServerDialog::on_serverList_itemDoubleClicked (QTreeWidgetItem*, int)
+void
+ConnectToServerDialog::on_serverList_itemDoubleClicked (QTreeWidgetItem*, int)
 {
     on_pushButtonConnect_clicked();
 }
 
-void ConnectToServerDialog::on_pushButtonAddServer_clicked()
+void
+ConnectToServerDialog::on_pushButtonAddServer_clicked()
 {
     NewServerDialog dialog(this);
     dialog.setupForNewServer();
@@ -62,7 +66,8 @@ void ConnectToServerDialog::on_pushButtonAddServer_clicked()
     saveConfigValues();
 }
 
-void ConnectToServerDialog::on_pushButtonEditServer_clicked()
+void
+ConnectToServerDialog::on_pushButtonEditServer_clicked()
 {
     QTreeWidgetItem* item = serverList->currentItem();
     Q_ASSERT(item != 0);
@@ -77,14 +82,16 @@ void ConnectToServerDialog::on_pushButtonEditServer_clicked()
     saveConfigValues();
 }
 
-void ConnectToServerDialog::on_pushButtonDeleteServer_clicked()
+void
+ConnectToServerDialog::on_pushButtonDeleteServer_clicked()
 {
     QTreeWidgetItem* item = serverList->currentItem();
     Q_ASSERT(item != 0);
     delete item;
 }
 
-void ConnectToServerDialog::on_pushButtonConnect_clicked()
+void
+ConnectToServerDialog::on_pushButtonConnect_clicked()
 {
     Q_ASSERT(serverList->currentItem() != 0);
     QString host = serverList->currentItem()->text(0);
@@ -93,7 +100,8 @@ void ConnectToServerDialog::on_pushButtonConnect_clicked()
     close();
 }
 
-void ConnectToServerDialog::loadConfigValues()
+void
+ConnectToServerDialog::loadConfigValues()
 {
     Config& cfg = Config::instance();
     cfg.refresh();
@@ -108,7 +116,8 @@ void ConnectToServerDialog::loadConfigValues()
     }
 }
 
-void ConnectToServerDialog::saveConfigValues()
+void
+ConnectToServerDialog::saveConfigValues()
 {
     Config& cfg = Config::instance();
     cfg.refresh();

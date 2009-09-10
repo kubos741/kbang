@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,10 +20,8 @@
 #ifndef CARDMOVEMENTEVENT_H
 #define CARDMOVEMENTEVENT_H
 
-#include "gameevent.h"
-#include "parser/parserstructs.h"
+#include "gameevent.h"      // inheritance
 
-#include <QObject>
 #include <QPoint>
 #include <QList>
 #include <QBasicTimer>
@@ -32,41 +30,64 @@
 
 namespace client
 {
-class Game;
 class CardPocket;
 class CardWidget;
 
 /**
- * This class handles the animation of cards in the game. Whenever there is a need
- * to move a card to a pocket, an instance of this class must be created. The instance
- * itself controls its lifetime, so you only need to create it with <b>new</b> operator
- * and leave it.
+ * The CardMovementEvent class provides the animated translation of cards in
+ * the game. As soon as a card-movement event is received and dequeued from
+ * GameEvent queue, the translation specified by CardMovementData is executed.
  *
- * @author MacJariel <MacJariel@gmail.com>
+ * @author MacJariel
  */
-class CardMovementEvent : public GameEvent
+class CardMovementEvent: public GameEvent
 {
 Q_OBJECT
 public:
     /**
-     * Creates an instance of CardMovementEvent class which starts the animation.
-     * @param mainWidget The main widget of the window.
-     * @param cardWidget The card widget that will be moved.
-     * @param destination The target pocket.
+     * Constructs a CardMovementEvent instance.
+     * @param parent The parent of this instance.
+     * @param cardMovementData The movement information.
      */
-    CardMovementEvent(Game* game, const CardMovementData& cardMovementData);
+    CardMovementEvent(QObject* parent, const CardMovementData& cardMovementData);
+
+    /**
+     * Destroys the CardMovement instance.
+     */
     virtual ~CardMovementEvent();
+
+public slots:
+    /**
+     * Runs the translation.
+     */
     virtual void run();
-    virtual void stop();
-    virtual bool isReadyRun();
 
 private:
+    /**
+     * Reads the stored CardMovementData and determines the CardWidget for
+     * translation and the destination CardPocket.
+     */
     void setCardAndPocket();
+
+    /**
+     * Starts the translation.
+     */
     void startTransition();
-    void timerEvent(QTimerEvent*);
+
+    /**
+     * Progress the translation.
+     */
+    virtual void timerEvent(QTimerEvent*);
+
+    /**
+     * Stops the translation.
+     */
     void stopTransition();
 
 private slots:
+    /**
+     * Unreveals the moved card.
+     */
     void unrevealCard();
 
 private:
@@ -74,12 +95,10 @@ private:
     CardWidget*         mp_card;
     CardPocket*         mp_destPocket;
     QPoint              m_srcPos;
-    QPoint              m_currPos;
     QPoint              m_destPos;
     qreal               m_length;
     int                 m_tick;
-    bool                m_cardAndPocketIsSet;
-    static QBasicTimer  sm_timer;
+    QBasicTimer         m_timer;
     QTime               m_time;
 };
 }

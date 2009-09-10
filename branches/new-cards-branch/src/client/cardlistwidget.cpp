@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,66 +17,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "cardlistwidget.h"
-#include "cardwidget.h"
 
-#include "gameenums.h"
-
-#include <cstdlib>
-
-#include <QSize>
 #include <QPainter>
 #include <QPaintEvent>
 
+#include "cardlistwidget.h"
+#include "cardwidget.h"
+#include "cardwidgetsizemanager.h"
 
 using namespace client;
 
 CardListWidget::CardListWidget(QWidget *parent):
         CardPocket(parent),
-        m_cardSize(CardWidget::SIZE_SMALL),
+        m_cardSizeRole(CARD_SIZE_NORMAL),
         m_hasBox(1),
         m_hPadding(3),
         m_vPadding(3)
 {
-    //setStyleSheet("client--CardListWidget { padding: 4px; background-color: rgba(0, 0, 0, 64); }");
 }
 
+/* virtual */
 CardListWidget::~CardListWidget()
 {
 }
 
-void CardListWidget::setCardSize(const CardWidget::Size& cardSize)
-{
-    m_cardSize = cardSize;
-    QSize cardS = CardWidget::qSize(cardSize);
-    QSize widgetSize(cardS.width() * 3 + 2 * m_hPadding, cardS.height() + 2 * m_vPadding);
-    m_moveFactor = cardS.width() / 2 + cardS.width() / 5;
-    setMinimumWidth((int)(cardS.width() * 3.8));
-    setMinimumHeight(cardS.height() + 2 * m_vPadding);
-    updateGeometry();
-}
-
-void CardListWidget::push(CardWidget* card)
-{
-    CardPocket::push(card);
-    card->move(newCardPosition());
-    card->setParent(this);
-    m_cards.push_back(card);
-    card->setSize(m_cardSize);
-    card->validate();
-    card->raise();
-    reorder();
-    card->show();
-}
-
-QPoint CardListWidget::newCardPosition() const
+/* virtual */ QPoint
+CardListWidget::newCardPosition() const
 {
     //return QPoint(m_hPadding + m_cards.size() * m_moveFactor, m_vPadding);
     return QPoint(cardX(m_cards.size(), 1), m_vPadding);
 }
 
+/* virtual */ void
+CardListWidget::push(CardWidget* card)
+{
+    CardPocket::push(card);
+    card->move(newCardPosition());
+    card->setParent(this);
+    m_cards.push_back(card);
+    card->setCardSizeRole(m_cardSizeRole);
+    card->updatePixmap();
+    card->raise();
+    reorder();
+    card->show();
+}
 
-CardWidget* CardListWidget::take(int cardId)
+/* virtual */ CardWidget*
+CardListWidget::take(int cardId)
 {
     if (m_cards.size() == 0) {
         qCritical("Trying to take from empty card list.");
@@ -98,20 +85,52 @@ CardWidget* CardListWidget::take(int cardId)
     return res;
 }
 
-CardWidget* CardListWidget::pop()
+/* virtual */ CardWidget*
+CardListWidget::pop()
 {
     CardWidget* res = m_cards.takeLast();
     reorder();
     return res;
 }
 
-void CardListWidget::showEvent(QShowEvent* event)
+void
+CardListWidget::setHasBox(bool hasBox)
+{
+    m_hasBox = hasBox;
+}
+
+void
+CardListWidget::clear()
+{
+    foreach(CardWidget* card, m_cards) {
+        card->hide();
+        card->deleteLater();
+    }
+    m_cards.clear();
+}
+
+/* virtual */ void
+CardListWidget::updateWidgetSize()
+{
+    QSize cardSize = CardWidgetSizeManager::instance().size(m_cardSizeRole);
+    QSize widgetSize(cardSize.width() * 3 + 2 * m_hPadding,
+                     cardSize.height() + 2 * m_vPadding);
+    m_moveFactor = cardSize.width() / 2 + cardSize.width() / 5;
+    setMinimumWidth((int)(cardSize.width() * 3.8));
+    setMinimumHeight(cardSize.height() + 2 * m_vPadding);
+    updateGeometry();
+    reorder();
+}
+
+/* virtual */ void
+CardListWidget::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
     reorder();
 }
 
-void CardListWidget::paintEvent(QPaintEvent* event)
+/* virtual */ void
+CardListWidget::paintEvent(QPaintEvent* event)
 {
     if (m_hasBox) {
         QPainter painter(this);
@@ -119,53 +138,45 @@ void CardListWidget::paintEvent(QPaintEvent* event)
     }
 }
 
-void CardListWidget::setHasBox(bool hasBox)
-{
-    m_hasBox = hasBox;
-}
-
-void CardListWidget::clear()
-{
-    foreach(CardWidget* card, m_cards)
-        card->deleteLater();
-    m_cards.clear();
-}
-
-void CardListWidget::reorder()
+void
+CardListWidget::reorder()
 {
     for(int i = 0; i < m_cards.size(); ++i) {
         m_cards[i]->move(cardX(i), m_vPadding);
     }
 }
 
-/*
-int CardListWidget::cardX(int i, bool newCard) const
+#if 0   // old implementation of cardX - to be removed later
+int
+CardListWidget::cardX(int i, bool newCard) const
 {
     int cardCount = m_cards.size();
     if (newCard)
         cardCount++;
     int moveFactor;
     if (m_cards.size() >= 2)
-        moveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
+        moveFactor = (int)((width() - 2 * m_hPadding -
+                            CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
     else
         moveFactor = m_moveFactor;
     return m_hPadding + i * moveFactor;
 }
-*/
+#endif
 
-int CardListWidget::cardX(int i, bool newCard) const
+int
+CardListWidget::cardX(int i, bool newCard) const
 {
+    const QSize& cardSize = CardWidgetSizeManager::instance().size(m_cardSizeRole);
     int cardCount = m_cards.size();
     if (newCard)
         cardCount++;
-    int cSize = (cardCount - 1) * m_moveFactor + CardWidget::qSize(m_cardSize).width();
+    int cSize = (cardCount - 1) * m_moveFactor + cardSize.width();
     if (cSize <= width() - 2 * m_hPadding) {
-        return m_hPadding + i * m_moveFactor + (int)((width() - 2 * m_hPadding) / 2 - (cSize / 2));
+        return m_hPadding + i * m_moveFactor +
+                (int)((width() - 2 * m_hPadding) / 2 - (cSize / 2));
     } else {
-        int newMoveFactor = (int)((width() - 2 * m_hPadding - CardWidget::qSize(m_cardSize).width())) / (int)(cardCount - 1);
-        //i * NF = todoWidth - 2*hpadding - width
+        int newMoveFactor = (int)((width() - 2 * m_hPadding -
+                                   cardSize.width())) / (int)(cardCount - 1);
         return m_hPadding + i * newMoveFactor;
     }
 }
-
-

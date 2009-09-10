@@ -1,3 +1,5 @@
+#if 0
+
 #include <QWidget>
 #include "cardwidgetfactory.h"
 #include "game.h"
@@ -41,3 +43,4 @@ void CardWidgetFactory::registerCard(CardWidget* cardWidget)
     cardWidget->setGameActionManager(mp_game->gameActionManager());
 }
 
+#endif

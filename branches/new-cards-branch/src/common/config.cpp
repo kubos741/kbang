@@ -26,24 +26,7 @@ Config* Config::smp_instance = 0;
 
 Config::Config()
 {
-    QString kbangDirName;
-    QString kbangConfigName = "kbang.conf";
-#ifdef Q_OS_WIN
-    kbangDirName = "KBang";
-#else
-    kbangDirName = ".kbang";
-#endif
-    if (QDir::home().cd(kbangDirName) == 0) {
-        if (QDir::home().mkdir(kbangDirName) == 0) {
-            qFatal("Cannot create KBang config directory.");
-        }
-    }
-    QDir kbangDir = QDir::home();
-    if (kbangDir.cd(kbangDirName) == 0) {
-        qFatal("Cannot change to KBang config directory.");
-    }
-    m_configFileName = kbangDir.absolutePath() + "/" + kbangConfigName;
-    if (!kbangDir.exists(kbangConfigName)) {
+    if (!QFile::exists(configFilePath())) {
         createDefaultConfig();
         store();
     } else {
@@ -125,9 +108,9 @@ bool Config::hasGroup(QString group)
 
 void Config::refresh()
 {
-    QFile file(m_configFileName);
+    QFile file(configFilePath());
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical(qPrintable(QString("%1: cannot open config file for reading.").arg(m_configFileName)));
+        qCritical(qPrintable(QString("%1: cannot open config file for reading.").arg(configFilePath())));
         return;
     }    
     QTextStream in(&file);
@@ -156,7 +139,7 @@ void Config::refresh()
             currentGroup = &(m_groups[currentGroupName]);
         } else {
             if (currentGroupName.isEmpty()) {
-                qWarning(qPrintable(QString("%1: %2: line is not in group.").arg(m_configFileName, lineNum)));
+                qWarning(qPrintable(QString("%1: %2: line is not in group.").arg(configFilePath(), lineNum)));
                 continue;
             }
             if (singleVarRegExp.exactMatch(line)) {
@@ -164,7 +147,7 @@ void Config::refresh()
                 QString varName = singleVarRegExp.capturedTexts()[1];
                 QString varValue = singleVarRegExp.capturedTexts()[2];
                 if (currentGroup->records.contains(varName)) {
-                    qWarning(qPrintable(QString("%1: %2: variable %3 already assigned.").arg(m_configFileName).
+                    qWarning(qPrintable(QString("%1: %2: variable %3 already assigned.").arg(configFilePath()).
                                         arg(lineNum).arg(varName)));
                     continue;
                 }
@@ -175,13 +158,13 @@ void Config::refresh()
                 if (!currentGroup->records.contains(varName)) {
                     currentGroup->records[varName] = ConfigRecord(varName, CONFIG_RECORD_LIST, QString());
                 } else if (currentGroup->records[varName].type != CONFIG_RECORD_LIST) {
-                    qWarning(qPrintable(QString("%1: %2: variable %3 is not list.").arg(m_configFileName).
+                    qWarning(qPrintable(QString("%1: %2: variable %3 is not list.").arg(configFilePath()).
                                         arg(lineNum).arg(varName)));
                     continue;
                 }
                 currentGroup->records[varName].valueList.append(varValue);
             } else {
-                qWarning(qPrintable(QString("%1: %2: cannot parse line.").arg(m_configFileName).arg(lineNum)));
+                qWarning(qPrintable(QString("%1: %2: cannot parse line.").arg(configFilePath()).arg(lineNum)));
             }
         }
     }
@@ -189,9 +172,9 @@ void Config::refresh()
 
 void Config::store()
 {
-    QFile file(m_configFileName);
+    QFile file(configFilePath());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical(qPrintable(QString("%1: cannot open config file for writing.").arg(m_configFileName)));
+        qCritical(qPrintable(QString("%1: cannot open config file for writing.").arg(configFilePath())));
         return;
     }
     QTextStream out(&file);
@@ -257,9 +240,15 @@ Config::ConfigRecord* Config::configRecord(QString group, QString varName) {
     return &(m_groups[group].records[varName]);
 }
 
+/* static */ QString
+Config::configFilePath()
+{
+    static QString result = userAppLocation() + "/kbang.conf";
+    return result;
+}
 
 /* static */ QString
-Config::dataPathString()
+Config::systemDataLocation()
 {
     QString path(QCoreApplication::instance()->applicationDirPath());
 
@@ -292,4 +281,41 @@ Config::dataPathString()
         #endif
     #endif
     return (QDir::cleanPath(path) + "/");
+}
+
+/* static */ QString
+Config::userDataLocation()
+{
+    static QString result = userAppLocation() + "/data/";
+    return result;
+}
+
+/* static */ QStringList
+Config::dataLocations()
+{
+    return (QStringList() << systemDataLocation() << userDataLocation());
+}
+
+
+/* static */ QString
+Config::userAppLocation()
+{
+    QString userAppDir;
+#ifdef Q_OS_WIN
+    userAppDir = "KBang";
+#else
+    userAppDir = ".kbang";
+#endif
+    QDir dir = QDir::home();
+    if (!dir.exists(userAppDir)) {
+        if (!dir.mkdir(userAppDir)) {
+            qCritical("Cannot create user directory '%s'.",
+                      qPrintable(dir.filePath(userAppDir)));
+        }
+    }
+    if (!dir.cd(userAppDir)) {
+        qCritical("Cannot read user directory '%s'.",
+                  qPrintable(dir.filePath(userAppDir)));
+    }
+    return dir.absolutePath();
 }

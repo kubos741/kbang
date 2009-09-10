@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,34 +17,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CARDSETMANAGER_H
+#define CARDSETMANAGER_H
 
-#ifndef COMMON_H
-#define COMMON_H
-
-#include <QtDebug>
+#include <QObject>
 #include <QList>
-#include <QLabel>
+#include <QStringList>
 
-class QGridLayout;
+#include "cardsetinfo.h"
 
-namespace client
+namespace client {
+
+/**
+ * The CardSetManager singleton class manages local CardSets.
+ * @author MacJariel
+ */
+class CardSetManager: public QObject
 {
-class LocalPlayerWidget;
-class OpponentWidget;
+public:
+    /**
+     * Returns a reference to the singleton CardSetManager instance.
+     */
+    static CardSetManager& instance();
 
-struct GameWidgets
-{
-    QWidget* mainWidget;
-    QWidget* middleWidget;
-    LocalPlayerWidget* localPlayerWidget;
-    QList<OpponentWidget*> opponentWidget;
-    QLabel*  statusLabel;
-    GameWidgets(QWidget* main, QWidget* middle, LocalPlayerWidget* p,
-                const QList<OpponentWidget*>& o, QLabel* s):
-        mainWidget(main), middleWidget(middle), localPlayerWidget(p), opponentWidget(o),
-        statusLabel(s){}
+    /**
+     * Reloads the information about installed card sets.
+     */
+    void refreshLocalCardSets();
+
+    /**
+     * Returns the information about installed card sets.
+     */
+    QList<CardSetInfo> localCardSets();
+
+    /**
+     * Appends the <i>slot</i> to the list of known slots.
+     */
+    void addKnownSlot(QString slot);
+
+    /**
+     * Returns the list of known slots.
+     */
+    QStringList knownSlots() { return m_knownSlots; }
+
+    /**
+     * Returns the list of card sets that can be downloaded from server.
+     */
+    QList<CardSetInfo> remoteCardSets();
+
+private:
+    CardSetManager();
+
+    void refreshKnownSlots();
+    void saveKnownSlots();
+
+    QList<CardSetInfo>  m_localCardSets;
+    QStringList         m_knownSlots;
 };
 
 }
-
-#endif
+#endif // CARDSETMANAGER_H

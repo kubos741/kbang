@@ -20,8 +20,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "util.h"
-
 #include <QtCore>
 
 /**
@@ -29,11 +27,10 @@
  * arguments. This class is a singleton.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
 */
-class Config: private NonCopyable {
-
+class Config {
 public:
     QString         readString(QString group, QString varName);
-    QStringList  readStringList(QString group, QString varName);
+    QStringList     readStringList(QString group, QString varName);
     int             readInt(QString group, QString varName);
     QList<int>      readIntList(QString group, QString varName);
 
@@ -53,9 +50,13 @@ public:
         return *smp_instance;
     }
 
-    static QString dataPathString();
+    static QString configFilePath();
+    static QString systemDataLocation();
+    static QString userDataLocation();
+    static QStringList dataLocations();
 
 private:
+    Q_DISABLE_COPY(Config)
     Config();
     ~Config();
 
@@ -85,9 +86,10 @@ private:
     void createDefaultConfig();
     ConfigRecord* configRecord(QString group, QString varName);
 
-    QString m_configFileName;
     QMap<QString, ConfigGroup> m_groups;
     static Config* smp_instance;
+
+    static QString userAppLocation();
 
 };
 

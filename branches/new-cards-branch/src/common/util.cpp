@@ -45,3 +45,15 @@ bool randomBool(qreal probability)
     int random_val = qrand() % random_val_size;
     return (random_val < true_val_treshold);
 }
+
+QString boolToString(bool aBool)
+{
+    return aBool ? "true" : "false";
+}
+
+bool stringToBool(QString aString)
+{
+    aString = aString.toLower();
+    if (aString == "true" || aString == "1") return 1;
+    return 0;
+}

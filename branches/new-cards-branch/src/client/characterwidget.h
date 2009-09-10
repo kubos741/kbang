@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,43 +23,73 @@
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
-#include <QSize>
+
 #include "cardwidget.h"
 
 namespace client {
 
+
+/**
+ * The CharacterWidget class provides a widget to show player's character
+ * card and to show his lifepoints.
+ * @author MacJariel
+ */
 class CharacterWidget: public QWidget
 {
 Q_OBJECT
 public:
+    /**
+     * Constructs a clean CharacterWidget instance.
+     */
     CharacterWidget(QWidget *parent = 0);
+
+    /**
+     * Destroys the instance.
+     */
     virtual ~CharacterWidget();
 
-    void init(CardWidgetFactory* cardWidgetFactory);
+    /**
+     * Returns the character of this character widget.
+     */
+    inline QString character() const    { return m_character; }
 
+    /**
+     * Returns the life points of this character widget.
+     */
+    inline int     lifePoints() const   { return m_lifePoints; }
 
-    inline CharacterType character() const { return m_character; }
-    inline int     lifePoints() const { return m_lifePoints; }
+    /**
+     * Sets the ownerId of this CharacterWidget.
+     */
+    void setOwnerId(PlayerId ownerId);
 
-    void setOwnerId(int ownerId);
-    void setCharacter(CharacterType character);
+    /**
+     * Sets the character of this CharacterWidget.
+     */
+    void setCharacter(const QString& character);
+
+    /**
+     * Sets the life points of this CharacterWidget. If life points
+     * changes, an animation is started and animationFinished() signal
+     * is emitted when the animation finishes.
+     */
     void setLifePoints(int lifePoints);
-    bool isEmpty() const;
 
 private:
-    void lifePointsChanged();
+    void startAnimation();
 
-private slots:
-    void onTimeout();
+public slots:
+    void updateWidgetSize();
+    void onAnimationTimeout();
 
 signals:
     void animationFinished();
 
 private:
-    CharacterType m_character;
-    int m_lifePoints;
-    int m_sourceY;
-    int m_targetY;
+    QString m_character;
+    int     m_lifePoints;
+    int     m_sourceY;
+    int     m_targetY;
 
     CardWidget* mp_backCard;
     CardWidget* mp_characterCard;
@@ -68,9 +98,6 @@ private:
 
     static QTimer sm_timer;
     static int    sm_countAnimaton;
-    //QSize         m_sizeHint;
-
-    CardWidgetFactory*  mp_cardWidgetFactory;
     QTime         m_time;
 };
 

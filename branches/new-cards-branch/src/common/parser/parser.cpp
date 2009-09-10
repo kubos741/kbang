@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 
-#include "parserstructs.h"
+#include "gamestructs.h"
 #include "parser.h"
 #include "queryget.h"
 #include "util.h"
@@ -135,7 +135,7 @@ void Parser::writeData(const QByteArray& data)
 void Parser::ping()
 {
     ASSERT_SOCKET;
-    QueryGet* query = queryGet();
+    QueryGet* query = newQueryGet();
     connect(query, SIGNAL(pong(int)),
             this, SIGNAL(pong(int)));
     query->getPing();
@@ -506,7 +506,7 @@ void Parser::sendTermination()
 }
 
 
-QueryGet* Parser::queryGet()
+QueryGet* Parser::newQueryGet()
 {
     QString id;
     do {

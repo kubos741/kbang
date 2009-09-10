@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,13 +27,22 @@ namespace client
 {
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The ConnectToServerDialog provides a dialog that allows user to manage
+ * known servers and to connect to them.
+ * @author MacJariel
  */
-class ConnectToServerDialog : public QDialog, public Ui::ConnectToServerDialog
+class ConnectToServerDialog: public QDialog, public Ui::ConnectToServerDialog
 {
 Q_OBJECT
 public:
-    ConnectToServerDialog(QWidget *parent = 0);
+    /**
+     * Constructs a ConnectToServerDialog.
+     */
+    ConnectToServerDialog(QWidget* parent = 0);
+    
+    /**
+     * Destroys the ConnectToServerDialog.
+     */
     ~ConnectToServerDialog();
 
     void reloadServerList();

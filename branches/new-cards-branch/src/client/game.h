@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,142 +20,289 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <QObject>
-#include <QWidget>
-#include <QHash>
-#include <QList>
-#include <QQueue>
 #include <QPushButton>
-#include "parser/parserstructs.h"
-#include "common.h"
-#include "playerwidget.h"
+#include <QList>
+#include <QMap>
+#include <QPointer>
 
-#include "cardwidgetfactory.h"
-#include "gameactionmanager.h"
+#include "gamestructs.h"
 
 namespace client {
-
-class ServerConnection;
-class GameEventHandler;
-class CardWidgetSizeManager;
-
+// Widgets:
+class PlayerWidget;
+class LocalPlayerWidget;
 class DeckWidget;
 class GraveyardWidget;
+class CardListWidget;
+
+class GameEventHandler;
+class GameActionManager;
 
 /**
+ *
  * @author MacJariel <MacJariel@gmail.com>
  */
 class Game: public QObject {
 Q_OBJECT;
 public:
-    Game(QObject* parent, int gameId, ClientType, ServerConnection*, const GameWidgets&);
-    virtual ~Game();
+    static void enterGameMode(GameId, QString gameName, ClientType);
 
-    void setPlayerId(int playerId);
+    void leaveGameMode();
+
+    /**
+     * Returns the pointer to the current game or 0 if client
+     * is not in game.
+     */
+    inline static Game* currentGame() {
+        return smp_currentGame;
+    }
+
+    /**
+     * Returns whether client is in a game.
+     */
+    inline static bool isInGame() {
+        return (smp_currentGame != 0);
+    }
+
+    /**
+     * Returns the ClientType of the game.
+     */
+    inline ClientType clientType() const {
+        return m_clientType;
+    }
+
+    /**
+     * Returns the PlayerWidget of the player with given <i>id</i>
+     * or 0, if such PlayerWidget is not found.
+     */
+    inline PlayerWidget* playerWidget(PlayerId id) const {
+        return m_playerWidgets.value(id, 0);
+    }
+
+    /**
+     * Returns the widget of local player, or 0 if game is in spectator mode.
+     */
+    inline LocalPlayerWidget* localPlayerWidget() const {
+        return mp_localPlayerWidget;
+    }
+
+    /**
+     * Returns the DeckWidget, or 0 if it was not created yet.
+     */
+    inline DeckWidget* deck() const {
+        return mp_deck;
+    }
+
+    /**
+     * Returns the GraveyardWidget. or 0 if it was not created yet.
+     */
+    inline GraveyardWidget* graveyard() const {
+        return mp_graveyard;
+    }
+
+    /**
+     * Returns the CardListWidget for selection pocket, or 0 if it was not
+     * created yet.
+     */
+    inline CardListWidget* selection() const {
+        return mp_selection;
+    }
+
+    /**
+     * Returns the id of current player.
+     */
+    inline PlayerId currentPlayerId() const {
+        return m_gameContextData.currentPlayerId;
+    }
+
+    /**
+     * Returns the id of requested player.
+     */
+    inline PlayerId requestedPlayerId() const {
+        return m_gameContextData.requestedPlayerId;
+    }
+
+    /**
+     * Returns the current GamePlayState.
+     */
+    inline GamePlayState gamePlayState() const {
+        return m_gameContextData.gamePlayState;
+    }
+
+    /**
+     * Returns, whether local player is requested.
+     */
+    inline bool isRequested() const {
+        return (localPlayerId() == requestedPlayerId());
+    }
+
+    /**
+     * Returns the id of the local player, or 0 in spectator mode.
+     */
+    inline PlayerId localPlayerId() const {
+        return m_localPlayerId;
+    }
+
+    /**
+     * Returns the character of local player, or empty string in spectator mode.
+     */
+    QString localCharacter() const;
+
+    inline bool isCreator() const {
+        return m_isCreator;
+    }
+
+    inline GameEventHandler* eventHandler() const {
+        return mp_gameEventHandler;
+    }
+
+    inline GameActionManager* actionManager() const {
+        return mp_gameActionManager;
+    }
+
+    void setIsCreator(bool isCreator) {
+        m_isCreator = isCreator;
+    }
+
+    /**
+     * Sets the widget of the local player according to PublicPlayerData.
+     * Does nothing in spectator mode.
+     * First use setLocalPlayer(PublicPlayerData), then
+     * setLocalPlayer(PrivatePlayerData).
+     */
+    void setLocalPlayer(const PublicPlayerData&);
+
+    /**
+     * Sets the widget of the local player according to PrivatePlayerData.
+     * Does nothing in spectator mode.
+     * First use setLocalPlayer(PublicPlayerData), then
+     * setLocalPlayer(PrivatePlayerData).
+     */
+    void setLocalPlayer(const PrivatePlayerData&);
+
+    /**
+     * Sets the state of the game.
+     */
     void setGameState(const GameState&);
-    void setGameContext(const GameContextData&);
-    void setSelection(QList<CardData>);
-    void setIsCreator(bool isCreator);
-    void setGraveyard(const CardData&);
-    void validate();
-    void clear();
 
+    /**
+     * Sets game context
+     */
+    void setGameContext(const GameContextData&);
+
+    /**
+     * Sets the selection.
+     */
+    void setSelection(QList<CardData>);
+
+    /**
+     * Sets the graveyard top card.
+     */
+    void setGraveyard(const CardData&);
+
+    /**
+     * Changes the game interface, if necessary.
+     */
+    void updateInterface();
+
+    /**
+     * Cleans the UI after leaving the game mode.
+     */
+    void cleanUp();
+
+    /**
+     * Sets the text-info string.
+     */
     void setTextInfo(const QString&);
+
+    /**
+     * Unsets the text-info string.
+     */
     void unsetTextInfo();
 
+    /**
+     * Adds new opponent according to PublicPlayerData. The opponent is
+     * added to first unused opponentWidget. This method should be used only
+     * before game is started, because the resulting player order may differ
+     * from the correct one.
+     */
+    void appendOpponent(const PublicPlayerData&);
 
-    void playerJoinedGame(const PublicPlayerData& player);
-    void playerLeavedGame(int playerId);
-    void playerUpdate(const PublicPlayerData& player);
-public slots:
-    void gameCanBeStarted(bool);
-    void startButtonClicked();
+    /**
+     * Inserts new opponent according to PublicPlayerData. The opponent is
+     * added to the OpponentWidget with given <i>index</i>. Index with positive
+     * value counts from the local player clock-wise, and with negative value
+     * counts counter-clock-wise.
+     */
+    void insertOpponent(int index, const PublicPlayerData&);
 
-public:
-    inline DeckWidget*     deck() const               { return mp_deck; }
-    inline GraveyardWidget*graveyard() const          { return mp_graveyard; }
-    inline CardListWidget*       selection() const          { return mp_selection; }
-    inline PlayerWidget*   playerWidget(int id) const { return m_players.contains(id) ? m_players[id] : 0; }
-    inline LocalPlayerWidget*
-                           localPlayerWidget() const  { return mp_localPlayerWidget; }
-    inline QWidget*        mainWidget() const         { return mp_mainWidget; }
+    /**
+     * Removes the opponent with given <i>id</i>.
+     */
+    void removeOpponent(PlayerId id);
 
-    inline int             currentPlayerId() const    { return m_gameContextData.currentPlayerId; }
-    inline int             requestedPlayerId() const  { return m_gameContextData.requestedPlayerId; }
-    inline GamePlayState   gamePlayState() const      { return m_gameContextData.gamePlayState; }
-    inline bool            isCreator() const          { return m_isCreator; }
-    inline bool            isAbleToRequest() const    { return requestedPlayerId() == m_playerId; }
-    inline bool            isPlaying() const          { return m_gameState == GAMESTATE_PLAYING; }
-    inline bool            isFinished() const         { return m_gameState == GAMESTATE_FINISHED; }
+    /**
+     * Updates the opponent according to PublicPlayerData. First the right
+     * OpponentWidget is found and then this widget is updated with PublicPlayerData.
+     */
+    void updateOpponent(const PublicPlayerData&);
 
-    inline bool            gameInterfaceLoaded() const { return m_interface == GameInterface; }
+    /**
+     * Clears opponent widget specified with index.
+     */
+    void clearOpponentWidget(int index);
 
-    inline int playerId() const { return m_playerId; }
-    CharacterType character() const;
-
-    inline OpponentWidget* opponentWidget(int index) { return m_opponentWidgets[index]; }
-
-    void assignPlayerWidget(int playerId, PlayerWidget*);
-
-    inline GameActionManager* gameActionManager() { return &m_gameActionManager; }
-    inline CardWidgetFactory*       cardWidgetFactory()  { return &m_cardWidgetFactory; }
-
-    inline ServerConnection* serverConnection() { return mp_serverConnection; }
-
-    void sendLogMessage(const QString&);
-
+    /**
+     * Pauses the dequeuing of incoming game events.
+     */
     void pauseGameEvents();
+
+    /**
+     * Resumes the dequeuing of incoming game events.
+     */
     void resumeGameEvents();
 
-signals:
-    void emitLogMessage(const QString&);
+public slots:
+    void setGameStartability(bool);
 
 private:
+    Game(GameId, QString gameName, ClientType);
+    virtual ~Game();
+
     void loadCreatorInterface();
     void unloadCreatorInterface();
     void loadGameInterface();
     void unloadGameInterface();
     void unloadInterface();
 
-
-private:
-    int             m_gameId;
-    int             m_playerId;
-    bool            m_isCreator;
-    GameState       m_gameState;
-    GameContextData m_gameContextData;
-
-    enum {
+    enum InterfaceType {
         NoInterface = 0,
         CreatorInterface,
         GameInterface
-    } m_interface;
+    };
 
-    ServerConnection* mp_serverConnection;
+    GameId          m_gameId;
+    QString         m_gameName;
+    ClientType      m_clientType;
+    PlayerId        m_localPlayerId;
+    GameState       m_gameState;
+    GameContextData m_gameContextData;
+    InterfaceType   m_interfaceType;
+    bool            m_isCreator;
 
+    QMap<PlayerId, PlayerWidget*>   m_playerWidgets;
+    QList<PlayerWidget*>            m_playerWidgetsList;
 
-/*  Visual elements - provided by MainWindow */
-    LocalPlayerWidget*        mp_localPlayerWidget;
-    QList<OpponentWidget*>    m_opponentWidgets;
-    QWidget*                  mp_mainWidget;
-    QWidget*                  mp_middleWidget;
-    QLabel*                   mp_statusLabel;
+    QPushButton*        mp_startButton;
+    DeckWidget*         mp_deck;
+    GraveyardWidget*    mp_graveyard;
+    CardListWidget*     mp_selection;
+    LocalPlayerWidget*  mp_localPlayerWidget;
 
+    GameEventHandler*   mp_gameEventHandler;
+    GameActionManager*  mp_gameActionManager;
 
-
-    QHash<int, PlayerWidget*> m_players;
-    QPushButton*              mp_startButton;
-    DeckWidget*               mp_deck;
-    GraveyardWidget*          mp_graveyard;
-    CardListWidget*                 mp_selection;
-    QQueue<CardMovementData> m_cardMovementQueue;
-
-    GameEventHandler*         mp_gameEventHandler;
-    CardWidgetFactory         m_cardWidgetFactory;
-    GameActionManager    m_gameActionManager;
-
-
-
+    static QPointer<Game> smp_currentGame;
 };
 }
 #endif

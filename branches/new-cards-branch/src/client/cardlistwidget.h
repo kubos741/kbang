@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,53 +17,89 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CLIENTCARDLISTWIDGET_H
-#define CLIENTCARDLISTWIDGET_H
-
-#include <cardpocket.h>
-#include <cardwidget.h>
+#ifndef CARDLISTWIDGET_H
+#define CARDLISTWIDGET_H
 
 #include <QList>
+
+#include "cardpocket.h"                 // inheritance
 
 namespace client {
 
 /**
- * @author MacJariel <MacJariel@gmail.com>
+ * The CardListWidget class is a widget that stores CardWidget instances and
+ * displays them in a row. It is used to show cards in hands and on player's
+ * table.
+ * @author MacJariel
  */
 class CardListWidget: public CardPocket
 {
 Q_OBJECT
 public:
+    /**
+     * Constructs a CardListWidget which is child of parent.
+     */
     CardListWidget(QWidget *parent);
-    void setCardSize(const CardWidget::Size& cardSize);
+
+    /**
+     * Destroys the CardListWidget.
+     */
     virtual ~CardListWidget();
 
-    virtual void push(CardWidget* card);
+    /**
+     * Returns the position (relative to this widget) of the next card to be
+     * added to pocket. This is used by CardMovementEvent.
+     */
     virtual QPoint newCardPosition() const;
 
-    virtual CardWidget* take(int cardId);
+    /**
+     * Pushes a CardWidget into the pocket.
+     */
+    virtual void push(CardWidget* card);
+
+    /**
+     * Removes a CardWidget with given id from the pocket and returns it. If id is 0,
+     * a random card is picked. Use this only with CardListWidgets that contain only
+     * unknown cards.
+     */
+    virtual CardWidget* take(CardId id);
+
+    /**
+     * Removes the last CardWidget from the pocket and returns it.
+     */
     virtual CardWidget* pop();
 
+    /**
+     * Sets the hasBox property. If hasBox is set, the widget is painted on a
+     * semi-transparent box. @see paintEvent(QPaintEvent*)
+     */
+    void setHasBox(bool hasBox);
+
+    /**
+     * Removes all CardWidgets from the list and destroys them.
+     */
+    virtual void clear();
+
+public slots:
+    /**
+     * Recomputes size of the widget and reorders CardWidgets. The actual CardWidget size
+     * from CardWidgetSizeManager is used.
+     */
+    virtual void updateWidgetSize();
+
+protected:
     virtual void showEvent(QShowEvent*);
     virtual void paintEvent(QPaintEvent*);
 
-    void setHasBox(bool hasBox);
-
-    void clear();
-
-protected:
     QList<CardWidget*> m_cards;
 
 private:
     void reorder();
     int cardX(int i, bool newCard = 0) const;
 
-private:
-    CardWidget::Size m_cardSize;
-    bool             m_hasBox;
-    bool             m_revealed;
-    int              m_moveFactor;
-    int              m_hPadding, m_vPadding;
+    bool            m_hasBox;
+    int             m_moveFactor;
+    int             m_hPadding, m_vPadding;
 };
 
 }

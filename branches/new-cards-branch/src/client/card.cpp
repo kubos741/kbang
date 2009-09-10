@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,237 +20,89 @@
 
 #include <QtDebug>
 #include "card.h"
-#include "config.h"
+#include "cardbank.h"
+//#include "config.h"
 
 #include <QPainter>
 #include <QFont>
 
 using namespace client;
 
-QMap<PlayingCardType, Card*> Card::sm_playingCards;
-QMap<PlayerRole,      Card*> Card::sm_roleCards;
-QMap<CharacterType,   Card*> Card::sm_characterCards;
-
-Card::Card(const QString& name, PlayingCardType playingCardType, const QString& imageFileName):
+Card::Card(CardBank* parent, const QString& name, CardType type,
+           const QString& cardSetName):
+        QObject(parent),
+        m_cardBank(parent),
         m_name(name),
-        m_type(Card::Playing),
-        m_imageFileName(imageFileName)
-
+        m_type(type),
+        m_cardSetName(cardSetName)
 {
-    if (sm_playingCards.contains(playingCardType)) {
-        qCritical("Unable to create a playing card. Given type already created.");
-        return;
-    }
-    loadPixmap();
-    sm_playingCards[playingCardType] = this;
 }
 
-Card::Card(const QString& name, PlayerRole role, const QString& imageFileName):
-        m_name(name),
-        m_type(Card::Role),
-        m_imageFileName(imageFileName)
-
+void
+Card::addGraphics(const QString& gfx, const QString& suitString,
+                  const QString& rankString, bool renderSigns)
 {
-    if (sm_roleCards.contains(role)) {
-        qCritical("Unable to create a role card. Given role card already created.");
+    Card::Graphics graphics;
+    if (graphics.image.load(gfx)) {
+        qWarning(qPrintable(QString("Cannot load pixmap: %1").arg(gfx)));
         return;
     }
-    loadPixmap();
-    sm_roleCards[role] = this;
-}
+    if (m_type == CARDTYPE_PLAYING) {
+        // Only playing cards have suits and ranks
+        
+        if (!suitString.isEmpty()) {
+            graphics.suit = stringToCardSuit(suitString);
+        }
 
-Card::Card(const QString& name, CharacterType character, const QString& imageFileName):
-        m_name(name),
-        m_type(Card::Character),
-        m_imageFileName(imageFileName)
-{
-    if (sm_characterCards.contains(character)) {
-        qCritical("Unable to create a character card. Given character card already created.");
-        return;
+        if (!rankString.isEmpty()) {
+            QStringList sl = rankString.split("-");
+            graphics.rankFrom = stringToCardRank(sl[0]);
+            if (sl.size() == 1) {
+                graphics.rankTo = graphics.rankFrom;
+            } else {
+                graphics.rankTo = stringToCardRank(sl[1]);
+            }
+        }
+        graphics.renderSigns = renderSigns;
     }
-    loadPixmap();
-    sm_characterCards[character] = this;
+    m_graphics.append(graphics);
 }
 
-QPixmap Card::image(const CardSuit& suit, const CardRank& rank) const
+QPixmap
+Card::pixmap(const CardData& cardData) const
 {
-
-        QPoint posRank(35, 590);
-
-        QFont font;
-        font.setPixelSize(60);
-        QPixmap  result = image();
-        QPainter painter(&result);
-
-        QString textRank = rankToString(rank);
-        QChar   textSuit = suitToChar(suit);
-        QColor  suitColor = suitToColor(suit);
-
-        QPainterPath path1;
-        QPainterPath path2;
-        //timesFont.setStyleStrategy(QFont::ForceOutline);
-        path1.addText(posRank, font, textRank);
-        QPoint posSuit = posRank + QPoint((int)(font.pixelSize() * 2 * textRank.size() / 3), 0);
-        path2.addText(posSuit, font, textSuit);
-
-        painter.setRenderHint(QPainter::Antialiasing);
-/*
-        painter.setPen(QPen(Qt::white, 2, Qt::SolidLine, Qt::RoundCap,
-                         Qt::RoundJoin));
-
-        painter.setBrush(Qt::black);
-        painter.drawPath(path1);
-        painter.drawPath(path2);
-*/
-        painter.setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap,
-                         Qt::RoundJoin));
-
-        painter.setBrush(Qt::black);
-    painter.drawPath(path1);
-
-        painter.setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap,
-                         Qt::RoundJoin));
-        painter.setBrush(suitColor);
-        painter.drawPath(path2);
+    if (m_graphics.size() == 0) {
+        qCritical(qPrintable(QString("Card '%1' has no graphics.").arg(m_name)));
         return result;
-}
-
-
-void Card::loadDefaultRuleset()
-{
-    new Card("Bang!",       CARD_BANG,       "gfx/cards/bang.png");
-    new Card("Mancato",     CARD_MISSED,     "gfx/cards/missed.png");
-    new Card("Birra",       CARD_BEER,       "gfx/cards/beer.png");
-    new Card("Saloon",      CARD_SALOON,     "gfx/cards/saloon.png");
-    new Card("Wells Fargo", CARD_WELLSFARGO,  "gfx/cards/wellsfargo.png");
-    new Card("Diligenza",   CARD_DILIGENZA,   "gfx/cards/diligenza.png");
-    new Card("Emporio",     CARD_GENERALSTORE,"gfx/cards/emporio.png");
-    new Card("Panico!",     CARD_PANIC,       "gfx/cards/panico.png");
-    new Card("Cat Balou",   CARD_CATBALOU,    "gfx/cards/catbalou.png");
-    new Card("Indiani!",    CARD_INDIANS,     "gfx/cards/indians.png");
-    new Card("Duello",      CARD_DUEL,        "gfx/cards/duel.png");
-    new Card("Gatling",     CARD_GATLING,     "gfx/cards/gatling.png");
-    new Card("Mustang",     CARD_MUSTANG,    "gfx/cards/mustang.png");
-    new Card("Appaloosa",   CARD_APPALOSSA,  "gfx/cards/appaloosa.png");
-    new Card("Barile",      CARD_BARREL,     "gfx/cards/barrel.png");
-    new Card("Dinamite",    CARD_DYNAMITE,   "gfx/cards/dynamite.png");
-    new Card("Prigione",    CARD_JAIL,       "gfx/cards/jail.png");
-    new Card("Volcanic",    CARD_VOLCANIC,   "gfx/cards/volcanic.png");
-    new Card("Schofield",   CARD_SCHOFIELD,  "gfx/cards/schofield.png");
-    new Card("Winchester",  CARD_WINCHESTER, "gfx/cards/winchester.png");
-    new Card("Remington",   CARD_REMINGTON,  "gfx/cards/remington.png");
-    new Card("Carabine",    CARD_CARABINE,   "gfx/cards/carabine.png");
-    new Card("",            CARD_UNKNOWN,    "gfx/cards/back-playing.png");
-
-    new Card("Bart Cassidy",    CHARACTER_BART_CASSIDY,     "gfx/characters/bart-cassidy.png");
-    new Card("Black Jack",      CHARACTER_BLACK_JACK,       "gfx/characters/black-jack.png");
-    new Card("Calamity Janet",  CHARACTER_CALAMITY_JANET,   "gfx/characters/calamity-janet.png");
-    new Card("El Gringo",       CHARACTER_EL_GRINGO,        "gfx/characters/el-gringo.png");
-    new Card("Jesse Jones",     CHARACTER_JESSE_JONES,      "gfx/characters/jesse-jones.png");
-    new Card("Jourdonnais",     CHARACTER_JOURDONNAIS,      "gfx/characters/jourdonnais.png");
-    new Card("Kit Carlson",     CHARACTER_KIT_CARLSON,      "gfx/characters/kit-carlson.png");
-    new Card("Lucky Duke",      CHARACTER_LUCKY_DUKE,       "gfx/characters/lucky-duke.png");
-    new Card("Paul Regret",     CHARACTER_PAUL_REGRET,      "gfx/characters/paul-regret.png");
-    new Card("Pedro Ramirez",   CHARACTER_PEDRO_RAMIREZ,    "gfx/characters/pedro-ramirez.png");
-    new Card("Rose Doolan",     CHARACTER_ROSE_DOOLAN,      "gfx/characters/rose-doolan.png");
-    new Card("Sid Ketchum",     CHARACTER_SID_KETCHUM,      "gfx/characters/sid-ketchum.png");
-    new Card("Slab the Killer", CHARACTER_SLAB_THE_KILLER,  "gfx/characters/slab-the-killer.png");
-    new Card("Suzy Lafayette",  CHARACTER_SUZY_LAFAYETTE,   "gfx/characters/suzy-lafayette.png");
-    new Card("Vulture Sam",     CHARACTER_VULTURE_SAM,      "gfx/characters/vulture-sam.png");
-    new Card("Willy the Kid",   CHARACTER_WILLY_THE_KID,    "gfx/characters/willy-the-kid.png");
-    new Card("",                CHARACTER_UNKNOWN,          "gfx/cards/back-character.png");
-
-
-    new Card("Sheriff",  ROLE_SHERIFF,    "gfx/cards/sheriff.png");
-    new Card("Renegade", ROLE_RENEGADE,   "gfx/cards/renegade.png");
-    new Card("Outlaw",   ROLE_OUTLAW,     "gfx/cards/outlaw.png");
-    new Card("Deputy",   ROLE_DEPUTY,     "gfx/cards/deputy.png");
-    new Card("",         ROLE_UNKNOWN,    "gfx/cards/back-role.png");
-}
-
-
-const Card* Card::findPlayingCard(PlayingCardType id)
-{
-    return (sm_playingCards.contains(id) ? sm_playingCards[id] : 0);
-}
-
-const Card* Card::findRoleCard(PlayerRole id)
-{
-    return (sm_roleCards.contains(id) ? sm_roleCards[id] : 0);
-}
-
-const Card* Card::findCharacterCard(CharacterType id)
-{
-    return (sm_characterCards.contains(id) ? sm_characterCards[id] : 0);
-}
-
-QString Card::rankToString(CardRank rank)
-{
-    if (rank <= 9) {
-        return QString::number(rank);
-    } else if (rank == 10) {
-        return "10";
-    } else if (rank == 11) {
-        return "J";
-    } else if (rank == 12) {
-        return "Q";
-    } else if (rank == 13) {
-        return "K";
-    } else if (rank == 14) {
-        return "A";
     }
-    return "";
-}
 
-QChar Card::suitToChar(CardSuit suit)
-{
-    switch (suit) {
-    case SUIT_CLUBS:    return 0x2663;
-    case SUIT_DIAMONDS: return 0x2666;
-    case SUIT_HEARTS:   return 0x2665;
-    case SUIT_SPADES:   return 0x2660;
+    QPixmap result;
+    bool renderSigns = 0;
+
+    if (m_graphics.size() == 1) {
+        result = m_graphics.first().image;
+        renderSigns = m_graphics.first().renderSigns;
+    } else {
+        CardSuit suit = cardData.suit;
+        CardRank rank = cardData.rank;
+
+        foreach (Graphics g, m_graphics) {
+            if ((g.suit == SUIT_INVALID || g.suit == suit) &&
+                g.rankFrom <= rank && g.rankTo >= rank) {
+                result = g.image;
+                renderSigns = g.renderSigns;
+                break;
+            }
+        }
+
+        if (result.isNull()) {
+            qWarning("No graphics for card %s found.", qPrintable(m_name));
+            return result;
+        }
     }
-    NOT_REACHED();
-    return QChar();
-}
 
-QColor Card::suitToColor(CardSuit suit)
-{
-    switch (suit) {
-    case SUIT_CLUBS:    return Qt::black;
-    case SUIT_DIAMONDS: return Qt::red;
-    case SUIT_HEARTS:   return Qt::red;
-    case SUIT_SPADES:   return Qt::black;
+    if (renderSigns) {
+        // @todo: render signs
     }
-    NOT_REACHED();
-    return QColor();
-}
-
-QString Card::suitToColorString(CardSuit suit)
-{
-
-    QString color;
-    switch (suit) {
-    case SUIT_CLUBS:
-        color = "black";
-        break;
-    case SUIT_DIAMONDS:
-        color = "red";
-        break;
-    case SUIT_HEARTS:
-        color = "red";
-        break;
-    case SUIT_SPADES:
-        color = "black";
-        break;
-    }
-    return QString("<font color=\"%1\">%2</font>").arg(color).arg(suitToChar(suit));
-}
-
-
-void Card::loadPixmap()
-{
-    if (!m_image.load(Config::dataPathString() + m_imageFileName)) {
-        qWarning(qPrintable(QString("Cannot load pixmap: %1").arg(Config::dataPathString() + m_imageFileName)));
-    }
+    return result;
 }

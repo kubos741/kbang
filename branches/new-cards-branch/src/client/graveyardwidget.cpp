@@ -16,16 +16,15 @@ GraveyardWidget::~GraveyardWidget()
 {
 }
 
-void GraveyardWidget::init(CardWidgetFactory* cardWidgetFactory)
+void GraveyardWidget::init()
 {
-    mp_cardWidgetFactory = cardWidgetFactory;
 }
 
 CardWidget* GraveyardWidget::pop()
 {
-    CardWidget* res = mp_firstCard;
+    CardWidget* result = mp_firstCard;
     mp_firstCard = mp_secondCard;
-    return res;
+    return result;
 }
 
 void GraveyardWidget::push(CardWidget* card)
@@ -35,8 +34,8 @@ void GraveyardWidget::push(CardWidget* card)
     mp_secondCard = 0;
     mp_firstCard = card;
     card->setParent(this);
-    card->setSize(m_cardWidgetSize);
-    card->validate();
+    card->setCardSizeRole(m_cardSizeRole);
+    card->updatePixmap();
     card->move(newCardPosition());
     card->raise();
     card->show();
