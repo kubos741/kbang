@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,50 +20,43 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
-#include "parser/parserstructs.h"
-#include "gameenums.h"
-#include <QWidget>
-#include <QPixmap>
+#include <QWidget>                  // inheritance
+#include <QPixmap>                  // composition
+#include "gametypes.h"              // typedefs and enums
+#include "gamestructs.h"            // QList<CardData>
 
 class QLabel;
 
 namespace client {
+
 class CardListWidget;
 class CardWidget;
 class CharacterWidget;
 class Game;
-class CardWidgetFactory;
-class CardWidgetSizeManager;
 class GameActionManager;
 
 /**
- * The PlayerWidget class provides the abstraction for a widget that contains
- * a representation of player properties and state, like his name, his cards, etc.
+ * The PlayerWidget class provides common base class for opponents' widgets
+ * and local player widget.
  *
- * @author MacJariel <MacJariel@gmail.com>
+ * @author MacJariel
  */
 class PlayerWidget: public QWidget {
 Q_OBJECT
-public:
+protected:
+    /**
+     * Constructs a PlayerWidget instance.
+     */
     PlayerWidget(QWidget* parent);
+
+    /**
+     * Destroys the PlayerWidget instance.
+     */
     virtual ~PlayerWidget();
 
-    /**
-     * Sets-up the widget. This method should be called as soon as the
-     * object is created.
-     */
-    void setup(CardWidgetSizeManager*);
+public:
 
-    /**
-     * Initializes the object for Game mode. This should be called after
-     * the Game mode is entered.
-     */
-    virtual void enterGameMode(Game*);
-    virtual void leaveGameMode();
-
-    void clear();
-
-    inline int          id()        const { return m_id;            }
+    inline PlayerId     id()        const { return m_id;            }
     inline QString      name()      const { return m_name;          }
     inline bool         isAI()      const { return m_isAI;          }
     inline bool         isAlive()   const { return m_isAlive;       }
@@ -72,13 +65,16 @@ public:
     inline bool         isVoid()    const { return (m_id == 0);     }
     inline PlayerRole   role()      const { return m_playerRole;    }
 
+    /**
+     * Sets the state of the instance to the default clear state.
+     */
+    virtual void clear();
+
     void setCurrent(bool);
     void setRequested(bool);
 
-    void setFromPublicData(const PublicPlayerData&);
+    void setFromPublicData(const PublicPlayerData&);   
     void dieAndRevealRole(PlayerRole);
-
-
 
     virtual CardListWidget* hand() = 0;
     virtual CardListWidget* table() = 0;
@@ -86,29 +82,26 @@ public:
     virtual QLabel* avatarLabel() = 0;
     virtual QLabel* playerNameLabel() = 0;
     virtual bool isLocalPlayer() = 0;
+    virtual void moveWinnerIcon() = 0;
+
 
 protected:
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent*);
 
     GameActionManager* gameActionManager() const;
-    CardWidgetFactory*      cardWidgetFactory() const;
-
 
     virtual void setRoleFromPublicData(PlayerRole);
     virtual void setHandSize(int handSize);
     virtual void setTable(QList<CardData>);
-
-    virtual void clearWidgets();
     virtual void updateWidgets();
 
+private:
     void updateAvatarLabel();
-
     void createWinnerIcon();
-    virtual void moveWinnerIcon() = 0;
     void updateWinnerIcon();
 
-    int                     m_id;
+    PlayerId                m_id;
     QString                 m_name;
     bool                    m_hasController;
     bool                    m_isAI;
@@ -121,9 +114,7 @@ protected:
     QPixmap                 m_avatar;
     PlayerRole              m_playerRole;
     QLabel*                 mp_winnerIcon;
-
     Game*                   mp_game;
-    CardWidgetSizeManager*  mp_cardWidgetSizeManager;
 };
 }
 #endif

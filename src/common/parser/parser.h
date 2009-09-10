@@ -25,7 +25,7 @@
 #include <QHash>
 #include <QTimer>
 
-#include "parserstructs.h"
+#include "gamestructs.h"
 #include "queryget.h"
 #include "queryresult.h"
 
@@ -80,7 +80,7 @@ signals:
     ////////////
 public:
     void initializeStream();
-    QueryGet* queryGet();
+    QueryGet* newQueryGet();
 
     void actionCreateGame(const CreateGameData&, const CreatePlayerData&);
     void actionJoinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);

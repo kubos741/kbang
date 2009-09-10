@@ -21,7 +21,7 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include "parserstructs.h"
+#include "gamestructs.h"
 #include <QString>
 
 class QXmlStreamWriter;

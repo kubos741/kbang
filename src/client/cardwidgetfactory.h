@@ -1,3 +1,4 @@
+#if 0
 #ifndef CARDWIDGETFACTORY_H
 #define CARDWIDGETFACTORY_H
 
@@ -16,7 +17,6 @@ class CardWidgetFactory: private NonCopyable
 {
 friend class Game;
 public:
-
     CardWidget* createPlayingCard(QWidget* parent);
     CardWidget* createCharacterCard(QWidget* parent, CharacterType = CHARACTER_UNKNOWN);
     CardWidget* createRoleCard(QWidget* parent, PlayerRole = ROLE_UNKNOWN);
@@ -31,3 +31,4 @@ private:
 
 }
 #endif // CARDWIDGETFACTORY_H
+#endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,26 +21,35 @@
 #define CREATEGAMEDIALOG_H
 
 #include <QDialog>
-#include <ui_creategamedialog.h>
 
-#include "parser/parserstructs.h"
+namespace Ui {
+class CreateGameDialog;
+}
 
 namespace client {
 
 /**
- * @author MacJariel <MacJariel@gmail.com>
+ * The CreateGameDialog class provides a dialog for creating new games.
+ * @author MacJariel
  */
-class CreateGameDialog : public QDialog, public Ui::CreateGameDialog
+class CreateGameDialog: public QDialog
 {
 Q_OBJECT
 public:
-    CreateGameDialog(QWidget *parent);
+    /**
+     * Constructs a new CreateGameDialog.
+     */
+    CreateGameDialog(QWidget* parent);
+
+    /**
+     * Destroys the dialog.
+     */
     ~CreateGameDialog();
 
 private slots:
     void playerCountsChanged();
     void validateInput();
-    void on_pushButtonCreate_clicked();
+    void onCreateGameClicked();
 
 signals:
     void createGame(const CreateGameData&, const CreatePlayerData&);
@@ -48,6 +57,8 @@ signals:
 private:
     void loadConfigValues();
     void saveConfigValues(const CreateGameData&);
+
+    Ui::CreateGameDialog* mp_ui;
 };
 
 }

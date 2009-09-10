@@ -37,13 +37,13 @@ LocalPlayerWidget::LocalPlayerWidget(QWidget *parent):
     setupUi(this);
     setContentsMargins(5, 5, 5, 5);
 
-    mp_roleCardWidget->setType(Card::Role);
+    mp_roleCardWidget->setPlayerRoleCard(ROLE_UNKNOWN);
 
-    mp_hand->setCardSize(CardWidget::SIZE_SMALL);
+    mp_hand->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
 
-    mp_table->setCardSize(CardWidget::SIZE_SMALL);
+    mp_table->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_table->setPocketType(POCKET_TABLE);
     mp_table->setOwnerId(id());
 
@@ -65,12 +65,6 @@ LocalPlayerWidget::~LocalPlayerWidget()
 {
 }
 
-void LocalPlayerWidget::enterGameMode(Game* game)
-{
-    PlayerWidget::enterGameMode(game);
-    cardWidgetFactory()->registerCard(mp_roleCardWidget);
-}
-
 void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlayerData)
 {
     Q_ASSERT(m_id == privatePlayerData.id);
@@ -79,9 +73,9 @@ void LocalPlayerWidget::setFromPrivateData(const PrivatePlayerData& privatePlaye
     
     mp_hand->clear();
     foreach (const CardData& cardData, privatePlayerData.hand) {
-        CardWidget* card = cardWidgetFactory()->createPlayingCard(this);
+        CardWidget* card = new CardWidget(this);
         card->setCardData(cardData);
-        card->validate();
+        card->updatePixmap();
         mp_hand->push(card);
     }
     
@@ -130,8 +124,7 @@ void LocalPlayerWidget::setFromContext(const GameContextData& gameContext)
 void LocalPlayerWidget::clearWidgets()
 {
     PlayerWidget::clearWidgets();
-    mp_roleCardWidget->setEmpty();
-    mp_roleCardWidget->validate();
+    mp_roleCardWidget->clear();
 
     mp_buttonEndTurn->setEnabled(0);
     mp_buttonPass->setEnabled(0);
@@ -185,9 +178,8 @@ void LocalPlayerWidget::onDiscardClicked()
 void LocalPlayerWidget::updateRoleCardWidget()
 {
     if (m_playerRole != ROLE_UNKNOWN) {
-        mp_roleCardWidget->setPlayerRole(m_playerRole);
+        mp_roleCardWidget->setPlayerRoleCard(m_playerRole);
     } else {
-        mp_roleCardWidget->setEmpty();
+        mp_roleCardWidget->clear();
     }
-    mp_roleCardWidget->validate();
 }

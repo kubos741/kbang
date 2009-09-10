@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,16 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QtDebug>
-#include <QPainter>
-
 #include "characterwidget.h"
-#include "cardwidgetfactory.h"
-
 
 using namespace client;
-
-
 
 QTimer CharacterWidget::sm_timer;
 int    CharacterWidget::sm_countAnimaton = 0;
@@ -42,87 +35,95 @@ CharacterWidget::CharacterWidget(QWidget *parent):
         m_lifePoints(0),
         mp_backCard(0),
         mp_characterCard(0),
-        m_isAnimating(0),
-        mp_cardWidgetFactory(0)
+        m_isAnimating(0)
 {
-        QSize widgetSize(CardWidget::qSize(CardWidget::SIZE_SMALL).width(),
-                         (int)(CardWidget::qSize(CardWidget::SIZE_SMALL).height() + CardWidget::lifeLevel(5)));
-        setMinimumSize(widgetSize);
-        setMaximumSize(widgetSize);
-        resize(widgetSize);
+    connect(&CardWidgetSizeManager::instance(), SIGNAL(cardSizeChanged()),
+            this, SLOT(updateWidgetSize()));
+    updateWidgetSize();
+
+    mp_backCard = new CardWidget(this);
+    mp_backCard->setCharacterCard();
+    mp_backCard->updatePixmap();
+    mp_backCard->move(0, 0);
+    mp_backCard->hide();
+
+    mp_characterCard = new CardWidget(this);
+    mp_characterCard->setCharacterCard();
+    mp_characterCard->move(0, 0);
+    mp_characterCard->hide();
 }
 
+/* virtual */
 CharacterWidget::~CharacterWidget()
 {
 }
 
-void CharacterWidget::init(CardWidgetFactory* cardWidgetFactory)
+void
+CharacterWidget::setOwnerId(PlayerId ownerId)
 {
-    mp_backCard = cardWidgetFactory->createCharacterCard(this);
-    mp_backCard->validate();
-    mp_backCard->move(0,0);
-    mp_backCard->hide();
-
-    mp_characterCard = cardWidgetFactory->createCharacterCard(this);
-    mp_characterCard->setCharacterType(m_character);
-    mp_characterCard->validate();
-    mp_characterCard->move(0,0);
-    mp_characterCard->hide();
-
-    m_lifePoints = 0;
-}
-
-void CharacterWidget::setOwnerId(int ownerId)
-{
+    mp_backCard->setOwnerId(ownerId);
     mp_characterCard->setOwnerId(ownerId);
 }
 
-void CharacterWidget::setCharacter(CharacterType character)
+void
+CharacterWidget::setCharacter(const QString& character)
 {
     m_character = character;
     if (mp_characterCard) {
-        mp_characterCard->setCharacterType(m_character);
-        mp_characterCard->validate();
+        mp_characterCard->setCharacterCard(character);
+        mp_characterCard->updatePixmap();
         mp_characterCard->setVisible(!isEmpty());
     }
-    if (mp_backCard)
+    if (mp_backCard) {
         mp_backCard->setVisible(!isEmpty());
+    }
 }
 
-void CharacterWidget::setLifePoints(int lifePoints)
+void
+CharacterWidget::setLifePoints(int lifePoints)
 {
     if (lifePoints < 0 || lifePoints > 5) return;
 
     int oldLifePoints = m_lifePoints;
     m_lifePoints = lifePoints;
-    if (oldLifePoints != m_lifePoints)
-        lifePointsChanged();
-    else
+    if (oldLifePoints != m_lifePoints) {
+        startAnimation();
+    } else {
         emit animationFinished();
+    }
 }
 
-bool CharacterWidget::isEmpty() const
-{
-    return m_character == CHARACTER_UNKNOWN;
-}
-
-void CharacterWidget::lifePointsChanged()
+void
+CharacterWidget::startAnimation()
 {
     m_sourceY = mp_characterCard->y();
-    m_targetY = mp_backCard->y() + CardWidget::lifeLevel(m_lifePoints);
+    m_targetY = mp_backCard->y() +
+                CardWidgetSizeManager::instance().lifeLevel(m_lifePoints);
     m_time.start();
     if (m_isAnimating) return;
     m_isAnimating = 1;
 
     connect(&sm_timer, SIGNAL( timeout()),
-            this,      SLOT(onTimeout()));
+            this,      SLOT(onAnimationTimeout()));
     if (sm_countAnimaton == 0) {
         sm_timer.start(timerInterval);
     }
     sm_countAnimaton++;
 }
 
-void CharacterWidget::onTimeout()
+void
+CharacterWidget::updateWidgetSize()
+{
+    QSize cardSize(CardWidgetSizeManager::instance().size(CARD_SIZE_NORMAL));
+    int maxLifeLevel = CardWidgetSizeManager::instance().lifeLevel(5);
+    QSize widgetSize(cardSize.width(), (int)(cardSize.height() + maxLifeLevel));
+    setMinimumSize(widgetSize);
+    setMaximumSize(widgetSize);
+    resize(widgetSize);
+}
+
+void
+CharacterWidget::onAnimationAnimationTimeout()
 {
     qreal progress;
     if (!isEmpty()) {

@@ -56,15 +56,10 @@ inline void shuffleList(QLinkedList<T>& list)
     }
 }
 
-class NonCopyable
-{
-protected:
-    NonCopyable() {}
-    ~NonCopyable() {}
-private:
-    NonCopyable(const NonCopyable&);
-    NonCopyable& operator=(const NonCopyable&);
-};
+QString boolToString(bool);
+bool stringToBool(QString);
 
+#define intToString(N) (QString::number(N))
+#define stringToInt(S) (S.toInt())
 
 #endif

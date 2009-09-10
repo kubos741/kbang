@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
- *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *   Copyright (C) 2009 by MacJariel                                       *
+ *   MacJariel (at) gmail.com                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,23 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef CLIENTTYPES_H
+#define CLIENTTYPES_H
 
-#include <QString>
-#include "common.h"
+/**
+ * @file gametypes.h
+ * The definition of enums and typedefs used only in client.
+ */
 
-using namespace client;
-
-QString randomToken(int minLength, int maxLength)
+namespace client
 {
-    Q_ASSERT(minLength <= maxLength);
-    const static char* chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    const static int charl = strlen(chars);
-    int length = minLength + ((int)qrand() % (maxLength - minLength + 1));
-    char token[length+1];
-    for (int i = 0; i < length; ++i)
-    {
-        token[i] = chars[qrand() % charl];
-    }
-    token[length - 1] = '\0';
-    return QString(token);
+
+enum CardSizeRole {
+    CARD_SIZE_NORMAL,
+    CARD_SIZE_ZOOMED
+};
+
 }
+
+
+#endif // CLIENTTYPES_H

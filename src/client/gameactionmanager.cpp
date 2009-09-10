@@ -51,7 +51,7 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
 
         addToSelection(cardWidget);
         if (m_cardSelection.size() == m_selectionSize) {
-            if (mp_activeCard->type() == Card::Character) {
+            if (mp_activeCard->cardData().type == "character") {
                 useAbilityWithCards();
             } else {
                 playWithCards();
@@ -61,7 +61,7 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
         return 1;
 
     case STATE_MAIN:
-        if (cardWidget->type() == Card::Character &&
+        if (cardWidget->cardData().type == "character" &&
             cardWidget->ownerId() == mp_game->playerId()) {
             onCharacterClicked(cardWidget);
             return 1;
@@ -101,7 +101,7 @@ void GameActionManager::onPlayerClicked(PlayerWidget* playerWidget)
         playerWidget->id() == 0     || mp_activeCard == 0)
         return;
 
-    if (mp_activeCard->type() == Card::Character) {
+    if (mp_activeCard->cardData().type == "character") {
         mp_game->serverConnection()->useAbility(playerWidget->id());
     } else {
         mp_game->serverConnection()->playCardWithPlayer(mp_activeCard->cardData().id, playerWidget->id());
@@ -129,6 +129,7 @@ void GameActionManager::setDiscardMode(bool inDiscardMode)
 
 void GameActionManager::onMainCardClicked(CardWidget* cardWidget)
 {
+#if 0
     switch (cardWidget->cardData().type) {
         case CARD_BANG:
         case CARD_DUEL:
@@ -148,10 +149,12 @@ void GameActionManager::onMainCardClicked(CardWidget* cardWidget)
             mp_game->serverConnection()->playCard(cardWidget->cardData().id);
             break;
     }
+#endif
 }
 
 void GameActionManager::onCharacterClicked(CardWidget* cardWidget)
 {
+#if 0
     switch(mp_game->character()) {
     case CHARACTER_JESSE_JONES:
         selectPlayer(cardWidget);
@@ -163,19 +166,23 @@ void GameActionManager::onCharacterClicked(CardWidget* cardWidget)
         mp_game->serverConnection()->useAbility();
         break;
     }
+#endif
 }
 
 void GameActionManager::selectPlayer(CardWidget* activeCard)
 {
+#if 0
     Q_ASSERT(mp_activeCard == 0);
     Q_ASSERT(m_state == STATE_MAIN);
     mp_activeCard = activeCard;
     m_state = STATE_SELECT_PLAYER;
     mp_activeCard->setHighlight(1);
+#endif
 }
 
 void GameActionManager::selectCards(CardWidget* activeCard, int cardCount)
 {
+#if 0
     Q_ASSERT(mp_activeCard == 0);
     Q_ASSERT(m_state == STATE_MAIN);
     mp_activeCard = activeCard;
@@ -183,6 +190,7 @@ void GameActionManager::selectCards(CardWidget* activeCard, int cardCount)
     m_cardSelection.clear();
     m_selectionSize = cardCount;
     mp_activeCard->setHighlight(1);
+#endif
 }
 
 void GameActionManager::unsetActiveCard()
@@ -223,6 +231,7 @@ void GameActionManager::useAbilityWithCards()
 
 void GameActionManager::playWithCards()
 {
+#if 0
     if (m_cardSelection.size() == 1) {
         CardWidget* card = m_cardSelection[0];
         if (card->pocketType() == POCKET_HAND) {
@@ -233,6 +242,7 @@ void GameActionManager::playWithCards()
     } else {
         NOT_REACHED();
     }
+#endif
 }
 
 

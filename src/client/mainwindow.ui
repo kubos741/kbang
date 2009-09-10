@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
-    <height>378</height>
+    <width>666</width>
+    <height>664</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
 
 }</string>
   </property>
-  <widget class="QWidget" name="mp_centralWidget">
+  <widget class="QWidget" name="centralWidget">
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
@@ -85,7 +85,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent2" native="true">
+         <widget class="client::OpponentWidget" name="opponent2" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -131,7 +131,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent3" native="true">
+         <widget class="client::OpponentWidget" name="opponent3" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -187,7 +187,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent4" native="true">
+         <widget class="client::OpponentWidget" name="opponent4" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -265,7 +265,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent5" native="true">
+         <widget class="client::OpponentWidget" name="opponent5" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -321,7 +321,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent1" native="true">
+         <widget class="client::OpponentWidget" name="opponent1" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -369,7 +369,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="mp_middleWidget" native="true">
+       <widget class="QWidget" name="middleWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -439,7 +439,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::OpponentWidget" name="mp_opponent6" native="true">
+         <widget class="client::OpponentWidget" name="opponent6" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -498,7 +498,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::ChatWidget" name="mp_chatWidget" native="true">
+         <widget class="client::ChatWidget" name="chatWidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -536,7 +536,17 @@
            </spacer>
           </item>
           <item>
-           <widget class="client::LocalPlayerWidget" name="mp_localPlayerWidget" native="true">
+           <widget class="client::OpponentWidget" name="opponent0" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="client::LocalPlayerWidget" name="localPlayerWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -630,7 +640,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="client::LogWidget" name="mp_logWidget" native="true">
+         <widget class="client::LogWidget" name="logWidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -650,8 +660,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>388</width>
-     <height>24</height>
+     <width>666</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -661,24 +671,24 @@
     <property name="title">
      <string>&amp;Game</string>
     </property>
-    <addaction name="mp_actionConnectToServer"/>
-    <addaction name="mp_actionDisconnectFromServer"/>
+    <addaction name="actionConnectToServer"/>
+    <addaction name="actionDisconnectFromServer"/>
     <addaction name="separator"/>
     <addaction name="actionCreateGame"/>
-    <addaction name="mp_actionJoinGame"/>
-    <addaction name="mp_actionLeaveGame"/>
-    <addaction name="mp_actionExit"/>
+    <addaction name="actionJoinGame"/>
+    <addaction name="actionLeaveGame"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="mp_actionAbout"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuGame"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="mp_actionConnectToServer">
+  <action name="actionConnectToServer">
    <property name="icon">
     <iconset resource="resources/client.qrc">
      <normaloff>:/icons/connect.png</normaloff>:/icons/connect.png</iconset>
@@ -687,12 +697,12 @@
     <string>&amp;Connect to Server</string>
    </property>
   </action>
-  <action name="mp_actionExit">
+  <action name="actionExit">
    <property name="text">
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="mp_actionDisconnectFromServer">
+  <action name="actionDisconnectFromServer">
    <property name="icon">
     <iconset resource="resources/client.qrc">
      <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
@@ -701,12 +711,12 @@
     <string>&amp;Disconnect from Server</string>
    </property>
   </action>
-  <action name="mp_actionJoinGame">
+  <action name="actionJoinGame">
    <property name="text">
     <string>&amp;Join Game</string>
    </property>
   </action>
-  <action name="mp_actionLeaveGame">
+  <action name="actionLeaveGame">
    <property name="text">
     <string>&amp;Leave Game</string>
    </property>
@@ -716,7 +726,7 @@
     <string>C&amp;reate Game</string>
    </property>
   </action>
-  <action name="mp_actionAbout">
+  <action name="actionAbout">
    <property name="text">
     <string>&amp;About KBang</string>
    </property>
@@ -753,7 +763,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>mp_actionExit</sender>
+   <sender>actionExit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>

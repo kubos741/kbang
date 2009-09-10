@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,88 +20,91 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include "gameenums.h"
-#include "util.h"
-
-#include <QMap>
-#include <QString>
-#include <QPixmap>
-
+#include <QObject>          // Inheritance
+#include "gametypes.h"
 
 namespace client
 {
+class CardBank;             // Friend class
 
 /**
- * This class is a type of a card in Bang! game. The whole set of Card instances
- * is created during the start of the client. This class manages lifetime of its
- * objects by itself. It's only sufficient to create an instance with \b{new}
- * operator and you should never free any instances with \b{delete} operator by
- * yourself.
+ * The Card class provides a mechanism to obtain/generate graphics for cards in
+ * KBang client. CardBank class is responsible for creating and holding Card
+ * instances, that are then used by CardWidget to get the right graphics.
  *
- * Cards can be then looked up by their id string. The identification of common cards
- * is specified in KBang specification, so you can use card identification that you
- * got from server (more specifically the parser class) to get the card object.
- *
- * The Card class is almost exclusively used in the CardWidget class.
- * @see client::CardWidget
- *
- * \note In future it may be possible to use different card sets. This will be
- *       implemented by adding a kind of card-set-manager class that will manage
- *       creating the Card objects.
- *
- *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel
  */
-class Card: private NonCopyable
+class Card: public QObject
 {
-public:
-    typedef enum {
-        Character, /**< Character card (Susy Lafayete, etc.) */
-        Role,      /**< Role card (Sheriff, etc.) */
-        Playing    /**< Playing card (Bang!, etc.) */
-    } Type;
+    friend class CardBank;
 
-private:
     /**
      * Constructs a new Card according to given parameters.
-     * @param id The unique card identificator.
-     * @param name The localized card name (should be used with QObject::tr).
-     * @param image The filename of the image, as used in QPixmap constructor.
+     *
+     * @param cardBank The CardBank that creates this card. CardBank
+     *                 automatically becomes the parent of this instance.
+     * @param name The card name.
+     * @param type The card type.
+     * @param cardSetName The name of CardSet this card comes from.
      */
-     Card(const QString& name, PlayingCardType, const QString& imageFileName);
-     Card(const QString& name, PlayerRole, const QString& imageFileName);
-     Card(const QString& name, CharacterType, const QString& imageFileName);
+    Card(CardBank* cardBank, const QString& name, CardType type,
+         const QString& cardSetName);
+
+    /**
+     * Adds graphics to the card. In most cases each Card instance has just
+     * one graphics associated with it, but in some more advanced scenarios
+     * one Card can have more graphics. For example, there are more graphics
+     * for Bang! card. You can distinguish one from another by specifying
+     * suits and ranks. The resulting set of (suit,rank) pairs is determined
+     * by cartesian product of suitString and rankString sets.
+     *
+     * Note that sets of (suit,rank) pairs for all graphics should be
+     * disjoint.
+     *
+     * @param gfx Text string that is pointing to the graphics file.
+     * @param suitString Text string that describes which suits are related
+     *                   to this graphics. It can contain a comma separated
+     *                   list of suits. An empty string means all suits.
+     * @param rankString Text string that describes which ranks are related
+     *                   to this graphics. It can contain a comma separated
+     *                   list of ranks or rank ranges. For example: 2-5,J-A.
+     *                   An empty string means all ranks.
+     * @param renderSings Whether sings (suits and ranks) should be added
+     *                    to graphics or not.
+     */
+    void addGraphics(const QString& gfx, const QString& suitString = QString(),
+                     const QString& rankString = QString(), bool renderSigns = 0);
 
 public:
-    inline QString name()  const { return m_name;  } ///< Returns card name.
-    inline Type    type()  const { return m_type;  } ///< Returns card type. @see Card::Type
-    inline QPixmap image() const { return m_image; } ///< Returns image pixmap.
-    QPixmap image(const CardSuit&, const CardRank&) const;
+    inline QString  name()  const { return m_name;  } ///< Returns card name.
+    inline CardType type()  const { return m_type;  } ///< Returns card type.
+    inline QString  cardSetName() const { return m_cardSetName; } ///< Returns name of the source CardSet.
 
-public: /* static */
-    static void loadDefaultRuleset();  ///< Loads default ruleset. To be replaced with ruleset manager.
-
-    static const Card* findPlayingCard(PlayingCardType);
-    static const Card* findRoleCard(PlayerRole);
-    static const Card* findCharacterCard(CharacterType);
-
-    static QString rankToString(CardRank);
-    static QChar   suitToChar(CardSuit);
-    static QColor  suitToColor(CardSuit);
-    static QString suitToColorString(CardSuit);
+    /**
+     * Returns the graphics for given card. The suit and rank information
+     * from CardData is used to decide which graphics is used and to
+     * render signs (if renderSigns is set for given graphics).
+     * If the Card has only one graphics, it is returned without (suit,rank)
+     * matching. Else, the target graphics is chosen according to (suit,rank)
+     * information, or unspecified graphics is returned if no matching
+     * graphics is found.
+     */
+    QPixmap pixmap(const CardData&) const;
 
 private:
-    void loadPixmap();
+    struct Graphics {
+        Graphics(): rankFrom(2), rankTo(14), suit(SUIT_INVALID) {}
+        CardRank rankFrom, rankTo;  ///< rank range
+        CardSuit suit;              ///< suit
+        bool     renderSigns;
+        QPixmap  image;
+    };
 
-    QString m_id;
-    QString m_name;
-    Type    m_type;
-    QPixmap m_image;
-    QString m_imageFileName;
-
-    static QMap<PlayingCardType, Card*> sm_playingCards;
-    static QMap<PlayerRole,      Card*> sm_roleCards;
-    static QMap<CharacterType,   Card*> sm_characterCards;
+    CardBank*       m_cardBank;
+    QString         m_name;
+    CardType        m_type;
+    QString         m_cardSetName;
+    QList<Graphics> m_graphics;
 };
 }
 #endif

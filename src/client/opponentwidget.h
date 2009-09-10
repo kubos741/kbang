@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,29 +24,27 @@
 #include "ui_opponentwidget.h"
 #include "playerwidget.h"
 
-#include "parser/parserstructs.h"
-
 namespace client {
+
 class CardWidget;
 class CardListWidget;
 class CharacterWidget;
 class Game;
 
 /**
- * @author MacJariel <MacJariel@gmail.com>
+ * @author MacJariel
  */
 class OpponentWidget: public PlayerWidget, public Ui::OpponentWidget {
-
 public:
     OpponentWidget(QWidget *parent);
     virtual ~OpponentWidget();
 
-    virtual CardListWidget*               hand()            { return mp_hand;             }
-    virtual CardListWidget*               table()           { return mp_table;            }
-    virtual CharacterWidget*  characterWidget() { return mp_characterWidget;  }
-    virtual QLabel*                 playerNameLabel() { return mp_labelPlayerName;  }
-    virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
-    virtual bool                    isLocalPlayer()   { return 0;                   }
+    virtual CardListWidget*     hand()              { return mp_hand;             }
+    virtual CardListWidget*     table()             { return mp_table;            }
+    virtual CharacterWidget*    characterWidget()   { return mp_characterWidget;  }
+    virtual QLabel*             playerNameLabel()   { return mp_labelPlayerName;  }
+    virtual QLabel*             avatarLabel()       { return mp_labelAvatar;      }
+    virtual bool                isLocalPlayer()     { return 0;                   }
 
 protected:
     virtual void clearWidgets();
@@ -64,7 +62,6 @@ private:
     QLabel*     mp_sheriffBadge;
     QLabel*     mp_disconnectIcon;
     CardWidget* mp_roleCard;
-
 };
 }
 #endif

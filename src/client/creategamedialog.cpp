@@ -23,76 +23,84 @@
 #include "creategamedialog.h"
 #include "config.h"
 
+#include "ui_creategamedialog.h"
+
+
 using namespace client;
 
 const int minPlayers = 4, maxPlayers = 7;
 
-CreateGameDialog::CreateGameDialog(QWidget *parent)
- : QDialog(parent), Ui::CreateGameDialog()
+CreateGameDialog::CreateGameDialog(QWidget* parent):
+        QDialog(parent),
+        mp_ui(new Ui::CreateGameDialog())
 {
-    setupUi(this);
+    mp_ui->setupUi(this);
 
-    pushButtonCreate->setEnabled(0);
+    mp_ui->pushButtonCreate->setEnabled(0);
 
-    spinBoxMinPlayers->setRange(minPlayers, maxPlayers);
-    spinBoxMaxPlayers->setRange(minPlayers, maxPlayers);
-    spinBoxAIPlayers->setRange(0, maxPlayers - 1);
+    mp_ui->spinBoxMinPlayers->setRange(minPlayers, maxPlayers);
+    mp_ui->spinBoxMaxPlayers->setRange(minPlayers, maxPlayers);
+    mp_ui->spinBoxAIPlayers->setRange(0, maxPlayers - 1);
 
     if (Config::instance().hasGroup("create-game-dialog")) {
         loadConfigValues();
     } else {
-        spinBoxMinPlayers->setValue(minPlayers);
-        spinBoxMaxPlayers->setValue(maxPlayers);
-        spinBoxAIPlayers->setValue(0);
-        spinBoxMaxSpectators->setValue(-1);
+        mp_ui->spinBoxMinPlayers->setValue(minPlayers);
+        mp_ui->spinBoxMaxPlayers->setValue(maxPlayers);
+        mp_ui->spinBoxAIPlayers->setValue(0);
+        mp_ui->spinBoxMaxSpectators->setValue(-1);
     }
 
-    connect(spinBoxMinPlayers, SIGNAL(valueChanged(int)),
+    connect(mp_ui->spinBoxMinPlayers, SIGNAL(valueChanged(int)),
             this, SLOT(playerCountsChanged()));
-    connect(spinBoxMaxPlayers, SIGNAL(valueChanged(int)),
+    connect(mp_ui->spinBoxMaxPlayers, SIGNAL(valueChanged(int)),
             this, SLOT(playerCountsChanged()));
 
-    connect(lineEditGameName,   SIGNAL(textChanged(const QString&)),
+    connect(mp_ui->lineEditGameName,   SIGNAL(textChanged(const QString&)),
             this, SLOT(validateInput()));
-    connect(lineEditPlayerName, SIGNAL(textChanged(const QString&)),
+    connect(mp_ui->lineEditPlayerName, SIGNAL(textChanged(const QString&)),
             this, SLOT(validateInput()));
+
+    connect(mp_ui->pushButtonCreate, SIGNAL(clicked()),
+            this, SLOT(onCreateGameClicked()));
 }
 
 
 CreateGameDialog::~CreateGameDialog()
 {
+    delete mp_ui;
 }
 
 void CreateGameDialog::playerCountsChanged()
 {
-    spinBoxMinPlayers->setMaximum(spinBoxMaxPlayers->value());
-    spinBoxMaxPlayers->setMinimum(spinBoxMinPlayers->value());
-    spinBoxAIPlayers->setMaximum(spinBoxMaxPlayers->value() - 1);
+    mp_ui->spinBoxMinPlayers->setMaximum(mp_ui->spinBoxMaxPlayers->value());
+    mp_ui->spinBoxMaxPlayers->setMinimum(mp_ui->spinBoxMinPlayers->value());
+    mp_ui->spinBoxAIPlayers->setMaximum(mp_ui->spinBoxMaxPlayers->value() - 1);
 }
 
 void CreateGameDialog::validateInput()
 {
-    pushButtonCreate->setEnabled(!lineEditGameName->text().isEmpty() &&
-                                 !lineEditPlayerName->text().isEmpty());
+    mp_ui->pushButtonCreate->setEnabled(!mp_ui->lineEditGameName->text().isEmpty() &&
+                                        !mp_ui->lineEditPlayerName->text().isEmpty());
 }
 
-void CreateGameDialog::on_pushButtonCreate_clicked()
+void CreateGameDialog::onCreateGameClicked()
 {
     CreateGameData createGameData;
-    createGameData.name                 = lineEditGameName->text();
-    createGameData.description          = lineEditGameDescription->text();
-    createGameData.minPlayers           = spinBoxMinPlayers->value();
-    createGameData.maxPlayers           = spinBoxMaxPlayers->value();
-    createGameData.maxSpectators        = spinBoxMaxSpectators->value();
-    createGameData.AIPlayers            = spinBoxAIPlayers->value();
-    createGameData.playerPassword       = lineEditGamePasswordPlayers->text();
-    createGameData.spectatorPassword    = lineEditGamePasswordSpectators->text();
-    createGameData.flagShufflePlayers   = radioButtonOrderRandom->isChecked();
+    createGameData.name                 = mp_ui->lineEditGameName->text();
+    createGameData.description          = mp_ui->lineEditGameDescription->text();
+    createGameData.minPlayers           = mp_ui->spinBoxMinPlayers->value();
+    createGameData.maxPlayers           = mp_ui->spinBoxMaxPlayers->value();
+    createGameData.maxSpectators        = mp_ui->spinBoxMaxSpectators->value();
+    createGameData.AIPlayers            = mp_ui->spinBoxAIPlayers->value();
+    createGameData.playerPassword       = mp_ui->lineEditGamePasswordPlayers->text();
+    createGameData.spectatorPassword    = mp_ui->lineEditGamePasswordSpectators->text();
+    createGameData.flagShufflePlayers   = mp_ui->radioButtonOrderRandom->isChecked();
 
     CreatePlayerData createPlayerData;
-    createPlayerData.name               = lineEditPlayerName->text();
-    createPlayerData.password           = lineEditPlayerPassword->text();
-    createPlayerData.avatar             = selectPlayerIconWidget->image();
+    createPlayerData.name               = mp_ui->lineEditPlayerName->text();
+    createPlayerData.password           = mp_ui->lineEditPlayerPassword->text();
+    createPlayerData.avatar             = mp_ui->selectPlayerIconWidget->image();
 
     saveConfigValues(createGameData);
 
@@ -106,20 +114,21 @@ void CreateGameDialog::loadConfigValues()
     Config& cfg = Config::instance();
     cfg.refresh();
     QString grp("create-game-dialog");
-    lineEditGameName->setText(cfg.readString(grp, "name"));
-    lineEditGameDescription->setText(cfg.readString(grp, "description"));
-    spinBoxMinPlayers->setValue(cfg.readInt(grp, "min-players"));
-    spinBoxMaxPlayers->setValue(cfg.readInt(grp, "max-players"));
-    spinBoxMaxSpectators->setValue(cfg.readInt(grp, "max-spectators"));
-    spinBoxAIPlayers->setValue(cfg.readInt(grp, "ai-players"));
+    mp_ui->lineEditGameName->setText(cfg.readString(grp, "name"));
+    mp_ui->lineEditGameDescription->setText(cfg.readString(grp, "description"));
+    mp_ui->spinBoxMinPlayers->setValue(cfg.readInt(grp, "min-players"));
+    mp_ui->spinBoxMaxPlayers->setValue(cfg.readInt(grp, "max-players"));
+    mp_ui->spinBoxMaxSpectators->setValue(cfg.readInt(grp, "max-spectators"));
+    mp_ui->spinBoxAIPlayers->setValue(cfg.readInt(grp, "ai-players"));
     int shufflePlayers = cfg.readInt(grp, "flag-shuffle-players");
-    if (shufflePlayers)
-        radioButtonOrderRandom->setChecked(1);
-    else
-        radioButtonOrderChronological->setChecked(1);
-    lineEditPlayerName->setText(cfg.readString("player", "name"));
-    lineEditPlayerPassword->setText(cfg.readString("player", "password"));
-    selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
+    if (shufflePlayers) {
+        mp_ui->radioButtonOrderRandom->setChecked(1);
+    } else {
+        mp_ui->radioButtonOrderChronological->setChecked(1);
+    }
+    mp_ui->lineEditPlayerName->setText(cfg.readString("player", "name"));
+    mp_ui->lineEditPlayerPassword->setText(cfg.readString("player", "password"));
+    mp_ui->selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
     validateInput();
 }
 

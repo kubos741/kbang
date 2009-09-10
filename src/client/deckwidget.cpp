@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,49 +18,45 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "deckwidget.h"
-#include "cardwidgetfactory.h"
 
 using namespace client;
 
 DeckWidget::DeckWidget(QWidget *parent):
-        CardPileWidget(parent),
-        mp_cardWidgetFactory(0)
+        CardPileWidget(parent)
 {
     setPocketType(POCKET_DECK);
+    m_cards.push(newCard());
 }
 
+/* virtual */
 DeckWidget::~DeckWidget()
 {
 }
 
-void DeckWidget::init(CardWidgetFactory* cardWidgetFactory)
-{
-    mp_cardWidgetFactory = cardWidgetFactory;
-    m_cards.push(newCard());
-}
-
-CardWidget* DeckWidget::pop()
-{
-    return newCard();
-}
-
-void DeckWidget::push(CardWidget* card)
+/* virtual */ void
+DeckWidget::push(CardWidget* card)
 {
     card->hide();
     card->deleteLater();
 }
 
-CardWidget* DeckWidget::newCard()
+/* virtual */ CardWidget*
+DeckWidget::pop()
 {
-    Q_ASSERT(mp_cardWidgetFactory != 0);
-    CardWidget* w = mp_cardWidgetFactory->createPlayingCard(this);
-    w->setSize(m_cardWidgetSize);
-    w->validate();
-    w->raise();
-    w->move(newCardPosition());
-    w->show();
-    w->setOwnerId(0);
-    w->setPocketType(POCKET_DECK);
-    return w;
+    return newCard();
 }
 
+CardWidget*
+DeckWidget::newCard()
+{
+    CardWidget* card = new CardWidget(this);
+    card->cardData().type = "playing";
+    card->setCardSizeRole(m_cardSizeRole);
+    card->updatePixmap();
+    card->raise();
+    card->move(newCardPosition());
+    card->show();
+    card->setOwnerId(0);
+    card->setPocketType(POCKET_DECK);
+    return card;
+}

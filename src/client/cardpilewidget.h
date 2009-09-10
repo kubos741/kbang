@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,41 +20,77 @@
 #ifndef CARDPILEWIDGET_H
 #define CARDPILEWIDGET_H
 
-#include <QWidget>
 #include <QStack>
 #include <QSize>
 
 #include "cardpocket.h"
-#include "cardwidget.h"
-
-
-
-
 
 namespace client
 {
 
+class CardWidget;
+
 /**
- * The CardPileWidget presents a kind of CardPocket (the place for holding a bunch
- * of playing cards), that keeps its cards on a pile. An example of CardPileWidget can
- * be the deck or the graveyard.
- * @author MacJariel <MacJariel@gmail.com>
+ * The CardPileWidget class is a widget that stores CardWidget instances and
+ * displays them on a pile. The CardPileWidget class is used to display
+ * discard pile (graveyard).
+ *
+ * @note Client only needs to remember the top card of the pile, so there's
+ *       no need to simulate the real pile of cards and store all of them.
+ *       Currently only subclasses of this class are used, so we are not
+ *       wasting, but the most of the code here is never used and maybe it
+ *       should be removed.
+ * @author MacJariel
  */
 class CardPileWidget : public CardPocket
 {
 Q_OBJECT
 public:
-    CardPileWidget(QWidget *parent = 0);
-    ~CardPileWidget();
+    /**
+     * Constructs a CardPileWidget which is child of parent.
+     */
+    CardPileWidget(QWidget *parent);
 
-    virtual CardWidget* peek();
-    virtual CardWidget* pop();
-    virtual void push(CardWidget* card);
+    /**
+     * Destroys the CardPileWidget.
+     */
+    virtual ~CardPileWidget();
+
+    /**
+     * Returns the position (relative to this widget) of the next card to be
+     * added to pocket. This is used by CardMovementEvent.
+     */
     virtual QPoint newCardPosition() const;
+
+    /**
+     * Pushes a CardWidget on top of the pile.
+     */
+    virtual void push(CardWidget* card);
+
+    /**
+     * Returns the top-most CardWidget without removing it from the pile.
+     */
+    virtual CardWidget* peek();
+
+    /**
+     * Removes the top-most CardWidget from the pile and returns it.
+     */
+    virtual CardWidget* pop();
+
+    /**
+     * Removes all CardWidgets from the pile and destroy them.
+     */
+    virtual void clear();
+
+public slots:
+    /**
+     * Recomputes size of the widget and reorders CardWidgets. The actual CardWidget size
+     * from CardWidgetSizeManager is used.
+     */
+    virtual void updateWidgetSize();
 
 protected:
     QStack<CardWidget*> m_cards;
-    CardWidget::Size m_cardWidgetSize;
 
 private:
     QSize            m_padding;   

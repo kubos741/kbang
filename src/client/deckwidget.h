@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,35 +20,41 @@
 #ifndef DECKWIDGET_H
 #define DECKWIDGET_H
 
-#include <QtDebug>
-#include <QWidget>
-#include <QMoveEvent>
-
 #include <cardpilewidget.h>
 
 namespace client {
-class CardWidgetFactory;
 
 /**
- * @author MacJariel <MacJariel@gmail.com>
+ * The DeckWidget class is a widget that displays the main deck of
+ * playing cards.
+ * @author MacJariel
  */
 class DeckWidget : public CardPileWidget
 {
 Q_OBJECT
 public:
-    DeckWidget(QWidget *parent = 0);
-    ~DeckWidget();
+    /**
+     * Constructs a DeckWidget which is child of parent.
+     */
+    DeckWidget(QWidget* parent);
 
-    void init(CardWidgetFactory*);
+    /**
+     * Destroys the DeckWidget.
+     */
+    virtual ~DeckWidget();
 
-    virtual CardWidget* pop();
+    /**
+     * Pushes a CardWidget on top of the deck.
+     */
     virtual void push(CardWidget* card);
 
-
+    /**
+     * Removes the top-most CardWidget from the deck and returns it.
+     */
+    virtual CardWidget* pop();
 
 private:
     CardWidget* newCard();
-    CardWidgetFactory* mp_cardWidgetFactory;
 };
 }
 #endif

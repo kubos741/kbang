@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,11 +20,17 @@
 #ifndef LOCALPLAYERWIDGET_H
 #define LOCALPLAYERWIDGET_H
 
-#include "parser/parserstructs.h"
-#include "playerwidget.h"
-#include <ui_localplayerwidget.h>
+#include "gametypes.h"              // PlayerRole enum
+#include "playerwidget.h"           // inheritance
+#include "ui_localplayerwidget.h"   // user interface
+
+class GameContextData;
+class PrivatePlayerData;
 
 namespace client {
+
+class CardListWidget;
+class CharacterWidget;
 
 /**
  * The LocalPlayerWidget instance represent the PlayerWidget that belongs to
@@ -38,14 +44,12 @@ public:
     LocalPlayerWidget(QWidget *parent);
     virtual ~LocalPlayerWidget();
 
-    virtual CardListWidget*               hand()            { return mp_hand;             }
-    virtual CardListWidget*               table()           { return mp_table;            }
-    virtual CharacterWidget*  characterWidget() { return mp_characterWidget;  }
-    virtual QLabel*                 playerNameLabel() { return mp_labelPlayerName;  }
-    virtual QLabel*                 avatarLabel()     { return mp_labelAvatar;      }
-    virtual bool                    isLocalPlayer()   { return 1;                   }
-
-    virtual void enterGameMode(Game* game);
+    virtual CardListWidget*     hand()            { return mp_hand;             }
+    virtual CardListWidget*     table()           { return mp_table;            }
+    virtual CharacterWidget*    characterWidget() { return mp_characterWidget;  }
+    virtual QLabel*             playerNameLabel() { return mp_labelPlayerName;  }
+    virtual QLabel*             avatarLabel()     { return mp_labelAvatar;      }
+    virtual bool                isLocalPlayer()   { return 1;                   }
 
     void setFromPrivateData(const PrivatePlayerData&);
     void setFromContext(const GameContextData&);

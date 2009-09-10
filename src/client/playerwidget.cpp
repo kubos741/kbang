@@ -43,8 +43,7 @@ PlayerWidget::PlayerWidget(QWidget* parent):
         m_isRequested(0),
         m_playerRole(ROLE_UNKNOWN),
         mp_winnerIcon(0),
-        mp_game(0),
-        mp_cardWidgetSizeManager(0)
+        mp_game(0)
 {
 }
 
@@ -52,24 +51,8 @@ PlayerWidget::~PlayerWidget()
 {
 }
 
-void PlayerWidget::setup(CardWidgetSizeManager* cardWidgetSizeManager)
-{
-    mp_cardWidgetSizeManager = cardWidgetSizeManager;
-}
-
-void PlayerWidget::enterGameMode(Game* game)
-{
-    mp_game = game;
-    characterWidget()->init(game->cardWidgetFactory());
-}
-
-void PlayerWidget::leaveGameMode()
-{
-    mp_game = 0;
-    clear();
-}
-
-void PlayerWidget::clear()
+/* virtual */ void
+PlayerWidget::clear()
 {
     m_id = m_isAI = m_isSheriff = m_isWinner = m_isCurrent = m_isRequested = 0;
     m_name = QString();
@@ -77,26 +60,28 @@ void PlayerWidget::clear()
     m_avatar = QPixmap();
     m_playerRole = ROLE_UNKNOWN;
 
-    characterWidget()->setCharacter(CHARACTER_UNKNOWN);
+    characterWidget()->setCharacter("");
     hand()->clear();
     table()->clear();
 
-    clearWidgets();
+    updateWidgets();
 }
 
-void PlayerWidget::setCurrent(bool isCurrent)
+void
+PlayerWidget::setCurrent(bool isCurrent)
 {
     m_isCurrent = isCurrent;
 }
 
-void PlayerWidget::setRequested(bool isRequested)
+void
+PlayerWidget::setRequested(bool isRequested)
 {
     m_isRequested = isRequested;
 }
 
-void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
+void
+PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
-    qDebug() << this << "setFromPublicData()";
     m_id            = publicPlayerData.id;
     m_name          = publicPlayerData.name;
     m_hasController = publicPlayerData.hasController;
@@ -126,14 +111,16 @@ void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     updateWidgets();
 }
 
-void PlayerWidget::dieAndRevealRole(PlayerRole playerRole)
+void
+PlayerWidget::dieAndRevealRole(PlayerRole playerRole)
 {
     m_isAlive = 0;
     m_playerRole = playerRole;
     updateWidgets();
 }
 
-void PlayerWidget::paintEvent(QPaintEvent* event)
+void
+PlayerWidget::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setClipRect(event->rect());
@@ -154,14 +141,16 @@ void PlayerWidget::paintEvent(QPaintEvent* event)
     }
 }
 
-void PlayerWidget::mousePressEvent(QMouseEvent* event)
+void
+PlayerWidget::mousePressEvent(QMouseEvent* event)
 {
     if (gameActionManager() && event->button() == Qt::LeftButton) {
         gameActionManager()->onPlayerClicked(this);
     }
 }
 
-GameActionManager* PlayerWidget::gameActionManager() const
+GameActionManager*
+PlayerWidget::gameActionManager() const
 {
     if (mp_game == 0) {
         return 0;
@@ -170,59 +159,46 @@ GameActionManager* PlayerWidget::gameActionManager() const
     }
 }
 
-CardWidgetFactory* PlayerWidget::cardWidgetFactory() const
-{
-    if (mp_game == 0) {
-        return 0;
-    } else {
-        return mp_game->cardWidgetFactory();
-    }
-}
-
-void PlayerWidget::setRoleFromPublicData(PlayerRole playerRole)
+/* virtual */ void
+PlayerWidget::setRoleFromPublicData(PlayerRole playerRole)
 {
     m_playerRole = playerRole;
 }
 
-void PlayerWidget::setHandSize(int handSize)
+/* virtual */ void
+PlayerWidget::setHandSize(int handSize)
 {
     hand()->clear();
     for(int i = 0; i < handSize; ++i) {
-        CardWidget* card = mp_game->cardWidgetFactory()->createPlayingCard(this);
-        card->validate();
+        CardWidget* card = new CardWidget(this);
+        card->cardData().type = "playing";
+        card->updatePixmap();
         hand()->push(card);
     }
 }
 
-void PlayerWidget::setTable(QList<CardData> tableCards)
+/* virtual */ void
+PlayerWidget::setTable(QList<CardData> tableCards)
 {
     table()->clear();
     foreach (const CardData& cardData, tableCards) {
-        CardWidget* card = mp_game->cardWidgetFactory()->createPlayingCard(this);
+        CardWidget* card = new CardWidget(this);
         card->setCardData(cardData);
-        card->validate();
+        card->updatePixmap();
         table()->push(card);
     }
 }
 
-void PlayerWidget::clearWidgets()
-{
-    playerNameLabel()->setText("");
-
-    if (mp_winnerIcon)
-        mp_winnerIcon->hide();
-
-    avatarLabel()->setPixmap(QPixmap());
-}
-
-void PlayerWidget::updateWidgets()
+/* virtual */ void
+PlayerWidget::updateWidgets()
 {
     playerNameLabel()->setText(m_name);
     updateWinnerIcon();
     updateAvatarLabel();
 }
 
-void PlayerWidget::updateAvatarLabel()
+void
+PlayerWidget::updateAvatarLabel()
 {
     QPixmap avatar = m_avatar;
     if (!m_hasController && !avatar.isNull()) {
@@ -232,17 +208,19 @@ void PlayerWidget::updateAvatarLabel()
     avatarLabel()->setPixmap(avatar);
 }
 
-void PlayerWidget::createWinnerIcon()
+void
+PlayerWidget::createWinnerIcon()
 {
     Q_ASSERT(mp_winnerIcon == 0);
-    QPixmap winnerPixmap(Config::dataPathString() + "gfx/misc/winner-sign.png");
+    QPixmap winnerPixmap(Config::systemDataLocation() + "gfx/misc/winner-sign.png");
     mp_winnerIcon = new QLabel(this);
     mp_winnerIcon->setPixmap(winnerPixmap);
     mp_winnerIcon->resize(winnerPixmap.size());
     mp_winnerIcon->setToolTip(tr("This player is winner."));
 }
 
-void PlayerWidget::updateWinnerIcon()
+void
+PlayerWidget::updateWinnerIcon()
 {
     if (m_isWinner && mp_game && mp_game->isFinished()) {
         if (mp_winnerIcon == 0) {
@@ -257,5 +235,3 @@ void PlayerWidget::updateWinnerIcon()
         }
     }
 }
-
-

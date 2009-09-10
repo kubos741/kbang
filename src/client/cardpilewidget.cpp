@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -22,47 +22,65 @@
 
 using namespace client;
 
-/**
- *
- * @param parent
- */
 CardPileWidget::CardPileWidget(QWidget *parent):
         CardPocket(parent),
-        m_cardWidgetSize(CardWidget::SIZE_NORMAL),
         m_padding(4, 4)
 {
-    setMinimumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
-    setMaximumSize(CardWidget::qSize(m_cardWidgetSize) + (2 * m_padding));
+    setCardSizeRole(CARD_SIZE_NORMAL);
 }
 
-
+/* virtual */
 CardPileWidget::~CardPileWidget()
 {
 }
 
-CardWidget* CardPileWidget::peek()
+/* virtual */ QPoint
+CardPileWidget::newCardPosition() const
 {
-    return m_cards.top();
+    return QPoint(m_padding.width(), m_padding.height());
 }
 
-CardWidget* CardPileWidget::pop()
-{
-    return m_cards.pop();
-}
-
-void CardPileWidget::push(CardWidget* card)
+/* virtual */ void
+CardPileWidget::push(CardWidget* card)
 {
     CardPocket::push(card);
     m_cards.push(card);
     card->setParent(this);
-    card->setSize(m_cardWidgetSize);
-    card->validate();
+    card->setCardSizeRole(m_cardSizeRole);
+    card->updatePixmap();
     card->move(CardPileWidget::newCardPosition());
     card->raise();
     card->show();
 }
 
-QPoint CardPileWidget::newCardPosition() const
+/* virtual */ CardWidget*
+CardPileWidget::peek()
 {
-    return QPoint(m_padding.width(), m_padding.height());
+    return m_cards.top();
+}
+
+/* virtual */ CardWidget*
+CardPileWidget::pop()
+{
+    return m_cards.pop();
+}
+
+/* virtual */ void
+CardPileWidget::clear()
+{
+    foreach (CardWidget* cardWidget, m_cards) {
+        cardWidget->hide();
+        cardWidget->deleteLater();
+    }
+    m_cards.clear();
+}
+
+/* virtual */ void
+CardPileWidget::updateWidgetSize()
+{
+    QSize cardSize(CardWidgetSizeManager::instance().size(m_cardSizeRole));
+    QSize widgetSize(cardSize + (2 * m_padding));
+    setMinimumSize(widgetSize);
+    setMaximumSize(widgetSize);
+    resize(widgetSize);
 }
