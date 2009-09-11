@@ -29,7 +29,6 @@ using namespace client;
 
 CardListWidget::CardListWidget(QWidget *parent):
         CardPocket(parent),
-        m_cardSizeRole(CARD_SIZE_NORMAL),
         m_hasBox(1),
         m_hPadding(3),
         m_vPadding(3)
@@ -63,7 +62,7 @@ CardListWidget::push(CardWidget* card)
 }
 
 /* virtual */ CardWidget*
-CardListWidget::take(int cardId)
+CardListWidget::take(CardId cardId)
 {
     if (m_cards.size() == 0) {
         qCritical("Trying to take from empty card list.");
@@ -112,7 +111,7 @@ CardListWidget::clear()
 /* virtual */ void
 CardListWidget::updateWidgetSize()
 {
-    QSize cardSize = CardWidgetSizeManager::instance().size(m_cardSizeRole);
+    QSize cardSize = CardWidgetSizeManager::instance().cardSize(m_cardSizeRole);
     QSize widgetSize(cardSize.width() * 3 + 2 * m_hPadding,
                      cardSize.height() + 2 * m_vPadding);
     m_moveFactor = cardSize.width() / 2 + cardSize.width() / 5;
@@ -166,7 +165,7 @@ CardListWidget::cardX(int i, bool newCard) const
 int
 CardListWidget::cardX(int i, bool newCard) const
 {
-    const QSize& cardSize = CardWidgetSizeManager::instance().size(m_cardSizeRole);
+    const QSize& cardSize = CardWidgetSizeManager::instance().cardSize(m_cardSizeRole);
     int cardCount = m_cards.size();
     if (newCard)
         cardCount++;

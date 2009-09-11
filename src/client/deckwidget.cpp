@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "deckwidget.h"
+#include "cardwidget.h"
 
 using namespace client;
 
@@ -50,7 +51,7 @@ CardWidget*
 DeckWidget::newCard()
 {
     CardWidget* card = new CardWidget(this);
-    card->cardData().type = "playing";
+    card->cardData().type = CARDTYPE_PLAYING;
     card->setCardSizeRole(m_cardSizeRole);
     card->updatePixmap();
     card->raise();

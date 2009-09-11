@@ -96,7 +96,6 @@ protected:
     virtual void setTable(QList<CardData>);
     virtual void updateWidgets();
 
-private:
     void updateAvatarLabel();
     void createWinnerIcon();
     void updateWinnerIcon();

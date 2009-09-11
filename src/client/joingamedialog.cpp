@@ -82,18 +82,19 @@ void setGameItem(const GameInfoData& gameInfo, QTreeWidgetItem* item)
 {
     item->setData(0, Qt::UserRole, gameInfo.id);
     item->setText(0, gameInfo.name);
-    switch(gameInfo.state) {
+
+    switch(gameInfo.gameState) {
         case GAMESTATE_WAITINGFORPLAYERS:
-            item->setText(1, "Waiting");
-            item->setText(2, QString("%1 / %2").arg(gameInfo.totalPlayersCnt).arg(gameInfo.maxPlayers));
+            item->setText(1, QObject::tr("Waiting"));
+            item->setText(2, QString("%1 / %2").arg(gameInfo.playersCnt).arg(gameInfo.playersMax));
             break;
         case GAMESTATE_PLAYING:
-            item->setText(1, "Playing");
-            item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.totalPlayersCnt));
+            item->setText(1, QObject::tr("Playing"));
+            item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.playersCnt));
             break;
         case GAMESTATE_FINISHED:
-            item->setText(1, "Finished");
-            item->setText(2, "");
+            item->setText(1, QObject::tr("Finished"));
+            item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.playersCnt));
             break;
         default:
             NOT_REACHED();
@@ -110,18 +111,18 @@ void JoinGameDialog::updateGameListView()
         QTreeWidgetItem* item = new QTreeWidgetItem(gameListView);
         item->setData(0, Qt::UserRole, gameInfo.id);
         item->setText(0, gameInfo.name);
-        switch(gameInfo.state) {
+        switch(gameInfo.gameState) {
             case GAMESTATE_WAITINGFORPLAYERS:
-                item->setText(1, "Waiting");
-                item->setText(2, QString("%1 / %2").arg(gameInfo.totalPlayersCnt).arg(gameInfo.maxPlayers));
+                item->setText(1, QObject::tr("Waiting"));
+                item->setText(2, QString("%1 / %2").arg(gameInfo.playersCnt).arg(gameInfo.playersMax));
                 break;
             case GAMESTATE_PLAYING:
-                item->setText(1, "Playing");
-                item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.totalPlayersCnt));
+                item->setText(1, QObject::tr("Playing"));
+                item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.playersCnt));
                 break;
             case GAMESTATE_FINISHED:
-                item->setText(1, "Finished");
-                item->setText(2, "");
+                item->setText(1, QObject::tr("Finished"));
+                item->setText(2, QString("%1 / %2").arg(gameInfo.alivePlayersCnt).arg(gameInfo.playersCnt));
                 break;
             default:
                 NOT_REACHED();
@@ -157,10 +158,10 @@ void JoinGameDialog::updateGameView()
     }
 
     labelName->setText(gameInfo->name);
-    labelDescription->setText(gameInfo->description);
-    labelState->setText(gameState(gameInfo->state));
-    labelPlayers->setText(gameInfo->minPlayers + " - " + gameInfo->maxPlayers);
-    labelAIPlayers->setText(QString::number(gameInfo->AIPlayersCnt));
+    labelDescription->setText(gameInfo->desc);
+    labelState->setText(gameState(gameInfo->gameState));
+    labelPlayers->setText(gameInfo->playersMin + " - " + gameInfo->playersMax);
+    labelAIPlayers->setText(QString::number(gameInfo->aiPlayersCnt));
     if (gameInfo->hasPlayerPassword)
         labelPassword->setText(QObject::tr("players need password"));
     else if (gameInfo->hasSpectatorPassword)
@@ -206,8 +207,8 @@ void JoinGameDialog::updateGameView()
         }
         playerListView->addTopLevelItem(item);
     }
-    if (gameInfo->state == GAMESTATE_WAITINGFORPLAYERS &&
-            gameInfo->totalPlayersCnt < gameInfo->maxPlayers) {
+    if (gameInfo->gameState == GAMESTATE_WAITINGFORPLAYERS &&
+            gameInfo->playersCnt < gameInfo->playersMax) {
         QTreeWidgetItem* item = new QTreeWidgetItem(playerListView);
         item->setData(0, Qt::UserRole, -1);
         item->setText(0, QObject::tr("Create new player"));
@@ -215,7 +216,9 @@ void JoinGameDialog::updateGameView()
         font.setItalic(1);
         item->setData(0, Qt::FontRole, font);
         if (m_currentPlayerId <= 0) {
+#if 0
             m_currentPlayerId = -1;
+#endif
             playerListView->setCurrentItem(item);
         }
     }
@@ -251,21 +254,21 @@ void JoinGameDialog::updateGame(const GameInfoData& game)
 
 void JoinGameDialog::refreshGameList()
 {
-    QueryGet* query = ServerConnection::instance()->queryGet();
+    QueryGet* query = ServerConnection::instance()->newQueryGet();
     connect(query,  SIGNAL(result(const GameInfoListData&)),
             this,   SLOT(updateGameList(const GameInfoListData&)));
     query->getGameInfoList();
 }
 
-void JoinGameDialog::refreshGame(int gameId)
+void JoinGameDialog::refreshGame(GameId gameId)
 {
-    QueryGet* query = ServerConnection::instance()->queryGet();
+    QueryGet* query = ServerConnection::instance()->newQueryGet();
     connect(query, SIGNAL(result(const GameInfoData&)),
             this, SLOT(updateGame(const GameInfoData&)));
     query->getGameInfo(gameId);
 }
 
-void JoinGameDialog::selectGame(int gameId)
+void JoinGameDialog::selectGame(GameId gameId)
 {
     if (m_currentGameId != gameId)
         m_currentPlayerId = 0;
@@ -320,9 +323,10 @@ void JoinGameDialog::on_pushButtonPlay_clicked()
              return;
     }
 
+#if 0
     if (m_currentPlayerId == -1)
         m_currentPlayerId = 0;
-
+#endif
     CreatePlayerData playerData;
     playerData.name     = lineEditPlayerName->text();
     playerData.password = lineEditPlayerPassword->text();
@@ -345,7 +349,7 @@ void JoinGameDialog::on_pushButtonSpectate_clicked()
     */
 }
 
-const GameInfoData* JoinGameDialog::gameInfoData(int gameId)
+const GameInfoData* JoinGameDialog::gameInfoData(GameId gameId)
 {
     foreach(const GameInfoData& gameInfo, m_gameList) {
         if (gameInfo.id == gameId)

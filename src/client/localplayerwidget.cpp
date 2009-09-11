@@ -123,7 +123,7 @@ void LocalPlayerWidget::setFromContext(const GameContextData& gameContext)
 }
 void LocalPlayerWidget::clearWidgets()
 {
-    PlayerWidget::clearWidgets();
+    PlayerWidget::clear();
     mp_roleCardWidget->clear();
 
     mp_buttonEndTurn->setEnabled(0);

@@ -19,12 +19,16 @@
  ***************************************************************************/
 
 #include <QtDebug>
-#include "card.h"
-#include "cardbank.h"
-//#include "config.h"
-
 #include <QPainter>
 #include <QFont>
+
+
+#include "card.h"
+#include "cardbank.h"
+#include "gamestructs.h"
+
+//#include "config.h"
+
 
 using namespace client;
 
@@ -73,7 +77,7 @@ Card::pixmap(const CardData& cardData) const
 {
     if (m_graphics.size() == 0) {
         qCritical(qPrintable(QString("Card '%1' has no graphics.").arg(m_name)));
-        return result;
+        return QPixmap();
     }
 
     QPixmap result;

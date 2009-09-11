@@ -46,8 +46,9 @@ public:
     virtual QLabel*             avatarLabel()       { return mp_labelAvatar;      }
     virtual bool                isLocalPlayer()     { return 0;                   }
 
+    virtual void clear();
+
 protected:
-    virtual void clearWidgets();
     virtual void updateWidgets();
     virtual void moveWinnerIcon();
 

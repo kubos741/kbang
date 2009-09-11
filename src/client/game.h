@@ -23,7 +23,6 @@
 #include <QPushButton>
 #include <QList>
 #include <QMap>
-#include <QPointer>
 
 #include "gamestructs.h"
 
@@ -36,6 +35,7 @@ class GraveyardWidget;
 class CardListWidget;
 
 class GameEventHandler;
+class GameEventQueue;
 class GameActionManager;
 
 /**
@@ -152,8 +152,19 @@ public:
         return m_isCreator;
     }
 
+    /**
+     * Returns whether the game already finished.
+     */
+    inline bool isFinished() const {
+        return (m_gameState == GAMESTATE_FINISHED);
+    }
+
     inline GameEventHandler* eventHandler() const {
         return mp_gameEventHandler;
+    }
+
+    inline GameEventQueue* eventQueue() const {
+        return mp_gameEventQueue;
     }
 
     inline GameActionManager* actionManager() const {
@@ -300,9 +311,10 @@ private:
     LocalPlayerWidget*  mp_localPlayerWidget;
 
     GameEventHandler*   mp_gameEventHandler;
+    GameEventQueue*     mp_gameEventQueue;
     GameActionManager*  mp_gameActionManager;
 
-    static QPointer<Game> smp_currentGame;
+    static Game*        smp_currentGame;
 };
 }
 #endif

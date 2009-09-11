@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "cardpilewidget.h"
 #include "cardwidget.h"
+#include "cardwidgetsizemanager.h"
 
 using namespace client;
 
@@ -78,7 +79,7 @@ CardPileWidget::clear()
 /* virtual */ void
 CardPileWidget::updateWidgetSize()
 {
-    QSize cardSize(CardWidgetSizeManager::instance().size(m_cardSizeRole));
+    QSize cardSize(CardWidgetSizeManager::instance().cardSize(m_cardSizeRole));
     QSize widgetSize(cardSize + (2 * m_padding));
     setMinimumSize(widgetSize);
     setMaximumSize(widgetSize);

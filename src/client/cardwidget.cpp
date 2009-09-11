@@ -25,7 +25,7 @@
 
 #include "card.h"
 #include "cardwidget.h"
-#include "cardactionswidget.h"
+#include "cardwidgetsizemanager.h"
 #include "game.h"
 #include "gameactionmanager.h"
 
@@ -107,7 +107,7 @@ CardWidget::setPlayerRoleCard(PlayerRole playerRole)
     if (playerRole == ROLE_UNKNOWN) {
         m_cardData.name = "";
     }
-    m_cardData.type = "player-role";
+    m_cardData.type = CARDTYPE_ROLE;
     updatePixmap();
 }
 
@@ -122,9 +122,9 @@ CardWidget::setCharacterCard(QString character)
 void
 CardWidget::updatePixmap()
 {
-    QSize size = CardWidgetSizeManager::instance().size(m_cardSizeRole);
+    QSize size = CardWidgetSizeManager::instance().cardSize(m_cardSizeRole);
 
-    if (m_cardData.name.isEmpty() && m_cardData.type.isEmpty()) {
+    if (m_cardData.name.isEmpty() && m_cardData.type == CARDTYPE_UNKNOWN) {
         setPixmap(QPixmap());
     } else {
         // TODO: lookup card
@@ -146,13 +146,13 @@ CardWidget::mousePressEvent(QMouseEvent* e)
 
     switch(e->button()) {
         case Qt::LeftButton: {
-            bool handled = game->gameActionManager()->onCardClicked(this);
+            bool handled = game->actionManager()->onCardClicked(this);
             if (!handled)
                 QLabel::mousePressEvent(e);
             break;
         }
         case Qt::RightButton:
-            game->gameActionManager()->onCardRightClicked(this);
+            game->actionManager()->onCardRightClicked(this);
             break;
         default:
             break;

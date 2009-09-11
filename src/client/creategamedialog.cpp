@@ -20,8 +20,10 @@
 
 #include <QRegExpValidator>
 #include <QRegExp>
+
 #include "creategamedialog.h"
 #include "config.h"
+#include "gamestructs.h"
 
 #include "ui_creategamedialog.h"
 
@@ -88,11 +90,11 @@ void CreateGameDialog::onCreateGameClicked()
 {
     CreateGameData createGameData;
     createGameData.name                 = mp_ui->lineEditGameName->text();
-    createGameData.description          = mp_ui->lineEditGameDescription->text();
-    createGameData.minPlayers           = mp_ui->spinBoxMinPlayers->value();
-    createGameData.maxPlayers           = mp_ui->spinBoxMaxPlayers->value();
-    createGameData.maxSpectators        = mp_ui->spinBoxMaxSpectators->value();
-    createGameData.AIPlayers            = mp_ui->spinBoxAIPlayers->value();
+    createGameData.desc                 = mp_ui->lineEditGameDescription->text();
+    createGameData.playersMin           = mp_ui->spinBoxMinPlayers->value();
+    createGameData.playersMax           = mp_ui->spinBoxMaxPlayers->value();
+    createGameData.spectatorsMax        = mp_ui->spinBoxMaxSpectators->value();
+    createGameData.aiPlayersCnt         = mp_ui->spinBoxAIPlayers->value();
     createGameData.playerPassword       = mp_ui->lineEditGamePasswordPlayers->text();
     createGameData.spectatorPassword    = mp_ui->lineEditGamePasswordSpectators->text();
     createGameData.flagShufflePlayers   = mp_ui->radioButtonOrderRandom->isChecked();
@@ -134,19 +136,20 @@ void CreateGameDialog::loadConfigValues()
 
 void CreateGameDialog::saveConfigValues(const CreateGameData& game)
 {
+    ///@todo change config var names
     Config& cfg = Config::instance();
     QString grp("create-game-dialog");
     cfg.writeString(grp, "name", game.name);
-    cfg.writeString(grp, "description", game.description);
-    cfg.writeInt(grp, "min-players", game.minPlayers);
-    cfg.writeInt(grp, "max-players", game.maxPlayers);
-    cfg.writeInt(grp, "max-spectators", game.maxSpectators);
-    cfg.writeInt(grp, "ai-players", game.AIPlayers);
+    cfg.writeString(grp, "description", game.desc);
+    cfg.writeInt(grp, "min-players", game.playersMin);
+    cfg.writeInt(grp, "max-players", game.playersMax);
+    cfg.writeInt(grp, "max-spectators", game.spectatorsMax);
+    cfg.writeInt(grp, "ai-players", game.aiPlayersCnt);
     cfg.writeInt(grp, "flag-shuffle-players", game.flagShufflePlayers);
 
-    cfg.writeString("player", "name", lineEditPlayerName->text());
-    cfg.writeString("player", "password", lineEditPlayerPassword->text());
-    cfg.writeString("player", "image", selectPlayerIconWidget->imageFileName());
+    cfg.writeString("player", "name", mp_ui->lineEditPlayerName->text());
+    cfg.writeString("player", "password", mp_ui->lineEditPlayerPassword->text());
+    cfg.writeString("player", "image", mp_ui->selectPlayerIconWidget->imageFileName());
 
     cfg.store();
 }
