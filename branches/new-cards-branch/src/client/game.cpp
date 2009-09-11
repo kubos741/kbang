@@ -20,7 +20,17 @@
 
 #include "game.h"
 #include "mainwindow.h"
+#include "util.h"
+#include "gameeventhandler.h"
+#include "gameeventqueue.h"
+#include "gameactionmanager.h"
+#include "serverconnection.h"
+
 #include "localplayerwidget.h"
+#include "graveyardwidget.h"
+#include "deckwidget.h"
+#include "cardlistwidget.h"
+
 
 using namespace client;
 
@@ -41,6 +51,7 @@ Game::Game(GameId gameId, QString gameName, ClientType clientType):
         mp_selection(0),
         mp_localPlayerWidget(MainWindow::instance().localPlayerWidget()),
         mp_gameEventHandler(new GameEventHandler(this)),
+        mp_gameEventQueue(new GameEventQueue(this)),
         mp_gameActionManager(new GameActionManager(this))
 {
     Q_ASSERT(smp_currentGame == 0);
@@ -50,12 +61,12 @@ Game::Game(GameId gameId, QString gameName, ClientType clientType):
     m_playerWidgetsList = MainWindow::instance().opponentWidgets();
     switch(m_clientType) {
         case CLIENTTYPE_PLAYER:
-            m_playerWidgetsList[0].hide();
+            m_playerWidgetsList[0]->hide();
             localPlayerWidget()->show();
             m_playerWidgetsList[0] = localPlayerWidget();
             break;
         case CLIENTTYPE_SPECTATOR:
-            m_playerWidgetsList[0].show();
+            m_playerWidgetsList[0]->show();
             localPlayerWidget()->hide();
             break;
     }
@@ -240,7 +251,7 @@ Game::setSelection(QList<CardData> cards)
 void
 Game::setGraveyard(const CardData& data)
 {
-    if (m_interface != GameInterface) {
+    if (m_interfaceType != GameInterface) {
         return;
     }
     mp_graveyard->setFirstCard(data);
@@ -253,7 +264,7 @@ Game::updateInterface()
     case GAMESTATE_INVALID:
     case GAMESTATE_WAITINGFORPLAYERS:
         if (m_isCreator) {
-            if (m_interface == CreatorInterface) return;
+            if (m_interfaceType== CreatorInterface) return;
             unloadInterface();
             loadCreatorInterface();
         } else {
@@ -271,6 +282,7 @@ Game::updateInterface()
 void
 Game::cleanUp()
 {
+#if 0
     unloadInterface();
     mp_localPlayerWidget->leaveGameMode();
     foreach(OpponentWidget* opponentWidget, m_opponentWidgets)
@@ -278,6 +290,7 @@ Game::cleanUp()
     unsetTextInfo();
     mp_gameEventHandler->clear();
     smp_currentGame = 0;
+#endif
 }
 
 void
@@ -312,7 +325,7 @@ Game::insertOpponent(int index, const PublicPlayerData& publicPlayerData)
         index += m_playerWidgetsList.size();
     }
     Q_ASSERT(0 <= index && index < m_playerWidgetsList.size());
-    m_playerWidgetsList[index].setFromPublicData(publicPlayerData);
+    m_playerWidgetsList[index]->setFromPublicData(publicPlayerData);
     m_playerWidgets[publicPlayerData.id] = m_playerWidgetsList[index];
 }
 
@@ -352,13 +365,13 @@ Game::clearOpponentWidget(int index)
 void
 Game::pauseGameEvents()
 {
-    mp_gameEventHandler->pause();
+    mp_gameEventQueue->pause();
 }
 
 void
 Game::resumeGameEvents()
 {
-    mp_gameEventHandler->resume();
+    mp_gameEventQueue->resume();
 }
 
 void
@@ -370,44 +383,47 @@ Game::setGameStartability(bool gameStartability)
 
 void Game::loadCreatorInterface()
 {
+    QWidget* middleWidget = MainWindow::instance().middleWidget();
     Q_ASSERT(mp_startButton == 0);
-    Q_ASSERT(mp_middleWidget->layout() == 0);
-    mp_startButton = new QPushButton(mp_middleWidget);
+    Q_ASSERT(middleWidget->layout() == 0);
+    mp_startButton = new QPushButton(middleWidget);
     QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
     mp_startButton->setText(tr("Start game"));
     mp_startButton->setEnabled(0);
     connect(mp_startButton, SIGNAL(clicked()),
             this, SLOT(startButtonClicked()));
-    connect(mp_serverConnection, SIGNAL(gameCanBeStarted(bool)),
+    connect(ServerConnection::instance(), SIGNAL(gameCanBeStarted(bool)),
             this, SLOT(gameCanBeStarted(bool)));
     l->addStretch(1);
     l->addWidget(mp_startButton);
     l->addStretch(1);
-    mp_middleWidget->setLayout(l);
-    m_interface = CreatorInterface;
+    middleWidget->setLayout(l);
+    m_interfaceType= CreatorInterface;
 }
 
 void Game::unloadCreatorInterface()
 {
+    QWidget* middleWidget = MainWindow::instance().middleWidget();
     Q_ASSERT(mp_startButton != 0);
-    Q_ASSERT(mp_middleWidget->layout() != 0);
+    Q_ASSERT(middleWidget->layout() != 0);
     mp_startButton->deleteLater();
     mp_startButton = 0;
-    delete mp_middleWidget->layout();
-    m_interface = NoInterface;
+    delete middleWidget->layout();
+    m_interfaceType= NoInterface;
 }
 
 void Game::loadGameInterface()
 {
+    QWidget* middleWidget = MainWindow::instance().middleWidget();
     Q_ASSERT(mp_deck == 0);
     Q_ASSERT(mp_graveyard == 0);
     Q_ASSERT(mp_selection == 0);
-    Q_ASSERT(mp_middleWidget->layout() == 0);
+    Q_ASSERT(middleWidget->layout() == 0);
     qDebug("---- loading game interface ----");
     mp_deck = new DeckWidget(0);
-    mp_deck->init();
+    //mp_deck->init();
     mp_graveyard = new GraveyardWidget(0);
-    mp_graveyard->init();
+    //mp_graveyard->init();
     mp_selection = new CardListWidget(0);
     mp_selection->setPocketType(POCKET_SELECTION);
     mp_selection->setCardSizeRole(CARD_SIZE_NORMAL);
@@ -430,22 +446,23 @@ void Game::loadGameInterface()
     l3->addLayout(l);
     l3->addStretch(1);
     l3->addLayout(l2);
-    mp_middleWidget->setLayout(l3);
-    m_interface = GameInterface;
+    middleWidget->setLayout(l3);
+    m_interfaceType= GameInterface;
 }
 
 void Game::unloadGameInterface()
 {
+    QWidget* middleWidget = MainWindow::instance().middleWidget();
     Q_ASSERT(mp_deck != 0);
     Q_ASSERT(mp_graveyard != 0);
     Q_ASSERT(mp_selection != 0);
-    Q_ASSERT(mp_middleWidget->layout() != 0);
+    Q_ASSERT(middleWidget->layout() != 0);
     qDebug("---- unloading game interface ----");
     mp_deck->deleteLater();
     mp_graveyard->deleteLater();
     mp_selection->deleteLater();
-    delete mp_middleWidget->layout();
-    m_interface = NoInterface;
+    delete middleWidget->layout();
+    m_interfaceType= NoInterface;
     mp_deck = 0;
     mp_graveyard = 0;
     mp_selection = 0;
@@ -453,7 +470,7 @@ void Game::unloadGameInterface()
 
 void Game::unloadInterface()
 {
-    switch(m_interface) {
+    switch(m_interfaceType) {
     case NoInterface:
         return;
     case CreatorInterface:
@@ -509,8 +526,8 @@ void Game::unloadInterface()
 //    mp_selection->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 //
 //
-//    if (mp_middleWidget->layout() != 0) {
-//        delete mp_middleWidget->layout();
+//    if (middleWidget->layout() != 0) {
+//        delete middleWidget->layout();
 //    }
 //
 //    QBoxLayout* l = new QBoxLayout(QBoxLayout::LeftToRight);
@@ -529,23 +546,6 @@ void Game::unloadInterface()
 //    l3->addLayout(l);
 //    l3->addStretch(1);
 //    l3->addLayout(l2);
-//    mp_middleWidget->setLayout(l3);
+//    middleWidget->setLayout(l3);
 //}
-
-QString Game::character() const
-{
-    return mp_localPlayerWidget->characterWidget()->character();
-}
-
-
-void Game::assignPlayerWidget(int playerId, PlayerWidget* playerWidget)
-{
-    m_players[playerId] = playerWidget;
-}
-
-void Game::sendLogMessage(const QString& message)
-{
-    emit emitLogMessage(message);
-}
-
 

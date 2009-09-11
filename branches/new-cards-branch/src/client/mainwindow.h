@@ -38,7 +38,7 @@ class JoinGameDialog;
 class AboutDialog;
 
 // Widgets:
-class OpponentWidget;
+class PlayerWidget;
 class LocalPlayerWidget;
 
 /**
@@ -65,7 +65,12 @@ public:
     /**
      * Returns the list of OpponentWidget instances.
      */
-    QList<OpponentWidget*> opponentWidgets() const { return m_opponentWidgets; }
+    QList<PlayerWidget*> opponentWidgets() const { return m_opponentWidgets; }
+
+    /**
+     * Returns the middle widget.
+     */
+    QWidget* middleWidget() const;
 
 public slots:
     /**
@@ -117,7 +122,7 @@ private:
     JoinGameDialog*        mp_joinGameDialog;
     AboutDialog*           mp_aboutDialog;
 
-    QList<OpponentWidget*> m_opponentWidgets;
+    QList<PlayerWidget*>   m_opponentWidgets;
 
     Ui::MainWindow*         mp_ui;
 };

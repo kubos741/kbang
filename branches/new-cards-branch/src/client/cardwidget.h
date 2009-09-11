@@ -22,6 +22,7 @@
 
 #include <QLabel>
 #include "gamestructs.h"
+#include "clienttypes.h"
 
 namespace client
 {

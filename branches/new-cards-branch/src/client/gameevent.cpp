@@ -43,7 +43,6 @@ GameEvent::isRunning() const
 GameEvent::run()
 {
     m_isRunning = 1;
-    return 1;
 }
 
 /* virtual */ void

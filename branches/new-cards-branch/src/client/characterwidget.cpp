@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "characterwidget.h"
+#include "cardwidgetsizemanager.h"
 
 using namespace client;
 
@@ -31,7 +32,6 @@ const int timerInterval = 100;
 
 CharacterWidget::CharacterWidget(QWidget *parent):
         QWidget(parent),
-        m_character(CHARACTER_UNKNOWN),
         m_lifePoints(0),
         mp_backCard(0),
         mp_characterCard(0),
@@ -72,10 +72,10 @@ CharacterWidget::setCharacter(const QString& character)
     if (mp_characterCard) {
         mp_characterCard->setCharacterCard(character);
         mp_characterCard->updatePixmap();
-        mp_characterCard->setVisible(!isEmpty());
+        mp_characterCard->setVisible(!m_character.isEmpty());
     }
     if (mp_backCard) {
-        mp_backCard->setVisible(!isEmpty());
+        mp_backCard->setVisible(!m_character.isEmpty());
     }
 }
 
@@ -114,7 +114,7 @@ CharacterWidget::startAnimation()
 void
 CharacterWidget::updateWidgetSize()
 {
-    QSize cardSize(CardWidgetSizeManager::instance().size(CARD_SIZE_NORMAL));
+    QSize cardSize(CardWidgetSizeManager::instance().cardSize(CARD_SIZE_NORMAL));
     int maxLifeLevel = CardWidgetSizeManager::instance().lifeLevel(5);
     QSize widgetSize(cardSize.width(), (int)(cardSize.height() + maxLifeLevel));
     setMinimumSize(widgetSize);
@@ -123,10 +123,10 @@ CharacterWidget::updateWidgetSize()
 }
 
 void
-CharacterWidget::onAnimationAnimationTimeout()
+CharacterWidget::onAnimationTimeout()
 {
-    qreal progress;
-    if (!isEmpty()) {
+    qreal progress = 1;
+    if (!m_character.isEmpty()) {
         progress = (m_time.elapsed() * pixelsPerSecond / 1000) / abs(m_sourceY - m_targetY);
         int currentY;
         if (progress >= 1) {
@@ -139,7 +139,7 @@ CharacterWidget::onAnimationAnimationTimeout()
         mp_characterCard->show();
     }
 
-    if (progress >= 1 || isEmpty())
+    if (progress >= 1 || m_character.isEmpty())
     {
         sm_countAnimaton--;
         m_isAnimating = 0;

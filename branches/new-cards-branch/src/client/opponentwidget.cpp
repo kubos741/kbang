@@ -57,9 +57,10 @@ OpponentWidget::~OpponentWidget()
 {
 }
 
-void OpponentWidget::clearWidgets()
+/* virtual */ void
+OpponentWidget::clear()
 {
-    PlayerWidget::clearWidgets();
+
     if (mp_sheriffBadge) {
         mp_sheriffBadge->hide();
     }
@@ -69,6 +70,7 @@ void OpponentWidget::clearWidgets()
     if (mp_roleCard) {
         mp_roleCard->hide();
     }
+    PlayerWidget::clear();
     update();
 }
 

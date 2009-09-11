@@ -22,6 +22,9 @@
 
 #include <QDialog>
 
+class CreateGameData;
+class CreatePlayerData;
+
 namespace Ui {
 class CreateGameDialog;
 }

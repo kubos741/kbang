@@ -28,6 +28,7 @@
 namespace client {
 
 /**
+ * @todo Code revision!
  * @author MacJariel
  */
 class JoinGameDialog : public QDialog, public Ui::JoinGameDialog
@@ -43,8 +44,8 @@ public:
 public slots:
     void refreshGameList();
 public:
-    void refreshGame(int gameId);
-    void selectGame(int gameId);
+    void refreshGame(GameId gameId);
+    void selectGame(GameId gameId);
 
     virtual void show();
 
@@ -60,16 +61,16 @@ public slots:
     void setButtonsState();
 
 signals:
-    void joinGame(int gameId, int playerId, const QString& password, const CreatePlayerData&);
+    void joinGame(GameId gameId, PlayerId playerId, const QString& password, const CreatePlayerData&);
 
 private:
-    const GameInfoData* gameInfoData(int gameId);
+    const GameInfoData* gameInfoData(GameId gameId);
     void loadConfigValues();
     void saveConfigValues();
 
     GameInfoListData            m_gameList;
-    int                         m_currentGameId;
-    int                         m_currentPlayerId;
+    GameId                      m_currentGameId;
+    PlayerId                    m_currentPlayerId;
 
 
 };

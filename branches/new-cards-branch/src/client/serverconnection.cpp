@@ -267,16 +267,6 @@ ServerConnection::onServerInfoReceived(const ServerInfoData& serverInfo)
     m_serverInfo = serverInfo;
 }
 
-
-
-
-
-QueryGet*
-ServerConnection::newQueryGet()
-{
-    Q_ASSERT(mp_parser != 0);
-    return mp_parser->queryGet();
-}
 /*
 void ServerConnection::recievedEventJoinGame(int gameId, const StructPlayer& player, bool other)
 {

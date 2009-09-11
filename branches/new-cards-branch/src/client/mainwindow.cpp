@@ -69,6 +69,12 @@ MainWindow::localPlayerWidget() const
     return mp_ui->localPlayerWidget;
 }
 
+QWidget*
+MainWindow::middleWidget() const
+{
+    return mp_ui->middleWidget;
+}
+
 void MainWindow::paintEvent(QPaintEvent* e)
 {
     QPainter painter(this);

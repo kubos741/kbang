@@ -22,7 +22,6 @@
 #include "game.h"
 #include "gameactionmanager.h"
 #include "cardlistwidget.h"
-#include "parser/parserstructs.h"
 #include "config.h"
 
 #include <QPainter>
@@ -155,7 +154,7 @@ PlayerWidget::gameActionManager() const
     if (mp_game == 0) {
         return 0;
     } else {
-        return mp_game->gameActionManager();
+        return mp_game->actionManager();
     }
 }
 
@@ -171,7 +170,7 @@ PlayerWidget::setHandSize(int handSize)
     hand()->clear();
     for(int i = 0; i < handSize; ++i) {
         CardWidget* card = new CardWidget(this);
-        card->cardData().type = "playing";
+        card->cardData().type = CARDTYPE_PLAYING;
         card->updatePixmap();
         hand()->push(card);
     }

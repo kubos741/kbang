@@ -20,8 +20,11 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include <QObject>          // Inheritance
+#include <QObject>
+#include <QPixmap>
 #include "gametypes.h"
+
+class CardData;
 
 namespace client
 {
