@@ -37,7 +37,7 @@ using namespace client;
 Game* Game::smp_currentGame(0);
 
 Game::Game(GameId gameId, QString gameName, ClientType clientType):
-        QObject(&MainWindow::instance()),
+        QObject(MainWindow::instance()),
         m_gameId(gameId),
         m_gameName(gameName),
         m_clientType(clientType),
@@ -49,7 +49,7 @@ Game::Game(GameId gameId, QString gameName, ClientType clientType):
         mp_deck(0),
         mp_graveyard(0),
         mp_selection(0),
-        mp_localPlayerWidget(MainWindow::instance().localPlayerWidget()),
+        mp_localPlayerWidget(MainWindow::instance()->localPlayerWidget()),
         mp_gameEventHandler(new GameEventHandler(this)),
         mp_gameEventQueue(new GameEventQueue(this)),
         mp_gameActionManager(new GameActionManager(this))
@@ -58,7 +58,7 @@ Game::Game(GameId gameId, QString gameName, ClientType clientType):
     smp_currentGame = this;
 
 
-    m_playerWidgetsList = MainWindow::instance().opponentWidgets();
+    m_playerWidgetsList = MainWindow::instance()->opponentWidgets();
     switch(m_clientType) {
         case CLIENTTYPE_PLAYER:
             m_playerWidgetsList[0]->hide();
@@ -363,6 +363,20 @@ Game::clearOpponentWidget(int index)
 }
 
 void
+Game::clearOpponentWidgetRange(int indexFrom, int indexTo)
+{
+    if (indexFrom < 0) {
+        indexFrom += m_playerWidgetsList.size();
+    }
+    if (indexTo < 0) {
+        indexTo += m_playerWidgetsList.size();
+    }
+    for (int index = indexFrom; index <= indexTo; ++index) {
+        clearOpponentWidget(index);
+    }
+}
+
+void
 Game::pauseGameEvents()
 {
     mp_gameEventQueue->pause();
@@ -383,7 +397,7 @@ Game::setGameStartability(bool gameStartability)
 
 void Game::loadCreatorInterface()
 {
-    QWidget* middleWidget = MainWindow::instance().middleWidget();
+    QWidget* middleWidget = MainWindow::instance()->middleWidget();
     Q_ASSERT(mp_startButton == 0);
     Q_ASSERT(middleWidget->layout() == 0);
     mp_startButton = new QPushButton(middleWidget);
@@ -403,7 +417,7 @@ void Game::loadCreatorInterface()
 
 void Game::unloadCreatorInterface()
 {
-    QWidget* middleWidget = MainWindow::instance().middleWidget();
+    QWidget* middleWidget = MainWindow::instance()->middleWidget();
     Q_ASSERT(mp_startButton != 0);
     Q_ASSERT(middleWidget->layout() != 0);
     mp_startButton->deleteLater();
@@ -414,7 +428,7 @@ void Game::unloadCreatorInterface()
 
 void Game::loadGameInterface()
 {
-    QWidget* middleWidget = MainWindow::instance().middleWidget();
+    QWidget* middleWidget = MainWindow::instance()->middleWidget();
     Q_ASSERT(mp_deck == 0);
     Q_ASSERT(mp_graveyard == 0);
     Q_ASSERT(mp_selection == 0);
@@ -452,7 +466,7 @@ void Game::loadGameInterface()
 
 void Game::unloadGameInterface()
 {
-    QWidget* middleWidget = MainWindow::instance().middleWidget();
+    QWidget* middleWidget = MainWindow::instance()->middleWidget();
     Q_ASSERT(mp_deck != 0);
     Q_ASSERT(mp_graveyard != 0);
     Q_ASSERT(mp_selection != 0);

@@ -20,12 +20,14 @@
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <QMessageBox>
 
 #include "mainwindow.h"         // Class declaration
 #include "ui_mainwindow.h"      // UI
 #include "config.h"
 #include "game.h"
 #include "serverconnection.h"
+#include "cardwidgetsizemanager.h"
 
 #include "connecttoserverdialog.h"
 #include "creategamedialog.h"
@@ -34,6 +36,8 @@
 
 using namespace client;
 
+MainWindow* MainWindow::smp_singleton(0);
+
 MainWindow::MainWindow():
         mp_connectToServerDialog(0),
         mp_createGameDialog(0),
@@ -41,6 +45,8 @@ MainWindow::MainWindow():
         mp_aboutDialog(0),
         mp_ui(new Ui::MainWindow)
 {
+    Q_ASSERT(smp_singleton == 0);
+    smp_singleton = this;
     mp_ui->setupUi(this);
     setStyleSheet(styleSheet() + "#mp_centralWidget { background-image: url(\""
                   + Config::systemDataLocation() + "gfx/misc/bang-artwork.png\");\n}\n\n");
@@ -61,6 +67,7 @@ MainWindow::MainWindow():
 MainWindow::~MainWindow()
 {
     delete mp_ui;
+    smp_singleton = 0;
 }
 
 LocalPlayerWidget*
@@ -73,6 +80,12 @@ QWidget*
 MainWindow::middleWidget() const
 {
     return mp_ui->middleWidget;
+}
+
+LogWidget*
+MainWindow::logWidget() const
+{
+    return mp_ui->logWidget;
 }
 
 void MainWindow::paintEvent(QPaintEvent* e)
@@ -128,6 +141,17 @@ MainWindow::showAboutDialog()
     mp_aboutDialog->show();
 }
 
+void
+MainWindow::showWarningMessage(const QString& message)
+{
+    QMessageBox* msgBox = new QMessageBox(0);
+    msgBox->setWindowTitle(QApplication::applicationName());
+    msgBox->setText(message);
+    msgBox->setIcon(QMessageBox::Warning);
+    connect(msgBox, SIGNAL(finished(int)), msgBox, SLOT(deleteLater()));
+    QTimer::singleShot(0, msgBox, SLOT(exec()));
+}
+
 /* signal */ void
 MainWindow::enterGameMode(GameId gameId, const QString& gameName, ClientType clientType)
 {
@@ -170,6 +194,10 @@ MainWindow::createActions()
             ServerConnection::instance(), SLOT(leaveGame()));
     connect(mp_ui->actionAbout, SIGNAL(triggered()),
             this, SLOT(showAboutDialog()));
+    connect(mp_ui->actionCardSizeUp, SIGNAL(triggered()),
+            &CardWidgetSizeManager::instance(), SLOT(cardSizeUp()));
+    connect(mp_ui->actionCardSizeDown, SIGNAL(triggered()),
+            &CardWidgetSizeManager::instance(), SLOT(cardSizeDown()));
 }
 
 void
@@ -183,6 +211,8 @@ MainWindow::createWidgets()
     m_opponentWidgets.append(mp_ui->opponent5);
     m_opponentWidgets.append(mp_ui->opponent6);
 
+    mp_ui->opponent0->hide();
+
     connect(mp_ui->chatWidget, SIGNAL(outgoingMessage(const QString&)),
             ServerConnection::instance(), SLOT(sendChatMessage(const QString&)));
     connect(ServerConnection::instance(), SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
@@ -190,10 +220,6 @@ MainWindow::createWidgets()
 
     connect(ServerConnection::instance(), SIGNAL(logMessage(QString)),
             mp_ui->logWidget, SLOT(appendLogMessage(QString)));
-    connect(ServerConnection::instance(), SIGNAL(incomingData(const QByteArray&)),
-            mp_ui->logWidget, SLOT(appendIncomingData(const QByteArray&)));
-    connect(ServerConnection::instance(), SIGNAL(outgoingData(const QByteArray&)),
-            mp_ui->logWidget, SLOT(appendOutgoingData(const QByteArray&)));
 }
 
 void

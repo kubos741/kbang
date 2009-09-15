@@ -138,8 +138,11 @@ public slots:
     void discardCard(CardId cardId);
 
 private slots:
+    void onDisconnect();
     void onSocketError();
+    void onParserError();
     void onSocketStateChanged();
+    void onStreamOpened();
     void onServerInfoReceived(const ServerInfoData&);
 
 
@@ -147,7 +150,7 @@ private:
     ServerConnection();
     virtual ~ServerConnection();
 
-    void initializeParserConnections();
+    void connectParser();
 
 
 private:

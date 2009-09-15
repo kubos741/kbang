@@ -49,7 +49,7 @@ public:
     /**
      * Constructs a CardPileWidget which is child of parent.
      */
-    CardPileWidget(QWidget *parent);
+    CardPileWidget(QWidget *parent, bool isRevealed);
 
     /**
      * Destroys the CardPileWidget.
@@ -62,6 +62,7 @@ public:
      */
     virtual QPoint newCardPosition() const;
 
+#if 0
     /**
      * Pushes a CardWidget on top of the pile.
      */
@@ -81,6 +82,7 @@ public:
      * Removes all CardWidgets from the pile and destroy them.
      */
     virtual void clear();
+#endif
 
 public slots:
     /**
@@ -89,8 +91,10 @@ public slots:
      */
     virtual void updateWidgetSize();
 
+#if 0
 protected:
     QStack<CardWidget*> m_cards;
+#endif
 
 private:
     QSize            m_padding;   

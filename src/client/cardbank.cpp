@@ -20,14 +20,21 @@
 
 #include <QDomElement>
 #include "cardbank.h"
+#include "cardsetmanager.h"
 #include "util.h"           // stringToBool(QString)
 #include "gamestructs.h"    // CardData
 
+
 using namespace client;
 
-CardBank::CardBank(QObject* parent):
-        QObject(parent)
+CardBank::CardBank():
+        QObject(0)
 {
+    /// @attention Loads all available CardSets. This should change in the future.
+    foreach (const CardSetInfo& cardSetInfo,
+             CardSetManager::instance().localCardSets()) {
+        loadCardSet(cardSetInfo);
+    }
 }
 
 /* virtual */
@@ -43,13 +50,13 @@ CardBank::loadCardSet(const CardSetInfo& cardSetInfo)
         return;
     }
 
-    QFile cardsetFile(cardSetInfo.cardSetFileName());
+    QFile cardsetFile(cardSetInfo.cardSetFilePath());
     QDomDocument doc("cardset");
 
     if (!cardsetFile.exists() || !cardsetFile.open(QIODevice::ReadOnly) ||
         !doc.setContent(&cardsetFile)) {
         qWarning("Cannot load card set file '%s'.",
-                 qPrintable(cardSetInfo.cardSetFileName()));
+                 qPrintable(cardSetInfo.cardSetFilePath()));
         return;
     }
     cardsetFile.close();
@@ -65,14 +72,6 @@ CardBank::loadCardSet(const CardSetInfo& cardSetInfo)
         }
         n = n.nextSibling();
     }
-
-    m_name = docElem.attribute("name");
-    m_slot = docElem.attribute("slot");
-    m_locale = QLocale(docElem.attribute("locale"));
-
-    CardSetManager::instance().addKnownSlot(m_slot);
-
-//    qDebug() << m_name << m_slot << m_locale.name();
 }
 
 const Card*
@@ -111,7 +110,7 @@ CardBank::addCard(const CardSetInfo& cardSetInfo, const QDomElement& e)
     if (m_cardStorage.contains(name)) {
         card = m_cardStorage[name];
     } else {
-        card = new Card(this, name, type, cardSetName);
+        card = new Card(this, name, type, cardSetInfo.name());
     }
     if (card->cardSetName() != cardSetInfo.name()) {
         qCritical("CardSet collision found. Trying to add %s from %s, but this"
@@ -119,5 +118,5 @@ CardBank::addCard(const CardSetInfo& cardSetInfo, const QDomElement& e)
                   qPrintable(cardSetInfo.name()), qPrintable(card->cardSetName()));
         return;
     }
-    card->addGraphics(gfx, suit, rank, renderSigns);
+    card->addGraphics(gfx, suitString, rankString, renderSigns);
 }

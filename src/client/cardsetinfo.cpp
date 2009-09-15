@@ -43,7 +43,7 @@ CardSetInfo::CardSetInfo(QDir dir):
     m_cardSetFilePath = m_dir.filePath("cardset.xml");
     QFile cardsetFile(m_cardSetFilePath);
     if (!cardsetFile.exists()) {
-        qWarning("Cannot create CardSetInfo. File '%s' does not exist."
+        qWarning("Cannot create CardSetInfo. File '%s' does not exist.",
                  qPrintable(m_cardSetFilePath));
         return;
     }
@@ -69,6 +69,4 @@ CardSetInfo::CardSetInfo(QDir dir):
     m_renderSigns = (docElem.attribute("render-signs") == "true");
 
     CardSetManager::instance().addKnownSlot(m_slot);
-
-    qDebug() << m_name << m_slot << m_locale.name();
 }

@@ -20,6 +20,7 @@
 
 #include "cardzoomwidget.h"
 #include "game.h"
+#include "mainwindow.h"
 #include "clienttypes.h"
 #include <QTime>
 #include <QTimer>
@@ -32,16 +33,16 @@ int CardZoomWidget::sm_minZoomTime = 500;
 /// @todo Review code after Game and MainWindow classes are cleaned up.
 
 CardZoomWidget::CardZoomWidget(Game* game, CardWidget* cardWidget):
-        CardWidget(game->mainWidget()),
+        CardWidget(MainWindow::instance()->centralWidget()),
         mp_game(game)
 {
     clone(cardWidget);
-    QPoint center = cardWidget->mapTo(mp_game->mainWidget(), cardWidget->center());
+    QPoint center = cardWidget->mapTo(MainWindow::instance()->centralWidget(), cardWidget->center());
     setCardSizeRole(CARD_SIZE_ZOOMED);
 
-    QPoint topLeft = center - QPoint((int)(qsize().width() / 2),
-                                     (int)(qsize().height() / 2));
-    QPoint bottomRight = topLeft + QPoint(qsize().width(), qsize().height());
+    QPoint topLeft = center - QPoint((int)(size().width() / 2),
+                                     (int)(size().height() / 2));
+    QPoint bottomRight = topLeft + QPoint(size().width(), size().height());
 
     if (topLeft.x() < 0) {
         QPoint move = QPoint(-topLeft.x(), 0);
@@ -53,18 +54,18 @@ CardZoomWidget::CardZoomWidget(Game* game, CardWidget* cardWidget):
         topLeft += move;
         bottomRight += move;
     }
-    if (bottomRight.x() > game->mainWidget()->size().width()) {
-        QPoint move = QPoint(game->mainWidget()->size().width() - bottomRight.x(), 0);
+    if (bottomRight.x() > MainWindow::instance()->centralWidget()->size().width()) {
+        QPoint move = QPoint(MainWindow::instance()->centralWidget()->size().width() - bottomRight.x(), 0);
         topLeft += move;
         bottomRight += move;
     }
-    if (bottomRight.y() > game->mainWidget()->size().height()) {
-        QPoint move = QPoint(0, game->mainWidget()->size().height() - bottomRight.y());
+    if (bottomRight.y() > MainWindow::instance()->centralWidget()->size().height()) {
+        QPoint move = QPoint(0, MainWindow::instance()->centralWidget()->size().height() - bottomRight.y());
         topLeft += move;
         bottomRight += move;
     }
     move(topLeft);
-    validate();
+    updatePixmap();
     raise();
     show();
     grabMouse();

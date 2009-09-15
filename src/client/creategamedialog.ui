@@ -5,9 +5,9 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>8</y>
+    <y>0</y>
     <width>374</width>
-    <height>369</height>
+    <height>378</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -209,7 +209,7 @@
     </widget>
    </item>
    <item row="10" column="5" rowspan="3">
-    <widget class="client::SelectPlayerIconWidget" name="selectPlayerIconWidget">
+    <widget class="client::SelectAvatarWidget" name="selectAvatarWidget">
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -318,9 +318,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>client::SelectPlayerIconWidget</class>
+   <class>client::SelectAvatarWidget</class>
    <extends>QLabel</extends>
-   <header>selectplayericonwidget.h</header>
+   <header>selectavatarwidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

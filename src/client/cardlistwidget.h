@@ -39,7 +39,7 @@ public:
     /**
      * Constructs a CardListWidget which is child of parent.
      */
-    CardListWidget(QWidget *parent);
+    CardListWidget(QWidget *parent, bool isRevealed = 1);
 
     /**
      * Destroys the CardListWidget.

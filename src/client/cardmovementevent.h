@@ -20,13 +20,12 @@
 #ifndef CARDMOVEMENTEVENT_H
 #define CARDMOVEMENTEVENT_H
 
-#include "gameevent.h"      // inheritance
-
 #include <QPoint>
-#include <QList>
 #include <QBasicTimer>
 #include <QTime>
 
+#include "gameevent.h"
+#include "gamestructs.h"
 
 namespace client
 {
@@ -45,11 +44,10 @@ class CardMovementEvent: public GameEvent
 Q_OBJECT
 public:
     /**
-     * Constructs a CardMovementEvent instance.
-     * @param parent The parent of this instance.
-     * @param cardMovementData The movement information.
+     * Constructs a CardMovementEvent instance related to <i>game</i> according
+     * to given CardMovementData.
      */
-    CardMovementEvent(QObject* parent, const CardMovementData& cardMovementData);
+    CardMovementEvent(Game* game, const CardMovementData&);
 
     /**
      * Destroys the CardMovement instance.

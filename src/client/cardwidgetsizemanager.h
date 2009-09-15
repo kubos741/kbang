@@ -57,6 +57,10 @@ public:
      */
     int lifeLevel(int lifePoints) const;
 
+public slots:
+    void cardSizeUp();
+    void cardSizeDown();
+
 signals:
     /**
      * This signal is emitted when card size is changed. Each CardWidget (and
@@ -73,7 +77,6 @@ private:
 
     static qreal sm_cardRatio;
     static qreal sm_lifePointCardRatio[];
-    static int sm_initialHeight;
 };
 
 }

@@ -26,6 +26,9 @@
 #include "game.h"
 #include "deckwidget.h"
 #include "graveyardwidget.h"
+#include "playerwidget.h"
+#include "cardlistwidget.h"
+#include "mainwindow.h"
 
 using namespace client;
 
@@ -59,7 +62,8 @@ CardMovementEvent::run()
     if (mp_card == 0 || mp_destPocket == 0) {
         setCardAndPocket();
         if (mp_card == 0 || mp_destPocket == 0) {
-            qCritical("Invalid card-movement event received. Skipping.");
+            qCritical("Cannot run CardMovementEvent. Either invalid "
+                      "card-movement event received or client not in game mode.");
             QTimer::singleShot(1, this, SLOT(finish()));
             return;
         }
@@ -82,7 +86,7 @@ CardMovementEvent::setCardAndPocket()
 {
     Game* game = Game::currentGame();
 
-    if (game == 0 || game->gameInterfaceLoaded()) {
+    if (game == 0 || game->interfaceType() != Game::GameInterface) {
         return;
     }
 
@@ -155,21 +159,19 @@ CardMovementEvent::setCardAndPocket()
 void
 CardMovementEvent::startTransition()
 {
-    Game* game = Game::currentGame();
-
     Q_ASSERT(mp_destPocket->isVisible());
     Q_ASSERT(mp_card->isVisible());
 
-    if (mp_card->parent() != game->mainWidget())
+    if (mp_card->parent() != MainWindow::instance()->centralWidget())
     {
-        // reparent card to mainWidget
-        QPoint pos = mp_card->mapTo(game->mainWidget(), QPoint(0,0));
-        mp_card->setParent(game->mainWidget());
+        // reparent card to centralWidget
+        QPoint pos = mp_card->mapTo(MainWindow::instance()->centralWidget(), QPoint(0,0));
+        mp_card->setParent(MainWindow::instance()->centralWidget());
         mp_card->move(pos);
     }
     mp_card->raise();
     mp_card->show();
-    m_destPos = mp_destPocket->mapTo(game->mainWidget(), mp_destPocket->newCardPosition());
+    m_destPos = mp_destPocket->mapTo(MainWindow::instance()->centralWidget(), mp_destPocket->newCardPosition());
     m_length  = sqrt(pow(m_destPos.x() - m_srcPos.x(), 2) + pow(m_destPos.y() - m_srcPos.y(), 2));
     m_time.start();
     m_timer.start(tickTime, this);
@@ -200,10 +202,9 @@ CardMovementEvent::stopTransition()
     mp_card->updatePixmap();
     mp_destPocket->push(mp_card);
     
-    if (mp_card->cardData().id != 0 && ((mp_card->pocketType() == POCKET_HAND &&
-        mp_card->ownerId() != game->playerId()) || mp_card->pocketType() == POCKET_DECK)) {
+    if (mp_card->cardData().id != 0 && !mp_destPocket->isRevealed()) {
         // If revealed card moves to a unrevealed pocket (deck or opponent's
-        // hand), it must be unrevealed. To give player time to notice what the
+        // hand), it must be unrevealed. To give user time to notice what the
         // card was, the unrevealing is delayed.
         QTimer::singleShot(500, this, SLOT(unrevealCard()));
     } else {

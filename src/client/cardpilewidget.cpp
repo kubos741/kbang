@@ -23,8 +23,8 @@
 
 using namespace client;
 
-CardPileWidget::CardPileWidget(QWidget *parent):
-        CardPocket(parent),
+CardPileWidget::CardPileWidget(QWidget *parent, bool isRevealed):
+        CardPocket(parent, isRevealed),
         m_padding(4, 4)
 {
     setCardSizeRole(CARD_SIZE_NORMAL);
@@ -41,6 +41,7 @@ CardPileWidget::newCardPosition() const
     return QPoint(m_padding.width(), m_padding.height());
 }
 
+#if 0
 /* virtual */ void
 CardPileWidget::push(CardWidget* card)
 {
@@ -75,6 +76,7 @@ CardPileWidget::clear()
     }
     m_cards.clear();
 }
+#endif
 
 /* virtual */ void
 CardPileWidget::updateWidgetSize()

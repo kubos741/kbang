@@ -26,6 +26,7 @@
 #include "card.h"
 #include "cardwidget.h"
 #include "cardwidgetsizemanager.h"
+#include "cardbank.h"
 #include "game.h"
 #include "gameactionmanager.h"
 
@@ -123,13 +124,17 @@ void
 CardWidget::updatePixmap()
 {
     QSize size = CardWidgetSizeManager::instance().cardSize(m_cardSizeRole);
+    QPixmap pixmap;
+    if (!m_cardData.name.isEmpty() || m_cardData.type != CARDTYPE_UNKNOWN) {
+        const Card* card = CardBank::instance().card(m_cardData);
+        if (card != 0) {
+            pixmap = card->pixmap(m_cardData);
+        }
+    }
 
-    if (m_cardData.name.isEmpty() && m_cardData.type == CARDTYPE_UNKNOWN) {
-        setPixmap(QPixmap());
+    if (pixmap.isNull()) {
+        setPixmap(pixmap);
     } else {
-        // TODO: lookup card
-        const Card* card;
-        QPixmap pixmap = card->pixmap(m_cardData);
         setPixmap(pixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
 

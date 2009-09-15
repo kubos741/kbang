@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,37 +21,50 @@
 #define LOGWIDGET_H
 
 #include <QWidget>
-#include "ui_logwidget.h"
+
+namespace Ui {
+class LogWidget;
+}
 
 namespace client {
 
 /**
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The LogWidget class provides a widget that displays the game log. Moreover,
+ * this widget can display useful debug information.
+ * @author MacJariel
  */
-class LogWidget : public QWidget, public Ui::LogWidget
+class LogWidget: public QWidget
 {
 Q_OBJECT
 public:
-    LogWidget(QWidget *parent = 0);
+    /**
+     * Constructs a LogWidget.
+     */
+    LogWidget(QWidget* parent = 0);
+
+    /**
+     * Destroys the LogWidget.
+     */
     ~LogWidget();
+
+
+    static QString formatServerName(const QString&);
 
 protected:
     virtual void paintEvent(QPaintEvent* event);
 
 public slots:
     void appendLogMessage(QString message);
-
-
-
-
-
     void appendIncomingData(const QByteArray& data);
     void appendOutgoingData(const QByteArray& data);
 
-
-
 private:
-    int m_dataType;
+    enum {
+        NoData = 0,
+        IncomingData,
+        OutgoingData
+    } m_lastDataType;
+    Ui::LogWidget* mp_ui;
 };
 }
 #endif

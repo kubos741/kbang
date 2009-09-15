@@ -330,7 +330,7 @@ void JoinGameDialog::on_pushButtonPlay_clicked()
     CreatePlayerData playerData;
     playerData.name     = lineEditPlayerName->text();
     playerData.password = lineEditPlayerPassword->text();
-    playerData.avatar   = selectPlayerIconWidget->image();
+    playerData.avatar   = selectAvatarWidget->avatar();
 
     emit joinGame(m_currentGameId, m_currentPlayerId, password, playerData);
     saveConfigValues();
@@ -364,7 +364,7 @@ void JoinGameDialog::loadConfigValues()
     cfg.refresh();
     lineEditPlayerName->setText(cfg.readString("player", "name"));
     lineEditPlayerPassword->setText(cfg.readString("player", "password"));
-    selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
+    selectAvatarWidget->loadAvatar(cfg.readString("player", "image"));
     setButtonsState();
 }
 
@@ -373,7 +373,7 @@ void JoinGameDialog::saveConfigValues()
     Config& cfg = Config::instance();
     cfg.writeString("player", "name", lineEditPlayerName->text());
     cfg.writeString("player", "password", lineEditPlayerPassword->text());
-    cfg.writeString("player", "image", selectPlayerIconWidget->imageFileName());
+    cfg.writeString("player", "avatar", selectAvatarWidget->avatarFilePath());
     cfg.store();
 }
 

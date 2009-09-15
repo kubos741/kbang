@@ -40,21 +40,32 @@ class AboutDialog;
 // Widgets:
 class PlayerWidget;
 class LocalPlayerWidget;
+class LogWidget;
 
 /**
  * The MainWindow singleton class represents the main window of the KBang
  * client.
  */
 class MainWindow: public QMainWindow
+
 {
 Q_OBJECT
 public:
     /**
+     * Constructs the MainWindow instance.
+     */
+    MainWindow();
+
+    /**
+     * Destroys the MainWindow instance.
+     */
+    virtual ~MainWindow();
+
+    /**
      * Returns a reference to the MainWindow singleton instance.
      */
-    static MainWindow& instance() {
-        static MainWindow singleton;
-        return singleton;
+    inline static MainWindow* instance() {
+        return smp_singleton;
     }
 
     /**
@@ -68,9 +79,14 @@ public:
     QList<PlayerWidget*> opponentWidgets() const { return m_opponentWidgets; }
 
     /**
-     * Returns the middle widget.
+     * Returns a pointer to the middle widget.
      */
     QWidget* middleWidget() const;
+
+    /**
+     * Returns a pointer to LogWidget.
+     */
+    LogWidget* logWidget() const;
 
 public slots:
     /**
@@ -93,6 +109,12 @@ public slots:
      */
     void showAboutDialog();
 
+    /**
+     * Shows a dialog with warning message. This method doesn't block the thread,
+     * instead schedules showing modal dialog window.
+     */
+    void showWarningMessage(const QString& message);
+
     void enterGameMode(GameId gameId, const QString& gameName, ClientType);
     void exitGameMode();
 
@@ -103,16 +125,6 @@ protected:
 
 
 private:
-    /**
-     * Constructs the MainWindow instance.
-     */
-    MainWindow();
-
-    /**
-     * Destroys the MainWindow instance.
-     */
-    virtual ~MainWindow();
-
     void createActions();
     void createWidgets();
     void updateActions();
@@ -124,7 +136,8 @@ private:
 
     QList<PlayerWidget*>   m_opponentWidgets;
 
-    Ui::MainWindow*         mp_ui;
+    Ui::MainWindow*        mp_ui;
+    static MainWindow*     smp_singleton;
 };
 }
 #endif

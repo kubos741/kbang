@@ -4,6 +4,7 @@
 #include "serverconnection.h"
 #include "cardwidget.h"
 #include "cardzoomwidget.h"
+#include "gamestructs.h"
 
 using namespace client;
 
@@ -23,15 +24,16 @@ bool GameActionManager::isClickable(CardWidget*)
 
 bool GameActionManager::onCardClicked(CardWidget* cardWidget)
 {
-    if (!mp_game->isAbleToRequest())
+    if (!mp_game->isRequested()) {
         return 0;
+    }
 
     switch(m_state) {
     case STATE_DISCARD:
         if (cardWidget->pocketType() != POCKET_HAND ||
-            cardWidget->ownerId()    != mp_game->playerId())
+            cardWidget->ownerId()    != mp_game->localPlayerId())
             return 0;
-        mp_game->serverConnection()->discardCard(cardWidget->cardData().id);
+        ServerConnection::instance()->discardCard(cardWidget->cardData().id);
         return 1;
 
     case STATE_SELECT_PLAYER:
@@ -51,7 +53,7 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
 
         addToSelection(cardWidget);
         if (m_cardSelection.size() == m_selectionSize) {
-            if (mp_activeCard->cardData().type == "character") {
+            if (mp_activeCard->cardData().type == CARDTYPE_CHARACTER) {
                 useAbilityWithCards();
             } else {
                 playWithCards();
@@ -61,14 +63,14 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
         return 1;
 
     case STATE_MAIN:
-        if (cardWidget->cardData().type == "character" &&
-            cardWidget->ownerId() == mp_game->playerId()) {
+        if (cardWidget->cardData().type == CARDTYPE_CHARACTER &&
+            cardWidget->ownerId() == mp_game->localPlayerId()) {
             onCharacterClicked(cardWidget);
             return 1;
         }
 
         if (cardWidget->pocketType() == POCKET_DECK) {
-            mp_game->serverConnection()->drawCard();
+            ServerConnection::instance()->drawCard();
             return 1;
         }
 
@@ -76,14 +78,20 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
             return 0;
 
         if (mp_game->gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
-            mp_game->serverConnection()->playCard(cardWidget->cardData().id);
+            ActionPlayCardData data;
+            data.playedCardId = cardWidget->cardData().id;
+            ServerConnection::instance()->playCard(data);
             return 1;
         }
 
-        if (cardWidget->pocketType() == POCKET_HAND && cardWidget->ownerId() == mp_game->playerId())
+        if (cardWidget->pocketType() == POCKET_HAND &&
+            cardWidget->ownerId() == mp_game->localPlayerId()) {
             onMainCardClicked(cardWidget);
-        else
-            mp_game->serverConnection()->playCard(cardWidget->cardData().id);
+        } else {
+            ActionPlayCardData data;
+            data.playedCardId = cardWidget->cardData().id;
+            ServerConnection::instance()->playCard(data);
+        }
         return 1;
     }
 
@@ -97,14 +105,19 @@ void GameActionManager::onCardRightClicked(CardWidget* cardWidget)
 
 void GameActionManager::onPlayerClicked(PlayerWidget* playerWidget)
 {
-    if (!mp_game->isAbleToRequest() || m_state != STATE_SELECT_PLAYER ||
+    if (!mp_game->isRequested() || m_state != STATE_SELECT_PLAYER ||
         playerWidget->id() == 0     || mp_activeCard == 0)
         return;
 
-    if (mp_activeCard->cardData().type == "character") {
-        mp_game->serverConnection()->useAbility(playerWidget->id());
+    if (mp_activeCard->cardData().type == CARDTYPE_CHARACTER) {
+        ActionUseAbilityData data;
+        data.targetPlayerId = playerWidget->id();
+        ServerConnection::instance()->useAbility(data);
     } else {
-        mp_game->serverConnection()->playCardWithPlayer(mp_activeCard->cardData().id, playerWidget->id());
+        ActionPlayCardData data;
+        data.playedCardId = mp_activeCard->cardData().id;
+        data.targetPlayerId = playerWidget->id();
+        ServerConnection::instance()->playCard(data);
     }
     unsetActiveCard();
 }
@@ -112,13 +125,13 @@ void GameActionManager::onPlayerClicked(PlayerWidget* playerWidget)
 void GameActionManager::onEndTurnClicked()
 {
     unsetActiveCard();
-    mp_game->serverConnection()->endTurn();
+    ServerConnection::instance()->endTurn();
 }
 
 void GameActionManager::onPassClicked()
 {
     unsetActiveCard();
-    mp_game->serverConnection()->pass();
+    ServerConnection::instance()->pass();
 }
 
 void GameActionManager::setDiscardMode(bool inDiscardMode)
@@ -146,7 +159,7 @@ void GameActionManager::onMainCardClicked(CardWidget* cardWidget)
                 selectPlayer(cardWidget);
                 break;
             }
-            mp_game->serverConnection()->playCard(cardWidget->cardData().id);
+            ServerConnection::instance()->playCard(cardWidget->cardData().id);
             break;
     }
 #endif
@@ -163,7 +176,7 @@ void GameActionManager::onCharacterClicked(CardWidget* cardWidget)
         selectCards(cardWidget, 2);
         break;
     default:
-        mp_game->serverConnection()->useAbility();
+        ServerConnection::instance()->useAbility();
         break;
     }
 #endif
@@ -222,11 +235,11 @@ void GameActionManager::removeFromSelection(CardWidget* card)
 
 void GameActionManager::useAbilityWithCards()
 {
-    QList<int> cards;
-    foreach (CardWidget* card, m_cardSelection)
-        cards.append(card->cardData().id);
-
-    mp_game->serverConnection()->useAbility(cards);
+    ActionUseAbilityData data;
+    foreach (CardWidget* card, m_cardSelection) {
+        data.targetCardsId.append(card->cardData().id);
+    }
+    ServerConnection::instance()->useAbility(data);
 }
 
 void GameActionManager::playWithCards()
@@ -235,9 +248,9 @@ void GameActionManager::playWithCards()
     if (m_cardSelection.size() == 1) {
         CardWidget* card = m_cardSelection[0];
         if (card->pocketType() == POCKET_HAND) {
-            mp_game->serverConnection()->playCardWithPlayer(mp_activeCard->cardData().id, card->ownerId());
+            ServerConnection::instance()->playCardWithPlayer(mp_activeCard->cardData().id, card->ownerId());
         } else {
-            mp_game->serverConnection()->playCardWithCard(mp_activeCard->cardData().id, card->cardData().id);
+            ServerConnection::instance()->playCardWithCard(mp_activeCard->cardData().id, card->cardData().id);
         }
     } else {
         NOT_REACHED();

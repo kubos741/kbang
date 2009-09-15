@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>575</width>
-    <height>461</height>
+    <width>582</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -299,7 +299,7 @@
           </widget>
          </item>
          <item row="0" column="2" rowspan="2">
-          <widget class="client::SelectPlayerIconWidget" name="selectPlayerIconWidget">
+          <widget class="client::SelectAvatarWidget" name="selectAvatarWidget">
            <property name="minimumSize">
             <size>
              <width>64</width>
@@ -415,9 +415,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>client::SelectPlayerIconWidget</class>
+   <class>client::SelectAvatarWidget</class>
    <extends>QLabel</extends>
-   <header>selectplayericonwidget.h</header>
+   <header>selectavatarwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
