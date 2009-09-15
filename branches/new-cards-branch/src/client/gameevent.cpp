@@ -19,11 +19,13 @@
  ***************************************************************************/
 
 #include "gameevent.h"
+#include "game.h"
 
 using namespace client;
 
-GameEvent::GameEvent(QObject* parent):
-        QObject(parent),
+GameEvent::GameEvent(Game* game):
+        QObject(game),
+        mp_game(game),
         m_isRunning(0)
 {
 }

@@ -21,14 +21,17 @@
 
 using namespace client;
 
-qreal CardWidgetSizeManager::sm_cardRatio = 20 / 31;
+qreal CardWidgetSizeManager::sm_cardRatio = 20.0 / 31.0;
 qreal CardWidgetSizeManager::sm_lifePointCardRatio[] = {0, 19/75, 31/75, 44/75, 57/75, 68/75};
-int CardWidgetSizeManager::sm_initialHeight = 75;
+
+int heightMinimal = 50;
+int heightInitial = 75;
+int heightMaximal = 150;
 
 CardWidgetSizeManager::CardWidgetSizeManager():
         QObject(0)
 {
-    m_sizes[CARD_SIZE_NORMAL] = QSize(width(sm_initialHeight), sm_initialHeight);
+    m_sizes[CARD_SIZE_NORMAL] = QSize(width(heightInitial), heightInitial);
     m_sizes[CARD_SIZE_ZOOMED] = QSize(200, 310);
 }
 
@@ -42,9 +45,34 @@ CardWidgetSizeManager::cardSize(CardSizeRole cardSizeRole) const
 int
 CardWidgetSizeManager::lifeLevel(int lifePoints) const
 {
-    if (lifePoints < 0 || lifePoints > 5)
+    if (lifePoints < 0 || lifePoints > 5) {
         return 0;
-    return (int)(m_normalSize.height() * sm_lifePointCardRatio[lifePoints]);
+    }
+    return (int)(m_sizes[CARD_SIZE_NORMAL].height() * sm_lifePointCardRatio[lifePoints]);
+}
+
+/* slot */ void
+CardWidgetSizeManager::cardSizeUp()
+{
+    int height = m_sizes[CARD_SIZE_NORMAL].height();
+    height += 5;
+    if (height > heightMaximal) {
+        return;
+    }
+    m_sizes[CARD_SIZE_NORMAL] = QSize(width(height), height);
+    emit cardSizeChanged();
+}
+
+/* slot */ void
+CardWidgetSizeManager::cardSizeDown()
+{
+    int height = m_sizes[CARD_SIZE_NORMAL].height();
+    height -= 5;
+    if (height < heightMinimal) {
+        return;
+    }
+    m_sizes[CARD_SIZE_NORMAL] = QSize(width(height), height);
+    emit cardSizeChanged();
 }
 
 int

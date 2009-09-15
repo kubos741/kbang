@@ -21,6 +21,7 @@
 #define GAMEEVENTHANDLER_H
 
 #include <QObject>
+#include "gamestructs.h"
 
 namespace client
 {

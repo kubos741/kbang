@@ -156,6 +156,22 @@ QString reactionTypeToString(const ReactionType& r)
     return "";
 }
 
+ClientType stringToClientType(const QString& s)
+{
+    if (s == "player")      return CLIENTTYPE_PLAYER;
+    if (s == "spectator")   return CLIENTTYPE_SPECTATOR;
+    return CLIENTTYPE_SPECTATOR;
+}
+
+QString clientTypeToString(ClientType clientType)
+{
+    switch(clientType) {
+        case CLIENTTYPE_PLAYER:     return "player";
+        case CLIENTTYPE_SPECTATOR:  return "spectator";
+    }
+    return "";
+}
+
 PocketType stringToPocketType(const QString& s)
 {
     if (s == "deck")      return POCKET_DECK;

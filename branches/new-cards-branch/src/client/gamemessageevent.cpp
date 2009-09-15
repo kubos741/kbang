@@ -1,33 +1,57 @@
+/***************************************************************************
+ *   Copyright (C) 2009 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include "gamemessageevent.h"
 #include "game.h"
 #include "card.h"
+#include "playerwidget.h"
 
 using namespace client;
 
 GameMessageEvent::GameMessageEvent(Game* game, const GameMessage& gameMessage):
-        GameEvent(game), m_gameMessage(gameMessage)
+        GameEvent(game),
+        m_gameMessage(gameMessage)
 {
 }
 
+/* virtual */
 GameMessageEvent::~GameMessageEvent()
 {
 }
 
-void GameMessageEvent::run()
+/* virtual */ void
+GameMessageEvent::run()
 {
     GameEvent::run();
     QString msg;
-    QString playerName       = m_gameMessage.player ? mp_game->playerWidget(m_gameMessage.player)->name() : "";
-    QString targetPlayerName = m_gameMessage.targetPlayer ? mp_game->playerWidget(m_gameMessage.targetPlayer)->name() : "";
-    QString causedByName     = m_gameMessage.causedBy ? mp_game->playerWidget(m_gameMessage.causedBy)->name() : "";
+    QString playerName       = m_gameMessage.player ? game()->playerWidget(m_gameMessage.player)->name() : "";
+    QString targetPlayerName = m_gameMessage.targetPlayer ? game()->playerWidget(m_gameMessage.targetPlayer)->name() : "";
+    QString causedByName     = m_gameMessage.causedBy ? game()->playerWidget(m_gameMessage.causedBy)->name() : "";
 
     switch(m_gameMessage.type) {
     case GAMEMESSAGE_GAMESTARTED:
-        mp_game->setGameState(GAMESTATE_PLAYING);
+        game()->setGameState(GAMESTATE_PLAYING);
         msg = tr("The game has just started.");
         break;
     case GAMEMESSAGE_GAMEFINISHED:
-        mp_game->setGameState(GAMESTATE_FINISHED);
+        game()->setGameState(GAMESTATE_FINISHED);
         msg = tr("The game has finished.");
         break;
     case GAMEMESSAGE_PLAYERDRAWFROMDECK:
@@ -110,14 +134,18 @@ void GameMessageEvent::run()
     case GAMEMESSAGE_INVALID:
         break;
     }
-    if (!msg.isEmpty())
-        mp_game->sendLogMessage(msg);
-    qDebug() << msg;
+    if (!msg.isEmpty()) {
+#if 0
+        game()->sendLogMessage(msg);
+#endif
+    }
     GameEvent::finish();
 }
 
-QString GameMessageEvent::cardToString(const CardData& cardData, bool withRankAndSuit)
+QString
+GameMessageEvent::cardToString(const CardData& cardData, bool withRankAndSuit)
 {
+#if 0
     if (cardData.id == 0) {
         return tr("<i>unknown card</i>");
     }
@@ -130,9 +158,12 @@ QString GameMessageEvent::cardToString(const CardData& cardData, bool withRankAn
         res += " (" + Card::rankToString(cardData.rank) +
                Card::suitToColorString(cardData.suit) + ")";
     return res;
+#endif
+    return QString();
 }
 
-QString GameMessageEvent::cardListWidgetToString(QList<CardData> cardListWidget)
+QString
+GameMessageEvent::cardListWidgetToString(QList<CardData> cardListWidget)
 {
     if (cardListWidget.size() == 0)
         return "";
@@ -154,7 +185,8 @@ QString GameMessageEvent::cardListWidgetToString(QList<CardData> cardListWidget)
     return result;
 }
 
-QString GameMessageEvent::decoratePlayerName(const QString& playerName, bool isTarget)
+QString
+GameMessageEvent::decoratePlayerName(const QString& playerName, bool isTarget)
 {
     return QString("<font color=\"%2\"><b>%1</b></font>").
                   arg(playerName).arg(isTarget ? "navy" : "lightblue");

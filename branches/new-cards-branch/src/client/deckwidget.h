@@ -53,6 +53,11 @@ public:
      */
     virtual CardWidget* pop();
 
+    /**
+     * Removes all CardWidgets from the pile and destroy them.
+     */
+    virtual void clear();
+
 private:
     CardWidget* newCard();
 };

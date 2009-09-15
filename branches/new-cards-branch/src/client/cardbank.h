@@ -30,28 +30,36 @@ class QDomElement;
 namespace client {
 
 /**
- * The CardBank class provides a storage for Card objects. As soon as client
- * joins a game, a new CardBank instance is created and is stuffed with
+ * The CardBank singleton class provides a storage for Card objects.
+ * As soon as client joins a game, the CardBank singleton is stuffed with
  * CardSets (through CardSetInfo instances). CardWidget instances then use this
  * class to get card graphics. The CardBank instance dies when client leaves
  * the game.
+ * @attention Selection of CardSets is hard-coded until support in the protocol
+ *            is introduced.
  * @author MacJariel
  */
 class CardBank : public QObject
 {
 Q_OBJECT
 public:
+    inline static CardBank& instance() {
+        static CardBank singleton;
+        return singleton;
+    }
+
+protected:
     /**
      * Constructs an empty CardBank.
-     * @param parent The parent of the CardBank.
      */
-    CardBank(QObject* parent);
+    CardBank();
 
     /**
      * Destroys the CardBank.
      */
     virtual ~CardBank();
 
+public:
     /**
      * Loads given card set. CardBank can hold more than one card set, but
      * you should not load the same card set more than once.

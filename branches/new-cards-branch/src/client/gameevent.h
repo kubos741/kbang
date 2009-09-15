@@ -26,6 +26,8 @@
 namespace client
 {
 
+class Game;
+
 /**
  * The GameEvent class provides base functionality and interface for game
  * events. Game events come from the server through the parser to the client
@@ -42,9 +44,9 @@ class GameEvent: public QObject
 Q_OBJECT;
 public:
     /**
-     * Constructs a GameEvent with is child of <i>parent</i>.
+     * Constructs a GameEvent with is related to <i>game</i>.
      */
-    GameEvent(QObject* parent);
+    GameEvent(Game* game);
 
     /**
      * Destroys the GameEvent.
@@ -56,7 +58,7 @@ public:
      */
     bool isRunning() const;
 
-protected slots:
+public slots:
     /**
      * Sets the GameEvent to running state. You can reimplement this method,
      * but make sure you call the original one in your reimplementation.
@@ -76,8 +78,14 @@ signals:
      */
     void finished(GameEvent* gameEvent);
 
+protected:
+    inline Game* game() {
+        return mp_game;
+    }
+
 private:
-    bool m_isRunning;
+    Game*   mp_game;
+    bool    m_isRunning;
 };
 }
 

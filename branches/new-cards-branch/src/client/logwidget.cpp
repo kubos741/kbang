@@ -18,74 +18,84 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "logwidget.h"
+#include "serverconnection.h"
+#include "ui_logwidget.h"
+
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <QtDebug>
+#include <QTextDocument>    // Qt::escape()
+
 
 using namespace client;
 
-LogWidget::LogWidget(QWidget *parent)
-: QWidget(parent), m_dataType(0)
+LogWidget::LogWidget(QWidget *parent):
+        QWidget(parent),
+        m_lastDataType(NoData),
+        mp_ui(new Ui::LogWidget())
 {
-    setupUi(this);
-    mp_xmlView->setFontPointSize(8);
+    mp_ui->setupUi(this);
+    mp_ui->xmlView->setFontPointSize(8);
+    connect(ServerConnection::instance(), SIGNAL(incomingData(QByteArray)),
+            this, SLOT(appendIncomingData(QByteArray)));
+    connect(ServerConnection::instance(), SIGNAL(outgoingData(QByteArray)),
+            this, SLOT(appendOutgoingData(QByteArray)));
 }
 
-
+/* virtual */
 LogWidget::~LogWidget()
 {
 }
 
-void LogWidget::paintEvent(QPaintEvent* event)
+/* static */ QString
+LogWidget::formatServerName(const QString& serverName)
+{
+    return "<font color=\"blue\">" + Qt::escape(serverName) +
+           "</font>";
+}
+
+/* virtual */ void
+LogWidget::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    painter.fillRect(event->rect().intersect(contentsRect()), QColor(0, 0, 0, 32));
+    painter.fillRect(event->rect().
+                     intersect(contentsRect()), QColor(0, 0, 0, 32));
 }
 
 
-void LogWidget::appendLogMessage(QString message)
+/* slot */ void
+LogWidget::appendLogMessage(QString message)
 {
-    mp_logView->append(message);
+    mp_ui->logView->append(message);
 }
 
-
-void LogWidget::appendIncomingData(const QByteArray & data)
+/* slot */ void
+LogWidget::appendIncomingData(const QByteArray& data)
 {
-    QTextCursor x = mp_xmlView->textCursor();
-    x.movePosition(QTextCursor::End);
-    mp_xmlView->setTextCursor(x);
-    if (m_dataType == 2)
-    {
-        mp_xmlView->append("");
+    mp_ui->xmlView->moveCursor(QTextCursor::End);
+    if (m_lastDataType == OutgoingData) {
+        mp_ui->xmlView->insertHtml("<br />");
     }
-    if (m_dataType != 1)
-    {
-        mp_xmlView->setTextColor(Qt::yellow);
+    if (m_lastDataType != IncomingData) {
+        mp_ui->xmlView->setTextColor(Qt::blue);
     }
-    mp_xmlView->insertPlainText(data);
-    m_dataType = 1;
-    x = mp_xmlView->textCursor();
-    x.movePosition(QTextCursor::End);
-    mp_xmlView->setTextCursor(x);
+    mp_ui->xmlView->insertPlainText(data);
+    mp_ui->xmlView->moveCursor(QTextCursor::End);
+    m_lastDataType = IncomingData;
 }
 
-void LogWidget::appendOutgoingData(const QByteArray & data)
+/* slot */ void
+LogWidget::appendOutgoingData(const QByteArray& data)
 {
-    QTextCursor x = mp_xmlView->textCursor();
-    x.movePosition(QTextCursor::End);
-    mp_xmlView->setTextCursor(x);
-    if (m_dataType == 1)
-    {
-        mp_xmlView->append("");
+    mp_ui->xmlView->moveCursor(QTextCursor::End);
+    if (m_lastDataType == IncomingData) {
+        mp_ui->xmlView->insertHtml("<br />");
     }
-    if (m_dataType != 2)
-    {
-        mp_xmlView->setTextColor(Qt::white);
+    if (m_lastDataType != OutgoingData) {
+        mp_ui->xmlView->setTextColor(Qt::white);
     }
-    mp_xmlView->setFontPointSize(9);
-    mp_xmlView->insertPlainText(data);
-    m_dataType = 2;
-    x = mp_xmlView->textCursor();
-    x.movePosition(QTextCursor::End);
-    mp_xmlView->setTextCursor(x);
+    mp_ui->xmlView->insertPlainText(data);
+    mp_ui->xmlView->moveCursor(QTextCursor::End);
+    m_lastDataType = OutgoingData;
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2009 by MacJariel                                       *
- *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *   MacJariel (at) gmail.com                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,43 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef DEBUGBLOCK_H
+#define DEBUGBLOCK_H
 
-#ifndef PLAYERDIEDEVENT_H
-#define PLAYERDIEDEVENT_H
+#include <QMutex>
+#include <QtDebug>
 
-#include "gameevent.h"
-#include "gametypes.h"
+#define DEBUG_BLOCK DebugBlock uniquelyNamedStackAllocatedStandardBlock( __PRETTY_FUNCTION__ );
 
-namespace client
+
+class DebugBlock
 {
-/**
- * The PlayerDiedEvent class represents the player-died game event.
- * @author MacJariel
- */
-class PlayerDiedEvent: public GameEvent
-{
-Q_OBJECT;
 public:
-    /**
-     * Constructs a PlayerDiedEvent related to <i>game<i>.
-     * @param playerId The id of player that died.
-     * @param role The role of player that died.
-     */
-    PlayerDiedEvent(Game* game, PlayerId playerId, PlayerRole role);
-
-    /**
-     * Destroys the PlayerDiedEvent.
-     */
-    virtual ~PlayerDiedEvent();
-
-    /**
-     * Runs the event.
-     */
-    virtual void run();
+    DebugBlock(const char* label);
+    ~DebugBlock();
 
 private:
-    PlayerId    m_playerId;
-    PlayerRole  m_role;
+    const char* mp_label;
+    int         m_level;
+
+    static int sm_level;
+    static QMutex sm_mutex;
 };
-}
-#endif // PLAYERDIEDEVENT_H
+
+#endif // DEBUGBLOCK_H

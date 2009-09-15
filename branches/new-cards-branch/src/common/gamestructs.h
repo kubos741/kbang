@@ -421,4 +421,30 @@ struct ActionUseAbilityData {
     static QString elementName; /**< Name of corresponding XML element. */
 };
 
+/**
+ * This structure holds information about a chat message. It can be used to
+ * send chat messages between client and server in both directions (either as
+ * game event or as game action). In case of game action, clientId and playerId
+ * and senderName fields are ignored.
+ */
+struct ChatMessageData {
+    ChatMessageData(): clientId(0), playerId(0) {}
+    ClientId    clientId;
+    PlayerId    playerId;
+    QString     senderName;
+    QString     text;
+
+    /**
+     * Reads the given XML tree and writes data into this object.
+     */
+    bool read(XmlNode*);
+
+    /**
+     * Writes data from this object into XML stream using given writer.
+     */
+    void write(QXmlStreamWriter*) const;
+
+    static QString elementName; /**< Name of corresponding XML element. */
+};
+
 #endif // GAMESTRUCTS_H

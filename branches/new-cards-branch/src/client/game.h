@@ -45,8 +45,21 @@ class GameActionManager;
 class Game: public QObject {
 Q_OBJECT;
 public:
+    enum InterfaceType {
+        NoInterface = 0,
+        CreatorInterface,
+        GameInterface
+    };
+
+    /**
+     * Enters the game mode. Constructs a new Game instance.
+     */
     static void enterGameMode(GameId, QString gameName, ClientType);
 
+    /**
+     * Leaves the game mode. Destroys the Game instance and cleans up
+     * the widgets.
+     */
     void leaveGameMode();
 
     /**
@@ -159,6 +172,10 @@ public:
         return (m_gameState == GAMESTATE_FINISHED);
     }
 
+    inline InterfaceType interfaceType() const {
+        return m_interfaceType;
+    }
+
     inline GameEventHandler* eventHandler() const {
         return mp_gameEventHandler;
     }
@@ -259,9 +276,16 @@ public:
     void updateOpponent(const PublicPlayerData&);
 
     /**
-     * Clears opponent widget specified with index.
+     * Clears opponent widget specified with index. Negative indeces can be
+     * used.
      */
     void clearOpponentWidget(int index);
+
+    /**
+     * Clears opponent widgets specified by index range. Negative indeces can be
+     * used.
+     */
+    void clearOpponentWidgetRange(int indexFrom, int indexTo);
 
     /**
      * Pauses the dequeuing of incoming game events.
@@ -285,12 +309,6 @@ private:
     void loadGameInterface();
     void unloadGameInterface();
     void unloadInterface();
-
-    enum InterfaceType {
-        NoInterface = 0,
-        CreatorInterface,
-        GameInterface
-    };
 
     GameId          m_gameId;
     QString         m_gameName;

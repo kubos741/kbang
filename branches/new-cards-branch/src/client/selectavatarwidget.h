@@ -17,84 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef SELECTAVATARWIDGET_H
+#define SELECTAVATARWIDGET_H
 
-#include "gameeventqueue.h"
-#include "gameevent.h"
+#include <QLabel>
+#include <QImage>
 
-using namespace client;
-
-GameEventQueue::GameEventQueue(QObject* parent):
-        QObject(parent),
-        m_paused(0),
-        m_eventOnHold(0)
+namespace client {
+/**
+ * The SelectAvatarWidget class provides a widget that displays player's
+ * avatar and allows user to change it by clicking on it.
+ */
+class SelectAvatarWidget: public QLabel
 {
+public:
+    /**
+     * Constructs a SelectAvatarWidget.
+     */
+    SelectAvatarWidget(QWidget* parent);
+
+    /**
+     * Destroys the SelectAvatarWidget.
+     */
+    virtual ~SelectAvatarWidget();
+
+    /**
+     * Returns path to the selected avatar.
+     */
+    QString avatarFilePath() const;
+
+    /**
+     * Returns the selected avatar.
+     */
+    QImage avatar() const;
+
+    /**
+     * Loads avatar from file specified by <i>filePath</i>.
+     */
+    void loadAvatar(const QString& filePath);
+
+    /**
+     * Unloads the current avatar.
+     */
+    void unloadAvatar();
+
+protected:
+    virtual void mousePressEvent(QMouseEvent* ev);
+
+private:
+    QString m_avatarFilePath;
+    QImage  m_avatar;
+};
 }
 
-/* virtual */
-GameEventQueue::~GameEventQueue()
-{
-}
-
-void
-GameEventQueue::add(GameEvent* gameEvent)
-{
-    if (m_queue.isEmpty()) {
-        m_queue.enqueue(gameEvent);
-        runGameEvent();
-    } else {
-        m_queue.enqueue(gameEvent);
-    }
-}
-
-
-void
-GameEventQueue::pause()
-{
-    m_paused = 1;
-}
-
-void
-GameEventQueue::resume()
-{
-    m_paused = 0;
-    if (m_eventOnHold) {
-        m_eventOnHold = 0;
-        runGameEvent();
-    }
-}
-
-#if 0
-void GameEventQueue::clear()
-{
-    m_aboutToDelete = 1;
-    if (!m_queue.isEmpty() && m_queue.head()->isRunning()) {
-        m_queue.head()->stop();
-    }
-}
-#endif
-
-
-/* slot */ void
-GameEventQueue::onGameEventFinished(GameEvent* gameEvent)
-{
-    Q_ASSERT(gameEvent == m_queue.head());
-    Q_UNUSED(gameEvent);
-    m_queue.dequeue()->deleteLater();
-    if (!m_queue.isEmpty()) {
-        runGameEvent();
-    }
-}
-
-void
-GameEventQueue::runGameEvent()
-{
-    if (m_paused) {
-        m_eventOnHold = 1;
-        return;
-    }
-    GameEvent* gameEvent = m_queue.head();
-    Q_ASSERT(!gameEvent->isRunning());
-    connect(gameEvent, SIGNAL(finished(GameEvent*)),
-            this,      SLOT(onGameEventFinished(GameEvent*)));
-    gameEvent->run();
-}
+#endif // SELECTAVATARWIDGET_H

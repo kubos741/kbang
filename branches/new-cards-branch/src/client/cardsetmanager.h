@@ -48,7 +48,9 @@ public:
     /**
      * Returns the information about installed card sets.
      */
-    QList<CardSetInfo> localCardSets();
+    inline QList<CardSetInfo> localCardSets() {
+        return m_localCardSets;
+    }
 
     /**
      * Appends the <i>slot</i> to the list of known slots.

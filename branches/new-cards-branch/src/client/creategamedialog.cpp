@@ -102,7 +102,7 @@ void CreateGameDialog::onCreateGameClicked()
     CreatePlayerData createPlayerData;
     createPlayerData.name               = mp_ui->lineEditPlayerName->text();
     createPlayerData.password           = mp_ui->lineEditPlayerPassword->text();
-    createPlayerData.avatar             = mp_ui->selectPlayerIconWidget->image();
+    createPlayerData.avatar             = mp_ui->selectAvatarWidget->avatar();
 
     saveConfigValues(createGameData);
 
@@ -130,7 +130,7 @@ void CreateGameDialog::loadConfigValues()
     }
     mp_ui->lineEditPlayerName->setText(cfg.readString("player", "name"));
     mp_ui->lineEditPlayerPassword->setText(cfg.readString("player", "password"));
-    mp_ui->selectPlayerIconWidget->setImageFileName(cfg.readString("player", "image"));
+    mp_ui->selectAvatarWidget->loadAvatar(cfg.readString("player", "image"));
     validateInput();
 }
 
@@ -149,7 +149,7 @@ void CreateGameDialog::saveConfigValues(const CreateGameData& game)
 
     cfg.writeString("player", "name", mp_ui->lineEditPlayerName->text());
     cfg.writeString("player", "password", mp_ui->lineEditPlayerPassword->text());
-    cfg.writeString("player", "image", mp_ui->selectPlayerIconWidget->imageFileName());
+    cfg.writeString("player", "image", mp_ui->selectAvatarWidget->avatarFilePath());
 
     cfg.store();
 }

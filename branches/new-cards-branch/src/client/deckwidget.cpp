@@ -23,10 +23,10 @@
 using namespace client;
 
 DeckWidget::DeckWidget(QWidget *parent):
-        CardPileWidget(parent)
+        CardPileWidget(parent, 0)
 {
     setPocketType(POCKET_DECK);
-    m_cards.push(newCard());
+    newCard();
 }
 
 /* virtual */
@@ -45,6 +45,11 @@ DeckWidget::push(CardWidget* card)
 DeckWidget::pop()
 {
     return newCard();
+}
+
+/* virtual */ void
+DeckWidget::clear()
+{
 }
 
 CardWidget*

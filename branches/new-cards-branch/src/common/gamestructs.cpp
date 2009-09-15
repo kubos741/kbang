@@ -629,3 +629,38 @@ ActionUseAbilityData::write(QXmlStreamWriter* writer) const
     }
     writer->writeEndElement();
 }
+
+QString ChatMessageData::elementName("chat-message");
+
+bool
+ChatMessageData::read(XmlNode* node)
+{
+    READ_ELEMENT_NAME_CHECK;
+    clientId   = stringToInt(node->attribute("client-id"));
+    playerId   = stringToInt(node->attribute("player-id"));
+    senderName = node->attribute("sender-name");
+
+    XmlNode* textNode = node->getFirstChild();
+    if (!textNode || !textNode->isTextElement()) {
+        return 0;
+    }
+    text = textNode->text();
+    return 1;
+}
+
+void
+ChatMessageData::write(QXmlStreamWriter* writer) const
+{
+    writer->writeStartElement(elementName);
+    if (clientId != 0) {
+        writer->writeAttribute("client-id", intToString(clientId));
+    }
+    if (playerId != 0) {
+        writer->writeAttribute("player-id", intToString(playerId));
+    }
+    if (!senderName.isEmpty()) {
+        writer->writeAttribute("sender-name", senderName);
+    }
+    writer->writeCharacters(text);
+    writer->writeEndElement();
+}

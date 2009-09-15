@@ -21,15 +21,24 @@
 #include "serverconnection.h"
 #include "parser/parser.h"
 #include "parser/queryget.h"
+#include "mainwindow.h"
+#include "game.h"
+#include "logwidget.h"
+#include "debug/debugblock.h"
 
 #include <QTcpSocket>
+#include <QMessageBox>
+#include <QApplication>
 
 using namespace client;
 
 ServerConnection::ServerConnection()
-        : QObject(0), mp_parser(0)
+        : QObject(0),
+        mp_tcpSocket(new QTcpSocket(this)),
+        mp_parser(0)
 {
-    mp_tcpSocket = new QTcpSocket(this);
+    connect(mp_tcpSocket, SIGNAL(disconnected()),
+            this, SLOT(onDisconnect()));
     connect(mp_tcpSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(onSocketStateChanged()));
     connect(mp_tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -72,21 +81,19 @@ ServerConnection::newQueryGet()
 void
 ServerConnection::connectToServer(QString serverHost, int serverPort)
 {
-    if (mp_tcpSocket->state() == QAbstractSocket::UnconnectedState)
-    {
-#if 0
-        emit logMessage(tr("Connecting to <i>%1</i>...").arg(serverHost));
-#endif
-        mp_tcpSocket->connectToHost(serverHost, serverPort);
+    if (mp_tcpSocket->state() == QAbstractSocket::UnconnectedState) {
         m_serverHost = serverHost;
+        MainWindow::instance()->logWidget()->appendLogMessage(
+            tr("Connecting to %1.").arg(LogWidget::formatServerName(m_serverHost)));
+        mp_tcpSocket->connectToHost(serverHost, serverPort);
     }
 }
 
 void
 ServerConnection::disconnectFromServer()
 {
-    if (mp_parser != 0 && mp_tcpSocket->state() != QAbstractSocket::UnconnectedState) {
-        mp_parser->terminate();
+    if (mp_parser != 0) {
+        mp_parser->closeStream();
     }
 }
 
@@ -138,7 +145,9 @@ void ServerConnection::sendChatMessage(const QString& message)
     if (mp_parser == 0) {
         return;
     }
-    mp_parser->actionChatMessage(message);
+    ChatMessageData chatMessageData;
+    chatMessageData.text = message;
+    mp_parser->actionChatMessage(chatMessageData);
 }
 
 void ServerConnection::drawCard()
@@ -191,6 +200,13 @@ void ServerConnection::discardCard(CardId cardId)
 
 
 
+/* slot */ void
+ServerConnection::onDisconnect()
+{
+    mp_parser->deleteLater();
+    mp_parser = 0;
+}
+
 
 /**
  * @todo
@@ -200,35 +216,48 @@ ServerConnection::onSocketError()
 {
     switch(mp_tcpSocket->error()) {
         case QAbstractSocket::ConnectionRefusedError:
-            break;
-        case QAbstractSocket::RemoteHostClosedError:
-            break;
         case QAbstractSocket::HostNotFoundError:
+            MainWindow::instance()->showWarningMessage(
+                    tr("Cannot connect to server: %1").
+                    arg(mp_tcpSocket->errorString()));
             break;
         default:
-
             break;
     }
 }
 
-/**
- * @todo
- */
+/* slot */ void
+ServerConnection::onParserError()
+{
+    switch (mp_parser->parserError()) {
+        case Parser::ProtocolVersionError:
+            MainWindow::instance()->showWarningMessage(
+                    tr("Cannot connect to server. Remote server uses different "
+                       "protocol version. Please make sure you use the latest "
+                       "client version."));
+            break;
+        case Parser::StreamTimeoutError:
+            MainWindow::instance()->showWarningMessage(
+                    tr("Cannot connect to server. Server did not open the stream."));
+            break;
+        default:
+            break;
+    }
+}
+
 /* slot */ void
 ServerConnection::onSocketStateChanged()
 {
     switch(mp_tcpSocket->state()) {
         case QAbstractSocket::UnconnectedState:
-            break;
-        case QAbstractSocket::HostLookupState:
-            break;
-        case QAbstractSocket::ConnectingState:
+            MainWindow::instance()->logWidget()->appendLogMessage(
+                    tr("Disconnected from %1.").
+                    arg(LogWidget::formatServerName(m_serverHost)));
             break;
         case QAbstractSocket::ConnectedState:
-            break;
-        case QAbstractSocket::BoundState:
-            break;
-        case QAbstractSocket::ClosingState:
+            mp_parser = new Parser(mp_tcpSocket);
+            connectParser();
+            mp_parser->openStream();
             break;
         default:
             break;
@@ -241,11 +270,20 @@ ServerConnection::onSocketStateChanged()
     initializeParserConnections();
     mp_parser->initializeStream();
 
-    QueryGet* query = queryGet();
-    connect(query, SIGNAL(result(const ServerInfoData&)),
-            this, SLOT(recievedServerInfo(const ServerInfoData&)));
-    query->getServerInfo();
 #endif
+}
+
+/* socket */ void
+ServerConnection::onStreamOpened()
+{
+    MainWindow::instance()->logWidget()->appendLogMessage(
+        tr("Connected to %1.").
+        arg(LogWidget::formatServerName(m_serverHost)));
+
+    QueryGet* query = newQueryGet();
+    connect(query, SIGNAL(result(ServerInfoData)),
+            this, SLOT(onServerInfoReceived(ServerInfoData)));
+    query->getServerInfo();
 }
 
 #if 0
@@ -297,21 +335,32 @@ void ServerConnection::recievedEventLeaveGame(int gameId, const StructPlayer& pl
 }
 */
 
-void ServerConnection::initializeParserConnections()
+void ServerConnection::connectParser()
 {
-    connect(mp_parser, SIGNAL(sigEventEnterGameMode(int,QString,ClientType)),
-            this,      SIGNAL(enterGameMode(int,QString,ClientType)));
+    connect(mp_parser, SIGNAL(incomingData(QByteArray)),
+            this, SIGNAL(incomingData(QByteArray)));
+    connect(mp_parser, SIGNAL(outgoingData(QByteArray)),
+            this, SIGNAL(outgoingData(QByteArray)));
+    connect(mp_parser, SIGNAL(error(ParserError)),
+            this, SLOT(onParserError()));
+    connect(mp_parser, SIGNAL(streamOpened()),
+            this, SLOT(onStreamOpened()));
+
+    connect(mp_parser, SIGNAL(sigEventEnterGameMode(GameId,QString,ClientType)),
+            MainWindow::instance(), SLOT(enterGameMode(GameId,QString,ClientType)));
     connect(mp_parser, SIGNAL(sigEventExitGameMode()),
-            this,      SIGNAL(exitGameMode()));
-    connect(mp_parser, SIGNAL(sigEventChatMessage(int, const QString&, const QString&)),
+            MainWindow::instance(), SLOT(exitGameMode()));
+    ///@todo
+#if 0
+    connect(mp_parser, SIGNAL(sigEventChatMessage(ChatMessageData)),
+
+
+
             this, SIGNAL(incomingChatMessage(int, const QString&, const QString&)));
     connect(mp_parser, SIGNAL(sigEventGameCanBeStarted(bool)),
             this, SIGNAL(gameCanBeStarted(bool)));
-    connect(mp_parser, SIGNAL(incomingData(const QByteArray&)),
-            this, SIGNAL(incomingData(const QByteArray&)));
-    connect(mp_parser, SIGNAL(outgoingData(const QByteArray&)),
-            this, SIGNAL(outgoingData(const QByteArray&)));
     connect(mp_parser, SIGNAL(sigEventCardMovement(const CardMovementData&)),
             this, SIGNAL(eventCardMovement(const CardMovementData&)));
+#endif
 }
 

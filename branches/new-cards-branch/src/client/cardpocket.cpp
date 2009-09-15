@@ -24,8 +24,9 @@
 
 using namespace client;
 
-CardPocket::CardPocket(QWidget *parent):
+CardPocket::CardPocket(QWidget *parent, bool isRevealed):
         QFrame(parent),
+        m_isRevealed(isRevealed),
         m_pocketType(POCKET_INVALID),
         m_ownerId(0),
         m_cardSizeRole(CARD_SIZE_NORMAL)
@@ -44,6 +45,12 @@ CardPocket::push(CardWidget* cardWidget)
 {
     cardWidget->setOwnerId(m_ownerId);
     cardWidget->setPocketType(m_pocketType);
+}
+
+void
+CardPocket::setRevealed(bool isRevealed)
+{
+    m_isRevealed = isRevealed;
 }
 
 void

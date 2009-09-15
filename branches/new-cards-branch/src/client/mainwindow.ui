@@ -661,7 +661,7 @@
      <x>0</x>
      <y>0</y>
      <width>666</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -685,7 +685,15 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionCardSizeUp"/>
+    <addaction name="actionCardSizeDown"/>
+   </widget>
    <addaction name="menuGame"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionConnectToServer">
@@ -729,6 +737,22 @@
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About KBang</string>
+   </property>
+  </action>
+  <action name="actionCardSizeUp">
+   <property name="text">
+    <string>Enlarge Cards</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
+   </property>
+  </action>
+  <action name="actionCardSizeDown">
+   <property name="text">
+    <string>Shrink Cards</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
  </widget>

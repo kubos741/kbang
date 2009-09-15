@@ -41,10 +41,23 @@ class CardPocket : public QFrame
 {
 Q_OBJECT
 protected:
-    CardPocket(QWidget *parent);
+    CardPocket(QWidget *parent, bool isRevealed);
     virtual ~CardPocket();
 
 public:
+    /**
+     * Returns whether this pocket can contain revealed cards.
+     */
+    inline bool isRevealed() const {
+        return m_isRevealed;
+    }
+
+    /**
+     * Returns the owner's id.
+     */
+    inline PlayerId ownerId() const {
+        return m_ownerId;
+    }
 
     /**
      * Returns the position (relative to this widget) of the next card to be
@@ -61,6 +74,13 @@ public:
      * Removes all CardWidgets from the pocket.
      */
     virtual void clear() = 0;
+
+    /**
+     * Sets whether this pocket can contain revealed cards. If set to false,
+     * cards that are pushed into this pocket are automatically unrevealed.
+     * @note The unrevealing is implemented in CardMovementEvent.
+     */
+    void setRevealed(bool isRevealed);
 
     /**
      * Sets the PocketType to given type.
@@ -84,7 +104,7 @@ public slots:
      * Recomputes size of the widget and reorders CardWidgets. The actual CardWidget size
      * from CardWidgetSizeManager is used.
      */
-    virtual void updateWidgetSize() = 0;
+    virtual void updateWidgetSize() {}
 
 signals:
     /**
@@ -94,6 +114,7 @@ signals:
     void newCardPositionChanged(const QPoint&);
 
 protected:
+    bool            m_isRevealed;
     PocketType      m_pocketType;
     PlayerId        m_ownerId;
     CardSizeRole    m_cardSizeRole;

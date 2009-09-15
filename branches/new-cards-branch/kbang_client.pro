@@ -4,8 +4,9 @@ MOC_DIR = mocs/client
 RCC_DIR = rccs/client
 OBJECTS_DIR = obj/client
 CONFIG += qt
-CONFIG += release \
-    warn_on
+CONFIG += debug \
+#CONFIG += release \
+		   warn_on
 QT += network \
     xml
 RESOURCES += src/client/resources/client.qrc
@@ -46,7 +47,7 @@ HEADERS += src/client/gameloop.h \
     src/client/graveyardwidget.h \
     src/client/cardzoomwidget.h \
     src/client/newserverdialog.h \
-    src/client/selectplayericonwidget.h \
+    src/client/selectavatarwidget.h \
     src/client/gamemessageevent.h \
     src/client/cardwidgetsizemanager.h \
     src/client/aboutdialog.h \
@@ -97,7 +98,7 @@ SOURCES += src/client/gameloop.cpp \
     src/client/graveyardwidget.cpp \
     src/client/cardzoomwidget.cpp \
     src/client/newserverdialog.cpp \
-    src/client/selectplayericonwidget.cpp \
+    src/client/selectavatarwidget.cpp \
     src/client/gamemessageevent.cpp \
     src/client/cardwidgetsizemanager.cpp \
     src/client/aboutdialog.cpp \

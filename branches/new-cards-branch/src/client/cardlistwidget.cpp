@@ -27,8 +27,8 @@
 
 using namespace client;
 
-CardListWidget::CardListWidget(QWidget *parent):
-        CardPocket(parent),
+CardListWidget::CardListWidget(QWidget *parent, bool isRevealed):
+        CardPocket(parent, isRevealed),
         m_hasBox(1),
         m_hPadding(3),
         m_vPadding(3)

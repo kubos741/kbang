@@ -55,7 +55,8 @@ int main(int argc, char *argv[])
                                                   arg(KBANG_CLIENT_VERSION_MINOR).
                                                   arg(KBANG_CLIENT_VERSION_REVISION));
 
-    MainWindow::instance().show();
+    MainWindow mainWindow;
+    mainWindow.show();
     return app.exec();
 }
 

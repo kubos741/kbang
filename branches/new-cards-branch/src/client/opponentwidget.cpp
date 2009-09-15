@@ -22,7 +22,6 @@
 #include "cardlistwidget.h"
 
 #include <QMovie>
-#include <QtDebug>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QRect>
@@ -45,6 +44,7 @@ OpponentWidget::OpponentWidget(QWidget *parent):
     mp_hand->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_hand->setPocketType(POCKET_HAND);
     mp_hand->setOwnerId(id());
+    mp_hand->setRevealed(0);
 
     mp_table->setCardSizeRole(CARD_SIZE_NORMAL);
     mp_table->setPocketType(POCKET_TABLE);
@@ -123,7 +123,7 @@ void OpponentWidget::createRoleCard()
 
 void OpponentWidget::updateRoleCard()
 {
-    if (!m_isAlive || mp_game->isFinished()) {
+    if (!m_isAlive || (mp_game && mp_game->isFinished())) {
         createRoleCard();
         if (m_isWinner) {
             mp_roleCard->setCardSizeRole(CARD_SIZE_NORMAL);
