@@ -1,0 +1,308 @@
+#summary Protocol: events
+
+= Introduction =
+
+Events are sent from server to clients inside the xml stream.
+
+= Game Events =
+
+Game Events are events that are related to a concrete game.
+
+== Start Game ==
+Game started.
+
+{{{
+<event>
+  <game-event game-id="1" type="start-game" />
+</event>
+}}}
+
+== Finish Game ==
+Game finished. The event contains the list of all players with their roles and information whether they are winners.
+
+{{{
+<event>
+  <game-event game-id="1" type="finish-game">
+    <update-player id="1" role="sheriff" is-winner="true" />
+    <update-player id="2" role="deputy" is-winner="true" />
+    <update-player id="3" role="outlaw" is-winner="false" />
+    <update-player id="4" role="renegade" is-winner="false" />
+    <update-player id="5" role="outlaw" is-winner="false" />
+  </game-event>
+</event>
+}}}
+
+== Deal Cards ==
+Cards were dealt to players.
+
+{{{
+<event>
+  <game-event game-id="1" type="deal-cards">
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="3">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+      <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
+    </card-movement>
+    
+    ...
+
+  </game-event>
+</event>
+}}}
+
+== Start Turn ==
+Turn of the player started.
+
+{{{
+<event>
+  <game-event game-id="1" type="start-turn" player-id="1">
+    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="draw" />
+  </game-event>
+</event>
+}}}
+
+== Check Deck ==
+Player flipped a card from the deck, because of Jail or Dynamite.
+
+=== Successful Dynamite check ===
+{{{
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" success="true">
+    <cause>
+      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+    </cause>
+    <checked>
+      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+    </card-movement>
+    <card-movement pocket-type-from="table" pocket-type-to="table" player-from="1" player-to="2">
+      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+
+=== Unsuccessful Dynamite check ===
+{{{
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" success="false">
+    <cause>
+      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+    </cause>
+    <checked>
+      <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
+    </card-movement>
+    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+    </card-movement>
+    <
+  </game-event>
+</event>
+}}}
+
+=== Successful Jail check ===
+{{{
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" success="true">
+    <cause>
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </cause>
+    <checked>
+      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+    </card-movement>
+    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+
+=== Unsuccessful Jail check ===
+{{{
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" success="false">
+    <cause>
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </cause>
+    <checked>
+      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+    </card-movement>
+    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+
+=== Lucky Duke check ===
+The "draw!" of Lucky Duke must be split into 2 game events:
+
+{{{
+<event>
+  <game-event game-id="1" type="" player-id="1" use-ability="true">
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+    </card-movement>
+  </game-event>
+</event>
+
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" success="true">
+    <cause>
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </cause>
+    <checked>
+      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />      
+    </card-movement>
+    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+
+=== Jourdonnais's "barrel" check ===
+{{{
+<event>
+  <game-event game-id="1" type="check-deck" player-id="1" use-ability="true">
+    <cause>
+      <card id="0" name="jourdonnais" type="character" />
+    </cause>
+    <checked>
+      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+    </checked>
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+    </card-movement>
+  </game-event>
+</event>
+}}} 
+
+== Draw Cards ==
+Cards were drawn by a player to his hand.
+
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="1">
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+      <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+      <card id="87654321" name="beer" type="playing" suit="hearts" rank="ace" />
+    </card-movement>
+    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+  </game-event>
+</event>
+}}}
+
+=== Special case: Jesse Jones, Pedro Ramirez  ===
+
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="4" use-ability="true">
+    <card-movement pocket-type-from="hand" pocket-type-to="hand" player-from="1" player-to="4">
+      <card id="12345678" name="panic" type="playing" suit="hearts" rank="jack" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+      <card id="87654321" name="beer" type="playing" suit="spades" rank="5" />
+    </card-movement>
+    <game-context current-player-id="4" requested-player-id="4" turn-number="1" game-play-state="turn" />
+  </game-event>
+</event>
+}}}
+
+=== Special case: Black Jack ===
+The example shows Black Jack using his ability, as viewed by his opponents. They only see the second drew card.
+
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="1" use-ability="true">
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="87654321" name="beer" type="playing" suit="hearts" rank="5" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+  </game-event>
+</event>
+}}}
+
+=== Special case: Kit Carlson ===
+Kit Carlson's drawing is split into three game events:
+ 1. Sending 3 cards into _selection_ pocket.
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="1" use-ability="true">
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+ 
+ 2. Drawing the first card.
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="1" use-ability="true">
+    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+ 
+ 3. Drawing the second card.
+{{{
+<event>
+  <game-event game-id="1" type="draw-cards" player-id="1" use-ability="true">
+    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
+      <card id="0" />
+    </card-movement>
+    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+  </game-event>
+</event>
+}}}
+
+*Note:* We might join the last two game events into one. It will allow to display only one log message in client,
+instead of two. On the another hand, the player would have to send only one game action with both selected cards,
+instead of two game actions, each with one card.
+
+
+_TO BE CONTINUED_
