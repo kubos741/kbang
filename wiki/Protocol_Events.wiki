@@ -1,5 +1,7 @@
 #summary Protocol: events
 
+<wiki:toc />
+
 = Introduction =
 
 Events are sent from server to clients inside the xml stream.
