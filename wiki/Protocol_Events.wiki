@@ -1,17 +1,127 @@
-#summary Protocol: events
+﻿#summary Protocol: events
 
 <wiki:toc />
 
 = Introduction =
+Server sends events to inform clients about changes. There are two types of events,]
 
-Events are sent from server to clients inside the xml stream.
+= Server Events =
+Those events are not directly related to gameplay. They can inform about another players entering/leaving game, etc.
+
+== Enter Game ==
+The _Enter Game_ event is received after client sends a request for entering a game. Client is able
+to synchronize with the current state of the game, no matter whether the Game was already started or not.
+
+The _game-id_ attribute specifies the id of the game. The _player-id_ attribute specifies the id of player, that the client controls.
+If client connects to the game as a spectator, the _player-id_ attribute is not present (or is set to 0).
+
+{{{
+<server-event>
+  <enter-game game-id="1" game-name="Game Name" game-state="waiting-for-players" player-id="1" last-event-id="0">
+	<players>
+	  <public-player id="1" name="Player #1" ... />
+	  ...
+	  <private-player id="1" role="deputy" ... />
+	</players>
+	<game-context ... />
+	<graveyard>
+		<card ... />
+	</graveyard>
+	<selection>
+		<card ... />
+		<card ... />
+	</selection>
+  </enter-game>
+</server-event>
+}}}
+
+
+== Exit Game ==
+The _Exit Game_ event is received after client leaves the game. This event is sent after client asks to leave the game,
+but client can be kicked as well. The kicking is not implemented yet.
+
+{{{
+<server-event>
+  <exit-game game-id="1" />
+</server-event>
+}}}
+
+== Create Player ==
+The _Create Player_ event is received when new player is created. This can happen either by a client connecting to the game
+or by creating an AI. The nature of Bang! does not allow to create players in the middle of the game, so you can except this
+event only in _waiting-for-players_ state.
+
+{{{
+<server-event>
+  <create-player game-id="1">
+	<public-player id="2" ... />
+  </create-player>
+</server-event>
+}}}
+
+== Remove Player ==
+The _Remove Player_ event is received when a player is removed from the game. That can only happen in the _waiting-for-players-
+state. When a client (who controls a player) leaves the game that was already started, the player is never removed. Instead the
+player is in _detached_ state and waits for another client/AI.
+
+{{{
+<server-event>
+  <remove-player game-id="1" player-id="2" />
+</server-event>
+}}}
+
+== Chat Message ==
+The _Chat Message_ event is received when someone (something) sends a chat message. Chat messages currently work only in games,
+but the concept will be extended to global chat messages and local chat messages. This needs to be discussed in the community.
+
+Note that KBang does not support whispering and will never do.
+
+{{{
+<server-event>
+  <chat-message game-id="1" client-id="1" player-id="1" sender-name="Player #1">
+  Hello world!
+  </chat-message>
+</server-event>
+}}}
+
+== Game Update ==
+The _Game Update_ event is received when some attributes of the game are changed, however only attributes not related to
+gameplay are taken in account. This event is currently used only to tell, that _game startability_ changed, but in the future
+it might be possible to change some attributes during the game (at least in the _waiting-for-players_ state) and this event
+will serve the purpose.
+
+{{{
+<server-event>
+  <game-update game-id="1" is-startable="true" />
+</server-event>
+}}}
+
+
 
 = Game Events =
+Game Events are events that are related to a concrete game. The list of all Game Events is a complete log of a game
+and every game could be reconstructed from it. Game Events look like this:
+{{{
+<event>
+  <game-event game-id="${GAME_ID}" event-id="1" type="${GAME_EVENT_TYPE}" $SIMPLE_GAME_EVENT_ATTRIBUTES>
+    $COMPLEX_GAME_EVENT_ATTRIBUTES
+    $LIST_OF_IMPERATIVE_COMMANDS
+  </game-event>
+</event>
+}}}
 
-Game Events are events that are related to a concrete game.
+To maintain the correct state of the game, only the _list of imperative commands_ is necessary. The rest of the game event
+contains the semantic information, that is needed to display nice log message.
+
+Game events are sent to all players and spectators, but because some information may be private to certain player, there
+is a public and a private version of each game event.
+
+
 
 == Start Game ==
 Game started.
+
+*Important:* When this event is received, the state of the game is set to _playing_.
 
 {{{
 <event>
@@ -21,6 +131,8 @@ Game started.
 
 == Finish Game ==
 Game finished. The event contains the list of all players with their roles and information whether they are winners.
+
+*Important:* When this event is received, the state of the game is set to _finished_.
 
 {{{
 <event>
@@ -667,4 +779,29 @@ Player played a card.
 </event>
 }}}
 
-_TO BE CONTINUED_
+== Discard Card ==
+{{{
+<event>
+  <game-event game-id="1" type="discard-card" player-id="1">
+    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
+    </card-movement>
+    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="discard" />
+  </game-event>
+</event>
+}}}
+
+{{{
+<event>
+  <game-event game-id="1" type="discard-card" player-id="1">
+    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+      <card id="87654114" name="missed" type="playing" suit="hearts" rank="jack" />
+    </card-movement>
+  </game-event>
+</event>
+}}}
+
+
+= Request for comments =
+I would like to have a discussion about the game events.
+
