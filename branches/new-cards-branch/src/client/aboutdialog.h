@@ -30,8 +30,8 @@ class AboutDialog;
 namespace client {
 
 /**
- * The AboutDialog class is a dialog that shows
- * information about KBang.
+ * The AboutDialog class is a dialog that presents information about KBang
+ * to the user.
  * @author MacJariel
  */
 class AboutDialog: public QDialog {
@@ -41,7 +41,7 @@ public:
      * Constructs an AboutDialog. The constructor sets the UI using
      * generated Ui::AboutDialog class.
      */
-    AboutDialog(QWidget *parent = 0);
+    AboutDialog(QWidget* parent = 0);
 
     /**
      * Destroys the AboutDialog.

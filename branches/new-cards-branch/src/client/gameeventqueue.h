@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GAMEEVENTQUEUE_H
+#if 0
+//#ifndef GAMEEVENTQUEUE_H
 #define GAMEEVENTQUEUE_H
 
 #include <QObject>

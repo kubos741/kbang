@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,7 +25,9 @@
 
 #include "publicplayerview.h"
 #include "privateplayerview.h"
-#include "parser/parserstructs.h"
+#include "gametypes.h"
+
+class CreatePlayerData;
 
 
 class PlayingCard;
@@ -54,9 +56,9 @@ class CharacterBase;
  * basic controller is the Client class that forms an adapter between remote clients
  * and player controller API.
  *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * @author MacJariel
  */
-class Player : public QObject
+class Player: public QObject
 {
     Q_OBJECT;
 public:
@@ -69,8 +71,8 @@ public:
      * @param name      the name of the player
      * @param password  the password for reconnecting into player
      */
-    Player(Game* game, int id, const CreatePlayerData&);
-    ~Player();
+    Player(Game*, PlayerId, const CreatePlayerData&);
+    virtual ~Player();
     typedef QList<PlayingCard*> CardList;
 
   /////////////
@@ -81,7 +83,7 @@ public:
      * Returns the id of the player. Zero value is reserved and interpreted
      * as an invalid player.
      */
-    inline int                  id()               const { return this ? m_id : 0;     }
+    inline PlayerId             id()               const { return this ? m_id : 0;     }
     inline PlayerCtrl*          playerCtrl()       const { return mp_playerCtrl;       }
     inline QString              name()             const { return m_name;              }
     inline QString              password()         const { return m_password;          }
@@ -176,6 +178,7 @@ public:
     void setWeaponRange(int weaponRange);
     void setAlive(bool isAlive);
     void setWinner(bool isWinner);
+
     void appendCardToHand(PlayingCard* card);
     void appendCardToTable(PlayingCard* card);
     void appendCardToSelection(PlayingCard* card);
@@ -239,7 +242,7 @@ public:
     }
 
 private:
-    int                       m_id;
+    PlayerId                  m_id;
     int                       m_lifePoints;
     int                       m_maxLifePoints;
     QList<PlayingCard*>       m_hand;

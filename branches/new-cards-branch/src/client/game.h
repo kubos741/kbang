@@ -26,6 +26,8 @@
 
 #include "gamestructs.h"
 
+class GameEventData;
+
 namespace client {
 // Widgets:
 class PlayerWidget;
@@ -34,8 +36,9 @@ class DeckWidget;
 class GraveyardWidget;
 class CardListWidget;
 
-class GameEventHandler;
-class GameEventQueue;
+class GameEventPlayer;
+//class GameEventHandler;
+//class GameEventQueue;
 class GameActionManager;
 
 /**
@@ -55,6 +58,9 @@ public:
      * Enters the game mode. Constructs a new Game instance.
      */
     static void enterGameMode(GameId, QString gameName, ClientType);
+
+
+    static void enterGameMode(QIODevice* replay);
 
     /**
      * Leaves the game mode. Destroys the Game instance and cleans up
@@ -136,6 +142,13 @@ public:
     }
 
     /**
+     * Returns the current GameContextData.
+     */
+    inline GameContextData gameContext() const {
+        return m_gameContextData;
+    }
+
+    /**
      * Returns the current GamePlayState.
      */
     inline GamePlayState gamePlayState() const {
@@ -176,6 +189,11 @@ public:
         return m_interfaceType;
     }
 
+    inline GameEventPlayer* gameEventPlayer() const {
+        return mp_gameEventPlayer;
+    }
+
+/*
     inline GameEventHandler* eventHandler() const {
         return mp_gameEventHandler;
     }
@@ -183,7 +201,7 @@ public:
     inline GameEventQueue* eventQueue() const {
         return mp_gameEventQueue;
     }
-
+*/
     inline GameActionManager* actionManager() const {
         return mp_gameActionManager;
     }
@@ -297,8 +315,6 @@ public:
      */
     void resumeGameEvents();
 
-public slots:
-    void setGameStartability(bool);
 
 private:
     Game(GameId, QString gameName, ClientType);
@@ -328,8 +344,9 @@ private:
     CardListWidget*     mp_selection;
     LocalPlayerWidget*  mp_localPlayerWidget;
 
-    GameEventHandler*   mp_gameEventHandler;
-    GameEventQueue*     mp_gameEventQueue;
+    GameEventPlayer*    mp_gameEventPlayer;
+    //GameEventHandler*   mp_gameEventHandler;
+    //GameEventQueue*     mp_gameEventQueue;
     GameActionManager*  mp_gameActionManager;
 
     static Game*        smp_currentGame;

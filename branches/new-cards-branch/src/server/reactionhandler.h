@@ -2,7 +2,7 @@
 #define REACTIONHANDLER_H
 
 #include <QObject>
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 class PlayingCard;
 class Player;

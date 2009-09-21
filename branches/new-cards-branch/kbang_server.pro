@@ -2,15 +2,19 @@ TEMPLATE = app
 UI_DIR = uics/server
 MOC_DIR = mocs/server
 OBJECTS_DIR = obj/server
-QT += network xml
 
-CONFIG += release
+QT += network
+QT += xml
 
-INCLUDEPATH += src/server src/common
+#CONFIG += release
+CONFIG += debug
+
+INCLUDEPATH += src/server
+INCLUDEPATH += src/common
+
 DEPENDPATH += src/common
 
-HEADERS += \ 
-    src/server/player.h \
+HEADERS += src/server/player.h \
     src/server/gameserver.h \
     src/server/game.h \
     src/server/console.h \
@@ -21,10 +25,10 @@ HEADERS += \
     src/server/publicgameview.h \
     src/server/publicplayerview.h \
     src/server/privateplayerview.h \
-    src/server/playingcard.h \
+    src/server/cards/playingcard.h \
+    src/server/cards/tablecard.h \
     src/server/reactioncard.h \
-    src/server/tablecard.h \
-    src/server/weaponcard.h \
+    src/server/cards/original/weaponcard.h \
     src/server/cardbang.h \
     src/server/cardmissed.h \
     src/server/cards.h \
@@ -64,11 +68,9 @@ HEADERS += \
     src/server/playerreaper.h \
     src/server/charactervulturesam.h \
     src/server/checkdeckresulthandler.h \
-    src/server/characterluckyduke.h
-
-    
-SOURCES += \
-    src/server/main.cpp \
+    src/server/characterluckyduke.h \
+    src/server/servertypes.h
+SOURCES += src/server/main.cpp \
     src/server/player.cpp \
     src/server/gameserver.cpp \
     src/server/game.cpp \
@@ -80,10 +82,10 @@ SOURCES += \
     src/server/publicgameview.cpp \
     src/server/publicplayerview.cpp \
     src/server/privateplayerview.cpp \
-    src/server/playingcard.cpp \
+    src/server/cards/playingcard.cpp \
+	src/server/cards/tablecard.cpp \
     src/server/reactioncard.cpp \
-    src/server/tablecard.cpp \
-    src/server/weaponcard.cpp \
+    src/server/cards/original/weaponcard.cpp \
     src/server/cardbang.cpp \
     src/server/cardmissed.cpp \
     src/server/gamecycle.cpp \
@@ -121,18 +123,14 @@ SOURCES += \
     src/server/playerreaper.cpp \
     src/server/charactervulturesam.cpp \
     src/server/characterluckyduke.cpp
-
-unix {
+unix { 
     LIBPATH += lib
     TARGETDEPS += lib/libkbang_common.a
 }
-
-win32 {
+win32 { 
     debug:LIBPATH += debug/lib
     release:LIBPATH += release/lib
 }
-
 LIBS += -lkbang_common
-
 TARGET = kbang-server
 QMAKE_CXXFLAGS_DEBUG += -Wall

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QList>
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 
 class Player;

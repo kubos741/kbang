@@ -21,32 +21,32 @@
 #ifndef GAMEEVENT_H
 #define GAMEEVENT_H
 
+#include "gameevents.h"
+
 #include <QObject>
 
 namespace client
 {
 
 class Game;
+class GameEventCmd;
 
 /**
- * The GameEvent class provides base functionality and interface for game
- * events. Game events come from the server through the parser to the client
- * and they are then applied to the game, by changing something. Some of
- * the game events take some time, before they finnish. Because of that
- * game events are put into queue after they are received, and then they
- * are dequeued, one after one.
- * @see GameEventHandler
- * @see GameEventQueue
  * @author MacJariel
  */
 class GameEvent: public QObject
 {
 Q_OBJECT;
 public:
+    enum ExecutionMode {
+        ExecuteNormal,
+        ExecuteFast
+    };
+
     /**
-     * Constructs a GameEvent with is related to <i>game</i>.
+     * Constructs a GameEvent with is related to #game.
      */
-    GameEvent(Game* game);
+    GameEvent(Game* game, GameEventDataPtr);
 
     /**
      * Destroys the GameEvent.
@@ -54,22 +54,26 @@ public:
     virtual ~GameEvent();
 
     /**
-     * Returns, whether the game event is running.
+     * Returns whether the event is running.
      */
-    bool isRunning() const;
-
-public slots:
-    /**
-     * Sets the GameEvent to running state. You can reimplement this method,
-     * but make sure you call the original one in your reimplementation.
-     */
-    virtual void run();
+    inline bool isRunning() const {
+        return m_isRunning;
+    }
 
     /**
-     * Sets the GameEvent to not running state and emits the
-     * finished(GameEvent*) signal.
+     * Returns whether the event runs (will run) for the first time or not.
      */
-    virtual void finish();
+    inline bool isFirstRun() const {
+        return m_isFirstRun;
+    }
+
+    inline Game* game() const {
+        return mp_game;
+    }
+
+public:
+    void doEvent(ExecutionMode);
+    void undoEvent(ExecutionMode);
 
 signals:
     /**
@@ -78,14 +82,20 @@ signals:
      */
     void finished(GameEvent* gameEvent);
 
-protected:
-    inline Game* game() {
-        return mp_game;
-    }
+public slots:
+    void gameEventCmdFinished(GameEventCmd*);
 
 private:
-    Game*   mp_game;
-    bool    m_isRunning;
+    void step();
+
+    Game*                           mp_game;
+    QList<GameEventCmd*>            m_commands;
+    QListIterator<GameEventCmd*>*   mp_commandsIterator;
+    bool                            m_forward;
+
+    GameEventDataPtr                mp_gameEventData;
+    bool                            m_isRunning;
+    bool                            m_isFirstRun;
 };
 }
 

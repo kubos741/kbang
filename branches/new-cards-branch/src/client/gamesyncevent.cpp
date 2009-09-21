@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if 0
 #include "gamesyncevent.h"
 #include "game.h"
 
@@ -47,7 +48,7 @@ GameSyncEvent::run()
     ///      between player and spectator interfaces during the game.
 
     if (m_gameSyncData.localPlayer.id != 0) {
-        // We try to determine index of local player in m_gameSyncData.players    
+        // We try to determine index of local player in m_gameSyncData.players
         for (; index < m_gameSyncData.players.size(); ++index) {
             if (m_gameSyncData.players[index].id == m_gameSyncData.localPlayer.id) {
                 break;
@@ -102,3 +103,4 @@ GameSyncEvent::run()
 
     emit finished(this);
 }
+#endif

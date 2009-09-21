@@ -18,17 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QtDebug>
-#include <QPainter>
-#include <QFont>
+#include "card.h"               // Card header file
+#include "cardbank.h"           // To obtain suit and rank QPixmaps
+#include "gamestructs.h"        // CardData
 
-
-#include "card.h"
-#include "cardbank.h"
-#include "gamestructs.h"
-
-//#include "config.h"
-
+#include <QPainter>             // Runtime suit and rank painting
 
 using namespace client;
 
@@ -47,8 +41,8 @@ Card::addGraphics(const QString& gfx, const QString& suitString,
                   const QString& rankString, bool renderSigns)
 {
     Card::Graphics graphics;
-    if (graphics.image.load(gfx)) {
-        qWarning(qPrintable(QString("Cannot load pixmap: %1").arg(gfx)));
+    if (!graphics.image.load(gfx)) {
+        qWarning(qPrintable(QString("Cannot load image: %1").arg(gfx)));
         return;
     }
     if (m_type == CARDTYPE_PLAYING) {
@@ -105,8 +99,14 @@ Card::pixmap(const CardData& cardData) const
         }
     }
 
-    if (renderSigns) {
-        // @todo: render signs
+if (renderSigns) {
+        QPixmap rankImage = CardBank::instance().rank(m_cardSetName, cardData.rank);
+        QPixmap suitImage = CardBank::instance().suit(m_cardSetName, cardData.suit);
+        QPainter painter(&result);
+        QPoint point = CardBank::instance().renderSignsPosition(m_cardSetName);
+        painter.drawPixmap(point, rankImage);
+        point += QPoint(rankImage.width(), 0);
+        painter.drawPixmap(point, suitImage);
     }
     return result;
 }

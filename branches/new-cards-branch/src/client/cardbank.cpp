@@ -23,7 +23,7 @@
 #include "cardsetmanager.h"
 #include "util.h"           // stringToBool(QString)
 #include "gamestructs.h"    // CardData
-
+#include "debug/debugblock.h"
 
 using namespace client;
 
@@ -68,14 +68,28 @@ CardBank::loadCardSet(const CardSetInfo& cardSetInfo)
         if(!e.isNull()) {
             if (e.tagName() == "card") {
                 addCard(cardSetInfo, e);
+            } else if (e.tagName() == "rank") {
+                CardRank cardRank = stringToCardRank(e.attribute("value"));
+                QString gfx = cardSetInfo.dir().absoluteFilePath(e.attribute("gfx"));
+                if (!m_signStorage[cardSetInfo.name()].ranks[cardRank].load(gfx)) {
+                    qWarning(qPrintable(QString("Cannot load image: %1").arg(gfx)));
+                }
+            } else if (e.tagName() == "suit") {
+                CardSuit cardSuit = stringToCardSuit(e.attribute("value"));
+                QString gfx = cardSetInfo.dir().absoluteFilePath(e.attribute("gfx"));
+                if (!m_signStorage[cardSetInfo.name()].suits[cardSuit].load(gfx)) {
+                    qWarning(qPrintable(QString("Cannot load image: %1").arg(gfx)));
+                }
             }
         }
+        m_signStorage[cardSetInfo.name()].renderSignsPosition =
+                cardSetInfo.renderSignsPosition();
         n = n.nextSibling();
     }
 }
 
 const Card*
-CardBank::card(const CardData& cardData)
+CardBank::card(const CardData& cardData) const
 {
     QString key = cardData.name;
     if (key.isEmpty()) {
@@ -86,7 +100,25 @@ CardBank::card(const CardData& cardData)
             case CARDTYPE_UNKNOWN:                           break;
         }
     }
-    return m_cardStorage.value(cardData.name, 0);
+    return m_cardStorage.value(key, 0);
+}
+
+QPixmap
+CardBank::rank(const QString& cardSetName, CardRank cardRank) const
+{
+    return m_signStorage[cardSetName].ranks[cardRank];
+}
+
+QPixmap
+CardBank::suit(const QString& cardSetName, CardSuit cardSuit) const
+{
+    return m_signStorage[cardSetName].suits[cardSuit];
+}
+
+QPoint
+CardBank::renderSignsPosition(const QString& cardSetName) const
+{
+    return m_signStorage[cardSetName].renderSignsPosition;
 }
 
 void
@@ -111,6 +143,7 @@ CardBank::addCard(const CardSetInfo& cardSetInfo, const QDomElement& e)
         card = m_cardStorage[name];
     } else {
         card = new Card(this, name, type, cardSetInfo.name());
+        m_cardStorage[name] = card;
     }
     if (card->cardSetName() != cardSetInfo.name()) {
         qCritical("CardSet collision found. Trying to add %s from %s, but this"
@@ -118,5 +151,5 @@ CardBank::addCard(const CardSetInfo& cardSetInfo, const QDomElement& e)
                   qPrintable(cardSetInfo.name()), qPrintable(card->cardSetName()));
         return;
     }
-    card->addGraphics(gfx, suitString, rankString, renderSigns);
+    card->addGraphics(cardSetInfo.dir().absoluteFilePath(gfx), suitString, rankString, renderSigns);
 }

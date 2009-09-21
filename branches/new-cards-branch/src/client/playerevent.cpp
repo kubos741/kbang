@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if 0
+
 #include "playerevent.h"
 #include "game.h"
 
@@ -74,3 +76,5 @@ PlayerEvent::run()
     }
     GameEvent::finish();
 }
+
+#endif

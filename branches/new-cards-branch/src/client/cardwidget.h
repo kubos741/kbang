@@ -56,6 +56,7 @@ public:
     void setOwnerId(PlayerId ownerId);
     void setCardSizeRole(CardSizeRole cardSizeRole);
     void setHighlight(bool highlight);
+    void unreveal();
 
     void setPlayerRoleCard(PlayerRole);
     void setCharacterCard(QString character = QString());

@@ -3,7 +3,7 @@
 #define GAMEEXCEPTIONS_H
 
 
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 #include <QtDebug>
 
 
@@ -12,6 +12,10 @@ class GameException
 public:
     virtual void debug() = 0;
     virtual ~GameException() {}
+};
+
+class PermissionDeniedException: public GameException
+{
 };
 
 class BadPlayerException: public GameException

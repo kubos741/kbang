@@ -25,7 +25,11 @@
 #include "util.h"
 #include "xmlnode.h"
 
+#include "parser/gameeventparser.h"
+#include "parser/servereventparser.h"
+
 #include "debug/debugblock.h"
+
 
 #include <QTcpSocket>
 #include <QXmlStreamReader>
@@ -38,17 +42,20 @@
 static const int KeepAliveInterval = 15 * 1000;
 static const int WaitForStreamInterval = 5 * 1000;
 
-Parser::Parser(QTcpSocket* socket):
-        QObject(socket), mp_ioProxy(new IOProxy(this)),
-        mp_socket(socket), mp_streamReader(new QXmlStreamReader(mp_socket)),
+Parser::Parser(QIODevice* device, bool replay):
+        QObject(device), mp_ioProxy(new IOProxy(this)),
+        mp_device(device), mp_streamReader(new QXmlStreamReader(mp_device)),
         mp_streamWriter(new QXmlStreamWriter(mp_ioProxy)),
         m_parserState(WaitingForStreamState), m_parserError(NoError), m_readerDepth(0),
         mp_parsedStanza(0), mp_queryGet(0), m_keepAliveTimer(0),
         m_waitForStreamTimer(0)
 {
+    DEBUG_BLOCK;
     connect(mp_ioProxy, SIGNAL(networkOut(const QByteArray&)),
             this, SLOT(sendData(const QByteArray&)));
-    connect(mp_socket, SIGNAL(readyRead()), this, SLOT(readData()));
+    if (!replay) {
+        connect(mp_device, SIGNAL(readyRead()), this, SLOT(readData()));
+    }
     connect(this, SIGNAL(error(ParserError)), this, SLOT(closeStream()));
     mp_streamWriter->setAutoFormatting(1);
 }
@@ -56,10 +63,12 @@ Parser::Parser(QTcpSocket* socket):
 /* virtual */
 Parser::~Parser()
 {
-    if (mp_socket->state() == QAbstractSocket::ConnectedState) {
+#if 0
+    if (mp_device->state() == QAbstractSocket::ConnectedState) {
         closeStream();
     }
-    mp_socket->disconnectFromHost();
+    mp_device->disconnectFromHost();
+#endif
     delete mp_streamReader;
     delete mp_streamWriter;
 }
@@ -81,12 +90,16 @@ Parser::sendPing()
 void
 Parser::openStream()
 {
-    mp_streamWriter->writeStartDocument();
-    mp_streamWriter->writeStartElement("stream");
-    mp_streamWriter->writeAttribute("version", Parser::protocolVersion());
-    mp_streamWriter->writeCharacters("");
-    mp_socket->flush();
-    m_waitForStreamTimer = startTimer(WaitForStreamInterval);
+    if (mp_device->isWritable()) {
+        mp_streamWriter->writeStartDocument();
+        mp_streamWriter->writeStartElement("stream");
+        mp_streamWriter->writeAttribute("version", Parser::protocolVersion());
+        mp_streamWriter->writeCharacters("");
+        m_waitForStreamTimer = startTimer(WaitForStreamInterval);
+        //mp_device->flush();
+    } else {
+        readData();
+    }
 }
 
 void
@@ -95,9 +108,11 @@ Parser::closeStream()
     mp_streamWriter->writeEndElement();
     mp_streamWriter->writeEndDocument();
     emit streamClosed();
-    if (mp_socket->state() == QAbstractSocket::ConnectedState) {
-        mp_socket->disconnectFromHost();
+#if 0
+    if (mp_device->state() == QAbstractSocket::ConnectedState) {
+        mp_device->disconnectFromHost();
     }
+#endif
 }
 
 QueryGet*
@@ -217,140 +232,17 @@ Parser::actionDiscard(CardId cardId)
     actionEnd();
 }
 
-void
-Parser::eventEnterGameMode(GameId gameId, const QString& gameName, ClientType type)
+void Parser::sendGameEvent(GameEventDataPtr gameEventDataPtr)
 {
-    eventStart();
-    mp_streamWriter->writeStartElement("enter-game-mode");
-    mp_streamWriter->writeAttribute("id", QString::number(gameId));
-    mp_streamWriter->writeAttribute("name", gameName);
-    mp_streamWriter->writeAttribute("type", clientTypeToString(type));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
+    GameEventParser::write(mp_streamWriter, gameEventDataPtr);
 }
 
-void
-Parser::eventExitGameMode()
+void Parser::sendServerEvent(ServerEventDataPtr serverEventDataPtr)
 {
-    eventStart();
-    mp_streamWriter->writeEmptyElement("exit-game-mode");
-    eventEnd();
+    ServerEventParser::write(mp_streamWriter, serverEventDataPtr);
 }
 
-void
-Parser::eventPlayerJoinedGame(const PublicPlayerData& publicPlayerData)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("join-game");
-    publicPlayerData.write(mp_streamWriter);
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventPlayerLeavedGame(PlayerId playerId)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("leave-game");
-    mp_streamWriter->writeAttribute("player-id", QString::number(playerId));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventPlayerUpdate(const PublicPlayerData& publicPlayerData)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("player-update");
-    publicPlayerData.write(mp_streamWriter);
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventChatMessage(const ChatMessageData& chatMessageData)
-{
-    eventStart();
-    chatMessageData.write(mp_streamWriter);
-    eventEnd();
-}
-
-void
-Parser::eventGameMessage(const GameMessage& gameMessage)
-{
-    eventStart();
-    gameMessage.write(mp_streamWriter);
-    eventEnd();
-}
-
-void
-Parser::eventGameStateChange(const GameState& state)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("game-state");
-    mp_streamWriter->writeAttribute("state", gameStateToString(state));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventGameContextChange(const GameContextData& gameContextData)
-{
-    eventStart();
-    gameContextData.write(mp_streamWriter);
-    eventEnd();
-}
-
-void
-Parser::eventGameSync(const GameSyncData& gameSyncData)
-{
-    eventStart();
-    gameSyncData.write(mp_streamWriter);
-    eventEnd();
-}
-
-void
-Parser::eventCardMovement(const CardMovementData& cardMovement)
-{
-    eventStart();
-    cardMovement.write(mp_streamWriter);
-    eventEnd();
-}
-
-void
-Parser::eventLifePointsChange(PlayerId playerId, int lifePoints)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("life-points");
-    mp_streamWriter->writeAttribute("player-id", QString::number(playerId));
-    mp_streamWriter->writeAttribute("life-points", QString::number(lifePoints));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventPlayerDied(PlayerId playerId, PlayerRole role)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("player-died");
-    mp_streamWriter->writeAttribute("player-id", QString::number(playerId));
-    mp_streamWriter->writeAttribute("role", playerRoleToString(role));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::eventGameCanBeStarted(bool canBeStared)
-{
-    eventStart();
-    mp_streamWriter->writeStartElement("game-startable");
-    mp_streamWriter->writeAttribute("is-startable", boolToString(canBeStared));
-    mp_streamWriter->writeEndElement();
-    eventEnd();
-}
-
-void
-Parser::timerEvent(QTimerEvent* event)
+void Parser::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_waitForStreamTimer) {
         killTimer(m_waitForStreamTimer);
@@ -360,7 +252,7 @@ Parser::timerEvent(QTimerEvent* event)
             emit error(m_parserError);
         }
     } else if (event->timerId() == m_keepAliveTimer) {
-        if (mp_socket->state() == QAbstractSocket::ConnectedState) {
+        if (mp_device->isWritable()) {
             sendKeepAlive();
         }
     }
@@ -377,16 +269,17 @@ void
 Parser::sendData(const QByteArray& data)
 {
     emit outgoingData(data);
-    mp_socket->write(data);
+    mp_device->write(data);
 }
 
 void
 Parser::readData()
 {
+    DEBUG_BLOCK;
     if (m_parserState == ErrorState || m_parserState == TerminatedState) {
         return;
     }
-    emit incomingData(mp_socket->peek(mp_socket->bytesAvailable()));
+    emit incomingData(mp_device->peek(mp_device->bytesAvailable()));
     while (!mp_streamReader->atEnd()) {
         mp_streamReader->readNext();
         if (mp_streamReader->hasError()) {
@@ -443,6 +336,7 @@ Parser::readData()
 void
 Parser::readStreamStartElement()
 {
+    DEBUG_BLOCK;
     Q_ASSERT(m_readerDepth == 0);
     killTimer(m_waitForStreamTimer);
     if (mp_streamReader->isStartElement() &&
@@ -467,11 +361,12 @@ Parser::readStreamStartElement()
 void
 Parser::readStanzaStartElement()
 {
+    DEBUG_BLOCK;
     Q_ASSERT(m_readerDepth <= 1);
     if (mp_streamReader->isEndElement()) {
         // received end of stream
         m_parserState = TerminatedState;
-        if (mp_socket->state() == QAbstractSocket::ConnectedState) {
+        if (mp_device->isWritable()) {
             closeStream();
         }
     } else if (!mp_streamReader->isStartElement()) {
@@ -490,6 +385,7 @@ Parser::readStanzaStartElement()
 void
 Parser::readStanzaNextToken()
 {
+    DEBUG_BLOCK;
     if (mp_streamReader->isStartElement()) {
         // start element inside of stanza
         mp_parsedXmlElement = mp_parsedXmlElement->
@@ -507,8 +403,10 @@ Parser::readStanzaNextToken()
             processStanzaQuery();
         } else if (mp_parsedStanza->name() == "action") {
             processStanzaAction();
-        } else if (mp_parsedStanza->name() == "event") {
-            processStanzaEvent();
+        } else if (mp_parsedStanza->name() == "server-event") {
+            emit serverEventReceived(ServerEventParser::read(mp_parsedStanza));
+        } else if (mp_parsedStanza->name() == "game-event") {
+            emit gameEventReceived(GameEventParser::read(mp_parsedStanza));
         } else {
             raiseNotValidError();
         }
@@ -555,7 +453,7 @@ Parser::processStanzaQuery()
 
 void
 Parser::processStanzaAction()
-{  
+{
     XmlNode* action = mp_parsedStanza->getFirstChild();
     if (action == 0) {
         raiseNotValidError();
@@ -613,81 +511,6 @@ Parser::processStanzaAction()
         qWarning("[Parser] Unknown action: %s", qPrintable(action->name()));
     }
 }
-
-void
-Parser::processStanzaEvent()
-{
-    XmlNode* event = mp_parsedStanza->getFirstChild();
-    if (event == 0) {
-        raiseNotValidError();
-    } else if (event->name() == "enter-game-mode") {
-        GameId gameId = event->attribute("id").toInt();
-        QString gameName = event->attribute("name");
-        ClientType type = stringToClientType(event->attribute("type"));
-        emit sigEventEnterGameMode(gameId, gameName, type);
-        return;
-    } else if (event->name() == "exit-game-mode") {
-        emit sigEventExitGameMode();
-    } else if (event->name() == "join-game") {
-        XmlNode* player = event->getFirstChild();
-        if (!player || player->name() != PublicPlayerData::elementName) {
-            raiseNotValidError();
-        } else {
-            PublicPlayerData publicPlayerData;
-            publicPlayerData.read(player);
-            emit sigEventPlayerJoinedGame(publicPlayerData);
-        }
-    } else if (event->name() == "leave-game") {
-        PlayerId playerId = event->attribute("player-id").toInt();
-        emit sigEventPlayerLeavedGame(playerId);
-    } else if (event->name() == "player-update") {
-        XmlNode* player = event->getFirstChild();
-        if (!player || player->name() != PublicPlayerData::elementName) {
-            raiseNotValidError();
-        } else {
-            PublicPlayerData publicPlayerData;
-            publicPlayerData.read(player);
-            emit sigEventPlayerUpdate(publicPlayerData);
-        }
-    } else if (event->name() == "game-startable") {
-        bool canBeStarted = stringToBool(event->attribute("is-startable"));
-        emit sigEventGameCanBeStarted(canBeStarted);
-    } else if (event->name() == GameSyncData::elementName) {
-        GameSyncData gameSyncData;
-        gameSyncData.read(event);
-        emit sigEventGameSync(gameSyncData);
-    } else if (event->name() == "life-points") {
-        PlayerId playerId = event->attribute("player-id").toInt();
-        int lifePoints = event->attribute("life-points").toInt();
-        emit sigEventLifePointsChange(playerId, lifePoints);
-    } else if (event->name() == "player-died") {
-        PlayerId playerId = event->attribute("player-id").toInt();
-        PlayerRole role = stringToPlayerRole(event->attribute("role"));
-        emit sigEventPlayerDied(playerId, role);
-    } else if (event->name() == CardMovementData::elementName) {
-        CardMovementData cardMovementData;
-        cardMovementData.read(event);
-        emit sigEventCardMovement(cardMovementData);
-    } else if (event->name() == "chat-message") {
-        ChatMessageData chatMessageData;
-        chatMessageData.read(event);
-        emit sigEventChatMessage(chatMessageData);
-    } else if (event->name() == GameMessage::elementName) {
-        GameMessage gameMessage;
-        gameMessage.read(event);
-        emit sigEventGameMessage(gameMessage);
-    } else if (event->name() == "game-state") {
-        GameState gameState = stringToGameState(event->attribute("state"));
-        emit sigEventGameStateChange(gameState);
-    } else if (event->name() == GameContextData::elementName) {
-        GameContextData gameContextData;
-        gameContextData.read(event);
-        emit sigEventGameContextChange(gameContextData);
-    } else {
-        qWarning("[Parser] Unknown event: %s", qPrintable(event->name()));
-    }
-}
-
 void
 Parser::eventStart()
 {

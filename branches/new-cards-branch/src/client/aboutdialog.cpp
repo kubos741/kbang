@@ -32,9 +32,9 @@ AboutDialog::AboutDialog(QWidget* parent):
 {
     mp_ui->setupUi(this);
     mp_ui->labelAppName->setText(QApplication::instance()->applicationName());
-    mp_ui->labelAppVersion->setText(QString("Version: %1").arg(
+    mp_ui->labelAppVersion->setText(tr("Version: %1").arg(
             QApplication::instance()->applicationVersion()));
-    mp_ui->labelProtocolVersion->setText(QString("Protocol version: %1").arg(Parser::protocolVersion()));
+    mp_ui->labelProtocolVersion->setText(tr("Protocol version: %1").arg(Parser::protocolVersion()));
 }
 
 AboutDialog::~AboutDialog()

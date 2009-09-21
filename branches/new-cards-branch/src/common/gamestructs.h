@@ -201,6 +201,10 @@ struct CardData {
     CardRank    rank;       /**< Card rank. @see CardRank. */
     bool        isReady;    /**< Whether card is ready - this is related to green-bordered cards */
     CardData(): id(0) {}
+    CardData(CardId _id, CardName _name, CardType _type,
+             CardSuit _suit, CardRank _rank, bool _isReady):
+            id(_id), name(_name), type(_type), suit(_suit),
+            rank(_rank), isReady(_isReady) {}
 
     /**
      * Reads the given XML tree and writes data into this object.

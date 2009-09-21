@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if 0
+
 #include "gameeventhandler.h"
 #include "gameeventqueue.h"
 #include "game.h"
@@ -104,3 +106,4 @@ void GameEventHandler::onGameMessageEvent(const GameMessage& gameMessage)
 {
     mp_game->eventQueue()->add(new GameMessageEvent(mp_game, gameMessage));
 }
+#endif

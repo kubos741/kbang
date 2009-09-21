@@ -23,14 +23,18 @@
 #include "util.h"
 #include "gameeventhandler.h"
 #include "gameeventqueue.h"
+#include "gameeventplayer.h"
 #include "gameactionmanager.h"
 #include "serverconnection.h"
+
+#include "parser/parser.h"
 
 #include "localplayerwidget.h"
 #include "graveyardwidget.h"
 #include "deckwidget.h"
 #include "cardlistwidget.h"
 
+#include "debug/debugblock.h"
 
 using namespace client;
 
@@ -50,8 +54,9 @@ Game::Game(GameId gameId, QString gameName, ClientType clientType):
         mp_graveyard(0),
         mp_selection(0),
         mp_localPlayerWidget(MainWindow::instance()->localPlayerWidget()),
-        mp_gameEventHandler(new GameEventHandler(this)),
-        mp_gameEventQueue(new GameEventQueue(this)),
+        mp_gameEventPlayer(new GameEventPlayer(this)),
+        //mp_gameEventHandler(new GameEventHandler(this)),
+        //mp_gameEventQueue(new GameEventQueue(this)),
         mp_gameActionManager(new GameActionManager(this))
 {
     Q_ASSERT(smp_currentGame == 0);
@@ -93,6 +98,19 @@ Game::enterGameMode(GameId gameId, QString gameName, ClientType clientType)
         qFatal("Trying to create new Game instance, but another already exists.");
     }
     new Game(gameId, gameName, clientType);
+}
+
+/* static */
+void Game::enterGameMode(QIODevice* replay)
+{
+    if (smp_currentGame != 0) {
+        qFatal("Trying to create new Game instance, but another already exists.");
+    }
+    new Game(0, "", CLIENTTYPE_SPECTATOR);
+    Parser* parser = new Parser(replay, 1);
+    connect(parser, SIGNAL(gameEventReceived(GameEventDataPtr)),
+            currentGame()->gameEventPlayer(), SLOT(appendGameEvent(GameEventDataPtr)));
+    parser->openStream();
 }
 
 void
@@ -308,7 +326,8 @@ Game::unsetTextInfo()
 void
 Game::appendOpponent(const PublicPlayerData& publicPlayerData)
 {
-    foreach (PlayerWidget* widget, m_playerWidgets) {
+    DEBUG_BLOCK;
+    foreach (PlayerWidget* widget, m_playerWidgetsList) {
         if (widget->isVoid()) {
             widget->setFromPublicData(publicPlayerData);
             m_playerWidgets[publicPlayerData.id] = widget;
@@ -379,20 +398,22 @@ Game::clearOpponentWidgetRange(int indexFrom, int indexTo)
 void
 Game::pauseGameEvents()
 {
-    mp_gameEventQueue->pause();
+    //mp_gameEventQueue->pause();
 }
 
 void
 Game::resumeGameEvents()
 {
-    mp_gameEventQueue->resume();
+    //mp_gameEventQueue->resume();
 }
 
+/*
 void
 Game::setGameStartability(bool gameStartability)
 {
     mp_startButton->setEnabled(gameStartability);
 }
+*/
 
 
 void Game::loadCreatorInterface()

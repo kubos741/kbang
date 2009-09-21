@@ -22,6 +22,7 @@
 #define CARDBANK_H
 
 #include <QMap>
+#include <QPixmap>
 #include "cardsetinfo.h"
 #include "card.h"
 
@@ -31,10 +32,6 @@ namespace client {
 
 /**
  * The CardBank singleton class provides a storage for Card objects.
- * As soon as client joins a game, the CardBank singleton is stuffed with
- * CardSets (through CardSetInfo instances). CardWidget instances then use this
- * class to get card graphics. The CardBank instance dies when client leaves
- * the game.
  * @attention Selection of CardSets is hard-coded until support in the protocol
  *            is introduced.
  * @author MacJariel
@@ -43,6 +40,9 @@ class CardBank : public QObject
 {
 Q_OBJECT
 public:
+   /**
+    * Returns a reference to the CardBank singleton instance.
+    */
     inline static CardBank& instance() {
         static CardBank singleton;
         return singleton;
@@ -67,17 +67,31 @@ public:
     void loadCardSet(const CardSetInfo&);
 
     /**
-     * Returns the Card instance according to CardData. Only the name attribute
-     * from CardData is used. The type attribute is used only if name is empty,
-     * which means an unrevealed card. If CardBank does not contain such Card,
-     * 0 is returned.
+     * Returns a pointer to the Card instance according to CardData. Only the
+     * name attribute from CardData is used. The type attribute is used only if
+     * name is empty, which is used for an unrevealed card. If CardBank does
+     * not contain such Card, NULL pointer is returned.
      */
-    const Card* card(const CardData&);
+    const Card* card(const CardData&) const;
+
+    QPixmap rank(const QString& cardSetName, CardRank) const;
+
+    QPixmap suit(const QString& cardSetName, CardSuit) const;
+
+    QPoint renderSignsPosition(const QString& cardSetName) const;
 
 private:
     void addCard(const CardSetInfo&, const QDomElement&);
 
-    QMap<QString, Card*> m_cardStorage;
+
+    struct SignBank {
+        QMap<CardRank, QPixmap> ranks;
+        QMap<CardSuit, QPixmap> suits;
+        QPoint renderSignsPosition;
+    };
+
+    QMap<QString, Card*>    m_cardStorage;
+    QMap<QString, SignBank> m_signStorage;
 };
 
 }

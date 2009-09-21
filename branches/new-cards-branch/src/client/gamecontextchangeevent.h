@@ -21,15 +21,14 @@
 #ifndef GAMEFOCUSCHANGEEVENT_H
 #define GAMEFOCUSCHANGEEVENT_H
 
-#include "gameevent.h"      // inheritance
-#include "gamestructs.h"    // GameContextData
+#include "gameeventcmd.h"      // inheritance
 
 namespace client
 {
 /**
  * The GameContextChangeEvent class represents the game-context game event.
  */
-class GameContextChangeEvent: public GameEvent
+class GameContextChangeEvent: public GameEventCmd
 {
 Q_OBJECT;
 public:
@@ -37,21 +36,20 @@ public:
      * Constructs a GameContextChangeEvent related to <i>game</i>, according to
      * given GameContextData.
      */
-    GameContextChangeEvent(Game* game, const GameContextData&);
+    GameContextChangeEvent(GameEvent*, GameContextCmdDataPtr);
 
     /**
      * Destroys the GameContextChangeEvent.
      */
     virtual ~GameContextChangeEvent();
 
-    /**
-     * Runs the event. Sets the given context and schedules emitting finish()
-     * signal.
-     */
-    virtual void run();
+    virtual void doEventCmd(GameEvent::ExecutionMode);
+
+    virtual void undoEventCmd(GameEvent::ExecutionMode);
 
 private:
-    GameContextData m_gameContextData;
+    GameContextData m_newContext;
+    GameContextData m_oldContext;
 };
 }
 #endif // GAMEFOCUSCHANGEEVENT_H

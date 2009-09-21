@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if 0
+
 #include "lifepointschangeevent.h"
 #include "game.h"
 #include "playerwidget.h"
@@ -53,3 +55,4 @@ LifePointsChangeEvent::run()
     game()->playerWidget(m_playerId)->characterWidget()->
             setLifePoints(m_lifePoints);
 }
+#endif

@@ -21,6 +21,7 @@
 #define LOGWIDGET_H
 
 #include <QWidget>
+#include "gameeventplayer.h"
 
 namespace Ui {
 class LogWidget;
@@ -48,6 +49,8 @@ public:
     ~LogWidget();
 
 
+
+
     static QString formatServerName(const QString&);
 
 protected:
@@ -57,6 +60,8 @@ public slots:
     void appendLogMessage(QString message);
     void appendIncomingData(const QByteArray& data);
     void appendOutgoingData(const QByteArray& data);
+    void updateGameEventPlayerButtons(GameEventPlayer::Mode);
+    void gameEventPlayerButtonClicked();
 
 private:
     enum {

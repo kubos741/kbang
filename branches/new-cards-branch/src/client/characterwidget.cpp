@@ -21,6 +21,8 @@
 #include "characterwidget.h"
 #include "cardwidgetsizemanager.h"
 
+#include <QtDebug>
+
 using namespace client;
 
 QTimer CharacterWidget::sm_timer;
@@ -45,7 +47,7 @@ CharacterWidget::CharacterWidget(QWidget *parent):
     mp_backCard->setCharacterCard();
     mp_backCard->updatePixmap();
     mp_backCard->move(0, 0);
-    mp_backCard->hide();
+    mp_backCard->show();
 
     mp_characterCard = new CardWidget(this);
     mp_characterCard->setCharacterCard();

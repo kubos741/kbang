@@ -25,6 +25,8 @@
 #include "cardwidget.h"
 #include "cardwidgetsizemanager.h"
 
+#include "debug/debugblock.h"
+
 using namespace client;
 
 CardListWidget::CardListWidget(QWidget *parent, bool isRevealed):
@@ -47,9 +49,10 @@ CardListWidget::newCardPosition() const
     return QPoint(cardX(m_cards.size(), 1), m_vPadding);
 }
 
-/* virtual */ void
-CardListWidget::push(CardWidget* card)
+/* virtual */
+void CardListWidget::push(CardWidget* card)
 {
+    DEBUG_BLOCK;
     CardPocket::push(card);
     card->move(newCardPosition());
     card->setParent(this);

@@ -19,23 +19,31 @@
  ***************************************************************************/
 #include "cardsetmanager.h"
 #include "config.h"
+#include "debug/debugblock.h"
 
 using namespace client;
 
 CardSetManager::CardSetManager()
 {
-    refreshKnownSlots();
 }
 
 /* static */ CardSetManager&
 CardSetManager::instance()
 {
+    static bool initialized = 0;
     static CardSetManager singleton;
+    if (!initialized) {
+        initialized = 1;
+        singleton.refreshKnownSlots();
+        singleton.refreshLocalCardSets();
+    }
     return singleton;
 }
 
-void CardSetManager::refreshLocalCardSets()
+void
+CardSetManager::refreshLocalCardSets()
 {
+    DEBUG_BLOCK;
     m_localCardSets.clear();
     foreach (QString dataLocation, Config::dataLocations()) {
         QDir cardsetDir(dataLocation);
@@ -52,6 +60,7 @@ void CardSetManager::refreshLocalCardSets()
 void
 CardSetManager::addKnownSlot(QString knownSlot)
 {
+    DEBUG_BLOCK;
     if (m_knownSlots.contains(knownSlot) || knownSlot.isEmpty()) {
         return;
     }
@@ -86,8 +95,12 @@ CardSetManager::refreshKnownSlots()
 void
 CardSetManager::saveKnownSlots()
 {
+    DEBUG_BLOCK;
     QStringList extraKnownSlots = m_knownSlots;
     QDir cardsetDir(Config::userDataLocation());
+    if (!cardsetDir.exists()) {
+        cardsetDir.mkpath(".");
+    }
     QFile knownSlotsFile(cardsetDir.filePath("known_slots"));
     if (!knownSlotsFile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text)) {
         qWarning("Cannot write to '%s'.", qPrintable(knownSlotsFile.fileName()));

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,42 +17,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TABLECARD_H
-#define TABLECARD_H
 
-#include "playingcard.h"
-#include "parser/parserstructs.h"
+#ifndef GAMEEVENTPARSER_H
+#define GAMEEVENTPARSER_H
 
-class Player;
-class GameTable;
+#include "gameevents.h"
+#include "xmlnode.h"
+
+#include <QXmlStreamWriter>
+#include <QSharedPointer>
 
 /**
- * The TableCard is the base class for all playing cards, that can be put in front of a
- * player. In Bang! it represents the blue cards. This class provides no extra public
- * methods, but declares two important methods: reigsterPlayer and unregisterPlayer.
- *
- * @author MacJariel <MacJariel@gmail.com>
+ * The GameEventParser class provides static methods for writing GameEvents into
+ * XML streams and reading GameEvents from XML streams.
+ * @author MacJariel
  */
-class TableCard: public PlayingCard
+class GameEventParser
 {
-friend class GameTable;
-Q_OBJECT;
 public:
-    TableCard(Game *game, int id, PlayingCardType, CardSuit, CardRank);
-    virtual ~TableCard();
-
-protected:
     /**
-     * This method is called (by GameTable) when the card is
-     * put on the player's table.
+     * Writes GameEventData into XML stream using QXmlStreamWriter.
      */
-    virtual void registerPlayer(Player*) {};
-
+    static void write(QXmlStreamWriter*, GameEventDataPtr);
     /**
-     * This method is called (by GameTable) when the card is
-     * removed from the player's table.
+     * Reads the GameEventData from XML stream and returns it.
      */
-    virtual void unregisterPlayer(Player*) {};
+    static GameEventDataPtr read(XmlNode*);
+
+private:
+    static void writeCmdData(QXmlStreamWriter*, GameEventCmdDataPtr);
+    static void writeCardMovementCmdData(QXmlStreamWriter*, CardMovementCmdDataPtr);
+    static void writeUpdatePlayerCmdData(QXmlStreamWriter*, UpdatePlayerCmdDataPtr);
+    static void writeGameContextCmdData(QXmlStreamWriter*, GameContextCmdDataPtr);
+    static void writeSetPlayersCmdData(QXmlStreamWriter*, SetPlayersCmdDataPtr);
+    static GameEventCmdDataPtr readCmdData(XmlNode*);
+    static GameEventCmdDataPtr readCardMovementCmdData(XmlNode*);
+    static GameEventCmdDataPtr readUpdatePlayerCmdData(XmlNode*);
+    static GameEventCmdDataPtr readGameContextCmdData(XmlNode*);
+    static GameEventCmdDataPtr readSetPlayersCmdData(XmlNode*);
 };
 
-#endif
+#endif // GAMEEVENTPARSER_H

@@ -51,6 +51,8 @@ public:
      */
     virtual CardWidget* pop();
 
+    virtual CardWidget* peek();
+
     /**
      * Puts <i>card</i> on top of the graveyard.
      */

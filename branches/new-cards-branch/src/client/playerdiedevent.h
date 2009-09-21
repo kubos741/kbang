@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef PLAYERDIEDEVENT_H
+#if 0
+//#ifndef PLAYERDIEDEVENT_H
 #define PLAYERDIEDEVENT_H
 
 #include "gameevent.h"

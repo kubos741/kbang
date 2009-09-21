@@ -21,10 +21,9 @@
 #define CARDMOVEMENTEVENT_H
 
 #include <QPoint>
-#include <QBasicTimer>
 #include <QTime>
 
-#include "gameevent.h"
+#include "gameeventcmd.h"
 #include "gamestructs.h"
 
 namespace client
@@ -39,7 +38,7 @@ class CardWidget;
  *
  * @author MacJariel
  */
-class CardMovementEvent: public GameEvent
+class CardMovementEvent: public GameEventCmd
 {
 Q_OBJECT
 public:
@@ -47,7 +46,7 @@ public:
      * Constructs a CardMovementEvent instance related to <i>game</i> according
      * to given CardMovementData.
      */
-    CardMovementEvent(Game* game, const CardMovementData&);
+    CardMovementEvent(GameEvent* game, CardMovementCmdDataPtr);
 
     /**
      * Destroys the CardMovement instance.
@@ -58,19 +57,17 @@ public slots:
     /**
      * Runs the translation.
      */
-    virtual void run();
+    virtual void doEventCmd(GameEvent::ExecutionMode);
 
+    virtual void undoEventCmd(GameEvent::ExecutionMode);
+
+    virtual void finish();
 private:
     /**
      * Reads the stored CardMovementData and determines the CardWidget for
      * translation and the destination CardPocket.
      */
-    void setCardAndPocket();
-
-    /**
-     * Starts the translation.
-     */
-    void startTransition();
+    void setCardAndPocket(const CardMovementCmdDataPtr&);
 
     /**
      * Progress the translation.
@@ -84,20 +81,27 @@ private:
 
 private slots:
     /**
+     * Starts the translation.
+     */
+    void startTransition();
+
+    /**
      * Unreveals the moved card.
      */
     void unrevealCard();
 
 private:
-    CardMovementData    m_cardMovementData;
-    CardWidget*         mp_card;
-    CardPocket*         mp_destPocket;
-    QPoint              m_srcPos;
-    QPoint              m_destPos;
-    qreal               m_length;
-    int                 m_tick;
-    QBasicTimer         m_timer;
-    QTime               m_time;
+    CardMovementCmdDataPtr  mp_doCmd;
+    CardMovementCmdDataPtr  mp_undoCmd;
+    CardWidget*             mp_card;
+    CardPocket*             mp_destPocket;
+    CardData*               mp_cardData;
+    QPoint                  m_srcPos;
+    QPoint                  m_destPos;
+    qreal                   m_length;
+    int                     m_tick;
+    int                     m_animationTimer;
+    QTime                   m_time;
 };
 }
 #endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,22 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "cardplayable.h"
-#include "player.h"
-#include "gametable.h"
 
-CardPlayable::CardPlayable(Game* game, int id): PlayingCard(game, id)
+#ifndef SETPLAYERSCMD_H
+#define SETPLAYERSCMD_H
+
+#include "gameeventcmd.h"
+
+namespace client
 {
-}
 
-CardPlayable::~CardPlayable()
+class SetPlayersCmd: public GameEventCmd
 {
+Q_OBJECT;
+public:
+    SetPlayersCmd(GameEvent*, SetPlayersCmdDataPtr);
+    virtual ~SetPlayersCmd();
+    virtual void doEventCmd(GameEvent::ExecutionMode);
+    virtual void undoEventCmd(GameEvent::ExecutionMode);
+
+
+private:
+    SetPlayersCmdDataPtr    mp_doCmd;
+};
 }
-
-bool CardPlayable::play()
-{
-    mp_game->gameTable().playCard(owner(), this);
-    return 1;
-}
-
-
+#endif // SETPLAYERSCMD_H

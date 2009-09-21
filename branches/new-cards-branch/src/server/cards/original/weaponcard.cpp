@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,35 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "weaponcard.h"
+#include "cards/original/weaponcard.h"
 #include "gameexceptions.h"
 #include "player.h"
 #include "gametable.h"
 #include "gamecycle.h"
 
-WeaponCard::WeaponCard(Game *game, int id, int range, CardSuit suit, CardRank rank):
-        TableCard(game, id, CARD_UNKNOWN, suit, rank),
-        m_range(range)
+WeaponCard::WeaponCard(Game* game, CardId id, Weapon weapon,
+                       CardSuit suit, CardRank rank):
+        TableCard(game, id, WeaponCard::playingCardName(weapon),
+                  suit, rank),
+        m_weapon(weapon),
+        m_range(WeaponCard::range(weapon)
 {
-    switch(m_range) {
-    case 1:
-        setType(CARD_VOLCANIC);
-        break;
-    case 2:
-        setType(CARD_SCHOFIELD);
-        break;
-    case 3:
-        setType(CARD_REMINGTON);
-        break;
-    case 4:
-        setType(CARD_CARABINE);
-        break;
-    case 5:
-        setType(CARD_WINCHESTER);
-        break;
-    }
 }
 
+/* virtual */
 WeaponCard::~WeaponCard()
 {
 }
@@ -53,17 +40,17 @@ WeaponCard::~WeaponCard()
 void WeaponCard::play()
 {
     gameCycle()->assertTurn();
-
-    if (this->pocket() != POCKET_HAND)
-        throw BadUsageException();
+    assertInHand();
 
     foreach(PlayingCard* card, owner()->table()) {
         WeaponCard* weaponCard = qobject_cast<WeaponCard*>(card);
-        if (weaponCard == 0)
+        if (weaponCard == 0) {
             continue;
-        if (weaponCard->type() == type())
+        }
+        if (weaponCard->type() == type()) {
             throw TwoSameOnTableException();
-        gameTable()->playerDiscardCard(weaponCard);
+        }
+        weaponCard->discard();
     }
     gameTable()->playerPlayCardOnTable(this);
 }
@@ -84,4 +71,30 @@ void WeaponCard::unregisterPlayer(Player* player)
     }
 }
 
+PlayingCardName
+WeaponCard::playingCardName(Weapon weapon)
+{
+    switch(weapon) {
+    case Volcanic:      return CARD_VOLCANIC;
+    case Schofield:     return CARD_SCHOFIELD;
+    case Remington:     return CARD_REMINGTON;
+    case Carabine:      return CARD_CARABINE;
+    case Winchester:    return CARD_WINCHESTER;
+    default:            break;
+    }
+    return CARD_UNKNOWN;
+}
 
+int
+WeaponCard::range(Weapon weapon)
+{
+    switch(weapon) {
+    case Volcanic:      return 1;
+    case Schofield:     return 2;
+    case Remington:     return 3;
+    case Carabine:      return 4;
+    case Winchester:    return 5;
+    default:            break;
+    }
+    return 0;
+}

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,52 +21,70 @@
 #ifndef GAMEINFO_H
 #define GAMEINFO_H
 
-#include "parser/parserstructs.h"
-
-
+#include "gamestructs.h"
 
 class GameInfo
 {
 public:
     GameInfo(const CreateGameData&);
 
-    inline QString  name()                  const { return m_name; }
-    inline QString  description()           const { return m_description; }
-    inline int      minPlayers()            const { return m_minPlayers; }
-    inline int      maxPlayers()            const { return m_maxPlayers; }
-    inline int      maxSpectators()         const { return m_maxSpectators; }
-    inline int      AIPlayers()             const { return m_AIPlayers; }
-    inline bool     hasPlayerPassword()     const { return !m_playerPassword.isNull(); }
-    inline bool     hasSpectatorPassword()  const { return !m_spectatorPassword.isNull(); }
-    inline int      creatorId()             const { return m_creatorId; }
-    inline bool     hasShufflePlayers()     const { return m_shufflePlayersFlag; }
+    inline QString name() const {
+        return m_createGameData.name;
+    }
+
+    inline QString desc() const {
+        return m_createGameData.desc;
+    }
+
+    inline int playersMin() const {
+        return m_createGameData.playersMin;
+    }
+
+    inline int playersMax() const {
+        return m_createGameData.playersMax;
+    }
+
+    inline int spectatorsMax() const {
+        return m_createGameData.spectatorsMax;
+    }
+
+    inline int aiPlayersCnt() const {
+        return m_createGameData.aiPlayersCnt;
+    }
+
+    inline bool hasPlayerPassword() const {
+        return !m_createGameData.playerPassword.isEmpty();
+    }
+
+    inline bool hasSpectatorPassword() const {
+        return !m_createGameData.spectatorPassword.isEmpty();
+    }
+
+    inline PlayerId creatorId() const {
+        return m_creatorId;
+    }
+
+    inline bool hasShufflePlayers() const {
+        return m_createGameData.flagShufflePlayers;
+    }
 
     inline bool comparePlayerPassword(const QString& password) const {
-        return password == m_playerPassword;
+        return password == m_createGameData.playerPassword;
     }
 
     inline bool compareSpectatorPassword(const QString& password) const {
-        return (password == m_playerPassword || password == m_spectatorPassword);
+        return (password == m_createGameData.playerPassword ||
+                password == m_createGameData.spectatorPassword);
     }
 
-    //StructGame structGame() const;
-
-    void setCreatorId(int creatorId) {
+    inline void setCreatorId(int creatorId) {
         m_creatorId = creatorId;
     }
 
 
 private:
-    QString m_name;
-    QString m_description;
-    int     m_creatorId;
-    int     m_minPlayers;
-    int     m_maxPlayers;
-    int     m_maxSpectators;
-    int     m_AIPlayers;
-    QString m_playerPassword;
-    QString m_spectatorPassword;
-    bool    m_shufflePlayersFlag;
+    CreateGameData m_createGameData;
+    PlayerId       m_creatorId;
 };
 
 #endif // GAMEINFO_H

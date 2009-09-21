@@ -89,6 +89,8 @@ public:
     LogWidget* logWidget() const;
 
 public slots:
+    void test();
+
     /**
      * Shows the ConnectToServerDialog.
      */

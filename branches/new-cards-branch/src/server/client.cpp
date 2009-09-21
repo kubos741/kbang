@@ -25,7 +25,7 @@
 #include "publicgameview.h"
 #include "privateplayerview.h"
 #include "playingcard.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 #include "voidai.h"
 
@@ -36,7 +36,7 @@ Client::Client(QObject* parent, int id, QTcpSocket* socket):
         mp_socket(socket)
 {
     Q_ASSERT(m_id != 0);
-    mp_parser = new Parser(this, socket);
+    mp_parser = new Parser(socket);
     connect(mp_parser,  SIGNAL(terminated()),
             this,       SLOT(onParserTerminated()));
     connect(mp_parser,  SIGNAL(sigQueryServerInfo(QueryResult)),
@@ -185,14 +185,19 @@ void Client::onActionPlayCard(const ActionPlayCardData& actionPlayCardData)
         return;
 
     qDebug("[CLIENT]   onActionPlayCard");
-    PlayingCard* playedCard = mp_playerCtrl->privatePlayerView().card(actionPlayCardData.playedCardId);
-    if (playedCard == 0) {
-        qDebug(qPrintable(QString("[CLIENT]   Card '%1' not found!").arg(actionPlayCardData.playedCardId)));
-        // @todo feedback
-        return;
-    }
+
+
+    CardId      playedCardId;   /**< The id of card to be played. */
+    CardId      targetCardId;   /**< The id of target card. */
+    CardId      discardCardId;  /**< The id of card to be discarded. */
+    PlayerId    targetPlayerId; /**< The id of target player. */
+
     try {
-        switch (actionPlayCardData.type) {
+//@todo
+
+
+        switch (actionPlayCardData.
+                ) {
         case ActionPlayCardData::PLAYCARD_SIMPLE:
             mp_playerCtrl->playCard(playedCard);
             break;
