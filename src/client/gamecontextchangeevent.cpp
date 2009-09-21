@@ -18,17 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QTimer>                   // for QTimer::singleShot()
-
 #include "gamecontextchangeevent.h"
 #include "game.h"
+#include <QTimer>                   // for QTimer::singleShot()
 
 using namespace client;
 
-GameContextChangeEvent::GameContextChangeEvent(Game* game,
-                                               const GameContextData& data):
-        GameEvent(game),
-        m_gameContextData(data)
+GameContextChangeEvent::GameContextChangeEvent(GameEvent* gameEvent,
+                                               GameContextCmdDataPtr cmd):
+        GameEventCmd(gameEvent),
+        m_newContext(cmd->gameContext)
 {
 }
 
@@ -37,10 +36,25 @@ GameContextChangeEvent::~GameContextChangeEvent()
 {
 }
 
-/* virtual */ void
-GameContextChangeEvent::run()
+/* virtual */
+void GameContextChangeEvent::doEventCmd(GameEvent::ExecutionMode mode)
 {
-    GameEvent::run();
-    game()->setGameContext(m_gameContextData);
-    QTimer::singleShot(100, this, SLOT(finish()));
+    GameEventCmd::doEventCmd(mode);
+    if (m_isFirstRun) {
+        m_oldContext = mp_gameEvent->game()->gameContext();
+    }
+    mp_gameEvent->game()->setGameContext(m_newContext);
+    if (mode == GameEvent::ExecuteNormal) {
+        QTimer::singleShot(100, this, SLOT(finish()));
+    }
+}
+
+/* virtual */
+void GameContextChangeEvent::undoEventCmd(GameEvent::ExecutionMode mode)
+{
+    GameEventCmd::undoEventCmd(mode);
+    mp_gameEvent->game()->setGameContext(m_oldContext);
+    if (mode == GameEvent::ExecuteNormal) {
+        QTimer::singleShot(100, this, SLOT(finish()));
+    }
 }

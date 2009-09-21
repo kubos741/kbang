@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef LIFEPOINTSCHANGEEVENT_H
+#if 0
+//#ifndef LIFEPOINTSCHANGEEVENT_H
 #define LIFEPOINTSCHANGEEVENT_H
 
 #include "gameevent.h"

@@ -198,18 +198,18 @@ QString pocketTypeToString(const PocketType& p)
 
 GameState stringToGameState(const QString& s)
 {
-    if (s == "WaitingForPlayers")   return GAMESTATE_WAITINGFORPLAYERS;
-    if (s == "Playing")             return GAMESTATE_PLAYING;
-    if (s == "Finished")            return GAMESTATE_FINISHED;
+    if (s == "waiting-for-players") return GAMESTATE_WAITINGFORPLAYERS;
+    if (s == "playing")             return GAMESTATE_PLAYING;
+    if (s == "finished")            return GAMESTATE_FINISHED;
     return GAMESTATE_INVALID;
 }
 
 QString gameStateToString(const GameState& s)
 {
     switch(s) {
-    case GAMESTATE_WAITINGFORPLAYERS:   return "WaitingForPlayers";
-    case GAMESTATE_PLAYING:             return "Playing";
-    case GAMESTATE_FINISHED:            return "Finished";
+    case GAMESTATE_WAITINGFORPLAYERS:   return "waiting-for-players";
+    case GAMESTATE_PLAYING:             return "playing";
+    case GAMESTATE_FINISHED:            return "finished";
     default:                            break;
     }
     return "Invalid";

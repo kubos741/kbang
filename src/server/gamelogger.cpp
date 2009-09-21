@@ -1,7 +1,7 @@
 #include "gamelogger.h"
 #include "publicplayerview.h"
 #include "publicgameview.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 #include "playingcard.h"
 
 #include <QListIterator>

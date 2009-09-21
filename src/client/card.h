@@ -20,9 +20,9 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include <QObject>
-#include <QPixmap>
 #include "gametypes.h"
+
+#include <QPixmap>
 
 class CardData;
 
@@ -31,9 +31,21 @@ namespace client
 class CardBank;             // Friend class
 
 /**
- * The Card class provides a mechanism to obtain/generate graphics for cards in
- * KBang client. CardBank class is responsible for creating and holding Card
- * instances, that are then used by CardWidget to get the right graphics.
+ * The Card class represents a Bang! card. Those Cards are usually loaded on
+ * the startup by the CardBank class, which then manages them. In Bang! a
+ * card can have more pictures than one (eg. Bang, Missed) and the used picture
+ * depends only on card suit and rank. To achieve this feature, Cards can
+ * be linked with multiple pictures, identified by suit and rank set.
+ *
+ * A Card instance is initialized by calling the constructor and by using
+ * the addGraphics() method to attach pictures. After that, card parameters
+ * can be obtained by calling const Card methods.
+ *
+ * Although Card pictures can contain suit and rank information, it is wise
+ * to retouch card pictures and remove those signs. After that you can use
+ * this class to paint the suit and rank signs in the runtime. The pictures
+ * for those signs are defined in the parent CardSet and can be obtained using
+ * CardBank::suit() and CardBank::rank() methods.
  *
  * @author MacJariel
  */
@@ -43,54 +55,63 @@ class Card: public QObject
 
     /**
      * Constructs a new Card according to given parameters.
-     *
      * @param cardBank The CardBank that creates this card. CardBank
      *                 automatically becomes the parent of this instance.
      * @param name The card name.
      * @param type The card type.
-     * @param cardSetName The name of CardSet this card comes from.
+     * @param cardSetName The name of the CardSet this card comes from.
      */
     Card(CardBank* cardBank, const QString& name, CardType type,
          const QString& cardSetName);
 
     /**
-     * Adds graphics to the card. In most cases each Card instance has just
-     * one graphics associated with it, but in some more advanced scenarios
-     * one Card can have more graphics. For example, there are more graphics
-     * for Bang! card. You can distinguish one from another by specifying
-     * suits and ranks. The resulting set of (suit,rank) pairs is determined
-     * by cartesian product of suitString and rankString sets.
+     * Loads the image from <i>gfx</i> file and links it to this Card.
      *
-     * Note that sets of (suit,rank) pairs for all graphics should be
-     * disjoint.
-     *
-     * @param gfx Text string that is pointing to the graphics file.
-     * @param suitString Text string that describes which suits are related
-     *                   to this graphics. It can contain a comma separated
-     *                   list of suits. An empty string means all suits.
+     * @param gfx The full path to the image.
+     * @param suitString Text string that describes which suit is related
+     *                   to this image. Use empty string for all suits.
      * @param rankString Text string that describes which ranks are related
-     *                   to this graphics. It can contain a comma separated
-     *                   list of ranks or rank ranges. For example: 2-5,J-A.
-     *                   An empty string means all ranks.
-     * @param renderSings Whether sings (suits and ranks) should be added
-     *                    to graphics or not.
+     *                   to this graphics. It can contain either a single rank,
+     *                   or a range (e.g. "8", "10-K"). Use empty string for
+     *                   all ranks, instead of using "2-A".
+     * @param renderSigns Tells whether this graphics requires runtime painting
+     *                    of suit and rank signs.
+     * @note Only playing cards can have suits and ranks. The last three
+     *       parameters are ignored in case of other type of card.
      */
     void addGraphics(const QString& gfx, const QString& suitString = QString(),
-                     const QString& rankString = QString(), bool renderSigns = 0);
+                     const QString& rankString = QString(), bool renderSigns = 1);
 
 public:
-    inline QString  name()  const { return m_name;  } ///< Returns card name.
-    inline CardType type()  const { return m_type;  } ///< Returns card type.
-    inline QString  cardSetName() const { return m_cardSetName; } ///< Returns name of the source CardSet.
+    /**
+     * Returns the name (string identifier) of the card.
+     */
+    inline CardName name()  const {
+        return m_name;
+    }
 
     /**
-     * Returns the graphics for given card. The suit and rank information
+     * Returns the type of the card.
+     */
+    inline CardType type() const {
+        return m_type;
+    }
+
+    /**
+     * Returns the name of the CardSet.
+     */
+    inline QString cardSetName() const {
+        return m_cardSetName;
+    }
+
+    /**
+     * Returns the picture for given card. The suit and rank information
      * from CardData is used to decide which graphics is used and to
      * render signs (if renderSigns is set for given graphics).
-     * If the Card has only one graphics, it is returned without (suit,rank)
-     * matching. Else, the target graphics is chosen according to (suit,rank)
-     * information, or unspecified graphics is returned if no matching
-     * graphics is found.
+     * If the Card is not playing card (resp. has only one graphics), the first
+     * (resp. the only one) graphics is used. Otherwise the target graphics is
+     * chosen according to suit and rank information. If no graphics is
+     * matching given criteria, a null picture is returned.
      */
     QPixmap pixmap(const CardData&) const;
 
@@ -104,7 +125,7 @@ private:
     };
 
     CardBank*       m_cardBank;
-    QString         m_name;
+    CardName        m_name;
     CardType        m_type;
     QString         m_cardSetName;
     QList<Graphics> m_graphics;

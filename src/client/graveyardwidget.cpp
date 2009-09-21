@@ -45,6 +45,12 @@ GraveyardWidget::pop()
     return result;
 }
 
+/* virtual */
+CardWidget* GraveyardWidget::peek()
+{
+    return mp_firstCard;
+}
+
 /* virtual */ void
 GraveyardWidget::push(CardWidget* card)
 {

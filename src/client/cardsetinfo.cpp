@@ -26,7 +26,7 @@
 #include "cardsetinfo.h"
 #include "cardsetmanager.h"
 
-#include <QtDebug>
+#include "debug/debugblock.h"
 
 using namespace client;
 
@@ -34,6 +34,7 @@ CardSetInfo::CardSetInfo(QDir dir):
         m_isLocal(1),
         m_dir(dir)
 {
+    DEBUG_BLOCK;
     if (!m_dir.exists()) {
         qWarning("Cannot create CardSetInfo. Directory '%s' does not exist.",
                  qPrintable(dir.absolutePath()));
@@ -67,6 +68,11 @@ CardSetInfo::CardSetInfo(QDir dir):
     m_slot = docElem.attribute("slot");
     m_locale = QLocale(docElem.attribute("locale"));
     m_renderSigns = (docElem.attribute("render-signs") == "true");
-
+    QString renderSignsPosition = docElem.attribute("render-signs-position");
+    if (!renderSignsPosition.isEmpty()) {
+        QStringList splits = renderSignsPosition.split(",");
+        m_renderSignsPosition.setX(splits[0].toInt());
+        m_renderSignsPosition.setY(splits[1].toInt());
+    }
     CardSetManager::instance().addKnownSlot(m_slot);
 }

@@ -5,8 +5,9 @@ RCC_DIR = rccs/client
 OBJECTS_DIR = obj/client
 CONFIG += qt
 CONFIG += debug \
-#CONFIG += release \
-		   warn_on
+    \ \
+    \ \ # CONFIG += release \
+    warn_on
 QT += network \
     xml
 RESOURCES += src/client/resources/client.qrc
@@ -35,6 +36,7 @@ HEADERS += src/client/gameloop.h \
     src/client/localplayerwidget.h \
     src/client/cardlistwidget.h \
     src/client/gameevent.h \
+    src/client/gameeventcmd.h \
     src/client/cardmovementevent.h \
     src/client/gameeventqueue.h \
     src/client/gameeventhandler.h \
@@ -54,7 +56,9 @@ HEADERS += src/client/gameloop.h \
     src/client/cardsetmanager.h \
     src/client/cardsetinfo.h \
     src/client/cardbank.h \
-    src/client/clienttypes.h
+    src/client/clienttypes.h \
+    src/client/gameeventplayer.h \
+    src/client/setplayerscmd.h
 FORMS += src/client/connecttoserverdialog.ui \
     src/client/mainwindow.ui \
     src/client/joingamedialog.ui \
@@ -85,6 +89,7 @@ SOURCES += src/client/gameloop.cpp \
     src/client/localplayerwidget.cpp \
     src/client/cardlistwidget.cpp \
     src/client/gameevent.cpp \
+    src/client/gameeventcmd.cpp \
     src/client/cardmovementevent.cpp \
     src/client/gameeventqueue.cpp \
     src/client/gameeventhandler.cpp \
@@ -104,7 +109,10 @@ SOURCES += src/client/gameloop.cpp \
     src/client/aboutdialog.cpp \
     src/client/cardsetmanager.cpp \
     src/client/cardsetinfo.cpp \
-    src/client/cardbank.cpp
+    src/client/cardbank.cpp \
+    src/client/gameeventplayer.cpp \
+    src/client/setplayerscmd.cpp
+TRANSLATIONS = ts/kbang_client_cs.ts
 unix { 
     LIBPATH += lib
     TARGETDEPS += lib/libkbang_common.a

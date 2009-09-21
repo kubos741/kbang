@@ -2,7 +2,7 @@
 #define VOIDAI_H
 
 #include "gameeventlistener.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 #include <QObject>
 
 class PlayerCtrl;

@@ -20,6 +20,8 @@
 #include "deckwidget.h"
 #include "cardwidget.h"
 
+#include "debug/debugblock.h"
+
 using namespace client;
 
 DeckWidget::DeckWidget(QWidget *parent):
@@ -55,6 +57,7 @@ DeckWidget::clear()
 CardWidget*
 DeckWidget::newCard()
 {
+    DEBUG_BLOCK;
     CardWidget* card = new CardWidget(this);
     card->cardData().type = CARDTYPE_PLAYING;
     card->setCardSizeRole(m_cardSizeRole);

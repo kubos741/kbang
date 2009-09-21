@@ -17,9 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <cmath>
-#include <QtCore>
-#include <QtDebug>
 
 #include "cardmovementevent.h"
 #include "cardwidget.h"
@@ -30,6 +27,12 @@
 #include "cardlistwidget.h"
 #include "mainwindow.h"
 
+#include <cmath>
+#include <QTimerEvent>
+#include <QTimer>
+
+#include "debug/debugblock.h"
+
 using namespace client;
 
 //const int       tickTime        = 20;
@@ -39,12 +42,15 @@ using namespace client;
 const int       tickTime        = 20;
 const double    pixelsPerSecond = 1000;
 
-CardMovementEvent::CardMovementEvent(Game* game, const CardMovementData& cardMovementData):
-        GameEvent(game),
-        m_cardMovementData(cardMovementData),
+CardMovementEvent::CardMovementEvent(GameEvent* gameEvent,
+                                     CardMovementCmdDataPtr doCmd):
+        GameEventCmd(gameEvent),
+        mp_doCmd(doCmd),
         mp_card(0),
         mp_destPocket(0),
-        m_tick(0)
+        mp_cardData(0),
+        m_tick(0),
+        m_animationTimer(0)
 {
 }
 
@@ -56,51 +62,122 @@ CardMovementEvent::~CardMovementEvent()
     }
 }
 
-/* virtual slot */ void
-CardMovementEvent::run()
+/* virtual slot */
+void CardMovementEvent::doEventCmd(GameEvent::ExecutionMode mode)
 {
-    if (mp_card == 0 || mp_destPocket == 0) {
-        setCardAndPocket();
-        if (mp_card == 0 || mp_destPocket == 0) {
-            qCritical("Cannot run CardMovementEvent. Either invalid "
-                      "card-movement event received or client not in game mode.");
-            QTimer::singleShot(1, this, SLOT(finish()));
-            return;
-        }
-    }
+    DEBUG_BLOCK;
+    Q_ASSERT(mp_card == 0);
+    Q_ASSERT(mp_destPocket == 0);
+    Q_ASSERT(mp_cardData == 0);
 
-    if (!mp_card->isVisible() || !mp_destPocket->isVisible()) {
-        // We need to wait, because widgets that are essential
-        // for translation are not visible yet (and thus their
-        // coords can be incorrect).
-        QTimer::singleShot(20, this, SLOT(run()));
+    GameEventCmd::doEventCmd(mode);
+    setCardAndPocket(mp_doCmd);
+
+    if (mp_card == 0 || mp_destPocket == 0) {
+        qCritical("Cannot run CardMovementEvent. Either card or destPocket "
+                  "cannot be found.");
+        if (mode == GameEvent::ExecuteNormal) {
+            QTimer::singleShot(1, this, SLOT(finish()));
+        }
         return;
     }
 
-    startTransition();
-    GameEvent::run();
+    if (mode == GameEvent::ExecuteNormal) {
+        startTransition();
+    } else {
+        ///@todo Fast mode needs to be tested
+        if (mp_cardData->id != 0 && !mp_destPocket->isRevealed()) {
+            mp_card->setCardData(CardData());
+        } else {
+            mp_card->setCardData(*mp_cardData);
+        }
+        mp_cardData = 0;
+        mp_destPocket->push(mp_card);
+        mp_card = 0;
+        mp_destPocket = 0;
+    }
+}
+
+/* virtual */
+void CardMovementEvent::undoEventCmd(GameEvent::ExecutionMode mode)
+{
+    DEBUG_BLOCK;
+    GameEventCmd::doEventCmd(mode);
+    setCardAndPocket(mp_undoCmd);
+
+    if (mp_card == 0 || mp_destPocket == 0) {
+        qCritical("Cannot run CardMovementEvent. Either card or destPocket "
+                  "cannot be found.");
+        if (mode == GameEvent::ExecuteNormal) {
+            QTimer::singleShot(1, this, SLOT(finish()));
+        }
+        return;
+    }
+
+    if (mode == GameEvent::ExecuteNormal) {
+        Q_ASSERT(mp_card->isVisible());
+        Q_ASSERT(mp_destPocket->isVisible());
+        startTransition();
+    } else {
+        ///@todo Fast mode needs to be tested
+        if (mp_cardData->id != 0 && !mp_destPocket->isRevealed()) {
+            mp_card->setCardData(CardData());
+        } else {
+            mp_card->setCardData(*mp_cardData);
+        }
+        mp_cardData = 0;
+        mp_destPocket->push(mp_card);
+        mp_card = 0;
+        mp_destPocket = 0;
+    }
+}
+
+/* virtual */
+void CardMovementEvent::finish()
+{
+    mp_cardData = 0;
+    mp_card = 0;
+    mp_destPocket = 0;
+    GameEventCmd::finish();
 }
 
 void
-CardMovementEvent::setCardAndPocket()
+CardMovementEvent::setCardAndPocket(const CardMovementCmdDataPtr& cmd)
 {
-    Game* game = Game::currentGame();
+    Game* game = mp_gameEvent->game();
+    Q_ASSERT(game != 0);
+    Q_ASSERT(game->interfaceType() == Game::GameInterface);
 
-    if (game == 0 || game->interfaceType() != Game::GameInterface) {
-        return;
+    if (m_isFirstRun) {
+        /// Set the undo cmd
+        Q_ASSERT(mp_undoCmd.isNull());
+        mp_undoCmd = CardMovementCmdDataPtr(new CardMovementCmdData());
+        mp_undoCmd->pocketTypeFrom  = mp_doCmd->pocketTypeTo;
+        mp_undoCmd->pocketTypeTo    = mp_doCmd->pocketTypeFrom;
+        mp_undoCmd->playerFrom      = mp_doCmd->playerTo;
+        mp_undoCmd->playerTo        = mp_doCmd->playerFrom;
+        mp_undoCmd->card            = mp_doCmd->card;
+        if (cmd->pocketTypeTo == POCKET_GRAVEYARD) {
+            CardWidget* graveyardTop = game->graveyard()->peek();
+            if (graveyardTop != 0) {
+                mp_undoCmd->secondCard = graveyardTop->cardData();
+            }
+        }
+        m_isFirstRun = 0;
     }
 
-    PlayerWidget* srcPlayer  = game->playerWidget(m_cardMovementData.playerFrom);
-    PlayerWidget* destPlayer = game->playerWidget(m_cardMovementData.playerTo);
+    PlayerWidget* srcPlayer  = game->playerWidget(cmd->playerFrom);
+    PlayerWidget* destPlayer = game->playerWidget(cmd->playerTo);
+    mp_cardData = &cmd->card;
 
-    switch(m_cardMovementData.pocketTypeFrom)
+    switch(cmd->pocketTypeFrom)
     {
     case POCKET_DECK:
         mp_card = game->deck()->pop();
         break;
     case POCKET_GRAVEYARD:
-        if (m_cardMovementData.secondCard.id != 0) {
-            game->graveyard()->setSecondCard(m_cardMovementData.secondCard);
+        if (cmd->secondCard.id != 0) {
+            game->graveyard()->setSecondCard(cmd->secondCard);
         }
         mp_card = game->graveyard()->pop();
         break;
@@ -109,32 +186,32 @@ CardMovementEvent::setCardAndPocket()
             qCritical("Invalid card movement from POCKET_HAND (unknown player).");
             break;
         }
-        if (srcPlayer->isLocalPlayer() && m_cardMovementData.card.id == 0) {
+        if (srcPlayer->isLocalPlayer() && cmd->card.id == 0) {
             qCritical("Invalid card movement from POCKET_HAND (unknown card).");
             break;
         }
         mp_card = srcPlayer->hand()->take(srcPlayer->isLocalPlayer() ?
-                                          m_cardMovementData.card.id : 0);
+                                          cmd->card.id : 0);
         break;
     case POCKET_TABLE:
         if (!srcPlayer) {
             qCritical("Invalid card movement from POCKET_TABLE (unknown player).");
             break;
         }
-        if (m_cardMovementData.card.id == 0) {
+        if (cmd->card.id == 0) {
             qCritical("Invalid card movement from POCKET_TABLE (unknown card).");
             break;
         }
-        mp_card = srcPlayer->table()->take(m_cardMovementData.card.id);
+        mp_card = srcPlayer->table()->take(cmd->card.id);
         break;
     case POCKET_SELECTION:
-        mp_card = game->selection()->take(m_cardMovementData.card.id);
+        mp_card = game->selection()->take(cmd->card.id);
         break;
     case POCKET_INVALID:
         break;
     }
 
-    switch(m_cardMovementData.pocketTypeTo)
+    switch(cmd->pocketTypeTo)
     {
     case POCKET_DECK:
         mp_destPocket = game->deck();
@@ -159,49 +236,52 @@ CardMovementEvent::setCardAndPocket()
 void
 CardMovementEvent::startTransition()
 {
-    Q_ASSERT(mp_destPocket->isVisible());
-    Q_ASSERT(mp_card->isVisible());
+    if (!mp_destPocket->isVisible() || !mp_card->isVisible()) {
+        QTimer::singleShot(10, this, SLOT(startTransition()));
+        return;
+    }
 
     if (mp_card->parent() != MainWindow::instance()->centralWidget())
     {
+        qDebug() << "mp_card->pos()" << mp_card->pos();
         // reparent card to centralWidget
         QPoint pos = mp_card->mapTo(MainWindow::instance()->centralWidget(), QPoint(0,0));
+        qDebug() << "#pos" << pos;
         mp_card->setParent(MainWindow::instance()->centralWidget());
         mp_card->move(pos);
     }
+
     mp_card->raise();
     mp_card->show();
+    m_srcPos = mp_card->pos();
     m_destPos = mp_destPocket->mapTo(MainWindow::instance()->centralWidget(), mp_destPocket->newCardPosition());
     m_length  = sqrt(pow(m_destPos.x() - m_srcPos.x(), 2) + pow(m_destPos.y() - m_srcPos.y(), 2));
     m_time.start();
-    m_timer.start(tickTime, this);
+    m_animationTimer = startTimer(tickTime);
 }
 
-/* virtual */ void
-CardMovementEvent::timerEvent(QTimerEvent*)
+/* virtual */
+void CardMovementEvent::timerEvent(QTimerEvent* e)
 {
-    qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / m_length;
-    if (progress >= 1) {
-        stopTransition();
+    if (e->timerId() == m_animationTimer) {
+        qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / m_length;
+        if (progress >= 1) {
+            stopTransition();
+        } else {
+            QPoint currPos = m_srcPos + (m_destPos - m_srcPos) * progress;
+            mp_card->move(currPos);
+        }
     } else {
-        QPoint currPos = m_srcPos + (m_destPos - m_srcPos) * progress;
-        mp_card->move(currPos);
+        GameEventCmd::timerEvent(e);
     }
 }
 
-void
-CardMovementEvent::stopTransition()
+void CardMovementEvent::stopTransition()
 {
-    m_timer.stop();
-    int real     = m_time.elapsed();
-    int expected = (int)(m_length * 1000 / pixelsPerSecond);
-    if (real - expected > 50) {
-        qDebug("Card movement should take %d ms, but took %d ms.", expected, real);
-    }
-    mp_card->setCardData(m_cardMovementData.card);
-    mp_card->updatePixmap();
+    DEBUG_BLOCK;
+    killTimer(m_animationTimer);
+    mp_card->setCardData(*mp_cardData);
     mp_destPocket->push(mp_card);
-    
     if (mp_card->cardData().id != 0 && !mp_destPocket->isRevealed()) {
         // If revealed card moves to a unrevealed pocket (deck or opponent's
         // hand), it must be unrevealed. To give user time to notice what the
@@ -209,15 +289,15 @@ CardMovementEvent::stopTransition()
         QTimer::singleShot(500, this, SLOT(unrevealCard()));
     } else {
         mp_card = 0;
-        GameEvent::finish();
+        finish();
     }
 }
 
-/* slot */ void
-CardMovementEvent::unrevealCard()
+/* slot */
+void CardMovementEvent::unrevealCard()
 {
-    mp_card->setCardData(CardData());
+    mp_card->unreveal();
     mp_card->updatePixmap();
     mp_card = 0;
-    GameEvent::finish();
+    finish();
 }

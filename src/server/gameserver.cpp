@@ -50,7 +50,7 @@ GameServer::GameServer():
     mp_tcpServer = new TcpServer(this);
     m_serverInfoData.name =
             Config::instance().readString("network", "server_name");
-    m_serverInfoData.description =
+    m_serverInfoData.desc =
             Config::instance().readString("network", "server_description");
     mp_cardFactory = new CardFactory();
 }

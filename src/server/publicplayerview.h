@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,26 +20,28 @@
 #ifndef PUBLICPLAYERVIEW_H
 #define PUBLICPLAYERVIEW_H
 
-#include <QList>
+#include "gamestructs.h"
+#include "servertypes.h"
 
-#include "common.h"
-#include "parser/parserstructs.h"
+#include <QList>
 
 class Player;
 class PlayingCard;
 
 /**
- *
- * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
-*/
+ * The PublicPlayerView class provides read-only access to public attributes
+ * of the given player.
+ * @author MacJariel
+ */
 class PublicPlayerView {
 friend class Player;
+
 protected:
     PublicPlayerView(Player* player);
     virtual ~PublicPlayerView();
 
 public:
-    int                  id()                const;
+    PlayerId             id()                const;
     QString              name()              const;
     bool                 isCreator()         const;
     bool                 isSheriff()         const;

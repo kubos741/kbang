@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,31 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDPLAYABLE_H
-#define CARDPLAYABLE_H
 
-#include "playingcard.h"
+#ifndef TABLECARD_H
+#define TABLECARD_H
+
+#include "cards/playingcard.h"
+
+class Player;
+class GameTable;
 
 /**
- * This is an abstract class for all cards that can be played, which means
- * that player can use this card by putting it on the top of the graveyard.
- * Some of these cards can also require to specify a target player or target
- * card.
- * @author MacJariel <MacJariel@gmail.com>
+ * The TableCard class is the base class for all playing cards, that can be put
+ * in front of a player. In Bang! it represents the cards with blue border. This
+ * class provides no extra public methods, but declares two important protected
+ * methods - reigsterPlayer() and unregisterPlayer().
+ *
+ * @author MacJariel
  */
-class CardPlayable: public PlayingCard
+class TableCard: public PlayingCard
 {
-Q_OBJECT
+friend class GameTable;
+Q_OBJECT;
 public:
-    CardPlayable(Game* game, int id);
-    virtual ~CardPlayable();
+    TableCard(Game*, CardId, PlayingCardType, CardSuit, CardRank);
+    virtual ~TableCard();
 
-    virtual bool play();
-    virtual bool play(Player* targetPlayer) = 0;
-    virtual bool play(PlayingCard* targetCard) = 0;
+protected:
+    virtual void move(Player*, PocketType);
 
-    virtual void respondPass() = 0;
-    virtual void respondCard(PlayingCard* targetCard) = 0;
+    /**
+     * This method is called (by GameTable) when the card is
+     * put on the player's table.
+     */
+    virtual void registerPlayer(Player*) {}
+
+    /**
+     * This method is called (by GameTable) when the card is
+     * removed from the player's table.
+     */
+    virtual void unregisterPlayer(Player*) {}
 };
 
 #endif

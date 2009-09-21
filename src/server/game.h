@@ -22,7 +22,7 @@
 
 #include <QtCore>
 #include "publicgameview.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 class Client;
 class Player;
@@ -44,7 +44,7 @@ class BeerRescue;
 class PlayerReaper;
 
 /**
- * The Game class represents a bang game. Because there is a lot
+ * The Game class represents a Bang! game. Because there is a lot
  * of stuff to handle, the Game class delegates the problems
  * to its parts rather than managing everything itself.
  *
@@ -65,12 +65,14 @@ public:
     /**
      * Creates an instance of Game. The GameServer class is responsible
      * for creating instances of Game.
-     * \param parent parent of the Game is a GameServer
-     * \param structGame the game structure from parser
-     * \see GameServer::createGame()
+     * @param parent parent of the Game is a GameServer
+     * @param gameId the id of the game
+     * @param CreateGameData
+     * @see GameServer::createGame()
      */
-    Game(GameServer* parent, int gameId, const CreateGameData&);
-    ~Game();
+    Game(GameServer* parent, GameId gameId, const CreateGameData&);
+
+    virtual ~Game();
 
   /////////////
  // GETTERS //
@@ -80,19 +82,27 @@ public:
      * Returns the id of the game. Zero value is reserved and interpreted
      * as an invalid game.
      */
-    inline int id() const { return m_id; }
+    inline GameId id() const {
+        return m_id;
+    }
 
     /**
      * Returns the count of players in the game.
      */
-    inline int playersCount() const { return m_playerList.size(); }
+    inline int playersCount() const {
+        return m_playerList.size();
+    }
 
-    int alivePlayersCount() const;
+    inline int alivePlayersCount() const {
+        return m_goodGuysCount + m_outlawsCount + m_renegadesCount;
+    }
 
     /**
      * Returns the count of spectators in the game.
      */
-    inline int spectatorsCount() const { return 0; } /// @todo implement spectators
+    inline int spectatorsCount() const {
+        return 0; /// @todo implement spectators
+    }
 
     inline GameState& gameState() { return m_state; }
     inline GameInfo& gameInfo()   { return *mp_gameInfo;  }
@@ -125,7 +135,7 @@ public:
      * Looks up and returns the Player according to its id.
      * Returns 0 if player doesn't exist.
      */
-    Player* player(int playerId);
+    Player* player(PlayerId playerId);
 
     /**
      * Returns the first player that succeeds the currentPlayer
@@ -192,17 +202,18 @@ private:
 
 
 private:
-    int       m_id;
-    GameState m_state;
+    GameId              m_id;
+    GameState           m_state;
 
-    GameInfo*             mp_gameInfo;
-    GameTable*            mp_gameTable;
-    GameCycle*            mp_gameCycle;
-    GameEventManager*     mp_gameEventManager;
+    GameInfo*           mp_gameInfo;
+    GameTable*          mp_gameTable;
+    GameCycle*          mp_gameCycle;
+    GameEventManager*   mp_gameEventManager;
 
     PublicGameView      m_publicGameView;
-    int                 m_nextUnusedPlayerId;
-    QMap<int, Player*>  m_playerMap;
+    PlayerId            m_nextUnusedPlayerId;
+    QMap<PlayerId,
+         Player*>       m_playerMap;
     QList<Player*>      m_playerList;
     bool                m_startable;
     QList<PublicPlayerView*>

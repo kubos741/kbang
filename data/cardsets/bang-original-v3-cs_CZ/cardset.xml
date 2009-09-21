@@ -1,32 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cardset name="bang-original-v3-cs_CZ" locale="cs_CZ" slot="bang-original" render-signs="true">
-    <card name="bang" type="playing" suit="diamonds" rank="8-A" gfx="cards/bang.png" /> <!-- Bang v1 -->
+<cardset name="bang-original-v3-cs_CZ" locale="cs_CZ" slot="bang-original" render-signs="true" render-signs-position="36,556">
+	<card name="back-character" type="character" gfx="characters/back-character.png" />
+	<card name="back-role" type="role" gfx="roles/back-role.png" />
+	<card name="back-playing" type="role" gfx="cards/back-playing.png" />
+	
+	<card name="appaloosa" type="playing" gfx="cards/appaloosa.png" />
+	<card name="bang" type="playing" suit="diamonds" rank="8-A" gfx="cards/bang.png" /> <!-- Bang v1 -->
     <card name="bang" type="playing" suit="clubs" rank="2-6" gfx="cards/bang.png" /> <!-- Bang v1 -->
     <card name="bang" type="playing" suit="spades" rank="A" gfx="cards/bang.png" /> <!-- Bang v1 -->
-
     <card name="bang" type="playing" suit="hearts" rank="Q-A" gfx="cards/bang.png" /> <!-- Bang v2 -->
     <card name="bang" type="playing" suit="clubs" rank="7-9" gfx="cards/bang.png" /> <!-- Bang v2 -->
-
-    <card name="missed" type="playing" gfx="cards/missed.png" />
+    <card name="barrel" type="playing" gfx="cards/barrel.png" />
     <card name="beer" type="playing" gfx="cards/beer.png" />
-    <card name="saloon" type="playing" gfx="cards/saloon.png" />
-    <card name="wellsfargo" type="playing" gfx="cards/wellsfargo.png" />
+    <card name="carabine" type="playing" gfx="cards/carabine.png" />
+    <card name="catbalou" type="playing" gfx="cards/catbalou.png" />
     <card name="diligenza" type="playing" gfx="cards/diligenza.png" />
-    <card name="generalstore" type="playing" gfx="cards/generalstore.png" />
-    <card name="panic" type="playing" gfx="cards/generalstore.png" />
-    <card name="catbalou" type="playing" gfx="cards/generalstore.png" />
-    <card name="indians" type="playing" gfx="cards/generalstore.png" />
-    <card name="duel" type="playing" gfx="cards/generalstore.png" />
-    <card name="gatling" type="playing" gfx="cards/generalstore.png" />
-    <card name="mustang" type="playing" gfx="cards/generalstore.png" />
-    <card name="appalossa" type="playing" gfx="cards/generalstore.png" />
-    <card name="barrel" type="playing" gfx="cards/generalstore.png" />
-    <card name="dynamite" type="playing" gfx="cards/generalstore.png" />
-    <card name="jail" type="playing" gfx="cards/generalstore.png" />
-    <card name="volcanic" type="playing" gfx="cards/generalstore.png" />
-    <card name="schofield" type="playing" gfx="cards/generalstore.png" />
-    <card name="remington" type="playing" gfx="cards/generalstore.png" />
-    <card name="carabine" type="playing" gfx="cards/generalstore.png" />
-	<card name="winchester" type="playing" gfx="cards/generalstore.png" />
-	<card name="" type="playing" gfx="cards/generalstore.png" render-signs="" />
+    <card name="duel" type="playing" gfx="cards/duel.png" />
+    <card name="dynamite" type="playing" gfx="cards/dynamite.png" />
+    <card name="gatling" type="playing" gfx="cards/gatling.png" />
+    <card name="generalstore" type="playing" gfx="cards/emporio.png" />
+    <card name="indians" type="playing" gfx="cards/indians.png" />
+    <card name="jail" type="playing" gfx="cards/jail.png" />
+    <card name="missed" type="playing" gfx="cards/missed.png" />
+    <card name="mustang" type="playing" gfx="cards/mustang.png" />
+    <card name="panic" type="playing" gfx="cards/panico.png" />
+    <card name="remington" type="playing" gfx="cards/remington.png" />
+    <card name="saloon" type="playing" gfx="cards/saloon.png" />
+    <card name="schofield" type="playing" gfx="cards/schofield.png" />
+    <card name="volcanic" type="playing" gfx="cards/volcanic.png" />
+    <card name="wellsfargo" type="playing" gfx="cards/wellsfargo.png" />
+	<card name="winchester" type="playing" gfx="cards/winchester.png" />
+
+	<card name="sheriff" type="role" gfx="roles/sheriff.png" />
+	<card name="deputy" type="role" gfx="roles/deputy.png" />
+	<card name="outlaw" type="role" gfx="roles/outlaw.png" />
+	<card name="renegade" type="role" gfx="roles/renegade.png" />
+
+	<card name="bart-cassidy" type="character" gfx="characters/bart-cassidy.png" />
+	<card name="black-jack" type="character" gfx="characters/black-jack.png" />
+	<card name="calamity-janet" type="character" gfx="characters/calamity-janet.png" />
+	<card name="el-gringo" type="character" gfx="characters/el-gringo.png" />
+	<card name="jesse-jones" type="character" gfx="characters/jesse-jones.png" />
+	<card name="jourdonnais" type="character" gfx="characters/jourdonnais.png" />
+	<card name="kit-carlson" type="character" gfx="characters/kit-carlson.png" />
+	<card name="lucky-duke" type="character" gfx="characters/lucky-duke.png" />
+	<card name="paul-regret" type="character" gfx="characters/paul-regret.png" />
+	<card name="pedro-ramirez" type="character" gfx="characters/pedro-ramirez.png" />
+	<card name="rose-doolan" type="character" gfx="characters/rose-doolan.png" />
+	<card name="sid-ketchum" type="character" gfx="characters/sid-ketchum.png" />
+	<card name="slab-the-killer" type="character" gfx="characters/slab-the-killer.png" />
+	<card name="suzy-lafayette" type="character" gfx="characters/suzy-lafayette.png" />
+	<card name="vulture-sam" type="character" gfx="characters/vulture-sam.png" />
+	<card name="willy-the-kid" type="character" gfx="characters/willy-the-kid.png" />
+
+	<rank value="2" gfx="signs/2.png" />
+	<rank value="3" gfx="signs/3.png" />
+	<rank value="4" gfx="signs/4.png" />
+	<rank value="5" gfx="signs/5.png" />
+	<rank value="6" gfx="signs/6.png" />
+	<rank value="7" gfx="signs/7.png" />
+	<rank value="8" gfx="signs/8.png" />
+	<rank value="9" gfx="signs/9.png" />
+	<rank value="10" gfx="signs/10.png" />
+	<rank value="J" gfx="signs/jack.png" />
+	<rank value="Q" gfx="signs/queen.png" />
+	<rank value="K" gfx="signs/king.png" />
+	<rank value="A" gfx="signs/ace.png" />
+
+	<suit value="diamonds" gfx="signs/diamonds.png" />
+	<suit value="hearts" gfx="signs/hearts.png" />
+	<suit value="spades" gfx="signs/spades.png" />
+	<suit value="clubs" gfx="signs/clubs.png" />
 </cardset>

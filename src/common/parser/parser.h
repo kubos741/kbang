@@ -21,6 +21,9 @@
 #define PARSER_H
 
 
+#include "gameevents.h"
+#include "serverevents.h"
+
 #include "gamestructs.h"
 #include "queryget.h"
 #include "queryresult.h"
@@ -67,12 +70,12 @@ public:
     } ParserError;
 
     /**
-     * Constructs a Parser that uses <i>socket</i> to send and receive messages.
+     * Constructs a parser that uses <i>socket</i> to send and receive messages.
      */
-    Parser(QTcpSocket* socket);
+    Parser(QIODevice* device, bool replay = 0);
 
     /**
-     * Destroys the Parser. Closes the stream, if the <i>socket</i> is still
+     * Destroys the parser. Closes the stream, if the <i>socket</i> is still
      * alive.
      */
     virtual ~Parser();
@@ -87,10 +90,16 @@ public:
      */
     static QString protocolVersion();
 
+    /**
+     * Returns the state of the parser.
+     */
     inline ParserState parserState() const {
         return m_parserState;
     }
 
+    /**
+     * Returns the type of the current error, or Parser::NoError if no error occured.
+     */
     inline ParserError parserError() const {
         return m_parserError;
     }
@@ -173,39 +182,31 @@ public:
     void actionDiscard(CardId cardId);
 
 signals:
-    void sigEventEnterGameMode(GameId, const QString& gameName, ClientType);
-    void sigEventExitGameMode();
-    void sigEventPlayerJoinedGame(const PublicPlayerData&);
-    void sigEventPlayerLeavedGame(PlayerId);
-    void sigEventPlayerUpdate(const PublicPlayerData&);
-    void sigEventGameCanBeStarted(bool canBeStarted);
-    void sigEventGameStateChange(const GameState&);
-    void sigEventGameContextChange(const GameContextData&);
-    void sigEventGameSync(const GameSyncData&);
-    void sigEventLifePointsChange(PlayerId, int lifePoints);
-    void sigEventPlayerDied(PlayerId, PlayerRole role);
-    void sigEventCardMovement(const CardMovementData&);
-    void sigEventChatMessage(const ChatMessageData&);
-    void sigEventGameMessage(const GameMessage&);
+    /**
+     * This signal is emitted after a game event is received. The gameEvent
+     * parameter describes the received game event.
+     */
+    void gameEventReceived(GameEventDataPtr gameEvent);
 
-    ////////////
-    // SERVER //
-    ////////////
+    /**
+     * This signal is emitted after a server event is received. The serverEvent
+     * parameter describes the received server event.
+     */
+    void serverEventReceived(ServerEventDataPtr serverEvent);
+
 public:
-    void eventEnterGameMode(GameId, const QString& gameName, ClientType);
-    void eventExitGameMode();
-    void eventPlayerJoinedGame(const PublicPlayerData&);
-    void eventPlayerLeavedGame(PlayerId);
-    void eventPlayerUpdate(const PublicPlayerData&);
-    void eventChatMessage(const ChatMessageData&);
-    void eventGameMessage(const GameMessage&);
-    void eventGameStateChange(const GameState&);
-    void eventGameContextChange(const GameContextData&);
-    void eventGameSync(const GameSyncData&);
-    void eventCardMovement(const CardMovementData&);
-    void eventLifePointsChange(PlayerId, int lifePoints);
-    void eventPlayerDied(PlayerId, PlayerRole);
-    void eventGameCanBeStarted(bool canBeStarted);
+    /**
+     * Sends a game event specified by <i>event</i> to the peer. This method
+     * be used exclusively by server.
+     */
+    void sendGameEvent(GameEventDataPtr event);
+
+    /**
+     * Sends a server event specified by <i>event</i> to the peer. This method
+     * be used exclusively by server.
+     */
+    void sendServerEvent(ServerEventDataPtr event);
+
 
 signals:
     void sigQueryServerInfo(const QueryResult&);
@@ -239,7 +240,6 @@ private:
     void readStanzaNextToken();
     void processStanzaQuery();
     void processStanzaAction();
-    void processStanzaEvent();
     inline void eventStart();
     inline void eventEnd();
     inline void actionStart();
@@ -247,7 +247,7 @@ private:
     void raiseNotValidError();
 
     IOProxy*          mp_ioProxy;
-    QTcpSocket*       mp_socket;
+    QIODevice*        mp_device;
     QXmlStreamReader* mp_streamReader;
     QXmlStreamWriter* mp_streamWriter;
     ParserState       m_parserState;

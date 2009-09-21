@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if 0
+
 #include "gamemessageevent.h"
 #include "game.h"
 #include "card.h"
@@ -191,3 +193,4 @@ GameMessageEvent::decoratePlayerName(const QString& playerName, bool isTarget)
     return QString("<font color=\"%2\"><b>%1</b></font>").
                   arg(playerName).arg(isTarget ? "navy" : "lightblue");
 }
+#endif

@@ -40,10 +40,6 @@ public:
      */
     static CardSetManager& instance();
 
-    /**
-     * Reloads the information about installed card sets.
-     */
-    void refreshLocalCardSets();
 
     /**
      * Returns the information about installed card sets.
@@ -70,7 +66,14 @@ public:
 private:
     CardSetManager();
 
+private slots:
+    /**
+     * Reloads the information about installed card sets.
+     */
+    void refreshLocalCardSets();
     void refreshKnownSlots();
+
+private:
     void saveKnownSlots();
 
     QList<CardSetInfo>  m_localCardSets;

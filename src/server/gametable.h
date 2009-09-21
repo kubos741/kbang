@@ -106,6 +106,9 @@ public:
 
     QList<PlayingCard*> selection() const { return m_selection; }
 
+    void removeFromSelection(PlayingCard*);
+
+
 private:
     void generateCards(CardFactory*);
     void shuffleDeck();

@@ -100,6 +100,7 @@ bool GameActionManager::onCardClicked(CardWidget* cardWidget)
 
 void GameActionManager::onCardRightClicked(CardWidget* cardWidget)
 {
+    qDebug("TEST");
     new CardZoomWidget(mp_game, cardWidget);
 }
 

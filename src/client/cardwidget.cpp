@@ -29,6 +29,7 @@
 #include "cardbank.h"
 #include "game.h"
 #include "gameactionmanager.h"
+#include "debug/debugblock.h"
 
 using namespace client;
 
@@ -40,12 +41,14 @@ CardWidget::CardWidget(QWidget* parent):
         m_cardSizeRole(CARD_SIZE_NORMAL),
         m_hasHighlight(0)
 {
+    DEBUG_BLOCK;
     connect(&CardWidgetSizeManager::instance(), SIGNAL(cardSizeChanged()),
             this, SLOT(updatePixmap()));
 }
 
 CardWidget::~ CardWidget()
 {
+    DEBUG_BLOCK;
 }
 
 QPoint
@@ -54,7 +57,6 @@ CardWidget::center() const
     return QPoint((int)(QWidget::size().width() / 2),
                           (int)(QWidget::size().height() / 2));
 }
-
 
 void
 CardWidget::clone(CardWidget* other)
@@ -98,6 +100,14 @@ CardWidget::setHighlight(bool hasHighlight)
 {
     m_hasHighlight = hasHighlight;
     update();
+}
+
+void
+CardWidget::unreveal()
+{
+    CardType type = m_cardData.type;
+    m_cardData = CardData();
+    m_cardData.type = type;
 }
 
 void

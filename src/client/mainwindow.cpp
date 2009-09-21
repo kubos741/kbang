@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "mainwindow.h"         // Class declaration
 #include "ui_mainwindow.h"      // UI
@@ -61,6 +62,7 @@ MainWindow::MainWindow():
             this,                SLOT(enterGameMode(int, const QString&, ClientType)));
     connect(ServerConnection::instance(), SIGNAL(exitGameMode()),
             this,                SLOT(exitGameMode()));
+    QTimer::singleShot(10, this, SLOT(test()));
 }
 
 
@@ -98,6 +100,15 @@ void MainWindow::paintEvent(QPaintEvent* e)
     QMainWindow::paintEvent(e);
 }
 
+
+void MainWindow::test()
+{
+    QFile* file = new QFile("replay.xml");
+    if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+         return;
+    }
+    Game::enterGameMode(file);
+}
 
 /* slot */ void
 MainWindow::showConnectToServerDialog()

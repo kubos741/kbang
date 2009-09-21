@@ -29,7 +29,7 @@
 
 /** \typedef ClientId
  * Type used to identify clients on server. Every client on server has unique
- * identifier. The value 0 is reserved for invalid client.
+ * identifier. The value 0 is reserved for invalid client (or AI).
  */
 typedef quint32 ClientId;
 

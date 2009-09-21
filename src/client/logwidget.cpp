@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "logwidget.h"
 #include "serverconnection.h"
+#include "game.h"
 #include "ui_logwidget.h"
 
 
@@ -41,6 +42,12 @@ LogWidget::LogWidget(QWidget *parent):
             this, SLOT(appendIncomingData(QByteArray)));
     connect(ServerConnection::instance(), SIGNAL(outgoingData(QByteArray)),
             this, SLOT(appendOutgoingData(QByteArray)));
+    connect(mp_ui->buttonBackward, SIGNAL(clicked()),
+            this, SLOT(gameEventPlayerButtonClicked()));
+    connect(mp_ui->buttonForward, SIGNAL(clicked()),
+            this, SLOT(gameEventPlayerButtonClicked()));
+    connect(mp_ui->buttonPause, SIGNAL(clicked()),
+            this, SLOT(gameEventPlayerButtonClicked()));
 }
 
 /* virtual */
@@ -98,4 +105,34 @@ LogWidget::appendOutgoingData(const QByteArray& data)
     mp_ui->xmlView->insertPlainText(data);
     mp_ui->xmlView->moveCursor(QTextCursor::End);
     m_lastDataType = OutgoingData;
+}
+
+/* slot */
+void LogWidget::updateGameEventPlayerButtons(GameEventPlayer::Mode mode)
+{
+    mp_ui->buttonPlayForward->setChecked(mode == GameEventPlayer::PlayForwardMode);
+    mp_ui->buttonPlayBackward->setChecked(mode == GameEventPlayer::PlayBackwardMode);
+    mp_ui->buttonPause->setChecked(mode == GameEventPlayer::PausedMode);
+    mp_ui->buttonStepBackward->setChecked(mode == GameEventPlayer::StepBackwardMode);
+    mp_ui->buttonStepForward->setChecked(mode == GameEventPlayer::StepForwardMode);
+}
+
+/* slot */
+void LogWidget::gameEventPlayerButtonClicked()
+{
+    Game* game = Game::currentGame();
+    if (game == 0) {
+        return;
+    }
+    if (sender() == mp_ui->buttonPlayBackward) {
+        game->gameEventPlayer()->playBackward();
+    } else if (sender() == mp_ui->buttonPlayForward) {
+        game->gameEventPlayer()->playForward();
+    } else if (sender() == mp_ui->buttonPause) {
+        game->gameEventPlayer()->pause();
+    } else if (sender() == mp_ui->buttonStepBackward) {
+        game->gameEventPlayer()->stepBackward();
+    } else if (sender() == mp_ui->buttonStepForward) {
+        game->gameEventPlayer()->stepForward();
+    }
 }

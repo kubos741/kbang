@@ -23,6 +23,7 @@
 
 #include <QDir>
 #include <QLocale>
+#include <QPoint>
 
 namespace client {
 
@@ -59,6 +60,8 @@ public:
      */
     QString name() const            { return m_name; }
 
+    QDir dir() const                { return m_dir; }
+
     /**
      * Returns the name of the slot that CardSet provides.
      */
@@ -74,6 +77,7 @@ public:
      */
     bool    renderSigns() const     { return m_renderSigns; }
 
+    QPoint  renderSignsPosition() const { return m_renderSignsPosition; }
 
 private:
     bool    m_isLocal;
@@ -83,7 +87,7 @@ private:
     QString m_slot;
     QLocale m_locale;
     bool    m_renderSigns;
-
+    QPoint  m_renderSignsPosition;
 };
 
 }
