@@ -36,7 +36,7 @@ CardSets are stored in a directory in `$KBANG_DATA/cardsets/$CARDSET_NAME`. Ever
 
 This approach will allow us:
  * To have more graphics for same cards (currently we have only one graphics for Bang! card, instead of two)
- * To decide whether render signs (suits and ranks) in runtime, or not. (render-signs attribute). The value in cardset tag sets the default behaviour which can be overwritten with render-signs attribute in card tag.
+ * To decide whether render signs (suits and ranks) in runtime, or not. (render-signs attribute). The value in cardset tag sets the default behaviour which can be overwritten with render-signs attribute in card tag. _(this is not implemented and will be only if it's necessary)_
  * When we decide to render signs, we now use graphics for them, instead of using fonts to draw them.
 
 The gfx parameter points to the graphics file that is stored in the CardSet directory. 
