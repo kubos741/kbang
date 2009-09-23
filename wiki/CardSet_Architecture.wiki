@@ -45,3 +45,46 @@ The gfx parameter points to the graphics file that is stored in the CardSet dire
 In the future we are going to introduce expansions into KBang. When client connects to a new game, the server tells the client which slots are necessary (for example: bang-original, bang-dodgecity). Client then loads some CardSets (according to preferences) and makes sure that all slots are satisfied.
 
 The loaded sets are then merged together and card graphic information is then provided to CardWidget instances to draw cards. Card names should be unique even across different slots.
+
+= Downloading card sets from server =
+Server may allow to download some cardsets.
+
+== Getting the list of available cardsets ==
+
+*client:*
+{{{
+<query id="42" type="get">
+  <cardset-list />
+</query>
+}}}
+
+*server:*
+{{{
+<query id="42" type="result">
+  <cardset-list>
+    <cardset name="bang-original-v3-cs_CZ" locale="cs_CZ" slot="bang-original" />
+    <cardset name="bang-original-v3-en_US" locale="en_US" slot="bang-original" />
+    [...]
+  </cardset-list>
+</query>
+}}}
+
+== Downloading a cardset ==
+
+*client:*
+{{{
+<query id="42" type="get">
+  <cardset name="bang-original-v3-cs_CZ" />
+</query>
+}}}
+
+*server:*
+{{{
+<query id="42" type="result">
+  <cardset name="bang-original-v3-cs_CZ">
+    <file name="cardset.xml">[base-64 encoded data]</file>
+    <file name="cards/appaloosa.png">[base-64 encoded data]</file>
+    [..]
+  </cardset>
+</query>
+}}}
