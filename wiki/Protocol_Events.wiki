@@ -124,9 +124,15 @@ Game started.
 *Important:* When this event is received, the state of the game is set to _playing_.
 
 {{{
-<event>
-  <game-event game-id="1" type="start-game" />
-</event>
+<game-event game-id="1" type="start-game">
+  <set-players>
+      <player id="1" name="Anna" character="suzy-lafayette" role="unknown" life-points="4" />                                                                                       
+      <player id="2" name="Bob" character="kit-carlson" role="unknown" life-points="4" />                                                                                           
+      <player id="3" name="Chuck" character="willy-the-kid" role="sheriff" life-points="5" />                                                                                       
+      <player id="4" name="Dave" character="vulture-sam" role="unknown" life-points="4" />                                                                                          
+      <player id="5" name="Eve" character="calamity-janet" role="unknown" life-points="4" /> 
+  </set-players>
+</game-event>
 }}}
 
 == Finish Game ==
@@ -135,51 +141,44 @@ Game finished. The event contains the list of all players with their roles and i
 *Important:* When this event is received, the state of the game is set to _finished_.
 
 {{{
-<event>
-  <game-event game-id="1" type="finish-game">
-    <update-player id="1" role="sheriff" is-winner="true" />
-    <update-player id="2" role="deputy" is-winner="true" />
-    <update-player id="3" role="outlaw" is-winner="false" />
-    <update-player id="4" role="renegade" is-winner="false" />
-    <update-player id="5" role="outlaw" is-winner="false" />
-  </game-event>
-</event>
+<game-event game-id="1" type="finish-game">
+  <update-player id="1" role="sheriff" is-winner="true" />
+  <update-player id="2" role="deputy" is-winner="true" />
+  <update-player id="3" role="outlaw" is-winner="false" />
+  <update-player id="4" role="renegade" is-winner="false" />
+  <update-player id="5" role="outlaw" is-winner="false" />
+</game-event>
 }}}
 
 == Deal Cards ==
 Cards were dealt to players.
 
 {{{
-<event>
-  <game-event game-id="1" type="deal-cards">
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="3">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
-      <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
-    </card-movement>
-    
-    ...
+<game-event game-id="1" type="deal-cards">
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="3">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+    <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
+  </card-movement>
 
-  </game-event>
-</event>
+  ...
+</game-event>
 }}}
 
 == Start Turn ==
 Turn of the player started.
 
 {{{
-<event>
-  <game-event game-id="1" type="start-turn" player-id="1">
+<game-event game-id="1" type="start-turn" player-id="1">
     <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="draw" />
-  </game-event>
-</event>
+</game-event>
 }}}
 
 == Check Deck ==
@@ -187,217 +186,192 @@ Player flipped a card from the deck, because of Jail or Dynamite.
 
 === Successful Dynamite check ===
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="1" success="true">
-    <cause>
-      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
-    </cause>
-    <checked>
-      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="table" player-from="1" player-to="2">
-      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="1" success="true">
+  <cause>
+    <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+  </cause>
+  <checked>
+    <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="table" player-from="1" player-to="2">
+    <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+  </card-movement>
+</game-event>
 }}}
 
 === Unsuccessful Dynamite check ===
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="1" success="false">
-    <cause>
-      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
-    </cause>
-    <checked>
-      <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
-    </card-movement>
-    <
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="1" success="false">
+  <cause>
+    <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+  </cause>
+  <checked>
+    <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="spades" rank="4" />
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="12341234" name="dynamite" type="playing" suit="hearts" rank="king" />
+  </card-movement>
+</game-event>
 }}}
 
 === Successful Jail check ===
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="1" success="true">
-    <cause>
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </cause>
-    <checked>
-      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="1" success="true">
+  <cause>
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </cause>
+  <checked>
+    <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="hearts" rank="4" />
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </card-movement>
+</game-event>
 }}}
 
 === Unsuccessful Jail check ===
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="1" success="false">
-    <cause>
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </cause>
-    <checked>
-      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="1" success="false">
+  <cause>
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </cause>
+  <checked>
+    <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </card-movement>
+</game-event>
 }}}
 
 === Lucky Duke check ===
 The "draw!" of Lucky Duke must be split into 2 game events:
 
 {{{
-<event>
-  <game-event game-id="1" type="" player-id="1" use-ability="true">
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="" player-id="1" use-ability="true">
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </card-movement>
+</game-event>
 
-<event>
-  <game-event game-id="1" type="check-deck" player-id="1" success="true">
-    <cause>
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </cause>
-    <checked>
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />      
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="1" success="true">
+  <cause>
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </cause>
+  <checked>
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12345678" name="bang" type="playing" suit="diamonds" rank="4" />      
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="12341234" name="jail" type="playing" suit="hearts" rank="king" />
+  </card-movement>
+</game-event>
 }}}
 
 == Draw Cards ==
 Cards were drawn by a player to his hand.
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1">
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
-      <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
-      <card id="87654321" name="beer" type="playing" suit="hearts" rank="ace" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1">
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+    <card id="12345678" name="bang" type="playing" suit="spades" rank="ace" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+    <card id="87654321" name="beer" type="playing" suit="hearts" rank="ace" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 === Special case: Jesse Jones, Pedro Ramirez  ===
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="4" use-ability="true">
-    <card-movement pocket-type-from="hand" pocket-type-to="hand" player-from="1" player-to="4">
-      <card id="12345678" name="panic" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
-      <card id="87654321" name="beer" type="playing" suit="spades" rank="5" />
-    </card-movement>
-    <game-context current-player-id="4" requested-player-id="4" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="4" use-ability="true">
+  <card-movement pocket-type-from="hand" pocket-type-to="hand" player-from="1" player-to="4">
+    <card id="12345678" name="panic" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="4">
+    <card id="87654321" name="beer" type="playing" suit="spades" rank="5" />
+  </card-movement>
+  <game-context current-player-id="4" requested-player-id="4" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 === Special case: Black Jack ===
 The example shows Black Jack using his ability, as viewed by his opponents. They only see the second drew card.
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="87654321" name="beer" type="playing" suit="hearts" rank="5" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="87654321" name="beer" type="playing" suit="hearts" rank="5" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 === Special case: Kit Carlson ===
 Kit Carlson's drawing is split into three game events:
  1. Sending 3 cards into _selection_ pocket.
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+</game-event>
 }}}
  
  2. Drawing the first card.
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+</game-event>
 }}}
  
  3. Drawing the second card.
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="selection" pocket-type-to="deck" player-from="0" player-to="0">
-      <card id="0" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1" use-ability="true">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="selection" pocket-type-to="deck" player-from="0" player-to="0">
+    <card id="0" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 *Note:* We might join the last two game events into one. It will allow to display only one log message in client,
@@ -410,398 +384,343 @@ Player played a card.
 
 === Blue bordered cards (without Jail) ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-table" player-id="1">
-    <card-played>
-      <card id="87654321" name="mustang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="table" player-from="1" player-to="1">
-      <card id="87654321" name="mustang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-table" player-id="1">
+  <card-played>
+    <card id="87654321" name="mustang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="table" player-from="1" player-to="1">
+    <card id="87654321" name="mustang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+</game-event>
 }}}
 
 === Jail ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
-    <card-played>
-      <card id="87654321" name="jail" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="table" player-from="1" player-to="2">
-      <card id="87654321" name="jail" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
+  <card-played>
+    <card id="87654321" name="jail" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="table" player-from="1" player-to="2">
+    <card id="87654321" name="jail" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+</game-event>
 }}}
 
 === Bang ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
-    <card-played>
-      <card id="87654321" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
+  <card-played>
+    <card id="87654321" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" />
+</game-event>
 }}}
 
 ==== Missed on Bang ====
 {{{
-<event>
-  <game-event game-id="1" type="reaction-play-card" player-id="2">
-    <card-played>
-      <card id="87654321" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
-      <card id="87654321" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-play-card" player-id="2">
+  <card-played>
+    <card id="87654321" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
+    <card id="87654321" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 ==== Pass on Bang ====
 {{{
-<event>
-  <game-event game-id="1" type="reaction-pass" player-id="2">
-    <life-points player-id="2" life-points="3" />
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-pass" player-id="2">
+  <life-points player-id="2" life-points="3" />
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 ==== Barrel on Bang ====
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="2" success="true">
-    <cause>
-      <card id="12345678" name="barrel" type="playing" suit="hearts" rank="5" />
-    </cause>
-    <checked>
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="2" success="true">
+  <cause>
+    <card id="12345678" name="barrel" type="playing" suit="hearts" rank="5" />
+  </cause>
+  <checked>
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 ==== Jourdonnais's "barrel" on Bang ====
 {{{
-<event>
-  <game-event game-id="1" type="check-deck" player-id="2" use-ability="true" success="true">
-    <cause>
-      <card id="0" name="jourdonnais" type="character" />
-    </cause>
-    <checked>
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </checked>
-    <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
-      <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="check-deck" player-id="2" use-ability="true" success="true">
+  <cause>
+    <card id="0" name="jourdonnais" type="character" />
+  </cause>
+  <checked>
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </checked>
+  <card-movement pocket-type-from="deck" pocket-type-to="graveyard" player-from="0" player-to="0">
+    <card id="12341111" name="bang" type="playing" suit="hearts" rank="5" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}} 
 
 === Beer ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card" player-id="1">
-    <card-played>
-      <card id="87654321" name="beer" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="beer" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <life-points player-id="1" life-points="4" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card" player-id="1">
+  <card-played>
+    <card id="87654321" name="beer" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="beer" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <life-points player-id="1" life-points="4" />
+</game-event>
 }}}
 
 === Saloon ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card" player-id="1">
-    <card-played>
-      <card id="87654321" name="saloon" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="saloon" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <life-points player-id="1" life-points="4" />
-    <life-points player-id="2" life-points="3" />
-    <life-points player-id="5" life-points="4" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card" player-id="1">
+  <card-played>
+    <card id="87654321" name="saloon" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="saloon" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <life-points player-id="1" life-points="4" />
+  <life-points player-id="2" life-points="3" />
+  <life-points player-id="5" life-points="4" />
+</game-event>
 }}}
 
 === Wells Fargo, Diligenza ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card" player-id="2">
-    <card-played>
-      <card id="87654321" name="wells-fargo" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
-      <card id="87654321" name="wells-fargo" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
-      <card id="0" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
-      <card id="0" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card" player-id="2">
+  <card-played>
+    <card id="87654321" name="wells-fargo" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
+    <card id="87654321" name="wells-fargo" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
+    <card id="0" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="hand" player-from="0" player-to="2">
+    <card id="0" />
+  </card-movement>
+</game-event>
 }}}
 
 === General Store ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card" player-id="2">
-    <card-played>
-      <card id="87654321" name="general-store" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
-      <card id="87654321" name="general-store" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12332111" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12332113" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
-      <card id="12332114" name="beer" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="2" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card" player-id="2">
+  <card-played>
+    <card id="87654321" name="general-store" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
+    <card id="87654321" name="general-store" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12332111" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12332113" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="deck" pocket-type-to="selection" player-from="0" player-to="0">
+    <card id="12332114" name="beer" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="2" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="2">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="2">
-      <card id="12332113" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="2" requested-player-id="3" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="2">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="2">
+    <card id="12332113" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="2" requested-player-id="3" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="3">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="3">
-      <card id="12332114" name="beer" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="2" requested-player-id="4" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="3">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="3">
+    <card id="12332114" name="beer" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="2" requested-player-id="4" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="4">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="4">
-      <card id="12332111" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="2" requested-player-id="1" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="4">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="4">
+    <card id="12332111" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="2" requested-player-id="1" turn-number="1" game-play-state="reaction" reaction-type="general-store" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="draw-card" player-id="1">
-    <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
-      <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="2" requested-player-id="2" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="draw-card" player-id="1">
+  <card-movement pocket-type-from="selection" pocket-type-to="hand" player-from="0" player-to="1">
+    <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="2" requested-player-id="2" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 === Panic, Cat Balou on player's hand ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
-    <card-played>
-      <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="hand" pocket-type-to="hand" player-from="2" player-to="1">
-      <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
+  <card-played>
+    <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="hand" pocket-type-to="hand" player-from="2" player-to="1">
+    <card id="12332112" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+</game-event>
 }}}
 
 === Panic, Cat Balou on player's table ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-card" player-id="1">
-    <card-played>
-      <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-target>
-      <card id="12312311" name="volcanic" type="playing" suit="spades" rank="jack" />
-    </card-target>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <card-movement pocket-type-from="table" pocket-type-to="hand" player-from="2" player-to="1">
-      <card id="12312311" name="volcanic" type="playing" suit="spades" rank="jack" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-card" player-id="1">
+  <card-played>
+    <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-target>
+    <card id="12312311" name="volcanic" type="playing" suit="spades" rank="jack" />
+  </card-target>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="panic" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <card-movement pocket-type-from="table" pocket-type-to="hand" player-from="2" player-to="1">
+    <card id="12312311" name="volcanic" type="playing" suit="spades" rank="jack" />
+  </card-movement>
+</game-event>
 }}}
 
 === Duel ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
-    <card-played>
-      <card id="87654321" name="duel" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="duel" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="duel" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card-on-player" player-id="1" target-player-id="2">
+  <card-played>
+    <card id="87654321" name="duel" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="duel" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="duel" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-play-card" player-id="2">
-    <card-played>
-      <card id="12314637" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
-      <card id="12314637" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="reaction" reaction-type="duel" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-play-card" player-id="2">
+  <card-played>
+    <card id="12314637" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
+    <card id="12314637" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="reaction" reaction-type="duel" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-play-card" player-id="1">
-    <card-played>
-      <card id="12314631" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="12314631" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="duel" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-play-card" player-id="1">
+  <card-played>
+    <card id="12314631" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="12314631" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="duel" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-pass" player-id="2">
-    <life-points player-id="2" life-points="3" />
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-pass" player-id="2">
+  <life-points player-id="2" life-points="3" />
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 === Indians, Gatling ===
 {{{
-<event>
-  <game-event game-id="1" type="play-card" player-id="1">
-    <card-played>
-      <card id="87654321" name="indians" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654321" name="indians" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="indians" />
-  </game-event>
-</event>
+<game-event game-id="1" type="play-card" player-id="1">
+  <card-played>
+    <card id="87654321" name="indians" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654321" name="indians" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="2" turn-number="1" game-play-state="reaction" reaction-type="indians" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-play-card" player-id="2">
-    <card-played>
-      <card id="87654344" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
-      <card id="87654344" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="3" turn-number="1" game-play-state="reaction" reaction-type="indians" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-play-card" player-id="2">
+  <card-played>
+    <card id="87654344" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="2" player-to="0">
+    <card id="87654344" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="3" turn-number="1" game-play-state="reaction" reaction-type="indians" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-pass" player-id="3">
-    <life-points player-id="3" life-points="1" />
-    <game-context current-player-id="1" requested-player-id="4" turn-number="1" game-play-state="reaction" reaction-type="indians" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-pass" player-id="3">
+  <life-points player-id="3" life-points="1" />
+  <game-context current-player-id="1" requested-player-id="4" turn-number="1" game-play-state="reaction" reaction-type="indians" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="reaction-play-card" player-id="4">
-    <card-played>
-      <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-played>
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="4" player-to="0">
-      <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
-  </game-event>
-</event>
+<game-event game-id="1" type="reaction-play-card" player-id="4">
+  <card-played>
+    <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-played>
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="4" player-to="0">
+    <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="turn" />
+</game-event>
 }}}
 
 == Discard Card ==
 {{{
-<event>
-  <game-event game-id="1" type="discard-card" player-id="1">
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-    <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="discard" />
-  </game-event>
-</event>
+<game-event game-id="1" type="discard-card" player-id="1">
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654111" name="bang" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+  <game-context current-player-id="1" requested-player-id="1" turn-number="1" game-play-state="discard" />
+</game-event>
 }}}
 
 {{{
-<event>
-  <game-event game-id="1" type="discard-card" player-id="1">
-    <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
-      <card id="87654114" name="missed" type="playing" suit="hearts" rank="jack" />
-    </card-movement>
-  </game-event>
-</event>
+<game-event game-id="1" type="discard-card" player-id="1">
+  <card-movement pocket-type-from="hand" pocket-type-to="graveyard" player-from="1" player-to="0">
+    <card id="87654114" name="missed" type="playing" suit="hearts" rank="jack" />
+  </card-movement>
+</game-event>
 }}}
 
 
 = Request for comments =
 I would like to have a discussion about the game events.
-
