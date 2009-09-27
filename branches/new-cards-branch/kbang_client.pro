@@ -6,6 +6,14 @@ OBJECTS_DIR = obj/client
 CONFIG += qt
 CONFIG += debug \
     \ \
+    \ \
+    \ \
+    \ \
+    \ \
+    \ \
+    \ \
+    \ \
+    \ \
     \ \ # CONFIG += release \
     warn_on
 QT += network \
@@ -58,7 +66,11 @@ HEADERS += src/client/gameloop.h \
     src/client/cardbank.h \
     src/client/clienttypes.h \
     src/client/gameeventplayer.h \
-    src/client/setplayerscmd.h
+    src/client/setplayerscmd.h \
+    src/client/textformatter.h \
+    src/client/options/optionsdialog.h \
+    src/client/options/optionstab.h \
+    src/client/options/optionscardsets.h
 FORMS += src/client/connecttoserverdialog.ui \
     src/client/mainwindow.ui \
     src/client/joingamedialog.ui \
@@ -111,7 +123,11 @@ SOURCES += src/client/gameloop.cpp \
     src/client/cardsetinfo.cpp \
     src/client/cardbank.cpp \
     src/client/gameeventplayer.cpp \
-    src/client/setplayerscmd.cpp
+    src/client/setplayerscmd.cpp \
+    src/client/textformatter.cpp \
+    src/client/options/optionsdialog.cpp \
+    src/client/options/optionstab.cpp \
+    src/client/options/optionscardsets.cpp
 TRANSLATIONS = ts/kbang_client_cs.ts
 unix { 
     LIBPATH += lib

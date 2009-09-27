@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
+ *   Copyright (C) 2008-2009 by MacJariel                                  *
  *   MacJariel (at) gmail.com                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -22,76 +22,99 @@
 
 /**
  * @file gamestructs.h
- * The definition of structures common for both server and client.
+ * The definition of structures common for both server and client. All those
+ * common structures are derived from GameStruct pure abstract class. The
+ * following example shows how to downcast:
+ * <code>
+ * GameStruct* aStruct = getAGameStructFromSomewhere();
+ * if (aStruct->type() == GameStruct::ServerInfoDataType) {
+ *     ServerInfoData* serverInfoData = static_cast<ServerInfoData*>(aStruct);
+ * }
+ * </code>
  */
-
-#include <QString>
-#include <QList>
-#include <QImage>
-#include <QXmlStreamWriter> // We cannot forward declare QXmlStreamWriter,
-                            // because Qt redefines the class name to
-                            // QCoreXmlStreamWriter on some archs.
 
 #include "gametypes.h"
 
-class XmlNode;
+#include <QString>
+#include <QStringList>
+#include <QLocale>
+#include <QList>
+#include <QImage>
+#include <QVariant>
+#include <QDateTime>
 
 /**
- * Describes the information about the server. This structure
- * is used when querying for server information.
+ * The GameStruct struct is pure abstract base for all common game structs.
  */
-struct ServerInfoData
-{
-    QString name;   /**< Name of the server. */
-    QString desc;   /**< Short description of the server. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
+struct GameStruct {
+    enum Type {
+        InvalidType = 0,
+        ServerInfoType,
+        PlayerInfoType,
+        GameInfoType,
+        CardSetInfoType,
+        CreatePlayerType,
+        CreateGameType,
+        CardDataType,
+        PublicPlayerType,
+        PrivatePlayerType,
+        GameContextType,
+        GameSyncType
+    };
+    GameStruct(Type type): m_type(type) {}
+    inline Type t() { return m_type; }
+private:
+    Type m_type;
 };
 
 /**
- * This structure describes basic information about a Player. This
- * structure is used to list players in "join game" dialog.
+ * The ServerInfoData struct holds the information about the server.
+ * It is used when querying for server information.
  */
-struct PlayerInfoData
-{
+struct ServerInfoData: public GameStruct {
+    ServerInfoData(): GameStruct(ServerInfoType), gamesCnt(0),
+                      playersCnt(0), clientsCnt(0) {}
+
+    QString name;       /**< Name of the server. */
+    QString desc;       /**< Short description of the server. */
+    QString adminName;  /**< Server administrator's name. */
+    QString adminEmail; /**< Server administrator's email. */
+    quint16 gamesCnt;   /**< Count of games on server. */
+    quint16 playersCnt; /**< Count of players on server. */
+    quint16 clientsCnt; /**< Count of clients on server. */
+    QDateTime startTime;/**< Time of the start of the server in ISO 8601 UTC. */
+    QString motd;       /**< Message of the day. */
+};
+
+/**
+ * The PlayerInfoData structure describes basic information about a player.
+ * It is used to list players in join game dialog.
+ */
+struct PlayerInfoData: public GameStruct {
+    PlayerInfoData(): GameStruct(PlayerInfoType), id(0), hasPassword(0),
+                      hasController(0), isAI(0), isAlive(0) {}
+
     PlayerId    id;             /**< Player id. */
     QString     name;           /**< Player name. */
     bool        hasPassword;    /**< Whether player has password. */
     bool        hasController;  /**< Whether player has an attached controller. */
     bool        isAI;           /**< Whether is controlled by AI. */
     bool        isAlive;        /**< Whether is alive. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
 };
+typedef QList<PlayerInfoData> PlayerInfoDataList;
 
-typedef QList<PlayerInfoData> PlayerInfoListData;
 
 /**
- * This structure describes basic information about a Game. This
- * structure is used to list games in "join game" dialog.
+ * The GameInfoData structure describes basic information about a game.
+ * It is used to list games in join game dialog.
  */
-struct GameInfoData
-{
+struct GameInfoData: public GameStruct {
+    GameInfoData(): GameStruct(GameInfoType), id(0), playersMin(0),
+                    playersMax(0), playersCnt(0), alivePlayersCnt(0),
+                    aiPlayersCnt(0), spectatorsMax(0), spectatorsCnt(0),
+                    hasPlayerPassword(0), hasSpectatorPassword(0),
+                    gameState(GAMESTATE_INVALID) {}
+
     GameId      id;                  /**< Game id. */
     QString     name;                /**< Game name. */
     QString     desc;                /**< Game description. */
@@ -105,59 +128,38 @@ struct GameInfoData
     bool        hasPlayerPassword;   /**< Whether has player password. */
     bool        hasSpectatorPassword;/**< Whether has spectator password. */
     GameState   gameState;           /**< State of the game. */
-    PlayerInfoListData players;      /**< List of players. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
+    PlayerInfoDataList players;      /**< List of players. */
 };
-
-struct GameInfoListData: public QList<GameInfoData>
-{
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
-};
-
-
+typedef QList<GameInfoData> GameInfoDataList;
 
 /**
- * This structure holds all information that is necessary to create a player.
- * This is used when creating or joining a game.
+ * The CardSetInfoData structure describes cardset information that is
+ * advertised by server to clients.
  */
-struct CreatePlayerData
-{
-    QString name;       /**< Player's name. */
-    QString password;   /**< Player's password. Empty or Null QString disables the password. */
-    QImage  avatar;     /**< Player's avatar. */
+struct CardSetInfoData: public GameStruct {
+    CardSetInfoData(): GameStruct(CardSetInfoType), formatVersion(0),
+    revision(0) {}
 
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
+    QString         id;                 /**< Unique id of cardset. */
+    QString         name;               /**< English name of cardset. */
+    QList<QLocale>  locales;            /**< Locales of the cardset. */
+    QString         slotId;             /**< Id of the slot. */
+    quint16         formatVersion;      /**< Version of used cardset format. */
+    quint16         revision;           /**< Revision of the cardset. */
+    QStringList     downloadLinks;      /**< List of download links. */
+};
+typedef QList<CardSetInfoData> CardSetInfoDataList;
 
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
+/**
+ * The NewPlayerData structure holds information needed to create a player.
+ * This is used when creating and/or joining games.
+ */
+struct CreatePlayerData: public GameStruct {
+    CreatePlayerData(): GameStruct(CreatePlayerType) {}
 
-    static QString elementName; /**< Name of corresponding XML element. */
+    QString name;     /**< Player's name. */
+    QString password; /**< Player's password. Empty string disables password. */
+    QImage  avatar;   /**< Player's avatar. */
 };
 
 /**
@@ -165,64 +167,46 @@ struct CreatePlayerData
  * This is used when creating a game.
  * \todo add items to determine game type and parameters
  */
-struct CreateGameData
-{
-    QString     name;           /**< Game name. */
-    QString     desc;           /**< Game description. */
-    quint8      playersMin;     /**< Minimal count of players. */
-    quint8      playersMax;     /**< Maximal count of players. */
-    qint16      spectatorsMax;  /**< Maximal number of spectators. */
-    quint8      aiPlayersCnt;   /**< Count of AI players. */
-    QString     playerPassword; /**< Player password. Use QString() for no password. */
-    QString     spectatorPassword; /**< Spectator password. Use QString() for no password. */
-    bool        flagShufflePlayers; /**< Whether shuffle players. \todo: move into generally handled parameters */
+struct CreateGameData: public GameStruct {
+    CreateGameData(): GameStruct(CreateGameType), playersMin(0), playersMax(0),
+                      spectatorsMax(0), aiPlayersCnt(0) {}
 
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
+    QString name;               /**< Game name. */
+    QString desc;               /**< Game description. */
+    quint8  playersMin;         /**< Minimal count of players. */
+    quint8  playersMax;         /**< Maximal count of players. */
+    qint16  spectatorsMax;      /**< Maximal number of spectators. */
+    quint8  aiPlayersCnt;       /**< Count of AI players. */
+    QString playerPassword;     /**< Player password, empty string = no pass. */
+    QString spectatorPassword;  /**< Spectator password, empty string = no pass. */
+    QMap<QString, QVariant> options;
 };
 
 /**
  * This structure holds information about a card.
  */
-struct CardData {
-    CardId      id;         /**< Card id. Defaults to 0. @see CardId. */
+struct CardData: public GameStruct {
+    CardData(): GameStruct(CardDataType), id(0), type(CARDTYPE_UNKNOWN),
+                suit(SUIT_INVALID), rank(0), isReady(1) {}
+
+    CardId      id;         /**< Card id.   @see CardId. */
     CardName    name;       /**< Card name. @see CardName. */
     CardType    type;       /**< Card type. @see CardType. */
     CardSuit    suit;       /**< Card suit. @see CardSuit. */
     CardRank    rank;       /**< Card rank. @see CardRank. */
     bool        isReady;    /**< Whether card is ready - this is related to green-bordered cards */
-    CardData(): id(0) {}
-    CardData(CardId _id, CardName _name, CardType _type,
-             CardSuit _suit, CardRank _rank, bool _isReady):
-            id(_id), name(_name), type(_type), suit(_suit),
-            rank(_rank), isReady(_isReady) {}
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
 };
+typedef QList<CardData> CardDataList;
 
 /**
  * This structure holds all public information about a player.
  */
-struct PublicPlayerData {
+struct PublicPlayerData: public GameStruct {
+    PublicPlayerData(): GameStruct(PublicPlayerType), id(0), hasPassword(0),
+                        hasController(0), isAI(0), isAlive(0), isWinner(0),
+                        isSheriff(0), lifePoints(0), handSize(0),
+                        role(ROLE_INVALID) {}
+
     PlayerId        id;             /**< Player id. */
     QString         name;           /**< Player name. */
     bool            hasPassword;    /**< Whether player has password. */
@@ -238,146 +222,59 @@ struct PublicPlayerData {
     quint8          handSize;       /**< Number of cards in player's hand. */
     QList<CardData> table;          /**< List of cards on table. */
     PlayerRole      role;           /**< Player's role (if is known) */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
 };
+typedef QList<PublicPlayerData> PublicPlayerDataList;
 
 /**
  * This structure holds player id and all private information about a player.
  */
-struct PrivatePlayerData {
+struct PrivatePlayerData: public GameStruct {
+    PrivatePlayerData(): GameStruct(PrivatePlayerType), id(0),
+                         role(ROLE_INVALID) {}
+
     PlayerId        id;             /**< Player id. */
     PlayerRole      role;           /**< Player's role. */
     QList<CardData> hand;           /**< List of cards in player's hand. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
 };
 
 /**
  * This structure holds information about game context.
  */
-struct GameContextData {
+struct GameContextData: public GameStruct {
+    GameContextData(): GameStruct(GameContextType), currentPlayerId(0),
+                       requestedPlayerId(0), turnNumber(0),
+                       gamePlayState(GAMEPLAYSTATE_INVALID),
+                       reactionType(REACTION_NONE),
+                       causedBy(0) {}
+
     PlayerId        currentPlayerId;    /**< Id of current player (Player on turn). */
     PlayerId        requestedPlayerId;  /**< Id of requested player. */
     quint32         turnNumber;         /**< Turn number. */
     GamePlayState   gamePlayState;      /**< GamePlay state. */
     ReactionType    reactionType;       /**< Reaction type. */
     PlayerId        causedBy;           /**< Id of player that caused reaction. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
 };
 
 /**
- * This structure is used to synchronize client with server. It contains all information
- * about a game that a client needs to reconstuct it from scratch. Note, that this structure
- * is created on demand for concrete player (client).
+ * This structure is used to synchronize client with server. It contains all
+ * information about a game that a client needs to reconstuct it from scratch.
+ * Note, that this structure is created on demand for concrete player (client).
  */
-struct GameSyncData {
-    GameId                  id;         /**< Game id. */
-    QString                 name;       /**< Game name. */
-    bool                    isCreator;  /**< Whether the client is creator. */
-    QList<PublicPlayerData> players;    /**< List of PublicPlayerData. */
-    PrivatePlayerData       localPlayer;/**< Local player information (if not spectator). */
-    GameContextData         gameContext;/**< The GameContext */
-    GameState               gameState;  /**< The GameState */
-    CardData                graveyard;  /**< The top card in graveyard. */
-    QList<CardData>         selection;  /**< The content of selection pocket. */
+struct GameSyncData: public GameStruct {
+    GameSyncData(): GameStruct(GameSyncType), id(0), isCreator(0) {}
 
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
+    GameId               id;         /**< Game id. */
+    QString              name;       /**< Game name. */
+    bool                 isCreator;  /**< Whether the client is creator. */
+    PublicPlayerDataList players;    /**< List of PublicPlayerData. */
+    PrivatePlayerData    localPlayer;/**< Local player information (if not spectator). */
+    GameContextData      gameContext;/**< The GameContext */
+    GameState            gameState;  /**< The GameState */
+    CardData             graveyard;  /**< The top card in graveyard. */
+    CardDataList         selection;  /**< The content of selection pocket. */
 };
 
-/**
- * This structure holds the information about a game message.
- * @todo: I don't like how this structure looks and works - to be refactored.
- * @todo: also the generated xml looks crapy..
- */
-struct GameMessage {
-    GameMessage(): type(GAMEMESSAGE_INVALID), player(0), targetPlayer(0), causedBy(0) {}
-    GameMessageType type;
-    PlayerId player;
-    PlayerId targetPlayer;
-    PlayerId causedBy;
-    CardData card;
-    CardData targetCard;
-    QList<CardData> cards;
-    bool checkResult;
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
-};
-
-/**
- * This structure holds information about CardMovement game event.
- */
-struct CardMovementData {
-    PocketType  pocketTypeFrom; /**< The source pocket type. */
-    PocketType  pocketTypeTo;   /**< The target pocket type. */
-    PlayerId    playerFrom;     /**< The source player id. */
-    PlayerId    playerTo;       /**< The target player id. */
-    CardData    card;           /**< The moved card. */
-    CardData    secondCard;     /**< This card is used in special cases. */
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
-};
+#if 0
 
 /**
  * This structure holds information about PlayCard game action.
@@ -425,30 +322,6 @@ struct ActionUseAbilityData {
     static QString elementName; /**< Name of corresponding XML element. */
 };
 
-/**
- * This structure holds information about a chat message. It can be used to
- * send chat messages between client and server in both directions (either as
- * game event or as game action). In case of game action, clientId and playerId
- * and senderName fields are ignored.
- */
-struct ChatMessageData {
-    ChatMessageData(): clientId(0), playerId(0) {}
-    ClientId    clientId;
-    PlayerId    playerId;
-    QString     senderName;
-    QString     text;
-
-    /**
-     * Reads the given XML tree and writes data into this object.
-     */
-    bool read(XmlNode*);
-
-    /**
-     * Writes data from this object into XML stream using given writer.
-     */
-    void write(QXmlStreamWriter*) const;
-
-    static QString elementName; /**< Name of corresponding XML element. */
-};
+#endif
 
 #endif // GAMESTRUCTS_H

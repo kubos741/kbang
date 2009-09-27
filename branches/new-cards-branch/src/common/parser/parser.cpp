@@ -425,7 +425,7 @@ Parser::processStanzaQuery()
         XmlNode* query = mp_parsedStanza->getFirstChild();
         if (query == 0) {
             raiseNotValidError();
-        } else if (query->name() == ServerInfoData::elementName) {
+        } else if (query->name() == "server-info") {
             emit sigQueryServerInfo(QueryResult(mp_streamWriter, id));
         } else if (query->name() == GameInfoData::elementName) {
             GameId gameId = query->attribute("id").toInt();

@@ -21,6 +21,8 @@
 
 #include "gameeventplayer.h"
 #include "game.h"
+#include "mainwindow.h"
+#include "logwidget.h"
 
 #include "debug/debugblock.h"
 
@@ -33,6 +35,10 @@ GameEventPlayer::GameEventPlayer(Game* game):
         m_currentGameEventIndex(0),
         m_mode(GameEventPlayer::PlayForwardMode)
 {
+    connect(this, SIGNAL(modeUpdated(GameEventPlayer::Mode)),
+            MainWindow::instance()->logWidget(),
+            SLOT(updateGameEventPlayerButtons(GameEventPlayer::Mode)));
+    updateMode(m_mode);
 }
 
 /* virtual */
@@ -74,7 +80,7 @@ void GameEventPlayer::pause()
 void GameEventPlayer::appendGameEvent(GameEventDataPtr gameEventData)
 {
     DEBUG_BLOCK;
-    GameEvent* gameEvent = new GameEvent(mp_game, gameEventData);
+    GameEvent* gameEvent = new GameEvent(mp_game, m_gameEvents.size(), gameEventData);
     connect(gameEvent, SIGNAL(finished(GameEvent*)),
             this, SLOT(gameEventFinished(GameEvent*)));
     m_gameEvents.append(gameEvent);
@@ -114,7 +120,7 @@ void GameEventPlayer::step()
     case StepBackwardMode:
     case PlayBackwardMode:
         if (m_currentGameEventIndex == 1) {
-            m_mode = PausedMode;
+            m_mode = PauseMode;
             break;
         }
         mp_runningEvent = m_gameEvents[--m_currentGameEventIndex];

@@ -155,7 +155,7 @@ QListWidget::item:selected {
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>

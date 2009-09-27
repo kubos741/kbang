@@ -231,6 +231,7 @@ QString cardSuitToString(const CardSuit& suit);
  *  * king  = 13,
  *  * ace   = 14
  * This represention allows simple comparing of card ranks.
+ * A value out of the valid range indicates invalid card rank.
  */
 typedef quint8 CardRank;
 
@@ -293,28 +294,6 @@ GamePlayState stringToGamePlayState(const QString& s);
  * Converts GamePlayState to QString.
  */
 QString gamePlayStateToString(const GamePlayState& s);
-
-/**
- * This enum of game-message types should be maybe changed.
- * \todo
- */
-enum GameMessageType {
-    GAMEMESSAGE_INVALID = 0,
-    GAMEMESSAGE_GAMESTARTED,
-    GAMEMESSAGE_GAMEFINISHED,
-    GAMEMESSAGE_PLAYERDRAWFROMDECK,
-    GAMEMESSAGE_PLAYERDRAWFROMGRAVEYARD,
-    GAMEMESSAGE_PLAYERDISCARDCARD,
-    GAMEMESSAGE_PLAYERPLAYCARD,
-    GAMEMESSAGE_PLAYERRESPONDWITHCARD,
-    GAMEMESSAGE_PLAYERPASS,
-    GAMEMESSAGE_PLAYERPICKFROMSELECTION,
-    GAMEMESSAGE_PLAYERCHECKDECK,
-    GAMEMESSAGE_PLAYERSTEALCARD,
-    GAMEMESSAGE_PLAYERCANCELCARD,
-    GAMEMESSAGE_DECKREGENERATE,
-    GAMEMESSAGE_PLAYERDIED,
-};
 
 /**
  * Converts QString to GameMessageType.

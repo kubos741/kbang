@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by MacJariel                                       *
+ *   Copyright (C) 2008 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,64 +17,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LOGWIDGET_H
-#define LOGWIDGET_H
 
-#include <QWidget>
-#include "gameeventplayer.h"
+#ifndef TARSTREAM_H
+#define TARSTREAM_H
 
-class QListWidgetItem;
+#include <QObject>
+#include <QIODevice>
+#include <QFile>
+#include <QDir>
 
-namespace Ui {
-class LogWidget;
-}
-
-namespace client {
-
-/**
- * The LogWidget class provides a widget that displays the game log. Moreover,
- * this widget can display useful debug information.
- * @author MacJariel
- */
-class LogWidget: public QWidget
-{
-Q_OBJECT
+class TarStream: public QObject {
+Q_OBJECT;
 public:
-    /**
-     * Constructs a LogWidget.
-     */
-    LogWidget(QWidget* parent = 0);
+    enum Mode {
+        InvalidMode = 0,
+        TarMode,    /**< Data from filesystem are tared and written to device. */
+        UntarMode   /**< Data from device are read and untared to filesystem. */
+    };
+    TarStream();
+    virtual ~TarStream();
 
-    /**
-     * Destroys the LogWidget.
-     */
-    ~LogWidget();
-
-
+    void open(QDir dir, QIODevice* device, Mode mode);
 
 
-    static QString formatServerName(const QString&);
+private slots:
+    void readBlock();
 
-protected:
-    virtual void paintEvent(QPaintEvent* event);
-
-public slots:
-    void appendGameEventMessage(int id, const QString& text);
-    void setActiveGameEvent(int id);
-    void appendIncomingData(const QByteArray& data);
-    void appendOutgoingData(const QByteArray& data);
-    void updateGameEventPlayerButtons(GameEventPlayer::Mode);
-    void gameEventPlayerButtonClicked();
 
 private:
-    enum {
-        NoData = 0,
-        IncomingData,
-        OutgoingData
-    } m_lastDataType;
+    void writeNextFile();
+    void writeFileData();
 
-    QListWidgetItem* mp_selectedItem;
-    Ui::LogWidget* mp_ui;
+    QString readFieldS(int offset, int size);
+    quint64 readFieldN(int offset, int size);
+
+    void writeFieldS(int offset, int size, QString field);
+    void writeFieldN(int offset, int size, quint64 number);
+
+    bool isNullBlock() const;
+    void calculateChecksum();
+
+private:
+    enum BlockType {
+        InvalidBlock = 0,
+        FileHeaderBlock,
+        DataBlock,
+        TrailingBlock
+    };
+    enum { BLOCK_SIZE = 512 };
+
+    QDir        m_dir;
+    QIODevice*  mp_device;
+    Mode        m_mode;
+    BlockType   m_nextBlockType;
+    QByteArray  m_block;
+    int         m_checksumUnsigned;
+    int         m_checksumSigned;
+    QFile       m_currentFile;
+    ulong       m_fileSizeLeft;
 };
-}
-#endif
+
+#endif // TARSTREAM_H

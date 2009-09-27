@@ -46,7 +46,7 @@ public:
     /**
      * Constructs a GameEvent with is related to #game.
      */
-    GameEvent(Game* game, GameEventDataPtr);
+    GameEvent(Game* game, int eventId, GameEventDataPtr);
 
     /**
      * Destroys the GameEvent.
@@ -87,12 +87,13 @@ public slots:
 
 private:
     void step();
+    void appendGameEventMessage();
 
     Game*                           mp_game;
+    int                         m_eventId;
     QList<GameEventCmd*>            m_commands;
     QListIterator<GameEventCmd*>*   mp_commandsIterator;
     bool                            m_forward;
-
     GameEventDataPtr                mp_gameEventData;
     bool                            m_isRunning;
     bool                            m_isFirstRun;

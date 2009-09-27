@@ -25,14 +25,19 @@
 #include "gamecontextchangeevent.h"
 #include "setplayerscmd.h"
 
+#include "mainwindow.h"
+#include "logwidget.h"
+#include "textformatter.h"
+
 #include "debug/debugblock.h"
 
 
 using namespace client;
 
-GameEvent::GameEvent(Game* game, GameEventDataPtr event):
-        QObject(game), mp_game(game), mp_commandsIterator(0),
-        mp_gameEventData(event), m_isRunning(0), m_isFirstRun(1)
+GameEvent::GameEvent(Game* game, int eventId, GameEventDataPtr event):
+        QObject(game), mp_game(game), m_eventId(eventId),
+        mp_commandsIterator(0), mp_gameEventData(event), m_isRunning(0),
+        m_isFirstRun(1)
 {
     DEBUG_BLOCK;
     foreach (const GameEventCmdDataPtr& cmd, mp_gameEventData->cmds) {
@@ -76,13 +81,10 @@ void GameEvent::doEvent(GameEvent::ExecutionMode mode)
             mp_game->setGameState(GAMESTATE_PLAYING);
             mp_game->updateInterface();
         }
-
-        ///@todo Append log message
-
-        mp_gameEventData.clear();
+        appendGameEventMessage();
         m_isFirstRun = 0;
     }
-
+    MainWindow::instance()->logWidget()->setActiveGameEvent(m_eventId);
     m_forward = 1;
     step();
 }
@@ -91,6 +93,7 @@ void GameEvent::undoEvent(GameEvent::ExecutionMode mode)
 {
     DEBUG_BLOCK;
     Q_ASSERT(m_isRunning == 0);
+    MainWindow::instance()->logWidget()->setActiveGameEvent(m_eventId - 1);
     m_forward = 0;
     step();
 }
@@ -124,4 +127,38 @@ void GameEvent::step()
         qDebug("emit GameEvent::finished()");
         emit finished(this);
     }
+}
+
+void GameEvent::appendGameEventMessage()
+{
+    QString msg;
+    switch (mp_gameEventData->type) {
+    case GameEventData::StartGameType:
+        msg = tr("The game starts.");
+        break;
+    case GameEventData::DealCardsType:
+        msg = tr("Cards are dealt to players.");
+        break;
+    case GameEventData::StartTurnType:
+        msg = tr("%1 is on turn.").arg(
+                TextFormatter::playerName(mp_gameEventData->playerId));
+        break;
+    case GameEventData::DrawCardType:
+        foreach (const GameEventCmdDataPtr& cmd, mp_gameEventData->cmds) {
+            if (cmd->type() == GameEventCmdData::CardMovementType) {
+
+
+            }
+        switch (cmd->type()) {
+        case GameEventCmdData::CardMovementType:
+            gameEventCmd = new CardMovementEvent(this, cmd.staticCast<CardMovementCmdData>());
+            break;
+        case GameEventCmdData::GameContextType:
+    }
+
+
+    MainWindow::instance()->logWidget()->
+            appendGameEventMessage(m_eventId, QString::number(m_eventId));
+
+   mp_gameEventData.clear();
 }

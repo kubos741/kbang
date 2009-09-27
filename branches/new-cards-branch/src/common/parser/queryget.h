@@ -36,12 +36,16 @@ public:
     void getServerInfo();
     void getGameInfo(int id);
     void getGameInfoList();
+    void getCardSetInfoList();
+
     void getPing();
 
 signals:
     void result(const ServerInfoData&);
     void result(const GameInfoData&);
     void result(const GameInfoListData&);
+    void result(const CardSetInfoListData&);
+
     void pong(int latency);
 
 private:
