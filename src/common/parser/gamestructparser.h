@@ -21,20 +21,53 @@
 #ifndef GAMESTRUCTPARSER_H
 #define GAMESTRUCTPARSER_H
 
+/**
+ * @file gamestructparser.h
+ * This file contains code to read and write common game structures
+ * (GameStruct derivates) from or to network protocol.
+ */
+
 #include "gamestructs.h"
+#include "xmlnode.h"
+#include <QXmlStreamWriter>
 
 class GameStructParser
 {
 public:
+    static QString elementName(GameStruct::Type);
+
+    static void writeServerInfo(QXmlStreamWriter*, const ServerInfoData&);
+    static void readServerInfo(XmlNode*, ServerInfoData&);
+
+    static void writePlayerInfo(QXmlStreamWriter*, const PlayerInfoData&);
+    static void readPlayerInfo(XmlNode*, PlayerInfoData&);
+
+    static void writeGameInfo(QXmlStreamWriter*, const GameInfoData&);
+    static void readGameInfo(XmlNode*, GameInfoData&);
+
+    static void writeCardSetInfo(QXmlStreamWriter*, const CardSetInfoData&);
+    static void readCardSetInfo(XmlNode*, CardSetInfoData&);
+
+    static void writeCreatePlayer(QXmlStreamWriter*, const CreatePlayerData&);
+    static void readCreatePlayer(XmlNode*, CreatePlayerData&);
+
+    static void writeCreateGame(QXmlStreamWriter*, const CreateGameData&);
+    static void readCreateGame(XmlNode*, CreateGameData&);
+
     static void writeCard(QXmlStreamWriter*, const CardData&);
     static void readCard(XmlNode*, CardData&);
-    static CardData readCard(XmlNode*);
+
     static void writePublicPlayer(QXmlStreamWriter*, const PublicPlayerData&);
     static void readPublicPlayer(XmlNode*, PublicPlayerData&);
-    static PublicPlayerData readPublicPlayer(XmlNode*);
+
     static void writePrivatePlayer(QXmlStreamWriter*, const PrivatePlayerData&);
     static void readPrivatePlayer(XmlNode*, PrivatePlayerData&);
-    static PrivatePlayerData readPrivatePlayer(XmlNode*);
+
+    static void writeGameContext(QXmlStreamWriter*, const GameContextData&);
+    static void readGameContext(XmlNode*, GameContextData&);
+
+    static void writeGameSync(QXmlStreamWriter*, const GameSyncData&);
+    static void readGameSync(XmlNode*, GameSyncData&);
 };
 
 #endif // GAMESTRUCTPARSER_H

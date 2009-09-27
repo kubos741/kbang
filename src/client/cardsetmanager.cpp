@@ -27,8 +27,8 @@ CardSetManager::CardSetManager()
 {
 }
 
-/* static */ CardSetManager&
-CardSetManager::instance()
+/* static */
+CardSetManager& CardSetManager::instance()
 {
     static bool initialized = 0;
     static CardSetManager singleton;
@@ -40,10 +40,8 @@ CardSetManager::instance()
     return singleton;
 }
 
-void
-CardSetManager::refreshLocalCardSets()
+void CardSetManager::refreshLocalCardSets()
 {
-    DEBUG_BLOCK;
     m_localCardSets.clear();
     foreach (QString dataLocation, Config::dataLocations()) {
         QDir cardsetDir(dataLocation);
@@ -57,10 +55,14 @@ CardSetManager::refreshLocalCardSets()
     }
 }
 
-void
-CardSetManager::addKnownSlot(QString knownSlot)
+void CardSetManager::refreshRemoteCardSets()
 {
-    DEBUG_BLOCK;
+
+
+}
+
+void CardSetManager::addKnownSlot(QString knownSlot)
+{
     if (m_knownSlots.contains(knownSlot) || knownSlot.isEmpty()) {
         return;
     }
@@ -68,9 +70,13 @@ CardSetManager::addKnownSlot(QString knownSlot)
     saveKnownSlots();
 }
 
+QList<CardSetInfo> CardSetManager::remoteCardSets()
+{
+    //@todo
+}
 
-void
-CardSetManager::refreshKnownSlots()
+
+void CardSetManager::refreshKnownSlots()
 {
     m_knownSlots.clear();
     foreach (QString dataLocation, Config::dataLocations()) {
@@ -92,10 +98,15 @@ CardSetManager::refreshKnownSlots()
     }
 }
 
-void
-CardSetManager::saveKnownSlots()
+void CardSetManager::updateRemoteCardSets(const CardSetInfoListData& x)
 {
-    DEBUG_BLOCK;
+    foreach (const CardSetInfoData& cardSetData, x) {
+
+    }
+}
+
+void CardSetManager::saveKnownSlots()
+{
     QStringList extraKnownSlots = m_knownSlots;
     QDir cardsetDir(Config::userDataLocation());
     if (!cardsetDir.exists()) {

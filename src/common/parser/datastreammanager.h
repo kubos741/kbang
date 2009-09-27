@@ -17,64 +17,50 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LOGWIDGET_H
-#define LOGWIDGET_H
 
-#include <QWidget>
-#include "gameeventplayer.h"
+#ifndef DATASTREAMMANAGER_H
+#define DATASTREAMMANAGER_H
 
-class QListWidgetItem;
+#include <QObject>
+#include "parser/datastreamsender.h"
+#include "parser/datastreamreceiver.h"
 
-namespace Ui {
-class LogWidget;
-}
 
-namespace client {
+class Parser;
 
 /**
- * The LogWidget class provides a widget that displays the game log. Moreover,
- * this widget can display useful debug information.
- * @author MacJariel
+ * The DataStreamManager class provides a manager that manages sending raw
+ * data over XML-based KBang protocol. This concept of sending data was
+ * introduced in KBang protocol version 2.
+ *
+ *
  */
-class LogWidget: public QWidget
+class DataStreamManager: public QObject
 {
-Q_OBJECT
 public:
     /**
-     * Constructs a LogWidget.
+     * Constructs a DataStreamManager that operates on #parser.
      */
-    LogWidget(QWidget* parent = 0);
+    DataStreamManager(Parser* parser);
+
+    quint32 initDataStream(DataStreamSender*);
 
     /**
-     * Destroys the LogWidget.
+     * Opens data stream to the peer.
+     * @param dataStreamId The id of data stream.
+     * @param dataSize The size of data. Use -1 if the size is not known.
      */
-    ~LogWidget();
+    quint32 openDataStream(quint32 dataStreamId, qint64 dataSize);
+
+    /**
+     *
+     */
+    void sendChunk(quint32 dataStreamId, const QByteArray& chunkData);
+    void closeDataStream(quint32 dataStreamId);
+
+    void registerDataStreamReceiver(quint32 dataStreamId, DataStreamReceiver*);
 
 
-
-
-    static QString formatServerName(const QString&);
-
-protected:
-    virtual void paintEvent(QPaintEvent* event);
-
-public slots:
-    void appendGameEventMessage(int id, const QString& text);
-    void setActiveGameEvent(int id);
-    void appendIncomingData(const QByteArray& data);
-    void appendOutgoingData(const QByteArray& data);
-    void updateGameEventPlayerButtons(GameEventPlayer::Mode);
-    void gameEventPlayerButtonClicked();
-
-private:
-    enum {
-        NoData = 0,
-        IncomingData,
-        OutgoingData
-    } m_lastDataType;
-
-    QListWidgetItem* mp_selectedItem;
-    Ui::LogWidget* mp_ui;
 };
-}
-#endif
+
+#endif // DATASTREAMMANAGER_H

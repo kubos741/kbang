@@ -24,7 +24,8 @@ HEADERS += src/common/debug/debugblock.h \
     src/common/gametypes.h \
     src/common/gamestructs.h \
     src/common/serverevents.h \
-    src/common/util.h
+    src/common/util.h \
+    src/common/tar/tar.h
 SOURCES += src/common/parser/servereventparser.cpp \
     src/common/debug/debugblock.cpp \
     src/common/parser/gameeventparser.cpp \
@@ -39,6 +40,7 @@ SOURCES += src/common/parser/servereventparser.cpp \
     src/common/gamestructs.cpp \
     src/common/serverevents.cpp \
     src/common/util.cpp \
-    src/common/parser/gamestructparser.cpp
+    src/common/parser/gamestructparser.cpp \
+    src/common/tar/tar.cpp
 TARGET = lib/kbang_common
 QMAKE_CXXFLAGS_DEBUG += -Wall

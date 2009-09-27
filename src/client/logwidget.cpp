@@ -29,11 +29,13 @@
 #include <QTextDocument>    // Qt::escape()
 
 
+
 using namespace client;
 
 LogWidget::LogWidget(QWidget *parent):
         QWidget(parent),
         m_lastDataType(NoData),
+        mp_selectedItem(0),
         mp_ui(new Ui::LogWidget())
 {
     mp_ui->setupUi(this);
@@ -42,9 +44,13 @@ LogWidget::LogWidget(QWidget *parent):
             this, SLOT(appendIncomingData(QByteArray)));
     connect(ServerConnection::instance(), SIGNAL(outgoingData(QByteArray)),
             this, SLOT(appendOutgoingData(QByteArray)));
-    connect(mp_ui->buttonBackward, SIGNAL(clicked()),
+    connect(mp_ui->buttonPlayBackward, SIGNAL(clicked()),
             this, SLOT(gameEventPlayerButtonClicked()));
-    connect(mp_ui->buttonForward, SIGNAL(clicked()),
+    connect(mp_ui->buttonStepBackward, SIGNAL(clicked()),
+            this, SLOT(gameEventPlayerButtonClicked()));
+    connect(mp_ui->buttonStepForward, SIGNAL(clicked()),
+            this, SLOT(gameEventPlayerButtonClicked()));
+    connect(mp_ui->buttonPlayForward, SIGNAL(clicked()),
             this, SLOT(gameEventPlayerButtonClicked()));
     connect(mp_ui->buttonPause, SIGNAL(clicked()),
             this, SLOT(gameEventPlayerButtonClicked()));
@@ -71,10 +77,29 @@ LogWidget::paintEvent(QPaintEvent* event)
 }
 
 
-/* slot */ void
-LogWidget::appendLogMessage(QString message)
+/* slot */
+void LogWidget::appendGameEventMessage(int id, const QString& text)
 {
-    mp_ui->logView->append(message);
+    QListWidgetItem* item = new QListWidgetItem(text);
+    item->setData(Qt::UserRole, id);
+    mp_ui->listGameEvents->addItem(item);
+    if (mp_selectedItem) {
+        mp_selectedItem->setSelected(0);
+    }
+    mp_selectedItem = item;
+    mp_selectedItem->setSelected(1);
+}
+
+/* slot */
+void LogWidget::setActiveGameEvent(int id)
+{
+    if (mp_ui->listGameEvents->count() > id) {
+        if (mp_selectedItem) {
+            mp_selectedItem->setSelected(0);
+        }
+        mp_selectedItem = mp_ui->listGameEvents->item(id);
+        mp_selectedItem->setSelected(1);
+    }
 }
 
 /* slot */ void
@@ -112,7 +137,7 @@ void LogWidget::updateGameEventPlayerButtons(GameEventPlayer::Mode mode)
 {
     mp_ui->buttonPlayForward->setChecked(mode == GameEventPlayer::PlayForwardMode);
     mp_ui->buttonPlayBackward->setChecked(mode == GameEventPlayer::PlayBackwardMode);
-    mp_ui->buttonPause->setChecked(mode == GameEventPlayer::PausedMode);
+    mp_ui->buttonPause->setChecked(mode == GameEventPlayer::PauseMode);
     mp_ui->buttonStepBackward->setChecked(mode == GameEventPlayer::StepBackwardMode);
     mp_ui->buttonStepForward->setChecked(mode == GameEventPlayer::StepForwardMode);
 }

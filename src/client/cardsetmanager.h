@@ -25,6 +25,7 @@
 #include <QStringList>
 
 #include "cardsetinfo.h"
+#include "gamestructs.h"
 
 namespace client {
 
@@ -44,7 +45,7 @@ public:
     /**
      * Returns the information about installed card sets.
      */
-    inline QList<CardSetInfo> localCardSets() {
+    inline QList<CardSetInfo> localCardSets() const {
         return m_localCardSets;
     }
 
@@ -61,7 +62,9 @@ public:
     /**
      * Returns the list of card sets that can be downloaded from server.
      */
-    QList<CardSetInfo> remoteCardSets();
+    inline QList<CardSetInfo> remoteCardSets() const {
+        return m_remoteCardSets;
+    }
 
 private:
     CardSetManager();
@@ -71,13 +74,19 @@ private slots:
      * Reloads the information about installed card sets.
      */
     void refreshLocalCardSets();
+    void refreshRemoteCardSets();
     void refreshKnownSlots();
+
+    void updateRemoteCardSets(const CardSetInfoListData&);
+
 
 private:
     void saveKnownSlots();
 
     QList<CardSetInfo>  m_localCardSets;
+    QList<CardSetInfo>  m_remoteCardSets;
     QStringList         m_knownSlots;
+    CardSetInfoListData m_cardSetInfoListData;
 };
 
 }

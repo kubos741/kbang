@@ -39,7 +39,7 @@ QueryGet::~QueryGet()
 void QueryGet::getServerInfo()
 {
     writeStartQuery();
-    mp_streamWriter->writeEmptyElement(ServerInfoData::elementName);
+    mp_streamWriter->writeEmptyElement("server-info");
     writeEndQuery();
 }
 
@@ -56,6 +56,13 @@ void QueryGet::getGameInfoList()
 {
     writeStartQuery();
     mp_streamWriter->writeEmptyElement(GameInfoListData::elementName);
+    writeEndQuery();
+}
+
+void QueryGet::getCardSetInfoList()
+{
+    writeStartQuery();
+    mp_streamWriter->writeEmptyElement("cardset-list");
     writeEndQuery();
 }
 
@@ -81,7 +88,7 @@ void QueryGet::writeEndQuery()
 
 void QueryGet::parseResult(XmlNode* node)
 {
-    if (node->name() == ServerInfoData::elementName) {
+    if (node->name() == "server-info") {
         ServerInfoData serverInfoData;
         serverInfoData.read(node);
         emit result(serverInfoData);

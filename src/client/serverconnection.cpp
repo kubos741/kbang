@@ -83,8 +83,10 @@ ServerConnection::connectToServer(QString serverHost, int serverPort)
 {
     if (mp_tcpSocket->state() == QAbstractSocket::UnconnectedState) {
         m_serverHost = serverHost;
+/*
         MainWindow::instance()->logWidget()->appendLogMessage(
             tr("Connecting to %1.").arg(LogWidget::formatServerName(m_serverHost)));
+*/
         mp_tcpSocket->connectToHost(serverHost, serverPort);
     }
 }
@@ -250,9 +252,11 @@ ServerConnection::onSocketStateChanged()
 {
     switch(mp_tcpSocket->state()) {
         case QAbstractSocket::UnconnectedState:
+/*
             MainWindow::instance()->logWidget()->appendLogMessage(
                     tr("Disconnected from %1.").
                     arg(LogWidget::formatServerName(m_serverHost)));
+*/
             break;
         case QAbstractSocket::ConnectedState:
             mp_parser = new Parser(mp_tcpSocket);
@@ -276,9 +280,11 @@ ServerConnection::onSocketStateChanged()
 /* socket */ void
 ServerConnection::onStreamOpened()
 {
+/*
     MainWindow::instance()->logWidget()->appendLogMessage(
         tr("Connected to %1.").
         arg(LogWidget::formatServerName(m_serverHost)));
+*/
 
     QueryGet* query = newQueryGet();
     connect(query, SIGNAL(result(ServerInfoData)),
