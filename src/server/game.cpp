@@ -46,9 +46,9 @@
 
 
 
-Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData):
+Game::Game(GameServer* parent, GameId id, const CreateGameData& createGameData):
     QObject(parent),
-    m_id(gameId),
+    m_id(id),
     m_state(GAMESTATE_WAITINGFORPLAYERS),
     m_publicGameView(this),
     m_nextUnusedPlayerId(0),
@@ -63,15 +63,16 @@ Game::Game(GameServer* parent, int gameId, const CreateGameData& createGameData)
     mp_playerReaper = mp_defaultPlayerReaper;
     mp_gameLogger = new GameLogger();
     mp_gameEventManager->registerSupervisor(mp_gameLogger);
-    createAI(mp_gameInfo->AIPlayers());
+    createAI(mp_gameInfo->aiPlayersCnt());
 }
 
 Game::~Game()
 {
     // We need to unregister handlers before we delete
     // gameEventManager
-    foreach(Player* player, m_playerList)
+    foreach(Player* player, m_playerList) {
         player->unregisterGameEventListener();
+    }
 
     delete mp_gameInfo;
     delete mp_gameTable;
@@ -80,12 +81,7 @@ Game::~Game()
     delete mp_gameLogger;
 }
 
-int Game::alivePlayersCount() const
-{
-    return m_goodGuysCount + m_outlawsCount + m_renegadesCount;
-}
-
-Player* Game::player(int playerId)
+Player* Game::player(PlayerId playerId)
 {
     if (m_playerMap.contains(playerId))
         return m_playerMap[playerId];
@@ -358,8 +354,8 @@ void Game::sendChatMessage(Player* player, const QString& message)
 void Game::checkStartable()
 {
     bool newStartable;
-    if (m_playerList.count() >= mp_gameInfo->minPlayers() &&
-            m_playerList.count() <= mp_gameInfo->maxPlayers())
+    if (m_playerList.count() >= mp_gameInfo->playersMin() &&
+            m_playerList.count() <= mp_gameInfo->playersMax())
         newStartable = 1;
     else
         newStartable = 0;
@@ -412,9 +408,9 @@ void Game::setRolesAndCharacters()
 
 QList<PlayerRole> Game::getRoleList()
 {
-    static char* roleSets[] = {"", "S", "SB", "SRB", "SBBR", "SVBBR", "SVBBBR", "SVVBBBR"};
+    static const char* roleSets[] = {"", "S", "SB", "SRB", "SBBR", "SVBBR", "SVBBBR", "SVVBBBR"};
     QList<PlayerRole> res;
-    char* i = roleSets[m_playerList.count()];
+    const char* i = roleSets[m_playerList.count()];
     while(*i != '\0')
     {
         switch(*i)

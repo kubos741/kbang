@@ -24,12 +24,13 @@
 #include "playerctrl.h"
 #include "gameeventmanager.h"
 #include "characterbase.h"
+#include "servertypes.h"
 
 #include "gameinfo.h"
 #include "gamecycle.h"
 
 
-Player::Player(Game* game, int id, const CreatePlayerData& createPlayerData):
+Player::Player(Game* game, PlayerId id, const CreatePlayerData& createPlayerData):
         QObject(game),
         m_id(id),
         m_lifePoints(0),

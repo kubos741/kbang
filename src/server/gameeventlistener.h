@@ -17,14 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
 #ifndef GAMEEVENTHANDLER_H
 #define GAMEEVENTHANDLER_H
 
+#include "gametypes.h"
+#include "servertypes.h"
+
 #include <QString>
 #include <QList>
-#include "parser/parserstructs.h"
-
 
 class PlayingCard;
 class PublicPlayerView;

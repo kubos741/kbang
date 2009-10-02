@@ -22,7 +22,7 @@
 
 #include "playingcard.h"
 #include "reactionhandler.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 /**
  * The ReactionCard is the base class for all playing cards, that, when are played,

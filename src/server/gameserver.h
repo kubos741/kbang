@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,15 +20,11 @@
 #ifndef GAMESERVER_H
 #define GAMESERVER_H
 
-#include <QtCore>
 #include "parser/parser.h"
-#include "parser/parserstructs.h"
-#include "util.h"
 
 class Game;
 class Client;
 class TcpServer;
-class QXmlStreamWriter;
 class CardFactory;
 
 /**
@@ -37,7 +33,7 @@ class CardFactory;
  * attributes of the server such as the server name, description, etc.
  * @author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
  */
-class GameServer: public QObject, private NonCopyable
+class GameServer: public QObject
 {
     Q_OBJECT;
 public:

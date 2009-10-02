@@ -1,90 +1,105 @@
+/***************************************************************************
+ *   Copyright (C) 2009 by MacJariel                                       *
+ *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #ifndef PLAYERCTRL_H
 #define PLAYERCTRL_H
 
+#include "gameexceptions.h"
+#include "gamestructs.h"
+
 #include <QObject>
 
-#include "gameexceptions.h"
-#include "parser/parserstructs.h"
-
-class Player;
-class GameEventListener;
-class PublicGameView;
 class PublicPlayerView;
 class PrivatePlayerView;
-class PlayingCard;
 
 /**
- * This class provides the only "correct" form to
- * control a player. It means that any code that
- * wants to control a player needs to do it throught
- * this API. It's used primarily by AIs and the
- * adaptor between this class and xml parser.
+ * The PlayerCtrl class provides complete interface for controlling a player.
+ * @todo The documentation is too brief.
  */
-class PlayerCtrl :  QObject
+class PlayerCtrl:  QObject
 {
-    Q_OBJECT;
-    friend class Player;
+Q_OBJECT
+friend class Player;
+
 public slots:
     /**
-     * Disconnects the player from the game, or possibly subtitutes player with
-     * AI. This method should never be called by AIs
-     * Typically you want to call this method after the remote client
-     * disconnected or requested a disconnection.
+     * The controlled player will leave the game.
+     * @warning This method should not be used by AIs.
      */
-    void disconnect();
+    void leaveGame();
 
     /**
-     * Starts the yet not started game.
-     * \throws BadPlayerException The player does not have the permission to
-     *         start the game.
-     * \throws BadGameStateException Either the game is already started, or
+     * Starts the game.
+     * @throws PermissionDeniedException Player is not allowed to start the game.
+     * @throws BadGameStateException Either the game is already started, or
      *         the right conditions are not met, eg. there is not enough
      *         players in the game.
      */
     void startGame();
 
-
     /**
-     * Player draws two cards in his draw phase.
-     * \throws BadGameStateException It's not right time to draw cards.
+     * The controlled player will draw (typically two) cards from the deck.
+     * @throws BadGameStateException The rules does not allow to draw at the
+     *         moment.
      */
     void draw();
 
     /**
-     * Finishes the player's turn.
-     * \throws TooManyCardsInHandException The player must discard some cards,
-     *         before he can finish his turn.
-     * \throws BadGameStateException The player cannot finish his turn, because
-     *         it's not the right moment.
+     * The controlled player will finish his turn.
+     * @throws TooManyCardsInHandException Player has too many cards in hand
+     *         to finish his turn.
+     * @throws BadGameStateException The rules does not allow to finish turn
+     *         at the moment.
      */
     void finishTurn();
 
     /**
-     * Discards a card.
-     * \param cardId The id of the card.
-     * \throws BadCardException There is no card with given id in player's hand.
-     * \throws BadGameStateException There is no right moment for discarding cards.
+     * The controlled player will discard a card.
+     * @param cardId The id of the card.
+     * @throws BadCardException Card cannot be found in player's hand.
+     * @throws BadGameStateException Player cannot discard a card at the moment.
      */
-    void discardCard(PlayingCard* card);
-
-
-    void useAbility();
-    void useAbility(const PublicPlayerView* targetPlayer);
-    void useAbility(QList<PlayingCard*> cards);
+    void discardCard(CardId cardId);
 
     /**
-     * Plays a card.
+     * The controlled player will use his ability.
      */
-    void playCard(PlayingCard* card);
-    void playCard(PlayingCard* card, const PublicPlayerView* player);
-    void playCard(PlayingCard* card, PlayingCard* targetCard);
+    void useAbility(const ActionUseAbilityData&);
+
+    /**
+     * The controlled player will play a card.
+     */
+    void playCard(const ActionPlayCardData&);
+
+    /**
+     * The controlled player will pass.
+     */
     void pass();
 
-
+    /**
+     * The controlled player will send a chat message.
+     */
     void sendChatMessage(const QString&);
 
 public:
-    PlayingCard* card(int cardId) const;
+    CardView* card(int cardId) const;
 
 
     const PublicGameView& publicGameView() const;

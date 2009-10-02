@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2009 by MacJariel                                       *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,7 +21,7 @@
 #include <QApplication>
 #include <QDialog>
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
 #include "mainwindow.h"
 #include "config.h"
 
@@ -29,9 +29,12 @@
 #include <signal.h>
 #endif
 
+#include "cardsetmanager.h"
+#include <QDesktopServices>
+
 #define KBANG_CLIENT_VERSION_MAJOR 0
-#define KBANG_CLIENT_VERSION_MINOR 1
-#define KBANG_CLIENT_VERSION_REVISION 3
+#define KBANG_CLIENT_VERSION_MINOR 2
+#define KBANG_CLIENT_VERSION_REVISION 0
 
 using namespace client;
 
@@ -51,6 +54,7 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(QString("%1.%2.%3").arg(KBANG_CLIENT_VERSION_MAJOR).
                                                   arg(KBANG_CLIENT_VERSION_MINOR).
                                                   arg(KBANG_CLIENT_VERSION_REVISION));
+
     MainWindow mainWindow;
     mainWindow.show();
     return app.exec();

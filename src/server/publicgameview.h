@@ -22,7 +22,7 @@
 #define PUBLICGAMEVIEW_H
 
 #include "common.h"
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 #include <QList>
 

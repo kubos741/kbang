@@ -17,59 +17,77 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "common.h"
+
+#include <QPainter>
+#include <QPaintEvent>
+#include <QMessageBox>
+#include <QTimer>
+
+#include "mainwindow.h"         // Class declaration
+#include "ui_mainwindow.h"      // UI
 #include "config.h"
-#include "mainwindow.h"
+#include "game.h"
+#include "serverconnection.h"
+#include "cardwidgetsizemanager.h"
+
 #include "connecttoserverdialog.h"
 #include "creategamedialog.h"
 #include "joingamedialog.h"
 #include "aboutdialog.h"
-#include "logwidget.h"
-#include "chatwidget.h"
-#include "opponentwidget.h"
-#include "localplayerwidget.h"
-#include "parser/queryget.h"
-#include "game.h"
-#include "card.h"
-#include "cardwidgetsizemanager.h"
-
-#include <QPainter>
-#include <QPaintEvent>
 
 using namespace client;
+
+MainWindow* MainWindow::smp_singleton(0);
 
 MainWindow::MainWindow():
         mp_connectToServerDialog(0),
         mp_createGameDialog(0),
         mp_joinGameDialog(0),
         mp_aboutDialog(0),
-        m_serverConnection(this),
-        mp_game(0)
+        mp_ui(new Ui::MainWindow)
 {
-    setupUi(this);
-    setStyleSheet(styleSheet() + "\n"
-        "#mp_centralWidget {\n"
-        "   background-image: url(\"" + Config::dataPathString() + "gfx/misc/bang-artwork.png\");\n"
-        "}\n\n");
-    Card::loadDefaultRuleset();
-    mp_cardWidgetSizeManager = new CardWidgetSizeManager(this);
+    Q_ASSERT(smp_singleton == 0);
+    smp_singleton = this;
+    mp_ui->setupUi(this);
+    setStyleSheet(styleSheet() + "#mp_centralWidget { background-image: url(\""
+                  + Config::systemDataLocation() + "gfx/misc/bang-artwork.png\");\n}\n\n");
 
     createActions();
-    createMenu();
     createWidgets();
     updateActions();
 
-    connect(&m_serverConnection, SIGNAL(statusChanged()),
+    connect(ServerConnection::instance(), SIGNAL(statusChanged()),
             this, SLOT(serverConnectionStatusChanged()));
-    connect(&m_serverConnection, SIGNAL(enterGameMode(int, const QString&, ClientType)),
+    connect(ServerConnection::instance(), SIGNAL(enterGameMode(int, const QString&, ClientType)),
             this,                SLOT(enterGameMode(int, const QString&, ClientType)));
-    connect(&m_serverConnection, SIGNAL(exitGameMode()),
+    connect(ServerConnection::instance(), SIGNAL(exitGameMode()),
             this,                SLOT(exitGameMode()));
+    QTimer::singleShot(10, this, SLOT(test()));
 }
 
 
 MainWindow::~MainWindow()
 {
+    delete mp_ui;
+    smp_singleton = 0;
+}
+
+LocalPlayerWidget*
+MainWindow::localPlayerWidget() const
+{
+    return mp_ui->localPlayerWidget;
+}
+
+QWidget*
+MainWindow::middleWidget() const
+{
+    return mp_ui->middleWidget;
+}
+
+LogWidget*
+MainWindow::logWidget() const
+{
+    return mp_ui->logWidget;
 }
 
 void MainWindow::paintEvent(QPaintEvent* e)
@@ -82,55 +100,51 @@ void MainWindow::paintEvent(QPaintEvent* e)
     QMainWindow::paintEvent(e);
 }
 
-void MainWindow::showConnectToServerDialog()
+
+void MainWindow::test()
 {
-    if (!mp_connectToServerDialog)
-    {
+    QFile* file = new QFile("replay.xml");
+    if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+         return;
+    }
+    Game::enterGameMode(file);
+}
+
+/* slot */ void
+MainWindow::showConnectToServerDialog()
+{
+    if (!mp_connectToServerDialog) {
         mp_connectToServerDialog = new ConnectToServerDialog(this);
         connect(mp_connectToServerDialog, SIGNAL(connectToServer(QString, int)),
-                &m_serverConnection, SLOT(connectToServer(QString, int)));
+                ServerConnection::instance(), SLOT(connectToServer(QString, int)));
     }
     mp_connectToServerDialog->show();
 }
 
-void MainWindow::disconnectFromServer()
-{
-    if (mp_game != 0)
-        exitGameMode();
-    m_serverConnection.disconnectFromServer();
-}
-
-void MainWindow::showCreateGameDialog()
+/* slot */ void
+MainWindow::showCreateGameDialog()
 {
     if (!mp_createGameDialog) {
         mp_createGameDialog = new CreateGameDialog(this);
-        connect(mp_createGameDialog,SIGNAL(createGame(CreateGameData,CreatePlayerData)),
-                &m_serverConnection, SLOT(createGame(CreateGameData,CreatePlayerData)));
+        connect(mp_createGameDialog,SIGNAL(createGame(CreateGameData, CreatePlayerData)),
+                ServerConnection::instance(), SLOT(createGame(CreateGameData, CreatePlayerData)));
     }
     mp_createGameDialog->show();
 }
 
-
-void MainWindow::showJoinGameDialog()
+/* slot */ void
+MainWindow::showJoinGameDialog()
 {
     if (!mp_joinGameDialog) {
-        mp_joinGameDialog = new JoinGameDialog(this, &m_serverConnection);
-        connect(mp_joinGameDialog, SIGNAL(joinGame(int,int,QString,CreatePlayerData)),
-                &m_serverConnection, SLOT(joinGame(int,int,QString,CreatePlayerData)));
+        mp_joinGameDialog = new JoinGameDialog(this);
+        connect(mp_joinGameDialog, SIGNAL(joinGame(int, int, QString, CreatePlayerData)),
+                ServerConnection::instance(), SLOT(joinGame(int, int, QString, CreatePlayerData)));
     }
     mp_joinGameDialog->show();
 }
 
-void MainWindow::leaveGame()
-{
-    if (m_serverConnection.isConnected()) {
-        m_serverConnection.leaveGame();
-    } else {
-        exitGameMode();
-    }
-}
-
-void MainWindow::showAboutDialog()
+/* slot */ void
+MainWindow::showAboutDialog()
 {
     if (!mp_aboutDialog) {
         mp_aboutDialog = new AboutDialog(this);
@@ -138,23 +152,36 @@ void MainWindow::showAboutDialog()
     mp_aboutDialog->show();
 }
 
-void MainWindow::enterGameMode(int gameId, const QString& gameName, ClientType clientType)
+void
+MainWindow::showWarningMessage(const QString& message)
 {
-    Q_ASSERT(mp_game == 0);
-    GameWidgets x(mp_centralWidget, mp_middleWidget, mp_localPlayerWidget, m_opponentWidgets, mp_statusLabel);
-    mp_game = new Game(this, gameId, clientType, &m_serverConnection, x);
+    QMessageBox* msgBox = new QMessageBox(0);
+    msgBox->setWindowTitle(QApplication::applicationName());
+    msgBox->setText(message);
+    msgBox->setIcon(QMessageBox::Warning);
+    connect(msgBox, SIGNAL(finished(int)), msgBox, SLOT(deleteLater()));
+    QTimer::singleShot(0, msgBox, SLOT(exec()));
+}
+
+/* signal */ void
+MainWindow::enterGameMode(GameId gameId, const QString& gameName, ClientType clientType)
+{
+    Game::enterGameMode(gameId, gameName, clientType);
+#if 0
     connect(mp_game, SIGNAL(emitLogMessage(const QString&)),
             mp_logWidget, SLOT(appendLogMessage(const QString&)));
     mp_logWidget->appendLogMessage(tr("You have joined <i>%1</i>.").arg(gameName));
+#endif
     updateActions();
 }
 
-void MainWindow::exitGameMode()
+/* signal */ void
+MainWindow::exitGameMode()
 {
-    mp_game->clear();
-    mp_game->deleteLater();
-    mp_game = 0;
+    Game::currentGame()->leaveGameMode();
+#if 0
     mp_chatWidget->clear();
+#endif
     updateActions();
 }
 
@@ -163,76 +190,69 @@ void MainWindow::serverConnectionStatusChanged()
     updateActions();
 }
 
-
-void MainWindow::createActions()
+void
+MainWindow::createActions()
 {
-    connect(mp_actionConnectToServer, SIGNAL(triggered()),
+    connect(mp_ui->actionConnectToServer, SIGNAL(triggered()),
             this, SLOT(showConnectToServerDialog()));
-    connect(mp_actionDisconnectFromServer, SIGNAL(triggered()),
-            this, SLOT(disconnectFromServer()));
-    connect(actionCreateGame, SIGNAL(triggered()),
+    connect(mp_ui->actionDisconnectFromServer, SIGNAL(triggered()),
+            ServerConnection::instance(), SLOT(disconnectFromServer()));
+    connect(mp_ui->actionCreateGame, SIGNAL(triggered()),
             this, SLOT(showCreateGameDialog()));
-    connect(mp_actionJoinGame, SIGNAL(triggered()),
+    connect(mp_ui->actionJoinGame, SIGNAL(triggered()),
             this, SLOT(showJoinGameDialog()));
-    connect(mp_actionLeaveGame, SIGNAL(triggered()),
-            this, SLOT(leaveGame()));
-    connect(mp_actionAbout, SIGNAL(triggered()),
+    connect(mp_ui->actionLeaveGame, SIGNAL(triggered()),
+            ServerConnection::instance(), SLOT(leaveGame()));
+    connect(mp_ui->actionAbout, SIGNAL(triggered()),
             this, SLOT(showAboutDialog()));
+    connect(mp_ui->actionCardSizeUp, SIGNAL(triggered()),
+            &CardWidgetSizeManager::instance(), SLOT(cardSizeUp()));
+    connect(mp_ui->actionCardSizeDown, SIGNAL(triggered()),
+            &CardWidgetSizeManager::instance(), SLOT(cardSizeDown()));
 }
 
-
-void MainWindow::createMenu()
+void
+MainWindow::createWidgets()
 {
+    m_opponentWidgets.append(mp_ui->opponent0);
+    m_opponentWidgets.append(mp_ui->opponent1);
+    m_opponentWidgets.append(mp_ui->opponent2);
+    m_opponentWidgets.append(mp_ui->opponent3);
+    m_opponentWidgets.append(mp_ui->opponent4);
+    m_opponentWidgets.append(mp_ui->opponent5);
+    m_opponentWidgets.append(mp_ui->opponent6);
+
+    mp_ui->opponent0->hide();
+
+    connect(mp_ui->chatWidget, SIGNAL(outgoingMessage(const QString&)),
+            ServerConnection::instance(), SLOT(sendChatMessage(const QString&)));
+    connect(ServerConnection::instance(), SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
+            mp_ui->chatWidget, SLOT(appendIncomingMessage(int, const QString&, const QString&)));
+
+    connect(ServerConnection::instance(), SIGNAL(logMessage(QString)),
+            mp_ui->logWidget, SLOT(appendLogMessage(QString)));
 }
 
-void MainWindow::createWidgets()
+void
+MainWindow::updateActions()
 {
-    m_opponentWidgets.append(mp_opponent1);
-    m_opponentWidgets.append(mp_opponent2);
-    m_opponentWidgets.append(mp_opponent3);
-    m_opponentWidgets.append(mp_opponent4);
-    m_opponentWidgets.append(mp_opponent5);
-    m_opponentWidgets.append(mp_opponent6);
-
-    connect(mp_chatWidget, SIGNAL(outgoingMessage(const QString&)),
-            &m_serverConnection, SLOT(sendChatMessage(const QString&)));
-    connect(&m_serverConnection, SIGNAL(incomingChatMessage(int, const QString&, const QString&)),
-            mp_chatWidget, SLOT(incomingMessage(int, const QString&, const QString&)));
-
-    connect(&m_serverConnection, SIGNAL(logMessage(QString)),
-            mp_logWidget, SLOT(appendLogMessage(QString)));
-    connect(&m_serverConnection, SIGNAL(incomingData(const QByteArray&)),
-            mp_logWidget, SLOT(appendIncomingData(const QByteArray&)));
-    connect(&m_serverConnection, SIGNAL(outgoingData(const QByteArray&)),
-            mp_logWidget, SLOT(appendOutgoingData(const QByteArray&)));
-
-}
-
-void MainWindow::updateActions()
-{
-    if (m_serverConnection.isConnected())
-    {
-        mp_actionConnectToServer->setEnabled(0);
-        mp_actionDisconnectFromServer->setEnabled(1);
-        if (mp_game != 0)
-        {
-            actionCreateGame->setEnabled(0);
-            mp_actionJoinGame->setEnabled(0);
-            mp_actionLeaveGame->setEnabled(1);
+    if (ServerConnection::instance()->isConnected()) {
+        mp_ui->actionConnectToServer->setEnabled(0);
+        mp_ui->actionDisconnectFromServer->setEnabled(1);
+        if (Game::isInGame()) {
+            mp_ui->actionCreateGame->setEnabled(0);
+            mp_ui->actionJoinGame->setEnabled(0);
+            mp_ui->actionLeaveGame->setEnabled(1);
+        } else {
+            mp_ui->actionCreateGame->setEnabled(1);
+            mp_ui->actionJoinGame->setEnabled(1);
+            mp_ui->actionLeaveGame->setEnabled(0);
         }
-        else
-        {
-            actionCreateGame->setEnabled(1);
-            mp_actionJoinGame->setEnabled(1);
-            mp_actionLeaveGame->setEnabled(0);
-        }
-    }
-    else
-    {
-        mp_actionConnectToServer->setEnabled(1);
-        mp_actionDisconnectFromServer->setEnabled(0);
-        actionCreateGame->setEnabled(0);
-        mp_actionJoinGame->setEnabled(0);
-        mp_actionLeaveGame->setEnabled(mp_game != 0);
+    } else {
+        mp_ui->actionConnectToServer->setEnabled(1);
+        mp_ui->actionDisconnectFromServer->setEnabled(0);
+        mp_ui->actionCreateGame->setEnabled(0);
+        mp_ui->actionJoinGame->setEnabled(0);
+        mp_ui->actionLeaveGame->setEnabled(0);
     }
 }

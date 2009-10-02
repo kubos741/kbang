@@ -20,44 +20,113 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "ui_mainwindow.h"
-#include "serverconnection.h"
-
+#include <QMainWindow>
 #include <QList>
+
+#include "gametypes.h"
+
+namespace Ui {
+class MainWindow;
+}
 
 namespace client {
 
+// Dialogs:
 class ConnectToServerDialog;
 class CreateGameDialog;
 class JoinGameDialog;
 class AboutDialog;
-class OpponentWidget;
-class Game;
-class CardWidgetSizeManager;
 
-class MainWindow : public QMainWindow, public Ui::MainWindow
+// Widgets:
+class PlayerWidget;
+class LocalPlayerWidget;
+class LogWidget;
+
+/**
+ * The MainWindow singleton class represents the main window of the KBang
+ * client.
+ */
+class MainWindow: public QMainWindow
+
 {
 Q_OBJECT
 public:
+    /**
+     * Constructs the MainWindow instance.
+     */
     MainWindow();
+
+    /**
+     * Destroys the MainWindow instance.
+     */
     virtual ~MainWindow();
-    virtual void paintEvent(QPaintEvent* event);
+
+    /**
+     * Returns a reference to the MainWindow singleton instance.
+     */
+    inline static MainWindow* instance() {
+        return smp_singleton;
+    }
+
+    /**
+     * Returns the LocalPlayerWidget.
+     */
+    LocalPlayerWidget* localPlayerWidget() const;
+
+    /**
+     * Returns the list of OpponentWidget instances.
+     */
+    QList<PlayerWidget*> opponentWidgets() const { return m_opponentWidgets; }
+
+    /**
+     * Returns a pointer to the middle widget.
+     */
+    QWidget* middleWidget() const;
+
+    /**
+     * Returns a pointer to LogWidget.
+     */
+    LogWidget* logWidget() const;
 
 public slots:
+    void test();
+
+    /**
+     * Shows the ConnectToServerDialog.
+     */
     void showConnectToServerDialog();
-    void disconnectFromServer();
+
+    /**
+     * Shows the CreateGameDialog.
+     */
     void showCreateGameDialog();
+
+    /**
+     * Shows the JoinGameDialog.
+     */
     void showJoinGameDialog();
-    void leaveGame();
+
+    /**
+     * Shows the AboutDialog.
+     */
     void showAboutDialog();
 
-    void enterGameMode(int gameId, const QString& gameName, ClientType);
+    /**
+     * Shows a dialog with warning message. This method doesn't block the thread,
+     * instead schedules showing modal dialog window.
+     */
+    void showWarningMessage(const QString& message);
+
+    void enterGameMode(GameId gameId, const QString& gameName, ClientType);
     void exitGameMode();
 
     void serverConnectionStatusChanged();
 
+protected:
+    virtual void paintEvent(QPaintEvent* event);
+
+
 private:
-    void createMenu();
     void createActions();
     void createWidgets();
     void updateActions();
@@ -66,12 +135,11 @@ private:
     CreateGameDialog*      mp_createGameDialog;
     JoinGameDialog*        mp_joinGameDialog;
     AboutDialog*           mp_aboutDialog;
-    ServerConnection       m_serverConnection;
-    Game*                  mp_game;
-    QList<OpponentWidget*> m_opponentWidgets;
-    CardWidgetSizeManager* mp_cardWidgetSizeManager;
 
+    QList<PlayerWidget*>   m_opponentWidgets;
 
+    Ui::MainWindow*        mp_ui;
+    static MainWindow*     smp_singleton;
 };
 }
 #endif

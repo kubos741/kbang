@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by MacJariel                                       *
+ *   Copyright (C) 2008-2009 by MacJariel                                  *
  *   echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil"                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,101 +20,120 @@
 #ifndef SERVERCONNECTION_H
 #define SERVERCONNECTION_H
 
-#include "gameenums.h"
+#include "gametypes.h"
 
 #include <QObject>
+#include <QString>
 #include <QList>
 
 class QTcpSocket;
-class QByteArray;
-class CreatePlayerData;
-class CreateGameData;
-class ServerInfoData;;
-class CardMovementData;
+
 class Parser;
-class QueryGet;
+class ServerInfoData;
+
 
 namespace client {
 
 /**
- *	@author MacJariel <echo "badmailet@gbalt.dob" | tr "edibmlt" "ecrmjil">
+ * The ServerConnection singleton class provides a singleton class for
+ * interaction with server.
+ * @author MacJariel
  */
-class ServerConnection : public QObject
+class ServerConnection: public QObject
 {
 Q_OBJECT
 public:
-    ServerConnection(QObject *parent);
-    virtual ~ServerConnection();
+    /**
+     * Returns a reference to the singleton instance.
+     * @warning The returned pointer is invalid after MainWindow's destructor
+     * was called.
+     */
+    static ServerConnection* instance() {
+        if (!smp_instance) {
+            smp_instance = new ServerConnection();
+        }
+        return smp_instance;
+    }
 
-    QueryGet* queryGet();
-    bool isConnected() const;
+    /**
+     * Returns whether client is connected to a server.
+     */
+    inline bool isConnected() const {
+        return mp_parser != 0;
+    }
+
+    /**
+     * Returns the name of the server to which the client is connected.
+     */
     QString serverName() const;
-    QString hostName() const;
 
-    QObject* parser() const;
+    /**
+     * Returns the hostname of the server to which the client is connected.
+     */
+    inline QString hostName() const {
+        return m_serverHost;
+    }
 
-public slots:
-    void connectToServer(QString serverHost, int serverPort);
+    void connectToServer(const QString& serverHost, int serverPort);
+
     void disconnectFromServer();
 
-    void createGame(const CreateGameData&, const CreatePlayerData&);
-    void joinGame(int gameId, int playerId, const QString& gamePassword, const CreatePlayerData&);
-    void leaveGame();
-    void startGame();
-    void sendChatMessage(const QString& message);
+    void sendQueryGet(const QueryGetPtr&, QueryResultHandler*);
 
+    void cancelQueryGet(QueryResultHandler*);
 
-    void drawCard();
-    void playCard(int cardId);
-    void playCardWithPlayer(int cardId, int playerId);
-    void playCardWithCard(int cardId, int otherCardId);
+    void sendAction(const ActionDataPtr&);
 
-    void useAbility();
-    void useAbility(int playerId);
-    void useAbility(QList<int> cards);
-
-    void endTurn();
-    void pass();
-    void discardCard(int cardId);
-
-
-
-
-private slots:
-    void connected();
-    void disconnected();
-
-    void recievedServerInfo(const ServerInfoData&);
-
-
-private:
-    void initializeParserConnections();
-
-
-
-private:
-    QTcpSocket*         mp_tcpSocket;
-    Parser*             mp_parser;
-
-    QString             m_serverHost;
-    QString             m_serverName;
-    QString             m_serverDescription;
 
 signals:
-    void statusChanged();//bool connected, QString serverHost, QString serverName, QString serverDescription);
-    void logMessage(QString message);
+    /**
+     * This signal is emitted after a game event is received. The gameEvent
+     * parameter describes the received game event.
+     */
+    void gameEventReceived(const GameEventDataPtr& gameEvent);
 
+    /**
+     * This signal is emitted after a server event is received. The serverEvent
+     * parameter describes the received server event.
+     */
+    void serverEventReceived(const ServerEventDataPtr& serverEvent);
+
+    /**
+     * This signal is emitted after client receives data from server.
+     * It can be used for debugging purposes.
+     */
     void incomingData(const QByteArray&);
+
+    /**
+     * This signal is emitted after client sends data to server.
+     * It can be used for debugging purposes.
+     */
     void outgoingData(const QByteArray&);
 
-    void incomingChatMessage(int senderId, const QString& senderName,const QString& message);
+private slots:
+    // callbacks from parser:
+    void onStreamOpened();
+    void onStreamClosed();
+    void onParserError();
 
-    void enterGameMode(int gameId, const QString& gameName, const ClientType&);
-    void exitGameMode();
-    void gameCanBeStarted(bool canBeStarted);
-    void eventCardMovement(const CardMovementData&);
+    // callbacks from socket
+    void onSocketStateChanged();
+    void onSocketError();
 
+private:
+    ServerConnection();
+    virtual ~ServerConnection();
 
+    class QueryHandler;
+    friend class QueryHandler;
+
+    QueryHandler*       mp_handler;
+    QTcpSocket*         mp_tcpSocket;
+    Parser*             mp_parser;
+    QString             m_serverHost;
+    ServerInfoData*     mp_serverInfo;
+
+    static ServerConnection* smp_instance;
 };
 }
 #endif

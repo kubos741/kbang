@@ -27,9 +27,8 @@
 #include <cstdlib>
 #include <qglobal.h>
 
-
 #define NOT_REACHED() qFatal("Fatal Error: NOT_REACHED triggered at line %d of %s", __LINE__, __FILE__)
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+#define NOT_IMPLEMENTED() qWarning("Warning: NOT_IMPLEMENTED triggered at line %d of %d", __LINE__, __FILE__)
 
 QString randomToken(int minLength, int maxLength);
 bool randomBool(qreal probability);
@@ -56,15 +55,10 @@ inline void shuffleList(QLinkedList<T>& list)
     }
 }
 
-class NonCopyable
-{
-protected:
-    NonCopyable() {}
-    ~NonCopyable() {}
-private:
-    NonCopyable(const NonCopyable&);
-    NonCopyable& operator=(const NonCopyable&);
-};
+QString boolToString(bool);
+bool stringToBool(QString);
 
+#define intToString(N) (QString::number(N))
+#define stringToInt(S) (S.toInt())
 
 #endif

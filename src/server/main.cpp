@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <time.h>
 
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 #define KBANG_SERVER_VERSION_MAJOR 0
 #define KBANG_SERVER_VERSION_MINOR 1

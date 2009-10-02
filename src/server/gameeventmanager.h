@@ -1,7 +1,7 @@
 #ifndef GAMEEVENTMANAGER_H
 #define GAMEEVENTMANAGER_H
 
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 #include "gameeventlistener.h"
 
 #include <QString>

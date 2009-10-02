@@ -1,7 +1,7 @@
 #ifndef GAMECYCLE_H
 #define GAMECYCLE_H
 
-#include "parser/parserstructs.h"
+#include "gamestructs.h"
 
 #include <QObject>
 #include <QQueue>
