@@ -15,9 +15,14 @@ OptionsTab::OptionsTab(OptionsDialog* optionsDialog, QString id,
 {
 }
 
-
 OptionsTab::~OptionsTab()
 {
 }
 
+void OptionsTab::applyOptions()
+{
+}
 
+void OptionsTab::restoreOptions()
+{
+}

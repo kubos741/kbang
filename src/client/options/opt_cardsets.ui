@@ -22,16 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QTreeWidget" name="localCardsetsWidget">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="showDropIndicator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
-     </property>
+    <widget class="QTreeView" name="localCardsetsWidget">
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
@@ -41,93 +32,9 @@
      <property name="expandsOnDoubleClick">
       <bool>false</bool>
      </property>
-     <attribute name="headerCascadingSectionResizes">
-      <bool>false</bool>
-     </attribute>
      <attribute name="headerStretchLastSection">
       <bool>false</bool>
      </attribute>
-     <column>
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Language</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Rev</string>
-      </property>
-     </column>
-     <item>
-      <property name="text">
-       <string notr="true">Card Slot #1</string>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <item>
-       <property name="text">
-        <string notr="true">Card Set #1</string>
-       </property>
-       <property name="text">
-        <string notr="true">English</string>
-       </property>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string notr="true">Card Set #2</string>
-       </property>
-       <property name="text">
-        <string notr="true">Czech</string>
-       </property>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </item>
-     </item>
-     <item>
-      <property name="text">
-       <string notr="true">Card Slot #2</string>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <item>
-       <property name="text">
-        <string notr="true">Card Set #3</string>
-       </property>
-       <property name="text">
-        <string notr="true">English</string>
-       </property>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string notr="true">Card Set #4</string>
-       </property>
-       <property name="text">
-        <string notr="true">Czech</string>
-       </property>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </item>
-     </item>
     </widget>
    </item>
    <item>
@@ -148,9 +55,6 @@
      <property name="expandsOnDoubleClick">
       <bool>false</bool>
      </property>
-     <attribute name="headerStretchLastSection">
-      <bool>false</bool>
-     </attribute>
      <attribute name="headerStretchLastSection">
       <bool>false</bool>
      </attribute>

@@ -2,15 +2,10 @@
 #define OPTIONSCARDSETS_H
 
 #include "optionstab.h"
-#include "gametypes.h"
-#include <QMap>
-
-class QTreeWidgetItem;
-class QStandardItemModel;
 
 namespace client {
 
-class OptionsCardsetsUI;
+class OptionsCardsetsPrivate;
 
 class OptionsCardsets: public OptionsTab
 {
@@ -20,10 +15,21 @@ public:
     virtual ~OptionsCardsets();
     virtual QWidget* widget();
 
+public slots:
+    void applyOptions();
+    void restoreOptions();
+    
+private:
+    friend class OptionsCardsetsPrivate;
+    OptionsCardsetsPrivate* d_ptr;
+};    
+/*
 private slots:
     void doUpdateData(QTreeWidgetItem*, int);
+    
 
-private:
+void refreshRemoteCardsets();
+    void updateRemoteCardsets();
     void reloadLocalCardsets();
     void reloadRemoteCardsets();
 
@@ -33,8 +39,8 @@ private:
     OptionsCardsetsUI*      mp_widget;
     QMap<QString, QString>  m_selectedCardsets;
     QStandardItemModel*     mp_remoteCardsetsModel;
-
-};
+    QueryResultHandler*     mp_queryHandler;
+*/
 
 }
 

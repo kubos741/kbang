@@ -1,50 +1,215 @@
 #include "opt_cardsets.h"
 #include "ui_opt_cardsets.h"
 #include "optionsdialog.h"
+#include "serverconnection.h"
+#include "queries.h"
+#include "cardsetmanager.h"
 
 #include <QStandardItemModel>
 #include <QtDebug>
 
+namespace client {
 
+///////////////
+// functions
+///////////////
 
-using namespace client;
-
-QString localeListToString(QList<QLocale> locales)
+QString localeListToString(const QList<QLocale>& locales)
 {
     QStringList languages;
-    foreach (const QLocale locale, cardset.locales) {
+    foreach (const QLocale locale, locales) {
         languages << QLocale::languageToString(locale.language());
     }
     return languages.join(", ");
 }
 
-class client::OptionsCardsetsUI: public QWidget, public Ui::OptionsCardsets
+///////////////////////////////////
+// class OptionsCardsetsUI
+///////////////////////////////////
+
+class OptionsCardsetsUI: public QWidget, public Ui::OptionsCardsets
 {
 public:
-    OptionsCardsetsUI(QWidget* parent);
+    OptionsCardsetsUI(QWidget* parent): QWidget(parent) {
+        setupUi(this);
+        localCardsetsWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
+        remoteCardsetsWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
+    }
     void setRemoteCardsetsModel(QAbstractItemModel*);
     friend class OptionsCardsets;
 };
 
-OptionsCardsetsUI::OptionsCardsetsUI(QWidget* parent):
-        QWidget(parent)
+///////////////////////////////////
+// class QueryCardsetHandler
+///////////////////////////////////
+
+class QueryCardsetHandler: public QueryResultHandler {
+public:
+    QueryCardsetHandler(OptionsCardsetsPrivate* pr): mp_pr(pr) {}
+    virtual ~QueryCardsetHandler() {}
+    virtual void resultReceived(const GameStructPtr& g);
+    OptionsCardsetsPrivate* mp_pr;
+};
+
+
+///////////////////////////////////
+// class OptionsCardsetsPrivate
+///////////////////////////////////
+
+class OptionsCardsetsPrivate: public QObject {
+    Q_OBJECT;
+public:
+    QStandardItemModel*     mp_localCardsetsModel;
+    QStandardItemModel*     mp_remoteCardsetsModel;
+    QStringList             m_slots;
+    OptionsCardsetsUI*      mp_widget;
+    QMap<QString, QString>  m_selectedCardsets;
+    QueryCardsetHandler     m_queryHandler;
+    OptionsDialog*          mp_optionsDialog;
+    
+    OptionsCardsetsPrivate(OptionsDialog* dialog):
+            mp_optionsDialog(dialog),
+            m_queryHandler(this) {}
+    
+    void constructModels();
+    void updateLocalModel();
+    void updateRemoteModel(const CardSetInfoListData&);
+    
+public slots:
+    void doActivateLocalItem(const QModelIndex&);
+    void doActivateRemoteItem(const QModelIndex&);
+    void refreshRemoteModel();
+};
+
+void OptionsCardsetsPrivate::constructModels()
 {
-    setupUi(this);
-    localCardsetsWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
+    Q_ASSERT(mp_remoteCardsetsModel == 0);
+    mp_localCardsetsModel = new QStandardItemModel(this);
+    mp_localCardsetsModel->setColumnCount(4);
+    mp_localCardsetsModel->setHorizontalHeaderLabels(QStringList() <<
+            OptionsCardsets::tr("Name") <<
+            OptionsCardsets::tr("Language") <<
+            OptionsCardsets::tr("Revision") << "");
+    mp_remoteCardsetsModel = new QStandardItemModel(this);
+    mp_remoteCardsetsModel->setColumnCount(4);
+    mp_remoteCardsetsModel->setHorizontalHeaderLabels(QStringList() <<
+            OptionsCardsets::tr("Name") <<
+            OptionsCardsets::tr("Language") <<
+            OptionsCardsets::tr("Revision") << "");
 }
 
-void OptionsCardsetsUI::setRemoteCardsetsModel(QAbstractItemModel* model)
+void OptionsCardsetsPrivate::updateLocalModel()
 {
-    remoteCardsetsWidget->setModel(model);
-    remoteCardsetsWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
+    if (mp_localCardsetsModel == 0) { return; }
+    mp_localCardsetsModel->clear();
+    QStandardItem* rootItem = mp_localCardsetsModel->invisibleRootItem();
+    const QList<CardSetInfo>& list = CardSetManager::instance().localCardSets();
+    
+    foreach (const QString& slotId, CardSetManager::instance().knownSlots()) {
+        QStandardItem* item = new QStandardItem(slotId);
+        item->setData(slotId, Qt::UserRole);
+        mp_localCardsetsModel->invisibleRootItem()->appendRow(item);
+    }
+       
+    foreach (const CardSetInfo& cardset, list) {
+        QStandardItem* slotItem = 0;
+        for (int i = 0; i < rootItem->rowCount(); ++i) {
+            slotItem = rootItem->child(i);
+            if (slotItem->data(Qt::UserRole).toString() == cardset.slotId()) {
+                break;
+            }
+            slotItem = 0;
+        }
+        if (slotItem == 0) {
+            slotItem = new QStandardItem();
+            slotItem->setText(CardSetManager::slotDisplayName(cardset.slotId()));
+            slotItem->setData(cardset.slotId(), Qt::UserRole);
+            rootItem->appendRow(slotItem);
+            continue;
+        }
+        QList<QStandardItem*> cardsetRow;
+        QStandardItem* cardsetItem = new QStandardItem();
+        cardsetItem->setData(cardset.id(), Qt::UserRole);
+        cardsetItem->setText(cardset.name());
+        cardsetRow.append(cardsetItem);
+        cardsetRow.append(new QStandardItem(localeListToString(cardset.locales())));
+        cardsetRow.append(new QStandardItem(QString::number(cardset.revision())));
+        slotItem->appendRow(cardsetRow);
+    }
 }
+
+void OptionsCardsetsPrivate::updateRemoteModel(const CardSetInfoListData& list)
+{
+    if (mp_remoteCardsetsModel == 0) { return; }
+    mp_remoteCardsetsModel->clear();
+    QStandardItem* rootItem = mp_remoteCardsetsModel->invisibleRootItem();
+    
+    foreach (const CardSetInfoData& data, list) {
+        QStandardItem* slotItem = 0;
+        for (int i = 0; i < rootItem->rowCount(); ++i) {
+            slotItem = rootItem->child(i);
+            if (slotItem->data(Qt::UserRole).toString() == data.slotId) {
+                break;
+            }
+            slotItem = 0;
+        }
+        if (slotItem == 0) {
+            slotItem = new QStandardItem();
+            slotItem->setText(CardSetManager::slotDisplayName(data.slotId));
+            slotItem->setData(data.slotId, Qt::UserRole);
+            rootItem->appendRow(slotItem);
+            continue;
+        }
+        QList<QStandardItem*> cardsetRow;
+        QStandardItem* cardsetItem = new QStandardItem();
+        cardsetItem->setData(data.id, Qt::UserRole);
+        cardsetItem->setText(data.name);
+        cardsetRow.append(cardsetItem);
+        cardsetRow.append(new QStandardItem(localeListToString(data.locales)));
+        cardsetRow.append(new QStandardItem(QString::number(data.revision)));
+        /// @todo append download button
+        slotItem->appendRow(cardsetRow);
+    }
+}
+
+void OptionsCardsetsPrivate::doActivateLocalItem(const QModelIndex& index)
+{
+    QStandardItem* item = mp_localCardsetsModel->itemFromIndex(index);
+    if (item == 0) { return; }
+    if (item->data(Qt::UserRole) == 0) { return; }
+    ///@todo implement this
+}
+
+void OptionsCardsetsPrivate::doActivateRemoteItem(const QModelIndex& index)
+{
+    QStandardItem* item = mp_localCardsetsModel->itemFromIndex(index);
+    if (item == 0) { return; }
+    if (item->data(Qt::UserRole) == 0) { return; }
+    ///@todo implement this
+}
+
+void OptionsCardsetsPrivate::refreshRemoteModel()
+{
+    QueryCardsetInfoGetPtr query(new QueryCardsetInfoGet());
+    ServerConnection::instance()->sendQueryGet(query, &m_queryHandler);
+}
+
+void QueryCardsetHandler::resultReceived(const GameStructPtr& g)
+{
+    if (g->t() == GameStruct::CardSetInfoListType) {
+        mp_pr->updateRemoteModel(*g.staticCast<CardSetInfoListData>());
+    }
+}
+
+///////////////////////////////
+// class OptionsCardsets
+///////////////////////////////
 
 OptionsCardsets::OptionsCardsets(OptionsDialog* optionsDialog):
-        OptionsTab(optionsDialog, "cardsets", tr("Card Sets"), tr("Select card sets and download new")),
-        mp_widget(0),
-        mp_remoteCardsetsModel(0)
+        OptionsTab(optionsDialog, "cardsets", tr("Card Sets"),
+                   tr("Select card sets and download new")),
+        d_ptr(new OptionsCardsetsPrivate(optionsDialog))
 {
-    m_slotList << "bang-original" << "bang-dodge-city" << "bang-high-noon";
 }
 
 OptionsCardsets::~OptionsCardsets()
@@ -53,170 +218,31 @@ OptionsCardsets::~OptionsCardsets()
 
 QWidget* OptionsCardsets::widget()
 {
-    if (mp_widget == 0) {
-        mp_widget = new OptionsCardsetsUI(mp_optionsDialog);
-        initModels();
-        mp_widget->setRemoteCardsetsModel(mp_remoteCardsetsModel);
-        reloadLocalCardsets();
-        connect(mp_widget->localCardsetsWidget, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
-                this, SLOT(doUpdateData(QTreeWidgetItem*,int)));
+    if (d_ptr->mp_widget == 0) {
+        d_ptr->mp_widget = new OptionsCardsetsUI(mp_optionsDialog);
+        d_ptr->constructModels();
+        d_ptr->mp_widget->localCardsetsWidget->setModel(
+            d_ptr->mp_localCardsetsModel);
+        d_ptr->mp_widget->remoteCardsetsWidget->setModel(
+            d_ptr->mp_remoteCardsetsModel);
+        d_ptr->updateLocalModel();
+        
+        connect(d_ptr->mp_widget->localCardsetsWidget, SIGNAL(activated(QModelIndex)),
+                d_ptr, SLOT(doActivateLocalItem(QModelIndex)));
+        connect(d_ptr->mp_widget->remoteCardsetsWidget, SIGNAL(activated(QModelIndex)),
+                d_ptr, SLOT(doActivateRemoteItem(QModelIndex)));
     }
-    return mp_widget;
+    return d_ptr->mp_widget;
 }
 
-void OptionsCardsets::doUpdateData(QTreeWidgetItem* item, int)
+void OptionsCardsets::applyOptions()
 {
-    QTreeWidgetItem* parent = item->parent();
-    Q_ASSERT(parent != 0);
-    if (item->checkState(0) != Qt::Checked) {
-        return;
-    }
-    for (int i = 0; i < parent->childCount(); ++i) {
-        if (parent->child(i) != item) {
-            qDebug() << parent->child(i) << item;
-            parent->child(i)->setCheckState(0, Qt::Unchecked);
-        }
-    }
-    m_selectedCardsets[parent->data(0, Qt::UserRole).toString()] =
-            item->data(0, Qt::UserRole).toString();
+    ///@todo implement this
 }
 
-
-void OptionsCardsets::updateRemoteCardsetsModel(const CardSetInfoListData& list)
+void OptionsCardsets::restoreOptions()
 {
-    if (mp_remoteCardsetsModel == 0) {
-        return;
-    }
-    foreach (const CardSetInfoData& data, list) {
-        QStandardItem* root = mp_remoteCardsetsModel->invisibleRootItem();
-        QStandardItem* slotItem = 0;
-        for (int i = 0; i < root->rowCount(); ++i) {
-             slotItem = root->child(i);
-             if (slotItem->data(Qt::UserRole).toString() == data.slot) {
-                 break;
-             }
-             slotItem = 0;
-        }
-        if (slotItem == 0) {
-            // Cardset with unknown slot encountered
-            continue;
-        }
-        QStandardItem* cardsetItem = 0;
-        int index;
-        for (index = 0; index < slotItem->rowCount(); ++index) {
-             cardsetItem = slotItem->child(index);
-             if (cardsetItem->data(Qt::UserRole).toString() == data.name) {
-                 break;
-             }
-             cardsetItem = 0;
-        }
-        if (cardsetItem == 0) {
-            // Add new cardset
-            cardsetItem = new QStandardItem(data.displayName);  /// @todo translate
-            cardsetItem->setData(data.name, Qt::UserRole);
-            QList<QStandardItem*> row;
-            row.append(cardsetItem);
-            row.append(new QStandardItem(localeListToString(data.locales)));
-            row.append(new QStandardItem(QString::number(data.revision)));
-            // @todo append download button
-            slotItem->appendRow(row);
-        } else {
-            // Update cardset
-            cardsetItem->setText(data.displayName);  /// @todo translate
-            slotItem->child(index, 1)->setText(localeListToString(data.locales));
-            slotItem->child(index, 2)->setText(QString::number(data.revision));
-
-        }
-    }
-
+    ///@todo implement this
 }
 
-
-void OptionsCardsets::reloadLocalCardsets()
-{
-    if (mp_widget == 0) {
-        return;
-    }
-    /// @todo use real data instead of testing
-    QStringList knownSlots;
-    knownSlots << "bang-original" << "bang-dodge-city" << "bang-high-noon" <<
-                  "bang-fistful-of-cards" << "bang-the-bullet";
-
-    QList<CardSetInfoData> cardsets;
-    CardSetInfoData x;
-    x.name = "bang-original-v3-cs_CZ";
-    x.displayName = "Original Bang! (version 3)";
-    x.locales.append(QLocale("cs_CZ"));
-    x.slot = "bang-original";
-    x.revision = 1;
-    cardsets.append(x);
-
-    x.name = "bang-original-v3-orig";
-    x.displayName = "Original Bang! (version 3)";
-    x.locales.clear();
-    x.locales.append(QLocale("it_IT"));
-    x.locales.append(QLocale("en"));
-    x.slot = "bang-original";
-    x.revision = 1;
-    cardsets.append(x);
-
-
-    /// @todo end
-
-    mp_widget->localCardsetsWidget->clear();
-    foreach (const QString& slot, knownSlots) {
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        item->setText(0, slot);
-        item->setData(0, Qt::UserRole, slot);
-        mp_widget->localCardsetsWidget->addTopLevelItem(item);
-        foreach (const CardSetInfoData& cardset, cardsets) {
-            if (cardset.slot == slot) {
-                QTreeWidgetItem* cardsetItem = new QTreeWidgetItem();
-                cardsetItem->setText(0, x.displayName);
-                QStringList langs;
-                foreach (const QLocale l, cardset.locales) {
-                    langs << QLocale::languageToString(l.language());
-                }
-                cardsetItem->setText(1, langs.join(", "));
-                cardsetItem->setText(2, QString::number(cardset.revision));
-                cardsetItem->setData(0, Qt::UserRole, x.name);
-                if (m_selectedCardsets[slot] == x.name) {
-                    cardsetItem->setCheckState(0, Qt::Checked);
-                } else {
-                    cardsetItem->setCheckState(0, Qt::Unchecked);
-                }
-                item->addChild(cardsetItem);
-            }
-        }
-        if (item->childCount() == 0) {
-                QTreeWidgetItem* cardsetItem = new QTreeWidgetItem();
-                cardsetItem->setText(0, tr("No cardsets for this slot."));
-                QFont font;
-                font.setItalic(1);
-                cardsetItem->setData(0, Qt::FontRole, font);
-                item->addChild(cardsetItem);
-        }
-    }
-    mp_widget->localCardsetsWidget->expandAll();
-}
-
-void OptionsCardsets::reloadRemoteCardsets()
-{
-
-}
-
-void OptionsCardsets::initModels()
-{
-    Q_ASSERT(mp_remoteCardsetsModel == 0);
-    mp_remoteCardsetsModel = new QStandardItemModel(this);
-    mp_remoteCardsetsModel->setColumnCount(4);
-    mp_remoteCardsetsModel->setHorizontalHeaderLabels(QStringList() <<
-                                                      tr("Name") <<
-                                                      tr("Language") <<
-                                                      tr("Revision") << "");
-    foreach (const QString& slotId, m_slotList) {
-        QStandardItem* item = new QStandardItem(slotId);
-        item->setData(slotId, Qt::UserRole);
-        mp_remoteCardsetsModel->invisibleRootItem()->appendRow(item);
-    }
 }
