@@ -64,9 +64,17 @@ CardSetInfo::CardSetInfo(QDir dir):
     cardsetFile.close();
 
     QDomElement docElem = doc.documentElement();
+    m_id = docElem.attribute("id");     ///@todo change cardsets
     m_name = docElem.attribute("name");
-    m_slot = docElem.attribute("slot");
-    m_locale = QLocale(docElem.attribute("locale"));
+    m_slotId = docElem.attribute("slot");
+    {
+        ///@todo change cardsets
+        QStringList localeStrings = docElem.attribute("locales").split(",");
+        foreach (const QString& localeString, localeStrings) {
+            m_locales.append(QLocale(localeString));
+        }
+    }
+    m_revision = docElem.attribute("revision").toUShort();
     m_renderSigns = (docElem.attribute("render-signs") == "true");
     QString renderSignsPosition = docElem.attribute("render-signs-position");
     if (!renderSignsPosition.isEmpty()) {
@@ -74,5 +82,14 @@ CardSetInfo::CardSetInfo(QDir dir):
         m_renderSignsPosition.setX(splits[0].toInt());
         m_renderSignsPosition.setY(splits[1].toInt());
     }
-    CardSetManager::instance().addKnownSlot(m_slot);
+    CardSetManager::instance().addKnownSlot(m_slotId);
 }
+
+QString CardSetInfo::slotId() const {
+    return m_slotId;
+}
+
+QString CardSetInfo::cardSetFilePath() const {
+    return m_cardSetFilePath;
+}
+

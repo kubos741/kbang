@@ -33,6 +33,10 @@ public:
 
     virtual QWidget* widget() = 0;
 
+public slots:
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    
 protected:
     OptionsDialog*  mp_optionsDialog;
 

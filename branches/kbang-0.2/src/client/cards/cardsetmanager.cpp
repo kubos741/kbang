@@ -82,6 +82,21 @@ void CardSetManager::addKnownSlot(QString knownSlot)
     saveKnownSlots();
 }
 
+/**
+ * The method knows about basic slot ids and returns their translatable
+ * displayable names.
+ */
+QString CardSetManager::slotDisplayName(const QString& name)
+{
+    if (name == "bang-original") {
+        return tr("Original Bang!");
+    } else if (name == "dodge-city") {
+        return tr("Dodge City");
+    } else {
+        return tr(name.toLatin1());
+    }
+}
+
 void CardSetManager::refreshKnownSlots()
 {
     m_knownSlots.clear();

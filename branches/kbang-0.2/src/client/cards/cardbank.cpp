@@ -71,18 +71,18 @@ CardBank::loadCardSet(const CardSetInfo& cardSetInfo)
             } else if (e.tagName() == "rank") {
                 CardRank cardRank = stringToCardRank(e.attribute("value"));
                 QString gfx = cardSetInfo.dir().absoluteFilePath(e.attribute("gfx"));
-                if (!m_signStorage[cardSetInfo.name()].ranks[cardRank].load(gfx)) {
+                if (!m_signStorage[cardSetInfo.id()].ranks[cardRank].load(gfx)) {
                     qWarning(qPrintable(QString("Cannot load image: %1").arg(gfx)));
                 }
             } else if (e.tagName() == "suit") {
                 CardSuit cardSuit = stringToCardSuit(e.attribute("value"));
                 QString gfx = cardSetInfo.dir().absoluteFilePath(e.attribute("gfx"));
-                if (!m_signStorage[cardSetInfo.name()].suits[cardSuit].load(gfx)) {
+                if (!m_signStorage[cardSetInfo.id()].suits[cardSuit].load(gfx)) {
                     qWarning(qPrintable(QString("Cannot load image: %1").arg(gfx)));
                 }
             }
         }
-        m_signStorage[cardSetInfo.name()].renderSignsPosition =
+        m_signStorage[cardSetInfo.id()].renderSignsPosition =
                 cardSetInfo.renderSignsPosition();
         n = n.nextSibling();
     }
@@ -142,13 +142,13 @@ CardBank::addCard(const CardSetInfo& cardSetInfo, const QDomElement& e)
     if (m_cardStorage.contains(name)) {
         card = m_cardStorage[name];
     } else {
-        card = new Card(this, name, type, cardSetInfo.name());
+        card = new Card(this, name, type, cardSetInfo.id());
         m_cardStorage[name] = card;
     }
-    if (card->cardSetName() != cardSetInfo.name()) {
+    if (card->cardSetName() != cardSetInfo.id()) {
         qCritical("CardSet collision found. Trying to add %s from %s, but this"
                   "card is already added from %s", qPrintable(name),
-                  qPrintable(cardSetInfo.name()), qPrintable(card->cardSetName()));
+                  qPrintable(cardSetInfo.id()), qPrintable(card->cardSetName()));
         return;
     }
     card->addGraphics(cardSetInfo.dir().absoluteFilePath(gfx), suitString, rankString, renderSigns);

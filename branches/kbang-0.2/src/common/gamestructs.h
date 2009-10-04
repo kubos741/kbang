@@ -43,6 +43,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QSharedPointer>
+#include <QMap>
 
 /**
  * The GameStruct struct is pure abstract base for all common game structs.

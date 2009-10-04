@@ -27,7 +27,8 @@
 #include "cardsetinfo.h"
 #include "gamestructs.h"
 
-namespace client {
+namespace client
+{
 
 /**
  * The CardSetManager singleton class manages local CardSets.
@@ -35,13 +36,12 @@ namespace client {
  */
 class CardSetManager: public QObject
 {
-Q_OBJECT;
+    Q_OBJECT;
 public:
     /**
      * Returns a reference to the singleton CardSetManager instance.
      */
     static CardSetManager& instance();
-
 
     /**
      * Appends the <i>slot</i> to the list of known slots.
@@ -51,7 +51,11 @@ public:
     /**
      * Returns the list of known slots.
      */
-    QStringList knownSlots() { return m_knownSlots; }
+    QStringList knownSlots() {
+        return m_knownSlots;
+    }
+  
+    static QString slotDisplayName(const QString&);
 
     /**
      * Returns the information about installed card sets.

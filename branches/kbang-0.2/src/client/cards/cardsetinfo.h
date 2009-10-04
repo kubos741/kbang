@@ -53,24 +53,31 @@ public:
      * Returns the full path to CardSet xml file, or empty string
      * in case of remote CardSet.
      */
-    QString cardSetFilePath() const { return m_cardSetFilePath; }
+    QString cardSetFilePath() const ;
 
+    
+    
     /**
      * Returns the name of the CardSet.
      */
+    QString id() const              { return m_id; }
+
     QString name() const            { return m_name; }
 
     QDir dir() const                { return m_dir; }
 
+    quint16 revision() const        { return m_revision; }
     /**
      * Returns the name of the slot that CardSet provides.
      */
-    QString slot() const            { return m_slot; }
+    QString slotId() const;
 
     /**
      * Returns the locale of the CardSet.
      */
-    QLocale locale() const          { return m_locale; }
+    QList<QLocale> locales() const          { return m_locales; }
+
+    
 
     /**
      * Returns whether CardSet should globally render signs.
@@ -83,11 +90,13 @@ private:
     bool    m_isLocal;
     QDir    m_dir;
     QString m_cardSetFilePath;
+    QString m_id;
     QString m_name;
-    QString m_slot;
-    QLocale m_locale;
+    QString m_slotId;
+    QList<QLocale> m_locales;
     bool    m_renderSigns;
     QPoint  m_renderSignsPosition;
+    quint16 m_revision;
 };
 
 }
