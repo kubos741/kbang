@@ -6,7 +6,7 @@
 #include "cardsetmanager.h"
 
 #include <QStandardItemModel>
-#include <QtDebug>
+#include "debug/debugblock.h"
 
 namespace client {
 
@@ -57,7 +57,6 @@ public:
 ///////////////////////////////////
 
 class OptionsCardsetsPrivate: public QObject {
-    Q_OBJECT;
 public:
     QStandardItemModel*     mp_localCardsetsModel;
     QStandardItemModel*     mp_remoteCardsetsModel;
@@ -69,16 +68,15 @@ public:
     
     OptionsCardsetsPrivate(OptionsDialog* dialog):
             mp_optionsDialog(dialog),
-            m_queryHandler(this) {}
+            mp_localCardsetsModel(0),
+            mp_remoteCardsetsModel(0),
+            mp_widget(0),
+            m_queryHandler(this),
+            mp_optionsDialog(0) {}
     
     void constructModels();
     void updateLocalModel();
     void updateRemoteModel(const CardSetInfoListData&);
-    
-public slots:
-    void doActivateLocalItem(const QModelIndex&);
-    void doActivateRemoteItem(const QModelIndex&);
-    void refreshRemoteModel();
 };
 
 void OptionsCardsetsPrivate::constructModels()
@@ -172,26 +170,26 @@ void OptionsCardsetsPrivate::updateRemoteModel(const CardSetInfoListData& list)
     }
 }
 
-void OptionsCardsetsPrivate::doActivateLocalItem(const QModelIndex& index)
+void OptionsCardsets::doActivateLocalItem(const QModelIndex& index)
 {
-    QStandardItem* item = mp_localCardsetsModel->itemFromIndex(index);
+    QStandardItem* item = d_ptr->mp_localCardsetsModel->itemFromIndex(index);
     if (item == 0) { return; }
     if (item->data(Qt::UserRole) == 0) { return; }
     ///@todo implement this
 }
 
-void OptionsCardsetsPrivate::doActivateRemoteItem(const QModelIndex& index)
+void OptionsCardsets::doActivateRemoteItem(const QModelIndex& index)
 {
-    QStandardItem* item = mp_localCardsetsModel->itemFromIndex(index);
+    QStandardItem* item = d_ptr->mp_localCardsetsModel->itemFromIndex(index);
     if (item == 0) { return; }
     if (item->data(Qt::UserRole) == 0) { return; }
     ///@todo implement this
 }
 
-void OptionsCardsetsPrivate::refreshRemoteModel()
+void OptionsCardsets::refreshRemoteModel()
 {
     QueryCardsetInfoGetPtr query(new QueryCardsetInfoGet());
-    ServerConnection::instance()->sendQueryGet(query, &m_queryHandler);
+    ServerConnection::instance()->sendQueryGet(query, &d_ptr->m_queryHandler);
 }
 
 void QueryCardsetHandler::resultReceived(const GameStructPtr& g)

@@ -261,6 +261,11 @@ void Parser::sendServerEvent(ServerEventDataPtr serverEventDataPtr)
     ServerEventParser::write(mp_streamWriter, serverEventDataPtr);
 }
 
+void Parser::sendAction(ActionDataPtr action)
+{
+	NOT_IMPLEMENTED();
+}
+
 void Parser::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_waitForStreamTimer) {

@@ -1,6 +1,7 @@
-#include "optionsdialog.h"
+s#include "optionsdialog.h"
 #include "ui_optionsdialog.h"
 
+#include "debug/debugblock.h"
 #include "opt_cardsets.h"
 #include <QListWidgetItem>
 
@@ -16,6 +17,7 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     connect(mp_ui->tabList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(doChangeTab(QListWidgetItem*)));
     registerTab(new OptionsCardsets(this));
+    //openTab("cardsets");
 }
 
 OptionsDialog::~OptionsDialog()
@@ -34,13 +36,17 @@ void OptionsDialog::openTab(const QString& id)
     }
     OptionsTab* optionsTab = it.value();
     QWidget* tab = optionsTab->widget();
+    
     if (!m_loadedTabWidgets.contains(tab)) {
         m_loadedTabWidgets.insert(tab);
         mp_ui->tabs->addWidget(tab);
     }
+    
     mp_ui->tabs->setCurrentWidget(tab);
     mp_ui->tabNameLabel->setText(optionsTab->name());
     mp_ui->tabDescLabel->setText(optionsTab->desc());
+    
+    
     ///@todo icon
 }
 

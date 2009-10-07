@@ -21,8 +21,6 @@
 #include "cardwidget.h"
 #include "cardlistwidget.h"
 #include "characterwidget.h"
-#include "cardwidgetfactory.h"
-
 #include "gameactionmanager.h"
 
 #include <QtDebug>

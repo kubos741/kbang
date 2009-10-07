@@ -34,6 +34,7 @@
 #include "creategamedialog.h"
 #include "joingamedialog.h"
 #include "aboutdialog.h"
+#include "options/optionsdialog.h"
 
 using namespace client;
 
@@ -44,6 +45,7 @@ MainWindow::MainWindow():
         mp_createGameDialog(0),
         mp_joinGameDialog(0),
         mp_aboutDialog(0),
+        mp_optionsDialog(0),
         mp_ui(new Ui::MainWindow)
 {
     Q_ASSERT(smp_singleton == 0);
@@ -152,6 +154,14 @@ MainWindow::showAboutDialog()
     mp_aboutDialog->show();
 }
 
+void MainWindow::showOptionsDialog()
+{
+    if (!mp_optionsDialog) {
+        mp_optionsDialog = new OptionsDialog(this);
+    }
+    mp_optionsDialog->show();
+}
+
 void
 MainWindow::showWarningMessage(const QString& message)
 {
@@ -209,6 +219,8 @@ MainWindow::createActions()
             &CardWidgetSizeManager::instance(), SLOT(cardSizeUp()));
     connect(mp_ui->actionCardSizeDown, SIGNAL(triggered()),
             &CardWidgetSizeManager::instance(), SLOT(cardSizeDown()));
+    connect(mp_ui->actionOptions, SIGNAL(triggered()),
+            this, SLOT(showOptionsDialog()));
 }
 
 void

@@ -99,8 +99,10 @@ PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
     table()->setOwnerId(m_id);
 
     if (!publicPlayerData.avatar.isNull()) {
-        m_avatar = QPixmap::fromImage(publicPlayerData.avatar).
-                   scaled(avatarLabel()->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        m_avatar.loadFromData(publicPlayerData.avatar);
+        m_avatar = m_avatar.scaled(avatarLabel()->size(),
+                                   Qt::KeepAspectRatio,
+                                   Qt::SmoothTransformation);
     } else {
         m_avatar = QPixmap();
     }

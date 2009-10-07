@@ -27,7 +27,6 @@
 #include <QRect>
 
 #include "cardpilewidget.h"
-#include "cardwidgetfactory.h"
 #include "game.h"
 
 using namespace client;

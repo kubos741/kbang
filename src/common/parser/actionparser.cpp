@@ -1,6 +1,14 @@
 #include "actionparser.h"
 #include "util.h"
 
+
+/* static */
+QString ActionParser::elementName(ActionData::Type)
+{
+	NOT_IMPLEMENTED();
+}
+
+
 /* static */
 void ActionParser::write(QXmlStreamWriter* w, const ActionDataPtr& d)
 {

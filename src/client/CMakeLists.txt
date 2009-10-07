@@ -123,5 +123,5 @@ QT4_WRAP_UI(client_UI_HEADERS ${client_UI})
 ADD_EXECUTABLE(kbang-client ${client_SRCS} ${client_MOC_SRCS}
     ${client_HEADERS} ${client_UI_HEADERS})
 
-TARGET_LINK_LIBRARIES(kbang-client kbang-common)
+TARGET_LINK_LIBRARIES(kbang-client kbang-common ${QT_LIBRARIES})
 

@@ -3,6 +3,8 @@
 
 #include "optionstab.h"
 
+class QModelIndex;
+
 namespace client {
 
 class OptionsCardsetsPrivate;
@@ -18,6 +20,12 @@ public:
 public slots:
     void applyOptions();
     void restoreOptions();
+
+private slots:
+    void doActivateLocalItem(const QModelIndex&);
+    void doActivateRemoteItem(const QModelIndex&);
+    void refreshRemoteModel();
+        
     
 private:
     friend class OptionsCardsetsPrivate;
