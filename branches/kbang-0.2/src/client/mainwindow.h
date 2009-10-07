@@ -36,6 +36,7 @@ class ConnectToServerDialog;
 class CreateGameDialog;
 class JoinGameDialog;
 class AboutDialog;
+class OptionsDialog;
 
 // Widgets:
 class PlayerWidget;
@@ -110,6 +111,8 @@ public slots:
      * Shows the AboutDialog.
      */
     void showAboutDialog();
+    
+    void showOptionsDialog();
 
     /**
      * Shows a dialog with warning message. This method doesn't block the thread,
@@ -135,6 +138,7 @@ private:
     CreateGameDialog*      mp_createGameDialog;
     JoinGameDialog*        mp_joinGameDialog;
     AboutDialog*           mp_aboutDialog;
+    OptionsDialog*         mp_optionsDialog;
 
     QList<PlayerWidget*>   m_opponentWidgets;
 

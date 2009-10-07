@@ -3,7 +3,8 @@
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(common_SRCS
-        gameevents.cpp
+        config.cpp
+		gameevents.cpp
         gametypes.cpp
         serverevents.cpp
         queries.cpp
