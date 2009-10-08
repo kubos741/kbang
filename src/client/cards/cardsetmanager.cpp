@@ -48,12 +48,14 @@ CardSetManager& CardSetManager::instance()
         initialized = 1;
         singleton.refreshKnownSlots();
         singleton.refreshLocalCardSets();
+        singleton.loadSelectedCardSets();
     }
     return singleton;
 }
 
 void CardSetManager::refreshLocalCardSets()
 {
+    DEBUG_BLOCK;
     m_localCardSets.clear();
     foreach (QString dataLocation, Config::dataLocations()) {
         QDir cardsetDir(dataLocation);
@@ -61,6 +63,7 @@ void CardSetManager::refreshLocalCardSets()
             continue;
         }
         cardsetDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+        
         foreach (QString cardSet, cardsetDir.entryList()) {
             m_localCardSets.append(CardSetInfo(cardsetDir.filePath(cardSet)));
         }
@@ -119,6 +122,29 @@ void CardSetManager::refreshKnownSlots()
     }
 }
 
+void CardSetManager::loadSelectedCardSets()
+{
+    const char* grp = "cardset";
+    Config& c = Config::instance();
+    m_selectedCardSets.clear();
+    foreach (const QString& slotId, c.readGroup(grp)) {
+        const QString& cardsetId = c.readString(grp, slotId);
+        m_selectedCardSets[slotId] = cardsetId;
+    }
+}
+
+void CardSetManager::saveSelectedCardSets()
+{
+    DEBUG_BLOCK;
+    const char* grp = "cardset";
+    Config& c = Config::instance();
+    foreach (const QString& slotId, m_selectedCardSets.keys()) {
+        c.writeString(grp, slotId, m_selectedCardSets[slotId]);
+    }
+    c.store();
+}
+
+
 void CardSetManager::updateRemoteCardSets(const CardSetInfoListData& x)
 {
     m_remoteCardSets = x;
@@ -128,6 +154,12 @@ void CardSetManager::updateRemoteCardSets(const CardSetInfoListData& x)
         }
     }
     emit updated();
+}
+
+void CardSetManager::updateSelectedCardsets(QMap<QString, QString> selectedCardsets)
+{
+    m_selectedCardSets = selectedCardsets;
+    saveSelectedCardSets();
 }
 
 void CardSetManager::saveKnownSlots()

@@ -21,8 +21,8 @@
 #include "gameevent.h"
 #include "gameeventcmd.h"
 #include "game.h"
-#include "cardmovementevent.h"
-#include "gamecontextchangeevent.h"
+#include "cardmovementcmd.h"
+#include "gamecontextcmd.h"
 #include "setplayerscmd.h"
 
 #include "mainwindow.h"
@@ -44,10 +44,10 @@ GameEvent::GameEvent(Game* game, int eventId, GameEventDataPtr event):
         GameEventCmd* gameEventCmd = 0;
         switch (cmd->type()) {
         case GameEventCmdData::CardMovementType:
-            gameEventCmd = new CardMovementEvent(this, cmd.staticCast<CardMovementCmdData>());
+            gameEventCmd = new CardMovementCmd(this, cmd.staticCast<CardMovementCmdData>());
             break;
         case GameEventCmdData::GameContextType:
-            gameEventCmd = new GameContextChangeEvent(this, cmd.staticCast<GameContextCmdData>());
+            gameEventCmd = new GameContextCmd(this, cmd.staticCast<GameContextCmdData>());
             break;
         case GameEventCmdData::SetPlayersType:
             gameEventCmd = new SetPlayersCmd(this, cmd.staticCast<SetPlayersCmdData>());

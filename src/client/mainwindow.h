@@ -133,15 +133,8 @@ private:
     void createActions();
     void createWidgets();
     void updateActions();
-
-    ConnectToServerDialog* mp_connectToServerDialog;
-    CreateGameDialog*      mp_createGameDialog;
-    JoinGameDialog*        mp_joinGameDialog;
-    AboutDialog*           mp_aboutDialog;
-    OptionsDialog*         mp_optionsDialog;
-
+    
     QList<PlayerWidget*>   m_opponentWidgets;
-
     Ui::MainWindow*        mp_ui;
     static MainWindow*     smp_singleton;
 };

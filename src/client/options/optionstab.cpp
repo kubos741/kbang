@@ -26,3 +26,8 @@ void OptionsTab::applyOptions()
 void OptionsTab::restoreOptions()
 {
 }
+
+void OptionsTab::setDirty()
+{
+    mp_optionsDialog->setDirty(this);
+}

@@ -18,30 +18,30 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef GAMEFOCUSCHANGEEVENT_H
-#define GAMEFOCUSCHANGEEVENT_H
+#ifndef GAMECONTEXTCMD_H
+#define GAMECONTEXTCMD_H
 
 #include "gameeventcmd.h"      // inheritance
 
 namespace client
 {
 /**
- * The GameContextChangeEvent class represents the game-context game event.
+ * The GameContextCmd class represents the game-context game event.
  */
-class GameContextChangeEvent: public GameEventCmd
+class GameContextCmd: public GameEventCmd
 {
 Q_OBJECT;
 public:
     /**
-     * Constructs a GameContextChangeEvent related to <i>game</i>, according to
+     * Constructs a GameContextCmd related to <i>game</i>, according to
      * given GameContextData.
      */
-    GameContextChangeEvent(GameEvent*, GameContextCmdDataPtr);
+    GameContextCmd(GameEvent*, GameContextCmdDataPtr);
 
     /**
-     * Destroys the GameContextChangeEvent.
+     * Destroys the GameContextCmd.
      */
-    virtual ~GameContextChangeEvent();
+    virtual ~GameContextCmd();
 
     virtual void doEventCmd(GameEvent::ExecutionMode);
 
@@ -52,4 +52,4 @@ private:
     GameContextData m_oldContext;
 };
 }
-#endif // GAMEFOCUSCHANGEEVENT_H
+#endif // GAMECONTEXTCMD_H

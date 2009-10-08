@@ -1,9 +1,10 @@
-s#include "optionsdialog.h"
+#include "optionsdialog.h"
 #include "ui_optionsdialog.h"
 
 #include "debug/debugblock.h"
 #include "opt_cardsets.h"
 #include <QListWidgetItem>
+#include <QPushButton>
 
 using namespace client;
 
@@ -14,9 +15,17 @@ OptionsDialog::OptionsDialog(QWidget* parent):
 {
     mp_ui->setupUi(this);
     mp_ui->tabList->clear();
+    setAttribute(Qt::WA_DeleteOnClose);
     connect(mp_ui->tabList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(doChangeTab(QListWidgetItem*)));
+    connect(mp_ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked(bool)),
+            this, SLOT(doOk()));
+    connect(mp_ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked(bool)),
+            this, SLOT(doApply()));
+    connect(mp_ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked(bool)),
+            this, SLOT(reject()));
     registerTab(new OptionsCardsets(this));
+    mp_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(0);
     //openTab("cardsets");
 }
 
@@ -40,6 +49,7 @@ void OptionsDialog::openTab(const QString& id)
     if (!m_loadedTabWidgets.contains(tab)) {
         m_loadedTabWidgets.insert(tab);
         mp_ui->tabs->addWidget(tab);
+        optionsTab->restoreOptions();
     }
     
     mp_ui->tabs->setCurrentWidget(tab);
@@ -50,13 +60,25 @@ void OptionsDialog::openTab(const QString& id)
     ///@todo icon
 }
 
+void OptionsDialog::setDirty(OptionsTab* tab)
+{
+    mp_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(1);
+    connect(this, SIGNAL(applyOptions()),
+            tab, SLOT(applyOptions()));
+}
 
 void OptionsDialog::doOk()
 {
+    doApply();
+    accept();
 }
 
 void OptionsDialog::doApply()
 {
+    DEBUG_BLOCK;
+    emit applyOptions();
+    disconnect(this, SIGNAL(applyOptions()));
+    mp_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(0);
 }
 
 void OptionsDialog::doChangeTab(QListWidgetItem* item)

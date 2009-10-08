@@ -18,26 +18,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gamecontextchangeevent.h"
+#include "gamecontextcmd.h"
 #include "game.h"
 #include <QTimer>                   // for QTimer::singleShot()
 
 using namespace client;
 
-GameContextChangeEvent::GameContextChangeEvent(GameEvent* gameEvent,
-                                               GameContextCmdDataPtr cmd):
+GameContextCmd::GameContextCmd(GameEvent* gameEvent,
+                                       GameContextCmdDataPtr cmd):
         GameEventCmd(gameEvent),
         m_newContext(cmd->gameContext)
 {
 }
 
 /* virtual */
-GameContextChangeEvent::~GameContextChangeEvent()
+GameContextCmd::~GameContextCmd()
 {
 }
 
 /* virtual */
-void GameContextChangeEvent::doEventCmd(GameEvent::ExecutionMode mode)
+void GameContextCmd::doEventCmd(GameEvent::ExecutionMode mode)
 {
     GameEventCmd::doEventCmd(mode);
     if (m_isFirstRun) {
@@ -50,7 +50,7 @@ void GameContextChangeEvent::doEventCmd(GameEvent::ExecutionMode mode)
 }
 
 /* virtual */
-void GameContextChangeEvent::undoEventCmd(GameEvent::ExecutionMode mode)
+void GameContextCmd::undoEventCmd(GameEvent::ExecutionMode mode)
 {
     GameEventCmd::undoEventCmd(mode);
     mp_gameEvent->game()->setGameContext(m_oldContext);

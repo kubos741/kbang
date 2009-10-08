@@ -40,6 +40,8 @@ public:
     void writeIntList(QString group, QString varName, QList<int> varValue);
 
     bool hasGroup(QString group);
+    
+    QStringList readGroup(QString group);
 
     void refresh();
     void store();

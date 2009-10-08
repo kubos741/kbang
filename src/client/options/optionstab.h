@@ -36,8 +36,10 @@ public:
 public slots:
     virtual void applyOptions();
     virtual void restoreOptions();
-    
+
 protected:
+    void setDirty();
+    
     OptionsDialog*  mp_optionsDialog;
 
 private:
