@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARDMOVEMENTEVENT_H
-#define CARDMOVEMENTEVENT_H
+#ifndef CARDMOVEMENTCMD_H
+#define CARDMOVEMENTCMD_H
 
 #include <QPoint>
 #include <QTime>
@@ -32,26 +32,26 @@ class CardPocket;
 class CardWidget;
 
 /**
- * The CardMovementEvent class provides the animated translation of cards in
+ * The CardMovementCmd class provides the animated translation of cards in
  * the game. As soon as a card-movement event is received and dequeued from
  * GameEvent queue, the translation specified by CardMovementData is executed.
  *
  * @author MacJariel
  */
-class CardMovementEvent: public GameEventCmd
+class CardMovementCmd: public GameEventCmd
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     /**
-     * Constructs a CardMovementEvent instance related to <i>game</i> according
+     * Constructs a CardMovementCmd instance related to <i>game</i> according
      * to given CardMovementData.
      */
-    CardMovementEvent(GameEvent* game, CardMovementCmdDataPtr);
+    CardMovementCmd(GameEvent* game, CardMovementCmdDataPtr);
 
     /**
      * Destroys the CardMovement instance.
      */
-    virtual ~CardMovementEvent();
+    virtual ~CardMovementCmd();
 
 public slots:
     /**
@@ -104,4 +104,4 @@ private:
     QTime                   m_time;
 };
 }
-#endif
+#endif // CARDMOVEMENTCMD_H

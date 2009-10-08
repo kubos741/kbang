@@ -661,7 +661,7 @@
      <x>0</x>
      <y>0</y>
      <width>666</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -687,7 +687,7 @@
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
-     <string>Settings</string>
+     <string>&amp;Settings</string>
     </property>
     <addaction name="actionCardSizeUp"/>
     <addaction name="actionCardSizeDown"/>
@@ -742,7 +742,7 @@
   </action>
   <action name="actionCardSizeUp">
    <property name="text">
-    <string>Enlarge Cards</string>
+    <string>&amp;Enlarge Cards</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
@@ -750,7 +750,7 @@
   </action>
   <action name="actionCardSizeDown">
    <property name="text">
-    <string>Shrink Cards</string>
+    <string>&amp;Shrink Cards</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
@@ -758,7 +758,7 @@
   </action>
   <action name="actionOptions">
    <property name="text">
-    <string>Preferences...</string>
+    <string>&amp;Preferences...</string>
    </property>
   </action>
  </widget>

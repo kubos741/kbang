@@ -22,6 +22,7 @@ public:
     ~OptionsDialog();
 
     void openTab(const QString& id);
+    void setDirty(OptionsTab* tab);
 
 signals:
     void applyOptions();

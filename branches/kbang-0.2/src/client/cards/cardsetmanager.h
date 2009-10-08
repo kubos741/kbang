@@ -64,14 +64,20 @@ public:
         return m_localCardSets;
     }
 
+    inline QMap<QString, QString> selectedCardsets() const {
+        return m_selectedCardSets;
+    }
+    
     /**
      * Returns the list of card sets that can be downloaded from server.
      */
     inline QList<CardSetInfoData> remoteCardSets() const {
         return m_remoteCardSets;
     }
-
+    
     void updateRemoteCardSets(const CardSetInfoListData&);
+    
+    void updateSelectedCardsets(QMap<QString, QString> selectedCardsets);
 
 private:
     CardSetManager();
@@ -83,6 +89,8 @@ private slots:
     void refreshLocalCardSets();
     void refreshRemoteCardSets();
     void refreshKnownSlots();
+    void loadSelectedCardSets();
+    void saveSelectedCardSets();
 
 signals:
     void updated();
@@ -94,7 +102,8 @@ private:
     QList<CardSetInfo>      m_localCardSets;
     CardSetInfoListData     m_remoteCardSets;
     QStringList             m_knownSlots;
-    CardSetInfoListData     m_cardSetInfoListData;
+    QMap<QString, QString>  m_selectedCardSets;
+    //CardSetInfoListData     m_cardSetInfoListData;
     QueryResultHandler*     mp_handler;
 };
 

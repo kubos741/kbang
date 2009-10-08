@@ -33,11 +33,11 @@ SET(client_SRCS
         events/gameeventhandler.cpp
         events/setplayerscmd.cpp
         events/gameeventplayer.cpp
-        events/cardmovementevent.cpp
+        events/cardmovementcmd.cpp
         events/gameeventcmd.cpp
         events/gameeventqueue.cpp
         events/gameevent.cpp
-        events/gamecontextchangeevent.cpp
+        events/gamecontextcmd.cpp
         mainwindow.cpp
         options/optionstab.cpp
         options/optionsdialog.cpp
@@ -76,8 +76,8 @@ SET(client_HEADERS
         events/gameevent.h
         events/setplayerscmd.h
         events/gameeventhandler.h
-        events/gamecontextchangeevent.h
-        events/cardmovementevent.h
+        events/gamecontextcmd.h
+        events/cardmovementcmd.h
         events/gameeventcmd.h
         events/gameeventplayer.h
         events/gameeventqueue.h

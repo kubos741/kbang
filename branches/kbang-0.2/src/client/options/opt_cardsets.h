@@ -4,6 +4,7 @@
 #include "optionstab.h"
 
 class QModelIndex;
+class QStandardItem;
 
 namespace client {
 
@@ -22,7 +23,7 @@ public slots:
     void restoreOptions();
 
 private slots:
-    void doActivateLocalItem(const QModelIndex&);
+    void doLocalItemChanged(QStandardItem*);
     void doActivateRemoteItem(const QModelIndex&);
     void refreshRemoteModel();
         

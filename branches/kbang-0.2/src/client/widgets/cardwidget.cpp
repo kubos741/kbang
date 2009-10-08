@@ -41,14 +41,12 @@ CardWidget::CardWidget(QWidget* parent):
         m_cardSizeRole(CARD_SIZE_NORMAL),
         m_hasHighlight(0)
 {
-    DEBUG_BLOCK;
     connect(&CardWidgetSizeManager::instance(), SIGNAL(cardSizeChanged()),
             this, SLOT(updatePixmap()));
 }
 
 CardWidget::~ CardWidget()
 {
-    DEBUG_BLOCK;
 }
 
 QPoint

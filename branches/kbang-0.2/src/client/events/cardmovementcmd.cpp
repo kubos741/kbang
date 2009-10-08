@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "cardmovementevent.h"
+#include "cardmovementcmd.h"
 #include "cardwidget.h"
 #include "game.h"
 #include "deckwidget.h"
@@ -42,8 +42,8 @@ using namespace client;
 const int       tickTime        = 20;
 const double    pixelsPerSecond = 1000;
 
-CardMovementEvent::CardMovementEvent(GameEvent* gameEvent,
-                                     CardMovementCmdDataPtr doCmd):
+CardMovementCmd::CardMovementCmd(GameEvent* gameEvent,
+                                 CardMovementCmdDataPtr doCmd):
         GameEventCmd(gameEvent),
         mp_doCmd(doCmd),
         mp_card(0),
@@ -55,7 +55,7 @@ CardMovementEvent::CardMovementEvent(GameEvent* gameEvent,
 }
 
 /* virtual */
-CardMovementEvent::~CardMovementEvent()
+CardMovementCmd::~CardMovementCmd()
 {
     if (mp_card) {
         mp_card->deleteLater();
@@ -63,7 +63,7 @@ CardMovementEvent::~CardMovementEvent()
 }
 
 /* virtual slot */
-void CardMovementEvent::doEventCmd(GameEvent::ExecutionMode mode)
+void CardMovementCmd::doEventCmd(GameEvent::ExecutionMode mode)
 {
     DEBUG_BLOCK;
     Q_ASSERT(mp_card == 0);
@@ -99,7 +99,7 @@ void CardMovementEvent::doEventCmd(GameEvent::ExecutionMode mode)
 }
 
 /* virtual */
-void CardMovementEvent::undoEventCmd(GameEvent::ExecutionMode mode)
+void CardMovementCmd::undoEventCmd(GameEvent::ExecutionMode mode)
 {
     DEBUG_BLOCK;
     GameEventCmd::doEventCmd(mode);
@@ -133,7 +133,7 @@ void CardMovementEvent::undoEventCmd(GameEvent::ExecutionMode mode)
 }
 
 /* virtual */
-void CardMovementEvent::finish()
+void CardMovementCmd::finish()
 {
     mp_cardData = 0;
     mp_card = 0;
@@ -142,7 +142,7 @@ void CardMovementEvent::finish()
 }
 
 void
-CardMovementEvent::setCardAndPocket(const CardMovementCmdDataPtr& cmd)
+CardMovementCmd::setCardAndPocket(const CardMovementCmdDataPtr& cmd)
 {
     Game* game = mp_gameEvent->game();
     Q_ASSERT(game != 0);
@@ -234,7 +234,7 @@ CardMovementEvent::setCardAndPocket(const CardMovementCmdDataPtr& cmd)
 }
 
 void
-CardMovementEvent::startTransition()
+CardMovementCmd::startTransition()
 {
     if (!mp_destPocket->isVisible() || !mp_card->isVisible()) {
         QTimer::singleShot(10, this, SLOT(startTransition()));
@@ -261,7 +261,7 @@ CardMovementEvent::startTransition()
 }
 
 /* virtual */
-void CardMovementEvent::timerEvent(QTimerEvent* e)
+void CardMovementCmd::timerEvent(QTimerEvent* e)
 {
     if (e->timerId() == m_animationTimer) {
         qreal progress = (m_time.elapsed() * pixelsPerSecond / 1000) / m_length;
@@ -276,7 +276,7 @@ void CardMovementEvent::timerEvent(QTimerEvent* e)
     }
 }
 
-void CardMovementEvent::stopTransition()
+void CardMovementCmd::stopTransition()
 {
     DEBUG_BLOCK;
     killTimer(m_animationTimer);
@@ -294,7 +294,7 @@ void CardMovementEvent::stopTransition()
 }
 
 /* slot */
-void CardMovementEvent::unrevealCard()
+void CardMovementCmd::unrevealCard()
 {
     mp_card->unreveal();
     mp_card->updatePixmap();

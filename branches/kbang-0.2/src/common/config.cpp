@@ -106,6 +106,14 @@ bool Config::hasGroup(QString group)
     return m_groups.contains(group);
 }
 
+QStringList Config::readGroup(QString group)
+{
+    if (m_groups.contains(group)) {
+        return m_groups[group].records.keys();
+    }
+    return QStringList();
+}
+
 void Config::refresh()
 {
     QFile file(configFilePath());

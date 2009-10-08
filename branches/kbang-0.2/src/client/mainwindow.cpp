@@ -41,11 +41,6 @@ using namespace client;
 MainWindow* MainWindow::smp_singleton(0);
 
 MainWindow::MainWindow():
-        mp_connectToServerDialog(0),
-        mp_createGameDialog(0),
-        mp_joinGameDialog(0),
-        mp_aboutDialog(0),
-        mp_optionsDialog(0),
         mp_ui(new Ui::MainWindow)
 {
     Q_ASSERT(smp_singleton == 0);
@@ -115,51 +110,56 @@ void MainWindow::test()
 /* slot */ void
 MainWindow::showConnectToServerDialog()
 {
-    if (!mp_connectToServerDialog) {
-        mp_connectToServerDialog = new ConnectToServerDialog(this);
-        connect(mp_connectToServerDialog, SIGNAL(connectToServer(QString, int)),
+    ConnectToServerDialog* dlg = findChild<ConnectToServerDialog*>();
+    if (!dlg) {
+        dlg = new ConnectToServerDialog(this);
+        connect(dlg, SIGNAL(connectToServer(QString, int)),
                 ServerConnection::instance(), SLOT(connectToServer(QString, int)));
     }
-    mp_connectToServerDialog->show();
+    dlg->show();
 }
 
 /* slot */ void
 MainWindow::showCreateGameDialog()
 {
-    if (!mp_createGameDialog) {
-        mp_createGameDialog = new CreateGameDialog(this);
-        connect(mp_createGameDialog,SIGNAL(createGame(CreateGameData, CreatePlayerData)),
+    CreateGameDialog* dlg = findChild<CreateGameDialog*>();
+    if (!dlg) {
+        dlg = new CreateGameDialog(this);
+        connect(dlg,SIGNAL(createGame(CreateGameData, CreatePlayerData)),
                 ServerConnection::instance(), SLOT(createGame(CreateGameData, CreatePlayerData)));
     }
-    mp_createGameDialog->show();
+    dlg->show();
 }
 
 /* slot */ void
 MainWindow::showJoinGameDialog()
 {
-    if (!mp_joinGameDialog) {
-        mp_joinGameDialog = new JoinGameDialog(this);
-        connect(mp_joinGameDialog, SIGNAL(joinGame(int, int, QString, CreatePlayerData)),
+    JoinGameDialog* dlg = findChild<JoinGameDialog*>();
+    if (!dlg) {
+        dlg = new JoinGameDialog(this);
+        connect(dlg, SIGNAL(joinGame(int, int, QString, CreatePlayerData)),
                 ServerConnection::instance(), SLOT(joinGame(int, int, QString, CreatePlayerData)));
     }
-    mp_joinGameDialog->show();
+    dlg->show();
 }
 
 /* slot */ void
 MainWindow::showAboutDialog()
 {
-    if (!mp_aboutDialog) {
-        mp_aboutDialog = new AboutDialog(this);
+    AboutDialog* dlg = findChild<AboutDialog*>();
+    if (!dlg) {
+        dlg = new AboutDialog(this);
     }
-    mp_aboutDialog->show();
+    dlg->show();
 }
 
 void MainWindow::showOptionsDialog()
 {
-    if (!mp_optionsDialog) {
-        mp_optionsDialog = new OptionsDialog(this);
+    OptionsDialog* dlg = findChild<OptionsDialog*>();
+    if (!dlg) {
+        dlg = new OptionsDialog(this);
     }
-    mp_optionsDialog->show();
+    dlg->show();
 }
 
 void
