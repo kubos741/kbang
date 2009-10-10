@@ -22,22 +22,32 @@
 
 #include "gametypes.h"
 #include "gamestructs.h"
-#include <QSharedPointer>
+
+/*[[[cog
+import cog
+from actiondefs import *
+]]]
+[[[end]]]*/
+
 
 struct ActionData {
     enum Type {
         InvalidType = 0,
+        /*[[[cog
+        cog.outl(",\n".join([a["actionType"] for a in Actions]))
+        ]]]*/
+        ChatMessageType,
         CreateGameType,
+        DiscardType,
+        DrawCardType,
+        EndTurnType,
         JoinGameType,
         LeaveGameType,
-        StartGameType,
-        ChatMessageType,
-        DrawCardType,
-        PlayCardType,
-        UseAbilityType,
-        EndTurnType,
         PassType,
-        DiscardType
+        PlayCardType,
+        StartGameType,
+        UseAbilityType
+        //[[[end]]]
     };
     ActionData(Type type): m_type(type) {}
     inline Type t() const {
@@ -47,74 +57,117 @@ private:
     Type m_type;
 };
 
-struct ActionCreateGameData: public ActionData {
-    ActionCreateGameData(): ActionData(CreateGameType) {}
+/*[[[cog
+for action in Actions:
+    cog.outl(action.genDef())
+]]]*/
 
-    CreateGameData      createGameData;
-    CreatePlayerData    createPlayerData;
-};
-
-struct ActionJoinGameData: public ActionData {
-    ActionJoinGameData(): ActionData(JoinGameType), gameId(0), playerId(0) {}
-
-    GameId              gameId;
-    PlayerId            playerId;
-    QString             gamePassword;
-    CreatePlayerData    createPlayerData;
-    GameParticipantType participantType;    ///@todo update parser
-};
-
-
-struct ActionLeaveGameData: public ActionData {
-    ActionLeaveGameData(): ActionData(LeaveGameType) {}
-
-    ///@todo this action should contain information about privilege delegation
-};
-
-struct ActionStartGameData: public ActionData {
-    ActionStartGameData(): ActionData(StartGameType) {}
-};
-
+/**
+ * @author: MacJariel
+ */
 struct ActionChatMessageData: public ActionData {
     ActionChatMessageData(): ActionData(ChatMessageType) {}
-
-    QString     message;
+    QString message; ///
 };
 
+
+/**
+ * @author: MacJariel
+ */
+struct ActionCreateGameData: public ActionData {
+    ActionCreateGameData(): ActionData(CreateGameType) {}
+    CreateGameData createGameData; ///
+    CreatePlayerData createPlayerData; ///
+};
+
+
+/**
+ * @author: MacJariel
+ */
+struct ActionDiscardData: public ActionData {
+    ActionDiscardData(): ActionData(DiscardType), cardId(0) {}
+    CardId cardId; ///Discarded card.
+};
+
+
+/**
+ * @author: MacJariel
+ */
 struct ActionDrawCardData: public ActionData {
     ActionDrawCardData(): ActionData(DrawCardType) {}
 };
 
-struct ActionPlayCardData: public ActionData {
-    ActionPlayCardData(): ActionData(PlayCardType), playedCardId(0),
-                          targetCardId(0), discardCardId(0),
-                          targetPlayerId(0) {}
 
-    CardId      playedCardId;   /**< The id of card to be played. */
-    CardId      targetCardId;   /**< The id of target card. */
-    CardId      discardCardId;  /**< The id of card to be discarded. */
-    PlayerId    targetPlayerId; /**< The id of target player. */
-};
-
-struct ActionUseAbilityData: public ActionData {
-    ActionUseAbilityData(): ActionData(UseAbilityType), targetPlayerId(0) {}
-
-    PlayerId        targetPlayerId; /**< The id of target player. */
-    QList<CardId>   targetCardsId;  /**< The list of target cards. */
-};
-
+/**
+ * @author: MacJariel
+ */
 struct ActionEndTurnData: public ActionData {
     ActionEndTurnData(): ActionData(EndTurnType) {}
 };
 
+
+/**
+ * @author: MacJariel
+ */
+struct ActionJoinGameData: public ActionData {
+    ActionJoinGameData(): ActionData(JoinGameType), gameId(0),
+         playerId(0), gamePassword(0),
+         gameParticipantType(GAMEPARTICIPANT_INVALID) {}
+    GameId gameId; ///
+    PlayerId playerId; ///
+    QString gamePassword; ///
+    GameParticipantType gameParticipantType; ///
+    CreatePlayerData createPlayerData; ///
+};
+
+
+/**
+ * @author: MacJariel
+ */
+struct ActionLeaveGameData: public ActionData {
+    ActionLeaveGameData(): ActionData(LeaveGameType) {}
+};
+
+
+/**
+ * @author: MacJariel
+ */
 struct ActionPassData: public ActionData {
     ActionPassData(): ActionData(PassType) {}
 };
 
-struct ActionDiscardData: public ActionData {
-    ActionDiscardData(): ActionData(DiscardType), cardId(0) {}
 
-    CardId      cardId;
+/**
+ * @author: MacJariel
+ */
+struct ActionPlayCardData: public ActionData {
+    ActionPlayCardData(): ActionData(PlayCardType), playedCardId(0),
+         targetCardId(0), discardCardId(0), targetPlayerId(0) {}
+    CardId playedCardId; ///
+    CardId targetCardId; ///
+    CardId discardCardId; ///
+    PlayerId targetPlayerId; ///
 };
+
+
+/**
+ * @author: MacJariel
+ */
+struct ActionStartGameData: public ActionData {
+    ActionStartGameData(): ActionData(StartGameType) {}
+};
+
+
+/**
+ * @author: MacJariel
+ */
+struct ActionUseAbilityData: public ActionData {
+    ActionUseAbilityData(): ActionData(UseAbilityType),
+         targetPlayerId(0) {}
+    PlayerId targetPlayerId; ///
+    CardIdListData targetCardsId; ///
+};
+
+//[[[end]]]
 
 #endif // ACTIONS_H

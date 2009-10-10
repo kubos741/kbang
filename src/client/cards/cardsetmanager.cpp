@@ -27,7 +27,7 @@ class QueryHandler: public QueryResultHandler {
 public:
     QueryHandler(CardSetManager* s): mp_s(s) {}
     virtual void resultReceived(const GameStructPtr& data) {
-        if (data->t() == GameStruct::CardSetInfoListType) {
+        if (data->t() == GameStruct::CardSetInfoListDataType) {
             mp_s->updateRemoteCardSets(*data.staticCast<CardSetInfoListData>());
         }
     }
@@ -63,7 +63,7 @@ void CardSetManager::refreshLocalCardSets()
             continue;
         }
         cardsetDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
-        
+
         foreach (QString cardSet, cardsetDir.entryList()) {
             m_localCardSets.append(CardSetInfo(cardsetDir.filePath(cardSet)));
         }

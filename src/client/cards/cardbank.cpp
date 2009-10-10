@@ -45,11 +45,6 @@ CardBank::~CardBank()
 void
 CardBank::loadCardSet(const CardSetInfo& cardSetInfo)
 {
-    if (!cardSetInfo.isLocal()) {
-        qCritical("Cannot load remote card set.");
-        return;
-    }
-
     QFile cardsetFile(cardSetInfo.cardSetFilePath());
     QDomDocument doc("cardset");
 

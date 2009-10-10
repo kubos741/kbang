@@ -58,7 +58,7 @@ private slots:
     void updateButtons();
 
 signals:
-    void joinGame(ActionDataPtr);
+    void joinGame(const ActionDataPtr&);
 
 private:
     static QString gameStateDisplayString(GameState);

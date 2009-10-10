@@ -75,7 +75,7 @@ public:
     OptionsDialog*          mp_optionsDialog;
     OptionsCardsets*        mp_optCardsets;
     bool                    m_isDirty;
-    
+
     OptionsCardsetsPrivate(OptionsCardsets* optCardsets, OptionsDialog* dialog):
             mp_localCardsetsModel(0),
             mp_remoteCardsetsModel(0),
@@ -84,7 +84,7 @@ public:
             mp_optionsDialog(dialog),
             mp_optCardsets(optCardsets),
             m_isDirty(0) {}
-    
+
     void constructModels();
     void updateLocalModel();
     void updateRemoteModel(const CardSetInfoListData&);
@@ -122,8 +122,8 @@ void OptionsCardsetsPrivate::updateLocalModel()
         item->setData(slotId, Qt::UserRole);
         mp_localCardsetsModel->invisibleRootItem()->appendRow(item);
     }
-       
-    
+
+
     foreach (const CardSetInfo& cardset, list) {
         QStandardItem* slotItem = 0;
         for (int i = 0; i < rootItem->rowCount(); ++i) {
@@ -133,7 +133,7 @@ void OptionsCardsetsPrivate::updateLocalModel()
             }
             slotItem = 0;
         }
-        
+
         if (slotItem == 0) {
             slotItem = new QStandardItem();
             slotItem->setText(CardSetManager::slotDisplayName(cardset.slotId()));
@@ -141,20 +141,20 @@ void OptionsCardsetsPrivate::updateLocalModel()
             rootItem->appendRow(slotItem);
         }
         QList<QStandardItem*> cardsetRow;
-        
+
         QStandardItem* cardsetItem = new QStandardItem();
         cardsetItem->setData(cardset.id(), Qt::UserRole);
         cardsetItem->setText(cardset.name());
         cardsetRow.append(cardsetItem);
-        
+
         cardsetItem = new QStandardItem(localeListToString(cardset.locales()));
         cardsetItem->setData(Qt::AlignHCenter, Qt::TextAlignmentRole);
         cardsetRow.append(cardsetItem);
-        
+
         cardsetItem = new QStandardItem(QString::number(cardset.revision()));
         cardsetItem->setData(Qt::AlignHCenter, Qt::TextAlignmentRole);
         cardsetRow.append(cardsetItem);
-        
+
         cardsetItem = new QStandardItem();
         cardsetItem->setData(Qt::AlignHCenter, Qt::TextAlignmentRole);
         cardsetItem->setData(cardset.id(), Qt::UserRole);
@@ -163,7 +163,7 @@ void OptionsCardsetsPrivate::updateLocalModel()
             cardsetItem->setCheckState(Qt::Checked);
         }
         cardsetRow.append(cardsetItem);
-        
+
         slotItem->appendRow(cardsetRow);
     }
     mp_widget->localCardsetsWidget->expandAll();
@@ -174,7 +174,7 @@ void OptionsCardsetsPrivate::updateRemoteModel(const CardSetInfoListData& list)
     if (mp_remoteCardsetsModel == 0) { return; }
     mp_remoteCardsetsModel->clear();
     QStandardItem* rootItem = mp_remoteCardsetsModel->invisibleRootItem();
-    
+
     foreach (const CardSetInfoData& data, list) {
         QStandardItem* slotItem = 0;
         for (int i = 0; i < rootItem->rowCount(); ++i) {
@@ -249,7 +249,7 @@ void OptionsCardsets::refreshRemoteModel()
 
 void QueryCardsetHandler::resultReceived(const GameStructPtr& g)
 {
-    if (g->t() == GameStruct::CardSetInfoListType) {
+    if (g->t() == GameStruct::CardSetInfoListDataType) {
         mp_pr->updateRemoteModel(*g.staticCast<CardSetInfoListData>());
     }
 }
@@ -279,7 +279,7 @@ QWidget* OptionsCardsets::widget()
         d_ptr->mp_widget->remoteCardsetsWidget->setModel(
             d_ptr->mp_remoteCardsetsModel);
         d_ptr->mp_widget->setupViews();
-        
+
         connect(d_ptr->mp_widget->remoteCardsetsWidget, SIGNAL(activated(QModelIndex)),
                 d_ptr, SLOT(doActivateRemoteItem(QModelIndex)));
     }

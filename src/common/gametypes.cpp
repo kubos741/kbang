@@ -43,14 +43,19 @@ QString cardSuitToString(const CardSuit& suit)
     return "";
 }
 
-CardRank stringToCardRank(QString s)
+CardRank stringToCardRank(const QString& s)
 {
-    s = s.toUpper();
-    if (s == "A") return 14;
-    if (s == "K") return 13;
-    if (s == "Q") return 12;
-    if (s == "J") return 11;
-    return s.toInt();
+    QString rank = s.toUpper();
+    if (rank == "A") return RANK_A;
+    if (rank == "K") return RANK_K;
+    if (rank == "Q") return RANK_Q;
+    if (rank == "J") return RANK_J;
+    int rankNum = rank.toInt();
+    if (rankNum >= 2 && rankNum <= 10) {
+        return (CardRank)(rankNum);
+    } else {
+        return RANK_INVALID;
+    }
 }
 
 QString cardRankToString(const CardRank& rank)

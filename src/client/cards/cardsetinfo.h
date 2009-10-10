@@ -28,63 +28,43 @@
 namespace client {
 
 /**
- * The CardSetInfo class provides an information about a CardSet. The referred
- * CardSet can be either local or remote. You can use local CardSetInfo to
- * load cards into CardBank and you can use remote CardSetInfo to display info
- * about availible CardSets and to download them.
+ * The CardSetInfo class provides an information about an installed CardSet.
  *
- * @todo The downloading of CardSets is currently not implemented.
  * @author MacJariel
  */
 class CardSetInfo
 {
 public:
-    /**
-     * Constructs a local CardSetInfo that refers to CardSet that is in <i>dir</i>.
-     */
-    CardSetInfo(QDir dir);
-
-    /**
-     * Returns, whether the referred CardSet is local or not.
-     */
-    bool    isLocal() const         { return m_isLocal; }
-
-    /**
-     * Returns the full path to CardSet xml file, or empty string
-     * in case of remote CardSet.
-     */
-    QString cardSetFilePath() const ;
-
-    
-    
-    /**
-     * Returns the name of the CardSet.
-     */
+    /// Constructs a local CardSetInfo that refers to CardSet that is in dir.
+    CardSetInfo(const QDir& dir);
+  
+    /// Returns the id of the CardSet.
     QString id() const              { return m_id; }
-
+    
+    /// Returns the name of the CardSet.
     QString name() const            { return m_name; }
 
+    /// Returns the slot it of the CardSet.
+    QString slotId() const          { return m_slotId; }
+    
+    /// Returns the list of locales of the CardSet.
+    QList<QLocale> locales() const  { return m_locales; }
+    
+    /// Returns the revision of the CardSet.
+    quint16 revision() const        { return m_revision; }
+    
+    /// Returns the directory of the CardSet
     QDir dir() const                { return m_dir; }
 
-    quint16 revision() const        { return m_revision; }
-    /**
-     * Returns the name of the slot that CardSet provides.
-     */
-    QString slotId() const;
+    /// Returns the full path to CardSet xml file, or empty string
+    /// in case of remote CardSet.
+    QString cardSetFilePath() const { return m_cardSetFilePath; }
 
-    /**
-     * Returns the locale of the CardSet.
-     */
-    QList<QLocale> locales() const          { return m_locales; }
+    /// Returns whether CardSet should globally render signs.
+    bool renderSigns() const        { return m_renderSigns; }
 
-    
-
-    /**
-     * Returns whether CardSet should globally render signs.
-     */
-    bool    renderSigns() const     { return m_renderSigns; }
-
-    QPoint  renderSignsPosition() const { return m_renderSignsPosition; }
+    /// Returns the origin position for sing rendering.
+    QPoint renderSignsPosition() const { return m_renderSignsPosition; }
 
 private:
     bool    m_isLocal;

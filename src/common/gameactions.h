@@ -1,4 +1,0 @@
-#ifndef GAMEACTIONS_H
-#define GAMEACTIONS_H
-
-#endif // GAMEACTIONS_H
