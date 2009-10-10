@@ -20,6 +20,8 @@
 #ifndef GAMETYPES_H
 #define GAMETYPES_H
 
+#include "xmacro/actions.h"
+
 /**
  * @file gametypes.h
  * The definition of enums and typedefs common for both server and client.
@@ -185,6 +187,7 @@ QString         reactionTypeToString(const ReactionType& r);
  * @see GameParticipantType stringToGameParticipantType(QString)
  */
 enum GameParticipantType {
+    GAMEPARTICIPANT_INVALID = 0,
     GAMEPARTICIPANT_PLAYER,      /**< A player. */
     GAMEPARTICIPANT_SPECTATOR    /**< A spectator. */
 };
@@ -234,14 +237,29 @@ QString cardSuitToString(const CardSuit& suit);
  * This represention allows simple comparing of card ranks.
  * A value out of the valid range indicates invalid card rank.
  */
-typedef quint8 CardRank;
+enum CardRank {
+    RANK_INVALID = 0,
+    RANK_2 = 2,
+    RANK_3 = 3,
+    RANK_4 = 4,
+    RANK_5 = 5,
+    RANK_6 = 6,
+    RANK_7 = 7,
+    RANK_8 = 8,
+    RANK_9 = 9,
+    RANK_10 = 10,
+    RANK_J = 11,
+    RANK_Q = 12,
+    RANK_K = 13,
+    RANK_A = 14
+};
 
 /**
  * Converts QString to CardRank. In case of invalid string, unspecified
  * value of CardRank is returned. String should be either decimal number (2-10)
  * or one of J, Q, K and A. The case of letters does not matter.
  */
-CardRank stringToCardRank(QString s);
+CardRank stringToCardRank(const QString& s);
 
 /**
  * Converts CardRank to QString. The result is upper-case.
@@ -339,30 +357,28 @@ typedef QSharedPointer<SetPlayersCmdData> SetPlayersCmdDataPtr;
 ///////////////////////////////////////////////////
 
 class ActionData;
-class ActionCreateGameData;
-class ActionJoinGameData;
-class ActionLeaveGameData;
-class ActionStartGameData;
-class ActionChatMessageData;
-class ActionDrawCardData;
-class ActionPlayCardData;
-class ActionUseAbilityData;
-class ActionEndTurnData;
-class ActionPassData;
-class ActionDiscardData;
-
 typedef QSharedPointer<ActionData> ActionDataPtr;
-typedef QSharedPointer<ActionCreateGameData> ActionCreateGameDataPtr;
-typedef QSharedPointer<ActionJoinGameData> ActionJoinGameDataPtr;
-typedef QSharedPointer<ActionLeaveGameData> ActionLeaveGameDataPtr;
-typedef QSharedPointer<ActionStartGameData> ActionStartGameDataPtr;
-typedef QSharedPointer<ActionChatMessageData> ActionChatMessageDataPtr;
-typedef QSharedPointer<ActionDrawCardData> ActionDrawCardDataPtr;
-typedef QSharedPointer<ActionPlayCardData> ActionPlayCardDataPtr;
-typedef QSharedPointer<ActionUseAbilityData> ActionUseAbilityDataPtr;
-typedef QSharedPointer<ActionEndTurnData> ActionEndTurnDataPtr;
-typedef QSharedPointer<ActionPassData> ActionPassDataPtr;
-typedef QSharedPointer<ActionDiscardData> ActionDiscardDataPtr;
+
+#define STRUCT_BEGIN(ACTION_NAME, UNUSED) class Action##ACTION_NAME##Data; \
+typedef QSharedPointer<Action##ACTION_NAME##Data> Action##ACTION_NAME##DataPtr;
+#define STRUCT_MBR_INIT(X,Y)
+#define STRUCT_BODY
+#define STRUCT_MBR_SIMPLE(X,Y,Z)
+#define STRUCT_MBR_COMPLEX(X,Y,Z)
+#define STRUCT_MBR_COMPLEX_BEGIN
+#define STRUCT_MBR_COMPLEX_END
+#define STRUCT_END
+
+XMACRO_ACTIONS
+
+#undef STRUCT_BEGIN
+#undef STRUCT_MBR_INIT
+#undef STRUCT_BODY
+#undef STRUCT_MBR_SIMPLE
+#undef STRUCT_MBR_COMPLEX
+#undef STRUCT_MBR_COMPLEX_BEGIN
+#undef STRUCT_MBR_COMPLEX_END
+#undef STRUCT_END
 
 ///////////////////////////////////////////////////
 // queries.h forward declarations & typedefs

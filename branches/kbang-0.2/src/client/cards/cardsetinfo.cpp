@@ -30,11 +30,10 @@
 
 using namespace client;
 
-CardSetInfo::CardSetInfo(QDir dir):
+CardSetInfo::CardSetInfo(const QDir& dir):
         m_isLocal(1),
         m_dir(dir)
 {
-    DEBUG_BLOCK;
     if (!m_dir.exists()) {
         qWarning("Cannot create CardSetInfo. Directory '%s' does not exist.",
                  qPrintable(dir.absolutePath()));
@@ -64,7 +63,7 @@ CardSetInfo::CardSetInfo(QDir dir):
     cardsetFile.close();
 
     QDomElement docElem = doc.documentElement();
-    m_id = docElem.attribute("id");     ///@todo change cardsets
+    m_id = docElem.attribute("id");
     m_name = docElem.attribute("name");
     m_slotId = docElem.attribute("slot");
     {
@@ -83,13 +82,5 @@ CardSetInfo::CardSetInfo(QDir dir):
         m_renderSignsPosition.setY(splits[1].toInt());
     }
     CardSetManager::instance().addKnownSlot(m_slotId);
-}
-
-QString CardSetInfo::slotId() const {
-    return m_slotId;
-}
-
-QString CardSetInfo::cardSetFilePath() const {
-    return m_cardSetFilePath;
 }
 

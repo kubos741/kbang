@@ -35,7 +35,7 @@ class ServerConnection::QueryHandler: public QueryResultHandler {
 public:
     QueryHandler(ServerConnection* s): mp_s(s) {}
     virtual void resultReceived(const GameStructPtr& data) {
-        if (data->t() == GameStruct::ServerInfoType) {
+        if (data->t() == GameStruct::ServerInfoDataType) {
             *(mp_s->mp_serverInfo) = *data.staticCast<ServerInfoData>();
         }
     }

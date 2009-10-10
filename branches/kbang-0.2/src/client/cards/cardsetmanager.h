@@ -54,7 +54,7 @@ public:
     QStringList knownSlots() {
         return m_knownSlots;
     }
-  
+
     static QString slotDisplayName(const QString&);
 
     /**
@@ -67,16 +67,16 @@ public:
     inline QMap<QString, QString> selectedCardsets() const {
         return m_selectedCardSets;
     }
-    
+
     /**
      * Returns the list of card sets that can be downloaded from server.
      */
     inline QList<CardSetInfoData> remoteCardSets() const {
         return m_remoteCardSets;
     }
-    
+
     void updateRemoteCardSets(const CardSetInfoListData&);
-    
+
     void updateSelectedCardsets(QMap<QString, QString> selectedCardsets);
 
 private:

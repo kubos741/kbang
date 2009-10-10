@@ -118,7 +118,7 @@ public:
 
 private:
     struct Graphics {
-        Graphics(): rankFrom(2), rankTo(14), suit(SUIT_INVALID) {}
+        Graphics(): rankFrom(RANK_2), rankTo(RANK_A), suit(SUIT_INVALID) {}
         CardRank rankFrom, rankTo;  ///< rank range
         CardSuit suit;              ///< suit
         bool     renderSigns;

@@ -50,7 +50,7 @@ void GameEventParser::write(QXmlStreamWriter* w, GameEventDataPtr e)
     while (it.hasNext()) {
         it.next();
         w->writeStartElement(GameEventData::cardMeaningToString(it.key()));
-        GameStructParser::writeCard(w, it.value());
+        GameStructParser::write(w, it.value());
         w->writeEndElement();
     }
     foreach (GameEventCmdDataPtr CmdData, e->cmds) {
@@ -77,7 +77,7 @@ GameEventDataPtr GameEventParser::read(XmlNode* node)
     foreach (XmlNode* CmdData, node->getChildren()) {
         cardMeaning = GameEventData::stringToCardMeaning(CmdData->name());
          if (cardMeaning != GameEventData::NoCard) {
-             GameStructParser::readCard(CmdData, e->cards[cardMeaning]);
+             GameStructParser::read(CmdData, e->cards[cardMeaning]);
          } else {
              e->cmds.append(readCmdData(CmdData));
          }
@@ -121,14 +121,10 @@ GameEventParser::writeCardMovementCmdData(QXmlStreamWriter* writer, CardMovement
         writer->writeAttribute("player-to", intToString(a->playerTo));
     }
     if (a->card.id != 0) {
-        writer->writeStartElement("card");
-        GameStructParser::writeCard(writer, a->card);
-        writer->writeEndElement();
+        GameStructParser::write(writer, a->card, "card");
     }
     if (a->secondCard.id != 0) {
-        writer->writeStartElement("second-card");
-        GameStructParser::writeCard(writer, a->secondCard);
-        writer->writeEndElement();
+        GameStructParser::write(writer, a->secondCard, "second-card");
     }
     writer->writeEndElement();
 }
@@ -215,9 +211,9 @@ GameEventCmdDataPtr GameEventParser::readCardMovementCmdData(XmlNode* node)
     a->playerTo       = stringToInt(node->attribute("player-to"));
     foreach(XmlNode* child, node->getChildren()) {
         if (child->name() == "card") {
-            GameStructParser::readCard(child, a->card);
+            GameStructParser::read(child, a->card);
         } else if (child->name() == "second-card") {
-            GameStructParser::readCard(child, a->secondCard);
+            GameStructParser::read(child, a->secondCard);
         }
     }
     return a;

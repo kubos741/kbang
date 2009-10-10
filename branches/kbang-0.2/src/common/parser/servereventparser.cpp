@@ -80,21 +80,19 @@ void ServerEventParser::writeEnterGame(QXmlStreamWriter* w, EnterGameEventDataPt
     ///@todo last-event-id
     w->writeStartElement("players");
     foreach (const PublicPlayerData& p, g.players) {
-        GameStructParser::writePublicPlayer(w, p);
+        GameStructParser::write(w, p);
     }
-    GameStructParser::writePrivatePlayer(w, g.localPlayer);
+    GameStructParser::write(w, g.localPlayer);
     w->writeEndElement();
-    GameStructParser::writeGameContext(w, g.gameContext);
+    GameStructParser::write(w, g.gameContext);
 
     w->writeStartElement("graveyard");
-    GameStructParser::writeCard(w, g.graveyard);
+    GameStructParser::write(w, g.graveyard);
     w->writeEndElement();
 
     w->writeStartElement("selection");
     foreach (const CardData& c, g.selection) {
-        w->writeStartElement("card");
-        GameStructParser::writeCard(w, c);;
-        w->writeEndElement();
+        GameStructParser::write(w, c, "card");;
     }
     w->writeEndElement();
     w->writeEndElement();
@@ -113,20 +111,20 @@ ServerEventDataPtr ServerEventParser::readEnterGame(XmlNode* node)
             foreach (XmlNode* plr, child->getChildren()) {
                 if (plr->name() == "public-player") {
                     PublicPlayerData playerData;
-                    GameStructParser::readPublicPlayer(plr, playerData);
+                    GameStructParser::read(plr, playerData);
                     g.players.append(playerData);
                 } else if (plr->name() == "private-player") {
-                    GameStructParser::readPrivatePlayer(plr, g.localPlayer);
+                    GameStructParser::read(plr, g.localPlayer);
                 }
             }
         } else if (child->name() == "game-context") {
-            GameStructParser::readGameContext(child, g.gameContext);
+            GameStructParser::read(child, g.gameContext);
         } else if (child->name() == "graveyard") {
-            GameStructParser::readCard(child, g.graveyard);
+            GameStructParser::read(child, g.graveyard);
         } else if (child->name() == "selection") {
             foreach (XmlNode* crd, child->getChildren()) {
                 CardData cardData;
-                GameStructParser::readCard(crd, cardData);
+                GameStructParser::read(crd, cardData);
                 g.selection.append(cardData);
             }
         }
@@ -153,7 +151,7 @@ void ServerEventParser::writeCreatePlayer(QXmlStreamWriter* w, CreatePlayerEvent
 {
     w->writeStartElement("create-player");
     w->writeAttribute("game-id", intToString(e->gameId));
-    GameStructParser::writePublicPlayer(w, e->publicPlayerData);
+    GameStructParser::write(w, e->publicPlayerData);
     w->writeEndElement();
 }
 

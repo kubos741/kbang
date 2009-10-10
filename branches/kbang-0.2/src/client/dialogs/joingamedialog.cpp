@@ -35,7 +35,7 @@ class QueryHandler: public QueryResultHandler
 public:
     QueryHandler(JoinGameDialog* s): mp_s(s) {}
     virtual void resultReceived(const GameStructPtr& data) {
-        if (data->t() == GameStruct::GameInfoListType) {
+        if (data->t() == GameStruct::GameInfoListDataType) {
             mp_s->setGameList(*data.staticCast<GameInfoListData>());
         }
     }

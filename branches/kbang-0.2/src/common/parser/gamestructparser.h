@@ -31,46 +31,85 @@
 #include "xmlnode.h"
 #include <QXmlStreamWriter>
 
+/*[[[cog
+import cog
+from gamestructdefs import *
+]]]
+[[[end]]]*/
+
 class GameStructParser
 {
 public:
-    static QString elementName(GameStruct::Type);
-
     static void write(QXmlStreamWriter*, const GameStruct&);
     static GameStruct* read(XmlNode*);
 
-    static void writeServerInfo(QXmlStreamWriter*, const ServerInfoData&);
-    static void readServerInfo(XmlNode*, ServerInfoData&);
+    /*[[[cog
+    for s in GameStructs:
+        cog.outl("static void write(QXmlStreamWriter*, const %(structName)s&, const char* elemName = 0);" % s)
+        cog.outl("static void read(XmlNode*, %(structName)s&);" % s)
+        cog.outl("");
+    ]]]*/
+    static void write(QXmlStreamWriter*, const ServerInfoData&, const char* elemName = 0);
+    static void read(XmlNode*, ServerInfoData&);
 
-    static void writePlayerInfo(QXmlStreamWriter*, const PlayerInfoData&);
-    static void readPlayerInfo(XmlNode*, PlayerInfoData&);
+    static void write(QXmlStreamWriter*, const PlayerInfoData&, const char* elemName = 0);
+    static void read(XmlNode*, PlayerInfoData&);
 
-    static void writeGameInfo(QXmlStreamWriter*, const GameInfoData&);
-    static void readGameInfo(XmlNode*, GameInfoData&);
+    static void write(QXmlStreamWriter*, const PlayerInfoListData&, const char* elemName = 0);
+    static void read(XmlNode*, PlayerInfoListData&);
 
-    static void writeCardSetInfo(QXmlStreamWriter*, const CardSetInfoData&);
-    static void readCardSetInfo(XmlNode*, CardSetInfoData&);
+    static void write(QXmlStreamWriter*, const GameInfoData&, const char* elemName = 0);
+    static void read(XmlNode*, GameInfoData&);
 
-    static void writeCreatePlayer(QXmlStreamWriter*, const CreatePlayerData&);
-    static void readCreatePlayer(XmlNode*, CreatePlayerData&);
+    static void write(QXmlStreamWriter*, const GameInfoListData&, const char* elemName = 0);
+    static void read(XmlNode*, GameInfoListData&);
 
-    static void writeCreateGame(QXmlStreamWriter*, const CreateGameData&);
-    static void readCreateGame(XmlNode*, CreateGameData&);
+    static void write(QXmlStreamWriter*, const UrlListData&, const char* elemName = 0);
+    static void read(XmlNode*, UrlListData&);
 
-    static void writeCard(QXmlStreamWriter*, const CardData&);
-    static void readCard(XmlNode*, CardData&);
+    static void write(QXmlStreamWriter*, const CardSetInfoData&, const char* elemName = 0);
+    static void read(XmlNode*, CardSetInfoData&);
 
-    static void writePublicPlayer(QXmlStreamWriter*, const PublicPlayerData&);
-    static void readPublicPlayer(XmlNode*, PublicPlayerData&);
+    static void write(QXmlStreamWriter*, const CardSetInfoListData&, const char* elemName = 0);
+    static void read(XmlNode*, CardSetInfoListData&);
 
-    static void writePrivatePlayer(QXmlStreamWriter*, const PrivatePlayerData&);
-    static void readPrivatePlayer(XmlNode*, PrivatePlayerData&);
+    static void write(QXmlStreamWriter*, const CreatePlayerData&, const char* elemName = 0);
+    static void read(XmlNode*, CreatePlayerData&);
 
-    static void writeGameContext(QXmlStreamWriter*, const GameContextData&);
-    static void readGameContext(XmlNode*, GameContextData&);
+    static void write(QXmlStreamWriter*, const CreateGameData&, const char* elemName = 0);
+    static void read(XmlNode*, CreateGameData&);
 
-    static void writeGameSync(QXmlStreamWriter*, const GameSyncData&);
-    static void readGameSync(XmlNode*, GameSyncData&);
+    static void write(QXmlStreamWriter*, const CardData&, const char* elemName = 0);
+    static void read(XmlNode*, CardData&);
+
+    static void write(QXmlStreamWriter*, const CardListData&, const char* elemName = 0);
+    static void read(XmlNode*, CardListData&);
+
+    static void write(QXmlStreamWriter*, const PublicPlayerData&, const char* elemName = 0);
+    static void read(XmlNode*, PublicPlayerData&);
+
+    static void write(QXmlStreamWriter*, const PublicPlayerListData&, const char* elemName = 0);
+    static void read(XmlNode*, PublicPlayerListData&);
+
+    static void write(QXmlStreamWriter*, const PrivatePlayerData&, const char* elemName = 0);
+    static void read(XmlNode*, PrivatePlayerData&);
+
+    static void write(QXmlStreamWriter*, const GameContextData&, const char* elemName = 0);
+    static void read(XmlNode*, GameContextData&);
+
+    static void write(QXmlStreamWriter*, const GameSyncData&, const char* elemName = 0);
+    static void read(XmlNode*, GameSyncData&);
+
+    static void write(QXmlStreamWriter*, const CardIdListData&, const char* elemName = 0);
+    static void read(XmlNode*, CardIdListData&);
+
+    //[[[end]]]
+
+    static void write(QXmlStreamWriter*, const QByteArray&, const char* elemName);
+    static void read(XmlNode*, QByteArray&);
+
+    static void write(QXmlStreamWriter*, const QMap<QString, QVariant>&, const char* elemName);
+    static void read(XmlNode*, QMap<QString, QVariant>&);
 };
 
 #endif // GAMESTRUCTPARSER_H
