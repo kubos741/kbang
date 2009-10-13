@@ -26,6 +26,7 @@
 #include <QList>
 #include <QQueue>
 #include <QPushButton>
+#include <QSound>
 #include "parser/parserstructs.h"
 #include "common.h"
 #include "playerwidget.h"

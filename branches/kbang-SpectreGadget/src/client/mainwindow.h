@@ -56,11 +56,17 @@ public slots:
 
     void serverConnectionStatusChanged();
 
+signals:
+    void connectToServer(QString serverHost, int serverPort);
+
 private:
     void createMenu();
     void createActions();
     void createWidgets();
     void updateActions();
+    QAction *cutAct;
+    QAction *copyAct;
+    QAction *pasteAct;
 
     ConnectToServerDialog* mp_connectToServerDialog;
     CreateGameDialog*      mp_createGameDialog;
@@ -70,7 +76,7 @@ private:
     Game*                  mp_game;
     QList<OpponentWidget*> m_opponentWidgets;
     CardWidgetSizeManager* mp_cardWidgetSizeManager;
-
+    QImage*                mp_background;
 
 };
 }

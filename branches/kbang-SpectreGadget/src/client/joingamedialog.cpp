@@ -27,6 +27,7 @@ c *   (at your option) any later version.                                   *
 #include "parser/queryget.h"
 #include "util.h"
 #include "config.h"
+#include "common.h"
 
 using namespace client;
 
@@ -39,7 +40,6 @@ JoinGameDialog::JoinGameDialog(QWidget *parent, ServerConnection* serverConnecti
     setupUi(this);
     connect(pushButtonRefresh, SIGNAL(clicked()),
             this, SLOT(refreshGameList()));
-
     connect(lineEditPlayerName, SIGNAL(textChanged(QString)),
             this, SLOT(setButtonsState()));
     //playerListView->header()->setResizeMode(0, QHeaderView::Stretch);
@@ -78,7 +78,6 @@ QString gameState(GameState g)
     return "";
 }
 
-
 void setGameItem(const GameInfoData& gameInfo, QTreeWidgetItem* item)
 {
     item->setData(0, Qt::UserRole, gameInfo.id);
@@ -100,8 +99,6 @@ void setGameItem(const GameInfoData& gameInfo, QTreeWidgetItem* item)
             NOT_REACHED();
     }
 }
-
-
 
 void JoinGameDialog::updateGameListView()
 {
@@ -134,6 +131,8 @@ void JoinGameDialog::updateGameListView()
     }
     if (!isCurrentGameInList)
         m_currentGameId = 0;
+    gameListView->sortByColumn(1);
+    gameListView->sortColumn();
     setButtonsState();
 }
 
@@ -175,7 +174,7 @@ void JoinGameDialog::updateGameView()
         item->setData(0, Qt::UserRole, p.id);
         if (p.id == m_currentPlayerId)
             playerListView->setCurrentItem(item);
-        item->setText(0, p.name);
+        item->setText(0, removeHTMLtags(p.name));
         if (p.hasController) {
             item->setIcon(1, QIcon(":/icons/connect.png"));
             item->setData(1, Qt::ToolTipRole, tr("Connected"));

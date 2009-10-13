@@ -1,6 +1,10 @@
 #include "gamemessageevent.h"
 #include "game.h"
 #include "card.h"
+#include "config.h"
+#include "common.h"
+
+#include <QSound>
 
 using namespace client;
 
@@ -24,6 +28,7 @@ void GameMessageEvent::run()
     switch(m_gameMessage.type) {
     case GAMEMESSAGE_GAMESTARTED:
         mp_game->setGameState(GAMESTATE_PLAYING);
+       QSound::play(Config::dataPathString() + "sounds/gamestart.wav");
         msg = tr("The game has just started.");
         break;
     case GAMEMESSAGE_GAMEFINISHED:
@@ -85,8 +90,11 @@ void GameMessageEvent::run()
                     arg(cardToString(m_gameMessage.card));
         if (m_gameMessage.checkResult)
             msg += tr("was lucky.");
-        else
+        else {
             msg += tr("failed.");
+            if(QString(cardToString(m_gameMessage.card)).contains("Dinamite"))
+                QSound::play(Config::dataPathString() + "sounds/dynamite.wav");
+        }
         break;
     case GAMEMESSAGE_PLAYERSTEALCARD:
         msg = tr("%1 drew %2 from %3.").
@@ -101,18 +109,19 @@ void GameMessageEvent::run()
                     arg(decoratePlayerName(targetPlayerName, 1));
         break;
     case GAMEMESSAGE_DECKREGENERATE:
+        QSound::play(Config::dataPathString() + "sounds/shuffle.wav");
         msg = tr("The deck ran out of cards. Cards from the discard pile were shuffled and are now used as new deck.");
         break;
     case GAMEMESSAGE_PLAYERDIED:
-        msg = tr("%1 passed away. R.I.P.").
-                    arg(decoratePlayerName(playerName));
+        QSound::play(Config::dataPathString() + "sounds/death.wav");
+        msg = tr("%1 passed away. R.I.P.").arg(decoratePlayerName(playerName));
         break;
     case GAMEMESSAGE_INVALID:
         break;
     }
     if (!msg.isEmpty())
         mp_game->sendLogMessage(msg);
-    qDebug() << msg;
+    //qDebug() << msg;
     GameEvent::finish();
 }
 
@@ -157,5 +166,5 @@ QString GameMessageEvent::cardListWidgetToString(QList<CardData> cardListWidget)
 QString GameMessageEvent::decoratePlayerName(const QString& playerName, bool isTarget)
 {
     return QString("<font color=\"%2\"><b>%1</b></font>").
-                  arg(playerName).arg(isTarget ? "navy" : "lightblue");
+                  arg(removeHTMLtags(playerName)).arg(isTarget ? "navy" : "lightblue");
 }
