@@ -37,3 +37,10 @@ QString randomToken(int minLength, int maxLength)
     token[length - 1] = '\0';
     return QString(token);
 }
+
+QString removeHTMLtags(QString textToSearch)
+{
+    QRegExp RegX("<[a-zA-Z\\/][^>]*>", Qt::CaseInsensitive, QRegExp::RegExp2);
+    //qDebug(qPrintable(QString(" before=%1\n after =%2").arg(textToSearch).arg(textToSearch.replace(RegX, ""))));
+    return QString(textToSearch.replace(RegX, ""));
+}

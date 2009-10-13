@@ -49,7 +49,7 @@ MainWindow::MainWindow():
     setupUi(this);
     setStyleSheet(styleSheet() + "\n"
         "#mp_centralWidget {\n"
-        "   background-image: url(\"" + Config::dataPathString() + "gfx/misc/bang-artwork.png\");\n"
+        "   background-image: url(\"" + Config::dataPathString() + "gfx/misc/background.png\");\n"
         "}\n\n");
     Card::loadDefaultRuleset();
     mp_cardWidgetSizeManager = new CardWidgetSizeManager(this);
@@ -65,8 +65,26 @@ MainWindow::MainWindow():
             this,                SLOT(enterGameMode(int, const QString&, ClientType)));
     connect(&m_serverConnection, SIGNAL(exitGameMode()),
             this,                SLOT(exitGameMode()));
-}
 
+    // Connect to alderan.cz as a default server
+    connect(this, SIGNAL(connectToServer(QString, int)),
+        &m_serverConnection, SLOT(connectToServer(QString, int)));
+
+    Config& cfg = Config::instance();
+    cfg.refresh();
+
+    // Get the default translation language
+    emit mp_chatWidget->setLanguage(cfg.readString("options","translate-to"));
+
+    // If there is only one server, then connect to it.  Otherwise, show the connecttoserver dialog
+    QStringList hosts = cfg.readStringList("server-list", "hostname");
+    QList<int>  ports = cfg.readIntList("server-list", "port");
+    int n = hosts.size() < ports.size() ? hosts.size() : ports.size();
+    if ( n == 1 )
+        emit connectToServer(hosts[0], ports[0]);
+    else
+        MainWindow::showConnectToServerDialog();
+}
 
 MainWindow::~MainWindow()
 {
@@ -79,6 +97,13 @@ void MainWindow::paintEvent(QPaintEvent* e)
     g.setColorAt(0, QColor(239, 215, 179));
     g.setColorAt(0.5 , QColor(211, 179, 140));
     painter.fillRect(e->rect(), g);
+
+    // place the background pic
+    //QImage background(Config::dataPathString() + "gfx/misc/background.png");
+    //background = background.scaledToHeight( background.height()*1.1, Qt::SmoothTransformation ); //.scaledToWidth( width(), Qt::SmoothTransformation );
+    //painter.drawImage( (width() - background.width())/2, (height() - background.height())/2-20, background);
+    //mp_logWidget->appendLogMessage(tr("window w=%3, h=%4").arg(background.width()).arg(background.height()));
+
     QMainWindow::paintEvent(e);
 }
 
@@ -161,6 +186,12 @@ void MainWindow::exitGameMode()
 void MainWindow::serverConnectionStatusChanged()
 {
     updateActions();
+
+    if (m_serverConnection.isConnected())
+    {
+        // Assume we want to join and show the join dialog
+        MainWindow::showJoinGameDialog();
+    }
 }
 
 
@@ -178,6 +209,12 @@ void MainWindow::createActions()
             this, SLOT(leaveGame()));
     connect(mp_actionAbout, SIGNAL(triggered()),
             this, SLOT(showAboutDialog()));
+
+    // Set up copy ability
+    //connect(mp_actionCopy, SIGNAL(triggered()),
+    //        mp_chatWidget->mp_chatView, SLOT(copy()));
+    //connect(mp_chatWidget->mp_chatView, SIGNAL(copyAvailable(bool)),
+    //        mp_actionCopy, SLOT(setEnabled(bool)));
 }
 
 

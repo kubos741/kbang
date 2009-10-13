@@ -24,17 +24,13 @@
 #include "characterwidget.h"
 #include "cardwidgetfactory.h"
 
-
 using namespace client;
-
-
 
 QTimer CharacterWidget::sm_timer;
 int    CharacterWidget::sm_countAnimaton = 0;
 
 double pixelsPerSecond =  25;
 const int timerInterval = 100;
-
 
 CharacterWidget::CharacterWidget(QWidget *parent):
         QWidget(parent),

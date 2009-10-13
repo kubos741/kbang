@@ -118,10 +118,10 @@ QPixmap Card::image(const CardSuit& suit, const CardRank& rank) const
 
 void Card::loadDefaultRuleset()
 {
-    new Card("Bang!",       CARD_BANG,       "gfx/cards/bang.png");
-    new Card("Mancato",     CARD_MISSED,     "gfx/cards/missed.png");
-    new Card("Birra",       CARD_BEER,       "gfx/cards/beer.png");
-    new Card("Saloon",      CARD_SALOON,     "gfx/cards/saloon.png");
+    new Card("Bang!",       CARD_BANG,        "gfx/cards/bang.png");
+    new Card("Mancato",     CARD_MISSED,      "gfx/cards/missed.png");
+    new Card("Birra",       CARD_BEER,        "gfx/cards/beer.png");
+    new Card("Saloon",      CARD_SALOON,      "gfx/cards/saloon.png");
     new Card("Wells Fargo", CARD_WELLSFARGO,  "gfx/cards/wellsfargo.png");
     new Card("Diligenza",   CARD_DILIGENZA,   "gfx/cards/diligenza.png");
     new Card("Emporio",     CARD_GENERALSTORE,"gfx/cards/emporio.png");
@@ -130,17 +130,17 @@ void Card::loadDefaultRuleset()
     new Card("Indiani!",    CARD_INDIANS,     "gfx/cards/indians.png");
     new Card("Duello",      CARD_DUEL,        "gfx/cards/duel.png");
     new Card("Gatling",     CARD_GATLING,     "gfx/cards/gatling.png");
-    new Card("Mustang",     CARD_MUSTANG,    "gfx/cards/mustang.png");
-    new Card("Appaloosa",   CARD_APPALOSSA,  "gfx/cards/appaloosa.png");
-    new Card("Barile",      CARD_BARREL,     "gfx/cards/barrel.png");
-    new Card("Dinamite",    CARD_DYNAMITE,   "gfx/cards/dynamite.png");
-    new Card("Prigione",    CARD_JAIL,       "gfx/cards/jail.png");
-    new Card("Volcanic",    CARD_VOLCANIC,   "gfx/cards/volcanic.png");
-    new Card("Schofield",   CARD_SCHOFIELD,  "gfx/cards/schofield.png");
-    new Card("Winchester",  CARD_WINCHESTER, "gfx/cards/winchester.png");
-    new Card("Remington",   CARD_REMINGTON,  "gfx/cards/remington.png");
-    new Card("Carabine",    CARD_CARABINE,   "gfx/cards/carabine.png");
-    new Card("",            CARD_UNKNOWN,    "gfx/cards/back-playing.png");
+    new Card("Mustang",     CARD_MUSTANG,     "gfx/cards/mustang.png");
+    new Card("Appaloosa",   CARD_APPALOSSA,   "gfx/cards/appaloosa.png");
+    new Card("Barile",      CARD_BARREL,      "gfx/cards/barrel.png");
+    new Card("Dinamite",    CARD_DYNAMITE,    "gfx/cards/dynamite.png");
+    new Card("Prigione",    CARD_JAIL,        "gfx/cards/jail.png");
+    new Card("Volcanic",    CARD_VOLCANIC,    "gfx/cards/volcanic.png");
+    new Card("Schofield",   CARD_SCHOFIELD,   "gfx/cards/schofield.png");
+    new Card("Winchester",  CARD_WINCHESTER,  "gfx/cards/winchester.png");
+    new Card("Remington",   CARD_REMINGTON,   "gfx/cards/remington.png");
+    new Card("Carabine",    CARD_CARABINE,    "gfx/cards/carabine.png");
+    new Card("",            CARD_UNKNOWN,     "gfx/cards/back-playing.png");
 
     new Card("Bart Cassidy",    CHARACTER_BART_CASSIDY,     "gfx/characters/bart-cassidy.png");
     new Card("Black Jack",      CHARACTER_BLACK_JACK,       "gfx/characters/black-jack.png");
@@ -158,14 +158,14 @@ void Card::loadDefaultRuleset()
     new Card("Suzy Lafayette",  CHARACTER_SUZY_LAFAYETTE,   "gfx/characters/suzy-lafayette.png");
     new Card("Vulture Sam",     CHARACTER_VULTURE_SAM,      "gfx/characters/vulture-sam.png");
     new Card("Willy the Kid",   CHARACTER_WILLY_THE_KID,    "gfx/characters/willy-the-kid.png");
-    new Card("",                CHARACTER_UNKNOWN,          "gfx/cards/back-character.png");
+    new Card("",                CHARACTER_UNKNOWN,          "gfx/characters/back-character.png");
 
 
-    new Card("Sheriff",  ROLE_SHERIFF,    "gfx/cards/sheriff.png");
-    new Card("Renegade", ROLE_RENEGADE,   "gfx/cards/renegade.png");
-    new Card("Outlaw",   ROLE_OUTLAW,     "gfx/cards/outlaw.png");
-    new Card("Deputy",   ROLE_DEPUTY,     "gfx/cards/deputy.png");
-    new Card("",         ROLE_UNKNOWN,    "gfx/cards/back-role.png");
+    new Card("Sheriff",  ROLE_SHERIFF,  "gfx/roles/sheriff.png");
+    new Card("Renegade", ROLE_RENEGADE, "gfx/roles/renegade.png");
+    new Card("Outlaw",   ROLE_OUTLAW,   "gfx/roles/outlaw.png");
+    new Card("Deputy",   ROLE_DEPUTY,   "gfx/roles/deputy.png");
+    new Card("",         ROLE_UNKNOWN,  "gfx/roles/back-role.png");
 }
 
 

@@ -27,9 +27,11 @@
 #include "deckwidget.h"
 #include "graveyardwidget.h"
 #include "cardwidgetsizemanager.h"
+#include "config.h"
 
 #include <QtDebug>
 #include <QBoxLayout>
+#include <QSound>
 
 using namespace client;
 
@@ -126,35 +128,40 @@ void Game::setGameContext(const GameContextData& gameContextData)
         return;
     }
 
-
-
     if (gamePlayState() == GAMEPLAYSTATE_RESPONSE) {
         PlayerWidget* causedBy = gameContextData.causedBy ? playerWidget(gameContextData.causedBy) : 0;
         QString causedByName = causedBy ? causedBy->name() : "";
         QString message;
         switch(gameContextData.reactionType) {
         case REACTION_BANG:
+            QSound::play(Config::dataPathString() + "sounds/colt45.wav");
             message = tr("<i>%1</i> played Bang! on you!").arg(causedByName);
             break;
         case REACTION_DUEL:
+            QSound::play(Config::dataPathString() + "sounds/clockchime.wav");
             message = tr("You are in duel with <i>%1</i>.").arg(causedByName);
             break;
         case REACTION_GATLING:
+            QSound::play(Config::dataPathString() + "sounds/gatling.wav");
             message = tr("<i>%1</i> played Gatling.").arg(causedByName);
             break;
         case REACTION_GENERALSTORE:
+            QSound::play(Config::dataPathString() + "sounds/cashregister.wav");
             message = tr("Shopping time. Please pick a card.").arg(causedByName);
             break;
         case REACTION_INDIANS:
+            QSound::play(Config::dataPathString() + "sounds/indianwardrums.wav");
             message = tr("The Indians lead by <i>%1</i> are in town.").arg(causedByName);
             break;
         case REACTION_LASTSAVE:
             message = tr("You've just got the fatal shot. Ya have beer?");
             break;
         case REACTION_KITCARLSON:
+            QSound::play(Config::dataPathString() + "sounds/triangle.wav");
             message = tr("Pick two cards from selection.");
             break;
         case REACTION_LUCKYDUKE:
+            QSound::play(Config::dataPathString() + "sounds/triangle.wav");
             message = tr("Feelin' lucky? Pick a card to respond with.");
             break;
         case REACTION_NONE:
@@ -162,6 +169,7 @@ void Game::setGameContext(const GameContextData& gameContextData)
         }
         setTextInfo(message);
     } else if (gamePlayState() == GAMEPLAYSTATE_DRAW) {
+        QSound::play(Config::dataPathString() + "sounds/cockgun.wav");
         setTextInfo(tr("It's your turn. Good luck!"));
     } else if (gamePlayState() == GAMEPLAYSTATE_DISCARD) {
         setTextInfo(tr("You need to discard some cards!"));
@@ -343,6 +351,9 @@ void Game::playerJoinedGame(const PublicPlayerData& player)
             w->setFromPublicData(player);
             m_players[player.id] = w;
             break;
+        }
+        else {
+            QSound::play(Config::dataPathString() + "sounds/triangle.wav");
         }
     }
     if (i == m_opponentWidgets.count()) {

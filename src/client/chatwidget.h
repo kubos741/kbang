@@ -21,6 +21,7 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
+#include <QtNetwork>
 #include "ui_chatwidget.h"
 
 namespace client
@@ -38,9 +39,22 @@ public:
     virtual void paintEvent(QPaintEvent* event);
     void clear();
 
+private:
+    QHttp *httpRequest;
+    void copy();
+    QString mp_destinationLanguage;
+    QString mp_destinationLanguageFull;
+    QSet<QString> languageSetShort;
+    QSet<QString> languageSetLong;
+    QMap<QString,QString> languageMap;
+    QMap<int,QString> translateTrack;
+    int translateCounter;
+
 public slots:
     void incomingMessage(int senderId, const QString& senderName, const QString& message);
     void sendMessage();
+    void httpDone();
+    void setLanguage(QString mp_destinationLanguage);
 
 signals:
     void outgoingMessage(const QString& message);

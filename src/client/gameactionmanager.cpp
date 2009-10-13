@@ -14,8 +14,6 @@ GameActionManager::GameActionManager(Game* game):
 {
 }
 
-
-
 bool GameActionManager::isClickable(CardWidget*)
 {
     return 1;

@@ -25,6 +25,8 @@
 #include <QList>
 #include <QLabel>
 
+QString removeHTMLtags(QString textToSearch);
+
 class QGridLayout;
 
 namespace client

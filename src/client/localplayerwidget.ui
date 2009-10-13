@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>354</width>
-    <height>209</height>
+    <height>225</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -162,8 +162,8 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
          </property>
          <property name="iconSize">
           <size>
-           <width>28</width>
-           <height>28</height>
+           <width>33</width>
+           <height>33</height>
           </size>
          </property>
         </widget>
@@ -179,8 +179,8 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
          </property>
          <property name="iconSize">
           <size>
-           <width>28</width>
-           <height>28</height>
+           <width>33</width>
+           <height>33</height>
           </size>
          </property>
         </widget>
@@ -196,8 +196,8 @@ font: oblique 7pt &quot;DejaVu Sans&quot;;</string>
          </property>
          <property name="iconSize">
           <size>
-           <width>28</width>
-           <height>28</height>
+           <width>33</width>
+           <height>33</height>
           </size>
          </property>
          <property name="checkable">

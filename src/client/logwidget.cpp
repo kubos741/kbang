@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "logwidget.h"
+#include "common.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -29,6 +30,13 @@ LogWidget::LogWidget(QWidget *parent)
 {
     setupUi(this);
     mp_xmlView->setFontPointSize(8);
+    #ifdef Q_WS_MAC
+        mp_tabWidget->setStyleSheet("margin-top: 5px;");
+    #endif
+    #ifndef Q_WS_MAC
+        mp_tabWidget->setStyleSheet("margin-top: 0px;");
+    #endif
+    qDebug(qPrintable(QString("styleSheet=%1").arg(QString(mp_tabWidget->styleSheet()))));  //   ->setContentsMargins( 0, -20, 0, 0);
 }
 
 

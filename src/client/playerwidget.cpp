@@ -27,7 +27,7 @@
 
 #include <QPainter>
 #include <QMouseEvent>
-
+#include <QSound>
 
 using namespace client;
 
@@ -96,7 +96,7 @@ void PlayerWidget::setRequested(bool isRequested)
 
 void PlayerWidget::setFromPublicData(const PublicPlayerData& publicPlayerData)
 {
-    qDebug() << this << "setFromPublicData()";
+//    qDebug() << this << "setFromPublicData()";
     m_id            = publicPlayerData.id;
     m_name          = publicPlayerData.name;
     m_hasController = publicPlayerData.hasController;
@@ -235,7 +235,7 @@ void PlayerWidget::updateAvatarLabel()
 void PlayerWidget::createWinnerIcon()
 {
     Q_ASSERT(mp_winnerIcon == 0);
-    QPixmap winnerPixmap(Config::dataPathString() + "gfx/misc/winner-sign.png");
+    QPixmap winnerPixmap(":/misc/winner-sign.png");
     mp_winnerIcon = new QLabel(this);
     mp_winnerIcon->setPixmap(winnerPixmap);
     mp_winnerIcon->resize(winnerPixmap.size());
@@ -244,14 +244,17 @@ void PlayerWidget::createWinnerIcon()
 
 void PlayerWidget::updateWinnerIcon()
 {
-    if (m_isWinner && mp_game && mp_game->isFinished()) {
+   if (m_isWinner && mp_game && mp_game->isFinished()) {
         if (mp_winnerIcon == 0) {
             createWinnerIcon();
         }
         moveWinnerIcon();
         mp_winnerIcon->show();
         mp_winnerIcon->raise();
-    } else {
+        // QSound::play(Config::dataPathString() + "sounds/yahoo.wav");
+   } else if (mp_game->isFinished()) {
+        // QSound::play(Config::dataPathString() + "sounds/awwww.wav");
+   } else {
         if (mp_winnerIcon) {
             mp_winnerIcon->hide();
         }

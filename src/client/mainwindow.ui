@@ -17,7 +17,7 @@
    <string>KBang Client</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/client.qrc">
+   <iconset>
     <normaloff>:/icons/kbang.png</normaloff>:/icons/kbang.png</iconset>
   </property>
   <property name="autoFillBackground">
@@ -30,6 +30,9 @@
 	background-repeat: no-repeat;
 
 }</string>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="mp_centralWidget">
    <property name="autoFillBackground">
@@ -651,7 +654,7 @@
      <x>0</x>
      <y>0</y>
      <width>388</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -686,10 +689,16 @@
    <property name="text">
     <string>&amp;Connect to Server</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="mp_actionExit">
    <property name="text">
     <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
    </property>
   </action>
   <action name="mp_actionDisconnectFromServer">
@@ -700,25 +709,40 @@
    <property name="text">
     <string>&amp;Disconnect from Server</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
   <action name="mp_actionJoinGame">
    <property name="text">
     <string>&amp;Join Game</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
    </property>
   </action>
   <action name="mp_actionLeaveGame">
    <property name="text">
     <string>&amp;Leave Game</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionCreateGame">
    <property name="text">
     <string>C&amp;reate Game</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="mp_actionAbout">
    <property name="text">
     <string>&amp;About KBang</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>
