@@ -1,5 +1,4 @@
 #summary This is the user manual of the SVN trunk version of KBang
-#labels Featured
 
 = Introduction =
 KBang is a [http://en.wikipedia.org/wiki/Cross-platform cross-platform] [http://en.wikipedia.org/wiki/Open_source open source] implementation of [http://en.wikipedia.org/wiki/Bang! Bang!], the card game designed by Emiliano Sciarra. The goal of this project is to allow Bang! enthusiasts play the game online with another folks from around the world.
