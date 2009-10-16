@@ -1,5 +1,4 @@
 #summary Screenshots of KBang.
-#labels Featured
 
 = Screenshots from KBang 0.1.3 =
 
